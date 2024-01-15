@@ -1,14 +1,21 @@
 pluginManagement {
-    repositories {
-        google {
-            content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
+    resolutionStrategy {
+        eachPlugin {
+            when (requested.id.id) {
+                "androidx.navigation" -> {
+                    useModule("androidx.navigation:navigation-safe-args-gradle-plugin:2.7.6")
+                }
+                "dagger.hilt.android.plugin" -> {
+                    useModule("com.google.dagger:hilt-android-gradle-plugin:2.46")
+                }
             }
         }
-        mavenCentral()
+    }
+
+    repositories {
         gradlePluginPortal()
+        google()
+        mavenCentral()
     }
 }
 dependencyResolutionManagement {
@@ -21,3 +28,8 @@ dependencyResolutionManagement {
 
 rootProject.name = "Hobby Matchmaker"
 include(":app")
+include(":auth")
+include(":core")
+include(":core:network")
+include(":core:model")
+include(":core:di")
