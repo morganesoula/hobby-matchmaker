@@ -49,11 +49,13 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.0"
+        kotlinCompilerExtensionVersion = "1.5.8"
     }
+}
 
-    packaging {
-        resources.excludes.add("**/*")
+androidComponents {
+    onVariants(selector().withBuildType("release")) {
+        it.packaging.resources.excludes.add(("META-INF/**"))
     }
 }
 

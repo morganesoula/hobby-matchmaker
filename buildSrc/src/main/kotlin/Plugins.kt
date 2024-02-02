@@ -10,7 +10,7 @@ object Plugins {
 }
 
 object PluginVersion {
-    const val AGP = "8.3.0-alpha18"
+    const val AGP = "8.2.1"
     const val GServices = "4.4.0"
     const val Navigation = "2.7.6"
 }

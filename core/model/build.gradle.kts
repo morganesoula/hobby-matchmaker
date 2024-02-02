@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         minSdk = AndroidConfig.MIN_SDK
-        targetSdk = AndroidConfig.TARGET_SDK
+        testOptions.targetSdk = AndroidConfig.TARGET_SDK
 
         testInstrumentationRunner = AndroidConfig.TEST_INSTRUMENTATION_RUNNER
     }
@@ -37,9 +37,11 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17.toString()
     }
+}
 
-    packaging {
-        resources.excludes.add("**/*")
+androidComponents {
+    onVariants(selector().withBuildType("release")) {
+        it.packaging.resources.excludes.add(("META-INF/**"))
     }
 }
 

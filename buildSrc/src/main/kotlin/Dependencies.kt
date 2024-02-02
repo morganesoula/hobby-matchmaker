@@ -10,13 +10,10 @@ object Deps {
         private const val firebaseVersion = "32.7.0"
         const val firebaseBom = "com.google.firebase:firebase-bom:$firebaseVersion"
         const val firebaseAuth = "com.google.firebase:firebase-auth"
+        const val firebaseCoreKtx = "com.google.firebase:firebase-auth-ktx:22.3.0"
 
         private const val firebaseUiAuthVersion = "7.2.0"
         const val firebaseUiAuth = "com.firebaseui:firebase-ui-auth:$firebaseUiAuthVersion"
-    }
-
-    object Android {
-        const val material = "com.google.android.material:material:1.11.0"
     }
 
     object AndroidX {
@@ -28,8 +25,11 @@ object Deps {
         }
 
         object Compose {
-            const val material3 = "androidx.compose.material3:material3"
-            const val preview = "androidx.compose.ui:ui-tooling-preview"
+            private const val version = "1.5.4"
+
+            const val material = "androidx.compose.material:material:$version"
+            const val material3 = "androidx.compose.material3:material3:1.2.0-rc01"
+            const val preview = "androidx.compose.ui:ui-tooling:$version"
             const val uiTest = "androidx.compose.ui:ui-test-junit4"
             const val activity = "androidx.activity:activity-compose:1.8.2"
             const val viewModel = "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2"
@@ -44,7 +44,7 @@ object Deps {
         object Navigation {
             private const val version = "2.7.6"
             const val ui = "androidx.navigation:navigation-ui-ktx:$version"
-            const val commonKtx = "androidx.navigation:navigation-common-ktx:$version"
+            const val composeNavigation = "androidx.navigation:navigation-compose:$version"
         }
 
         object Room {
@@ -59,7 +59,7 @@ object Deps {
         private const val version = "2.50"
         const val hiltAndroid = "com.google.dagger:hilt-android:$version"
         const val hiltAndroidCompiler = "com.google.dagger:hilt-compiler:$version"
-        const val hiltAndroidTesting = "com.google.dagger:hilt-android-testing:$version"
+        const val hiltNavigationCompose = "androidx.hilt:hilt-navigation-compose:1.1.0"
     }
 
     object OkHttp {
@@ -89,15 +89,19 @@ object TestDeps {
         const val androidX_jUnit = "androidx.test.ext:junit-ktx:1.1.5"
         const val navigationTest = "androidx.navigation:navigation-testing:2.7.6"
     }
+    object AssertK {
+        private const val version = "0.28.0"
+        const val assertK = "com.willowtreeapps.assertk:assertk:$version"
+    }
 
     object Coroutines {
         private const val version = "1.7.3"
         const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$version"
     }
 
-    object JUnit {
-        private const val version = "4.13.2"
-        const val junit = "junit:junit:$version"
+    object Dagger {
+        private const val version = "2.50"
+        const val hiltAndroidTesting = "com.google.dagger:hilt-android-testing:$version"
     }
 
     object MockK {

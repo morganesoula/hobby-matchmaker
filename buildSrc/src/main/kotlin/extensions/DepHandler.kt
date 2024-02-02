@@ -13,11 +13,12 @@ fun DependencyHandler.appModuleDeps() {
     // Compose
     val composeBom = platform("androidx.compose:compose-bom:2023.10.01")
     implementation(composeBom)
+    implementation(Deps.AndroidX.Compose.preview)
     androidTestImplementation(composeBom)
 
+    // Core
+    implementation(Deps.AndroidX.Compose.material)
     implementation(Deps.AndroidX.Compose.material3)
-    implementation(Deps.AndroidX.Compose.preview)
-    androidTestImplementation(Deps.AndroidX.Compose.uiTest)
 
     implementation(Deps.AndroidX.Compose.activity)
     implementation(Deps.AndroidX.Compose.viewModel)
@@ -36,6 +37,7 @@ fun DependencyHandler.appModuleDeps() {
     // Hilt
     implementation(Deps.Dagger.hiltAndroid)
     implementation(Deps.Dagger.hiltAndroidCompiler)
+    implementation(Deps.Dagger.hiltNavigationCompose)
 
     // Lifecycle
     implementation(Deps.AndroidX.Lifecycle.runtime)
@@ -45,8 +47,10 @@ fun DependencyHandler.appModuleDeps() {
     implementation(project(Modules.network))
     implementation(project(Modules.di))
     implementation(project(Modules.model))
+    implementation(project(Modules.design))
+    implementation(project(Modules.navigation))
 
-    api(Deps.Android.material)
+    implementation(Deps.AndroidX.Compose.material)
     api(Deps.AndroidX.appCompat)
 
     // Navigation
@@ -58,11 +62,6 @@ fun DependencyHandler.appModuleDeps() {
 }
 
 fun DependencyHandler.authModuleDeps() {
-    // Compose
-    val composeBom = platform("androidx.compose:compose-bom:2023.10.01")
-    implementation(composeBom)
-    androidTestImplementation(composeBom)
-
     implementation(Deps.AndroidX.Compose.material3)
     implementation(Deps.AndroidX.Compose.preview)
     androidTestImplementation(Deps.AndroidX.Compose.uiTest)
@@ -70,10 +69,15 @@ fun DependencyHandler.authModuleDeps() {
     implementation(Deps.AndroidX.Compose.activity)
     implementation(Deps.AndroidX.Compose.viewModel)
 
+    // Coroutine
+    implementation(Deps.Coroutines.core)
+
+    //DI
+    implementation(project(Modules.di))
+
     // Firebase
     implementation(platform(Deps.Firebase.firebaseBom))
     implementation(Deps.Firebase.firebaseAuth)
-    implementation(Deps.Firebase.firebaseUiAuth)
 
     // Hilt
     implementation(Deps.Dagger.hiltAndroid)
@@ -84,28 +88,70 @@ fun DependencyHandler.authModuleDeps() {
     implementation(Deps.Retrofit.moshiConverter)
     implementation(Deps.OkHttp.okHttp)
     implementation(Deps.OkHttp.logging)
+
+    // Librairie
+    implementation(project(Modules.design))
+    implementation(project(Modules.navigation))
 }
 
 fun DependencyHandler.coreNetworkModuleDeps() {
+    implementation(project(Modules.design))
 }
 
 fun DependencyHandler.coreDiModuleDeps() {
     // Core
     implementation(Deps.AndroidX.coreKtx)
     implementation(Deps.AndroidX.appCompat)
-    implementation(Deps.Android.material)
 
     // Hilt
     implementation(Deps.Dagger.hiltAndroid)
     kapt(Deps.Dagger.hiltAndroidCompiler)
+
+    // Firebase
+    implementation(Deps.Firebase.firebaseCoreKtx)
+
+    // Librairie
+    implementation(project(Modules.design))
+
+    // Navigation
+    implementation(Deps.AndroidX.Navigation.composeNavigation)
 }
 
 fun DependencyHandler.coreModelModuleDeps() {
+    implementation(project(Modules.design))
+}
+
+fun DependencyHandler.coreDesignModuleDeps() {
+    // Compose
+    val composeBom = platform("androidx.compose:compose-bom:2023.10.01")
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
+
+    implementation(Deps.AndroidX.Compose.material)
+    implementation(Deps.AndroidX.Compose.material3)
+
+    // Core
+    implementation(Deps.AndroidX.coreKtx)
+}
+
+fun DependencyHandler.coreNavigationModuleDeps() {
+    implementation(Deps.AndroidX.Navigation.ui)
+
+    // Librairie
+    implementation(project(Modules.design))
+
+    // Compose
+    implementation(Deps.AndroidX.Compose.activity)
+
+    // Navigation
+    implementation(Deps.AndroidX.Navigation.ui)
+    implementation(Deps.AndroidX.Navigation.composeNavigation)
 }
 
 fun DependencyHandler.unitTestDeps() {
     // (Required) writing and executing Unit Tests on the JUnit Platform
-    testImplementation(TestDeps.JUnit.junit)
+    testImplementation(TestDeps.AssertK.assertK)
+    testImplementation(TestDeps.Dagger.hiltAndroidTesting)
 
     // AndroidX Test - JVM testing
     testImplementation(TestDeps.AndroidX.coreKtx)

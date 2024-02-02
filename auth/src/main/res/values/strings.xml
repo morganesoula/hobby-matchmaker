@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    // GENERAL
+    <string name="welcome_title">Bienvenue sur\n\nHobbyMatchMaker</string>
+    <string name="welcome_back_title">Content de vous revoir\n\n sur HobbyMatchMaker</string>
+
+    // FORM
+    <string name="firstname">Pr\u00E9nom</string>
+    <string name="lastname">Nom de famille</string>
+    <string name="example">Exemple: </string>
+    <string name="email">E-mail</string>
+    <string name="password">Mot de passe</string>
+    <string name="at_least">Attendu: </string>
+    <string name="password_hint"> • 8 caractères • 1 chiffre • 1 majuscule \n• 1 minuscule • 1 caractère spécial</string>
+    <string name="sign_up">S\'inscrire</string>
+    <string name="already_a_member">Vous utilisez déjà HobbyMatchMaker ? Connectez-vous</string>
+    <string name="forgot_password">Mot de passe oublié ?</string>
+    <string name="log_in">Se connecter</string>
+    <string name="new_member">Pas encore membre ? Inscrivez-vous</string>
+    <string name="forgot_password_title">Merci d\'entrer votre e-mail. Nous allons vous envoyer un e-mail avec les instructions à suivre.</string>
+    <string name="your_email">Votre e-mail</string>
+    <string name="reset_password">R\u00E9initialiser</string>
+    <string name="cancel">Annuler</string>
+    <string name="sign_out">Déconnexion</string>
+    <string name="email_sent">E-mail envoy\u00E9</string>
+
+    // ERROR
+    <string name="login_error">Identifiant ou mot de passe incorrect</string>
+    <string name="signup_error">Cet email est déjà associé à un compte existant</string>
+</resources>

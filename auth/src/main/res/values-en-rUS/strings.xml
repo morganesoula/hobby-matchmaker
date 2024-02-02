@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    // GENERAL
+    <string name="welcome_title">Welcome to\n\nHobbyMatchMaker</string>
+    <string name="welcome_back_title">Welcome back to\n\nHobbyMatchMaker</string>
+
+    // FORM
+    <string name="firstname">First name</string>
+    <string name="lastname">Last name</string>
+    <string name="example">Example: </string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="at_least">At least: </string>
+    <string name="password_hint">• 8 characters • 1 number • 1 uppercase \n• 1 lowercase • 1 special character</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="already_a_member">Already using HobbyMatchMaker? Log in</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="log_in">Log In</string>
+    <string name="new_member">Not a member? Sign up</string>
+    <string name="forgot_password_title">Please enter your email address. We will send you an email with instructions to reset your password.</string>
+    <string name="your_email">Your email</string>
+    <string name="reset_password">Reset password</string>
+    <string name="cancel">Cancel</string>"
+    <string name="sign_out">Sign Out</string>
+    <string name="email_sent">Email sent</string>
+
+    // ERROR
+    <string name="login_error">Incorrect email or password</string>
+    <string name="signup_error">This email is already associated with an existing account</string>
+</resources>

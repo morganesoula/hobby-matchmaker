@@ -7,7 +7,6 @@ plugins {
     kotlin(Plugins.ANDROID)
     kotlin(Plugins.KAPT)
     id(Plugins.DAGGER_HILT)
-    //id(libs.plugins.firebaseCrashlytics.get().pluginId)
     id(Plugins.GOOGLE_SERVICES)
 }
 
@@ -57,7 +56,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.0"
+        kotlinCompilerExtensionVersion = "1.5.8"
     }
 
     packaging {
