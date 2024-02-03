@@ -1,7 +1,7 @@
 workflows:
   native-android:
-    name: Native Android
-    instance_type: mac_pro
-    environment:
-      vars:
-        PACKAGE_NAME: "com.msoula.hobbymatchmaker"
+    name: Tests
+    scripts:
+      - name: Unit Test
+        script: ./gradlew test
+        test_report: app/build/test-results/**/*.xml
