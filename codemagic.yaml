@@ -1,0 +1,7 @@
+workflows:
+  native-android:
+    name: Native Android
+    instance_type: mac_pro
+    environment:
+      vars:
+        PACKAGE_NAME: "com.msoula.hobbymatchmaker"
