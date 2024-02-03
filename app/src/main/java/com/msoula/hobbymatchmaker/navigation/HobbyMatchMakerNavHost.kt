@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -72,8 +73,8 @@ fun HobbyMatchMakerNavHost(navController: NavHostController, navigator: Navigato
         }
 
         composable(SignUpScreenRoute.route) {
-            val registrationState = signUpViewModel.registrationState.collectAsState().value
-            val signUpProgressLoading = signUpViewModel.signUpCircularProgress.value
+            val registrationState by signUpViewModel.registrationFormState.collectAsState()
+            val signUpProgressLoading by signUpViewModel.signUpCircularProgress.collectAsState()
 
             SignUpScreen(
                 registrationState = registrationState,

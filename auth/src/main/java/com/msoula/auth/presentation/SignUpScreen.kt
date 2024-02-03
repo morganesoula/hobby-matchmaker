@@ -53,21 +53,21 @@ fun SignUpScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Column(modifier = modifier.verticalScroll(rememberScrollState())) {
-                    registrationState.signUpError?.let {
-                        HMMErrorText(modifier = modifier, errorText = it)
+                    if (registrationState.signUpError != null) {
+                        HMMErrorText(modifier = modifier, errorText = registrationState.signUpError)
                     }
 
                     HMMTextFieldAuthComponent(
                         modifier = modifier,
                         placeHolderText = stringResource(id = StringRes.firstname),
-                        value = registrationState.firstName,
+                        value = registrationState.firstName.trimEnd(),
                         onValueChange = { onFirstNameChanged(it) }
                     )
                     Spacer(modifier = modifier.height(8.dp))
 
                     HMMTextFieldAuthComponent(
                         modifier = modifier,
-                        value = registrationState.lastName,
+                        value = registrationState.lastName.trimEnd(),
                         onValueChange = { onLastNameChanged(it) },
                         placeHolderText = stringResource(id = StringRes.lastname)
                     )
@@ -84,7 +84,7 @@ fun SignUpScreen(
                         modifier = modifier.onFocusChanged {
                             emailTipVisibility.value = it.isFocused
                         },
-                        value = registrationState.email,
+                        value = registrationState.email.trimEnd(),
                         onValueChange = { onEmailChanged(it) },
                         placeHolderText = stringResource(id = StringRes.email)
                     )
@@ -101,7 +101,7 @@ fun SignUpScreen(
                         modifier = modifier.onFocusChanged {
                             passwordTipVisibility.value = it.isFocused
                         },
-                        value = registrationState.password,
+                        value = registrationState.password.trimEnd(),
                         onValueChange = { onPasswordChanged(it) },
                         placeHolderText = stringResource(id = StringRes.password),
                         visualTransformation = PasswordVisualTransformation()

@@ -17,7 +17,10 @@ import com.msoula.di.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -32,61 +35,52 @@ class SignUpViewModel @Inject constructor(
     private val navigator: Navigator
 ) : ViewModel() {
 
-    private val _registrationFormState = MutableStateFlow(SignUpRegistrationState())
-    val registrationState = _registrationFormState.asStateFlow()
+    private val firstNameFlow = MutableStateFlow(SignUpRegistrationState().firstName.trimEnd())
+    private val lastNameFlow = MutableStateFlow(SignUpRegistrationState().lastName.trimEnd())
+    private val emailFlow = MutableStateFlow(SignUpRegistrationState().email.trimEnd())
+    private val passwordFlow = MutableStateFlow(SignUpRegistrationState().password.trimEnd())
+    private val signUpErrorFlow = MutableStateFlow(SignUpRegistrationState().signUpError)
 
-    val signUpCircularProgress = mutableStateOf(false)
+    private val formDataFlow = MutableStateFlow(SignUpRegistrationState())
+
+    val registrationFormState = formDataFlow.map { formData ->
+        SignUpRegistrationState(
+            formData.firstName,
+            formData.lastName,
+            formData.email,
+            formData.password,
+            submit = validateInput(formData),
+            signUpError = formData.signUpError
+        )
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, SignUpRegistrationState())
+
+    val signUpCircularProgress = MutableStateFlow(false)
 
     fun onEvent(event: AuthUIEvent) {
         when (event) {
-            is AuthUIEvent.OnEmailChanged -> {
-                _registrationFormState.update { it.copy(email = event.email) }
-                validateInput()
-            }
-
-            is AuthUIEvent.OnFirstNameChanged -> {
-                _registrationFormState.update { it.copy(firstName = event.firstName) }
-                validateInput()
-            }
-
-            is AuthUIEvent.OnLastNameChanged -> {
-                _registrationFormState.update { it.copy(lastName = event.lastName) }
-                validateInput()
-            }
-
-            is AuthUIEvent.OnPasswordChanged -> {
-                _registrationFormState.update { it.copy(password = event.password) }
-                validateInput()
-            }
-
+            is AuthUIEvent.OnEmailChanged -> formDataFlow.update { it.copy(email = event.email) }
+            is AuthUIEvent.OnFirstNameChanged -> formDataFlow.update { it.copy(firstName = event.firstName) }
+            is AuthUIEvent.OnLastNameChanged -> formDataFlow.update { it.copy(lastName = event.lastName) }
+            is AuthUIEvent.OnPasswordChanged -> formDataFlow.update { it.copy(password = event.password) }
             AuthUIEvent.OnSignUp -> launchSignUp()
-
             else -> Unit
         }
     }
 
-    private fun validateInput() {
-        val emailResult = authFormValidationUseCases.validateEmail(registrationState.value.email)
+    private fun validateInput(formData: SignUpRegistrationState): Boolean {
+        val emailResult = authFormValidationUseCases.validateEmail(formData.email)
         val passwordResult =
-            authFormValidationUseCases.validatePassword.validatePassword(registrationState.value.password)
-        val firstNameResult =
-            authFormValidationUseCases.validateFirstName(registrationState.value.firstName)
-        val lastNameResult =
-            authFormValidationUseCases.validateLastName(registrationState.value.lastName)
+            authFormValidationUseCases.validatePassword.validatePassword(formData.password)
+        val firstNameResult = authFormValidationUseCases.validateFirstName(formData.firstName)
+        val lastNameResult = authFormValidationUseCases.validateLastName(formData.lastName)
 
-        val error = listOf(
+        // TODO Check here
+        return listOf(
             emailResult,
             passwordResult,
             firstNameResult,
             lastNameResult
-        ).any { !it.successful }
-
-        if (error) {
-            if (registrationState.value.submit) _registrationFormState.update { it.copy(submit = false) }
-            return
-        } else {
-            _registrationFormState.update { it.copy(submit = true) }
-        }
+        ).all { it.successful }
     }
 
     private fun launchSignUp() {
@@ -99,22 +93,20 @@ class SignUpViewModel @Inject constructor(
         signUpCircularProgress.value = true
 
         when (val result = authRepository.signUp(
-            registrationState.value.email,
-            registrationState.value.password
+            emailFlow.value, passwordFlow.value
         )) {
             is Response.Success -> {
                 signUpCircularProgress.value = false
                 navigator.navigate(HomeScreenRoute)
             }
+
             is Response.Failure -> {
                 when (result.exception) {
                     is FirebaseAuthUserCollisionException -> {
                         signUpCircularProgress.value = false
-                        _registrationFormState.update {
-                            it.copy(
-                                signUpError = resourceProvider.getString(
-                                    R.string.signup_error
-                                )
+                        signUpErrorFlow.update {
+                            resourceProvider.getString(
+                                R.string.signup_error
                             )
                         }
                         Log.e("HMM", "Email already associated")
