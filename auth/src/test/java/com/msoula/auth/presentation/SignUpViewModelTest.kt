@@ -19,14 +19,17 @@ import com.msoula.di.navigation.NavigatorImpl
 import io.mockk.every
 import io.mockk.mockkStatic
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.setMain
 
 import org.junit.Before
 import org.junit.Test
 
 import com.msoula.auth.R.string as StringRes
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class SignUpViewModelTest {
 
     private lateinit var signUpViewModel: SignUpViewModel
@@ -34,6 +37,8 @@ class SignUpViewModelTest {
 
     @Before
     fun setUp() {
+        Dispatchers.setMain(Dispatchers.Unconfined)
+
         mockkStatic(TextUtils::class)
         mockkStatic(Log::class)
 
@@ -53,7 +58,7 @@ class SignUpViewModelTest {
 
     @Test
     fun getRegistrationState() {
-        val initialState = signUpViewModel.registrationState.value
+        val initialState = signUpViewModel.registrationFormState.value
 
         assertThat(initialState.firstName).isEmpty()
         assertThat(initialState.lastName).isEmpty()
@@ -65,7 +70,7 @@ class SignUpViewModelTest {
         signUpViewModel.onEvent(AuthUIEvent.OnLastNameChanged("lastName"))
         signUpViewModel.onEvent(AuthUIEvent.OnPasswordChanged("Password123!"))
 
-        val updatedInitialState = signUpViewModel.registrationState.value
+        val updatedInitialState = signUpViewModel.registrationFormState.value
 
         assertThat(updatedInitialState.firstName).isEqualTo("firstName")
         assertThat(updatedInitialState.lastName).isEqualTo("lastName")
@@ -88,7 +93,7 @@ class SignUpViewModelTest {
         assertThat(signUpViewModel.signUpCircularProgress.value).isFalse()
         delay(2000)
 
-        val initialState = signUpViewModel.registrationState.value
+        val initialState = signUpViewModel.registrationFormState.value
         assertThat(initialState.signUpError).isNotNull()
         assertThat(initialState.signUpError).isEqualTo(resourcesProvider.getString(StringRes.signup_error))
 

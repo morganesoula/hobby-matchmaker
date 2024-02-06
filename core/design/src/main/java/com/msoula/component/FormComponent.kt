@@ -1,14 +1,21 @@
 package com.msoula.component
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -16,10 +23,14 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.msoula.design.R.drawable as ImageRes
+import com.msoula.design.R.string as StringRes
 
 @Composable
 fun HMMTextFieldAuthComponent(
@@ -27,7 +38,8 @@ fun HMMTextFieldAuthComponent(
     value: String,
     onValueChange: (String) -> Unit,
     placeHolderText: String,
-    visualTransformation: VisualTransformation? = null
+    visualTransformation: VisualTransformation? = null,
+    keyboardOptions: KeyboardOptions? = null
 ) {
     TextField(
         modifier = modifier
@@ -42,7 +54,8 @@ fun HMMTextFieldAuthComponent(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
         ),
-        visualTransformation = visualTransformation ?: VisualTransformation.None
+        visualTransformation = visualTransformation ?: VisualTransformation.None,
+        keyboardOptions = keyboardOptions ?: KeyboardOptions.Default
     )
 }
 
@@ -51,7 +64,8 @@ fun HMMButtonAuthComponent(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     text: String,
-    enabled: Boolean = false
+    enabled: Boolean = false,
+    loading: Boolean = false
 ) {
     Button(
         onClick = onClick,
@@ -61,12 +75,16 @@ fun HMMButtonAuthComponent(
         enabled = enabled,
         shape = RoundedCornerShape(8.dp)
     ) {
-        Text(
-            text = text,
-            modifier = modifier.padding(8.dp),
-            fontSize = 16.sp,
-            textAlign = TextAlign.Center
-        )
+        if (loading) {
+            CircularProgressIndicator(modifier = modifier.wrapContentSize(), color = MaterialTheme.colorScheme.onPrimary)
+        } else {
+            Text(
+                text = text,
+                modifier = modifier.padding(8.dp),
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }
 
@@ -99,4 +117,46 @@ fun HMMErrorText(modifier: Modifier, errorText: String) {
     )
 
     Spacer(modifier = modifier.height(8.dp))
+}
+
+@Composable
+fun HMMSocialMediaRow(
+    modifier: Modifier,
+    onFacebookButtonClicked: () -> Unit,
+    onGoogleButtonClicked: () -> Unit
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .wrapContentHeight(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        Button(
+            onClick = { onFacebookButtonClicked() },
+            shape = RoundedCornerShape(4.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)),
+            modifier = modifier.size(80.dp)
+        ) {
+            Image(
+                modifier = modifier,
+                painter = painterResource(id = ImageRes.facebook_logo),
+                contentDescription = stringResource(id = StringRes.facebook_alt)
+            )
+        }
+
+        Button(
+            onClick = { onGoogleButtonClicked() },
+            shape = RoundedCornerShape(4.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)),
+            modifier = modifier.size(80.dp)
+        ) {
+            Image(
+                modifier = modifier,
+                painter = painterResource(id = ImageRes.google_logo),
+                contentDescription = stringResource(id = StringRes.google_alt)
+            )
+        }
+    }
 }

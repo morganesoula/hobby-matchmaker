@@ -20,14 +20,16 @@ import com.msoula.di.navigation.NavigatorImpl
 import io.mockk.every
 import io.mockk.mockkStatic
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
 
 import com.msoula.auth.R.string as StringRes
-
+@OptIn(ExperimentalCoroutinesApi::class)
 class LoginViewModelTest {
 
     private lateinit var loginViewModel: LoginViewModel
@@ -36,6 +38,8 @@ class LoginViewModelTest {
 
     @Before
     fun setUp() {
+        Dispatchers.setMain(Dispatchers.Unconfined)
+
         mockkStatic(TextUtils::class)
         mockkStatic(Log::class)
 
@@ -55,7 +59,7 @@ class LoginViewModelTest {
 
     @Test
     fun getLogInState() {
-        val initialLoginState = loginViewModel.logInState.value
+        val initialLoginState = loginViewModel.loginFormState.value
 
         assertThat(initialLoginState.email).isEmpty()
         assertThat(initialLoginState.logInError).isNull()
@@ -65,7 +69,7 @@ class LoginViewModelTest {
         loginViewModel.onEvent(AuthUIEvent.OnEmailChanged("test@test.com"))
         loginViewModel.onEvent(AuthUIEvent.OnPasswordChanged("testPassword"))
 
-        val updatedLoginState = loginViewModel.logInState.value
+        val updatedLoginState = loginViewModel.loginFormState.value
 
         assertThat(updatedLoginState.email).isEqualTo("test@test.com")
         assertThat(updatedLoginState.password).isEqualTo("testPassword")
@@ -107,11 +111,11 @@ class LoginViewModelTest {
         every { Log.e("HMM", "Invalid credentials") } returns 1
 
         loginViewModel.onEvent(AuthUIEvent.OnEmailChanged("test@test.com"))
-        var loginState = loginViewModel.logInState.value
+        var loginState = loginViewModel.loginFormState.value
         assertThat(loginState.submit).isFalse()
 
         loginViewModel.onEvent(AuthUIEvent.OnPasswordChanged("pass"))
-        loginState = loginViewModel.logInState.value
+        loginState = loginViewModel.loginFormState.value
         assertThat(loginState.submit).isTrue()
 
         assertThat(loginViewModel.circularProgressLoading.value).isFalse()
@@ -119,7 +123,7 @@ class LoginViewModelTest {
         assertThat(loginViewModel.circularProgressLoading.value).isTrue()
 
         delay(2000)
-        loginState = loginViewModel.logInState.value
+        loginState = loginViewModel.loginFormState.value
 
         assertThat(loginViewModel.circularProgressLoading.value).isFalse()
         assertThat(loginState.logInError).isNotNull()

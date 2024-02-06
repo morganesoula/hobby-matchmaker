@@ -1,7 +1,6 @@
 package com.msoula.auth.presentation
 
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
@@ -18,37 +17,29 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Named
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    @Named("authRepository") private val authRepository: AuthRepository,
-    @Named("authFormUseCases") private val authFormValidationUseCases: AuthFormValidationUseCase,
-    @Named("resourceProvider") private val resourceProvider: StringResourcesProvider,
-    @Named("ioDispatcher") private val ioDispatcher: CoroutineDispatcher,
+    private val authFormValidationUseCases: AuthFormValidationUseCase,
+    private val authRepository: AuthRepository,
+    private val resourceProvider: StringResourcesProvider,
+    private val ioDispatcher: CoroutineDispatcher,
     private val navigator: Navigator
 ) : ViewModel() {
-
-    private val firstNameFlow = MutableStateFlow(SignUpRegistrationState().firstName.trimEnd())
-    private val lastNameFlow = MutableStateFlow(SignUpRegistrationState().lastName.trimEnd())
-    private val emailFlow = MutableStateFlow(SignUpRegistrationState().email.trimEnd())
-    private val passwordFlow = MutableStateFlow(SignUpRegistrationState().password.trimEnd())
-    private val signUpErrorFlow = MutableStateFlow(SignUpRegistrationState().signUpError)
 
     private val formDataFlow = MutableStateFlow(SignUpRegistrationState())
 
     val registrationFormState = formDataFlow.map { formData ->
         SignUpRegistrationState(
-            formData.firstName,
-            formData.lastName,
-            formData.email,
-            formData.password,
+            firstName = formData.firstName,
+            lastName = formData.lastName,
+            email = formData.email,
+            password = formData.password,
             submit = validateInput(formData),
             signUpError = formData.signUpError
         )
@@ -58,9 +49,9 @@ class SignUpViewModel @Inject constructor(
 
     fun onEvent(event: AuthUIEvent) {
         when (event) {
-            is AuthUIEvent.OnEmailChanged -> formDataFlow.update { it.copy(email = event.email) }
-            is AuthUIEvent.OnFirstNameChanged -> formDataFlow.update { it.copy(firstName = event.firstName) }
-            is AuthUIEvent.OnLastNameChanged -> formDataFlow.update { it.copy(lastName = event.lastName) }
+            is AuthUIEvent.OnEmailChanged -> formDataFlow.update { it.copy(email = event.email.trimEnd()) }
+            is AuthUIEvent.OnFirstNameChanged -> formDataFlow.update { it.copy(firstName = event.firstName.trimEnd()) }
+            is AuthUIEvent.OnLastNameChanged -> formDataFlow.update { it.copy(lastName = event.lastName.trimEnd()) }
             is AuthUIEvent.OnPasswordChanged -> formDataFlow.update { it.copy(password = event.password) }
             AuthUIEvent.OnSignUp -> launchSignUp()
             else -> Unit
@@ -71,10 +62,11 @@ class SignUpViewModel @Inject constructor(
         val emailResult = authFormValidationUseCases.validateEmail(formData.email)
         val passwordResult =
             authFormValidationUseCases.validatePassword.validatePassword(formData.password)
-        val firstNameResult = authFormValidationUseCases.validateFirstName(formData.firstName)
-        val lastNameResult = authFormValidationUseCases.validateLastName(formData.lastName)
+        val firstNameResult =
+            authFormValidationUseCases.validateFirstName(formData.firstName.trimEnd())
+        val lastNameResult =
+            authFormValidationUseCases.validateLastName(formData.lastName.trimEnd())
 
-        // TODO Check here
         return listOf(
             emailResult,
             passwordResult,
@@ -93,7 +85,7 @@ class SignUpViewModel @Inject constructor(
         signUpCircularProgress.value = true
 
         when (val result = authRepository.signUp(
-            emailFlow.value, passwordFlow.value
+            formDataFlow.value.email, formDataFlow.value.password
         )) {
             is Response.Success -> {
                 signUpCircularProgress.value = false
@@ -101,12 +93,14 @@ class SignUpViewModel @Inject constructor(
             }
 
             is Response.Failure -> {
-                when (result.exception) {
+                when (val exception = result.exception) {
                     is FirebaseAuthUserCollisionException -> {
                         signUpCircularProgress.value = false
-                        signUpErrorFlow.update {
-                            resourceProvider.getString(
-                                R.string.signup_error
+                        formDataFlow.update {
+                            it.copy(
+                                signUpError = resourceProvider.getString(
+                                    R.string.signup_error
+                                )
                             )
                         }
                         Log.e("HMM", "Email already associated")
@@ -114,6 +108,11 @@ class SignUpViewModel @Inject constructor(
 
                     else -> {
                         signUpCircularProgress.value = false
+                        formDataFlow.update { registrationState ->
+                            registrationState.copy(
+                                signUpError = exception.message
+                            )
+                        }
                         Log.e("HMM", "Could not create an account")
                     }
                 }

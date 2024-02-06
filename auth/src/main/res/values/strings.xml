@@ -3,6 +3,7 @@
     // GENERAL
     <string name="welcome_title">Bienvenue sur\n\nHobbyMatchMaker</string>
     <string name="welcome_back_title">Content de vous revoir\n\n sur HobbyMatchMaker</string>
+    <string name="default_web_client_id" translatable="false">402985273077-ijpv11p99mv6vgii80etm1ee9j1ll9ui.apps.googleusercontent.com</string>
 
     // FORM
     <string name="firstname">Pr\u00E9nom</string>
@@ -16,13 +17,15 @@
     <string name="already_a_member">Vous utilisez déjà HobbyMatchMaker ? Connectez-vous</string>
     <string name="forgot_password">Mot de passe oublié ?</string>
     <string name="log_in">Se connecter</string>
-    <string name="new_member">Pas encore membre ? Inscrivez-vous</string>
+    <string name="new_member">Pas encore membre ?</string>
+    <string name="new_member_clickable_part">Inscrivez-vous</string>
     <string name="forgot_password_title">Merci d\'entrer votre e-mail. Nous allons vous envoyer un e-mail avec les instructions à suivre.</string>
     <string name="your_email">Votre e-mail</string>
     <string name="reset_password">R\u00E9initialiser</string>
     <string name="cancel">Annuler</string>
     <string name="sign_out">Déconnexion</string>
     <string name="email_sent">E-mail envoy\u00E9</string>
+    <string name="continue_with_rs">Ou se connecter avec</string>
 
     // ERROR
     <string name="login_error">Identifiant ou mot de passe incorrect</string>

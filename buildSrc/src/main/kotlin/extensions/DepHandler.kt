@@ -78,6 +78,7 @@ fun DependencyHandler.authModuleDeps() {
     // Firebase
     implementation(platform(Deps.Firebase.firebaseBom))
     implementation(Deps.Firebase.firebaseAuth)
+    implementation(Deps.Google.playServices)
 
     // Hilt
     implementation(Deps.Dagger.hiltAndroid)

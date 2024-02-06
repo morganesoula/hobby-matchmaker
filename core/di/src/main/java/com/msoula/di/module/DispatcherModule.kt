@@ -5,7 +5,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.Dispatchers
-import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -14,6 +13,5 @@ object DispatcherModule {
 
     @Provides
     @Singleton
-    @Named("ioDispatcher")
     fun provideIODispatcher() = Dispatchers.IO
 }

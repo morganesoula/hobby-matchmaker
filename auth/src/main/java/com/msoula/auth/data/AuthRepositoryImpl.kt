@@ -9,21 +9,19 @@ import com.msoula.auth.domain.repository.LoginResponse
 import com.msoula.auth.domain.repository.ResetEmailResponse
 import com.msoula.auth.domain.repository.Response
 import com.msoula.auth.domain.repository.SignUpResponse
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
-import javax.inject.Named
 
 class AuthRepositoryImpl @Inject constructor(
-    @Named("authInstance") private val auth: FirebaseAuth
+    private val auth: FirebaseAuth
 ) : AuthRepository {
 
-    override fun getAuthState(viewModelScope: CoroutineScope): Boolean {
+    override fun getAuthState(): Boolean {
         val authStateListener = AuthStateListener {
             if (auth.currentUser == null) {
                 Log.d("HMM", "Inside getAuthState with user null")
             } else {
-                Log.d("HMM", "Inside getAuthState but not ocmpleted it")
+                Log.d("HMM", "Inside getAuthState but not completed it")
             }
         }
 
@@ -53,10 +51,8 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun loginWithEmailAndPassword(email: String, password: String): LoginResponse {
-        val emailWithNoSpaces = email.replace("\\s".toRegex(), "")
-
         return try {
-            val result = auth.signInWithEmailAndPassword(emailWithNoSpaces, password).await()
+            val result = auth.signInWithEmailAndPassword(email, password).await()
             Response.Success(result)
         } catch (exception: Exception) {
             Response.Failure(exception)
@@ -64,10 +60,8 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun resetPassword(email: String): ResetEmailResponse {
-        val emailWithNoSpaces = email.replace("\\s".toRegex(), "")
-
         return try {
-            auth.sendPasswordResetEmail(emailWithNoSpaces)
+            auth.sendPasswordResetEmail(email)
             Response.Success(true)
         } catch (exception: Exception) {
             Response.Failure(exception)

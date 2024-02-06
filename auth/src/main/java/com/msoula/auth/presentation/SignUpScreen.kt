@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -17,9 +17,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.msoula.auth.data.AuthUIEvent
 import com.msoula.auth.data.SignUpRegistrationState
 import com.msoula.component.HMMButtonAuthComponent
 import com.msoula.component.HMMErrorText
@@ -33,11 +35,7 @@ fun SignUpScreen(
     modifier: Modifier = Modifier,
     registrationState: SignUpRegistrationState,
     signUpProgressLoading: Boolean,
-    onEmailChanged: (email: String) -> Unit,
-    onPasswordChanged: (password: String) -> Unit,
-    onFirstNameChanged: (firstName: String) -> Unit,
-    onLastNameChanged: (lastName: String) -> Unit,
-    onSignUp: () -> Unit,
+    authUIEvent: (AuthUIEvent) -> Unit,
     redirectToLogInScreen: () -> Unit
 ) {
     val emailTipVisibility = remember { mutableStateOf(false) }
@@ -61,15 +59,17 @@ fun SignUpScreen(
                         modifier = modifier,
                         placeHolderText = stringResource(id = StringRes.firstname),
                         value = registrationState.firstName.trimEnd(),
-                        onValueChange = { onFirstNameChanged(it) }
+                        onValueChange = { authUIEvent(AuthUIEvent.OnFirstNameChanged(it)) },
+                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
                     )
                     Spacer(modifier = modifier.height(8.dp))
 
                     HMMTextFieldAuthComponent(
                         modifier = modifier,
                         value = registrationState.lastName.trimEnd(),
-                        onValueChange = { onLastNameChanged(it) },
-                        placeHolderText = stringResource(id = StringRes.lastname)
+                        onValueChange = { authUIEvent(AuthUIEvent.OnLastNameChanged(it)) },
+                        placeHolderText = stringResource(id = StringRes.lastname),
+                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
                     )
                     Spacer(modifier = modifier.height(8.dp))
 
@@ -85,7 +85,7 @@ fun SignUpScreen(
                             emailTipVisibility.value = it.isFocused
                         },
                         value = registrationState.email.trimEnd(),
-                        onValueChange = { onEmailChanged(it) },
+                        onValueChange = { authUIEvent(AuthUIEvent.OnEmailChanged(it)) },
                         placeHolderText = stringResource(id = StringRes.email)
                     )
                     Spacer(modifier = modifier.height(8.dp))
@@ -102,16 +102,17 @@ fun SignUpScreen(
                             passwordTipVisibility.value = it.isFocused
                         },
                         value = registrationState.password.trimEnd(),
-                        onValueChange = { onPasswordChanged(it) },
+                        onValueChange = { authUIEvent(AuthUIEvent.OnPasswordChanged(it)) },
                         placeHolderText = stringResource(id = StringRes.password),
                         visualTransformation = PasswordVisualTransformation()
                     )
 
                     Spacer(modifier = modifier.height(32.dp))
                     HMMButtonAuthComponent(
-                        onClick = { onSignUp() },
+                        onClick = { authUIEvent(AuthUIEvent.OnSignUp) },
                         enabled = registrationState.submit,
-                        text = stringResource(id = StringRes.sign_up)
+                        text = stringResource(id = StringRes.sign_up),
+                        loading = signUpProgressLoading
                     )
                     Spacer(modifier = modifier.height(16.dp))
                     HMMButtonAuthComponent(
@@ -119,10 +120,6 @@ fun SignUpScreen(
                         text = stringResource(id = StringRes.already_a_member),
                         enabled = true
                     )
-                }
-
-                if (signUpProgressLoading) {
-                    CircularProgressIndicator()
                 }
             }
         }
@@ -135,11 +132,7 @@ fun SignUpScreenPreview() {
     SignUpScreen(
         registrationState = SignUpRegistrationState(),
         signUpProgressLoading = false,
-        onEmailChanged = {},
-        onPasswordChanged = {},
-        onFirstNameChanged = {},
-        onLastNameChanged = {},
-        onSignUp = {},
+        authUIEvent = {},
         redirectToLogInScreen = {}
     )
 }

@@ -1,8 +1,10 @@
 package com.msoula.auth.presentation
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,7 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -27,24 +29,30 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.msoula.auth.data.AuthUIEvent
 import com.msoula.auth.data.LoginFormState
 import com.msoula.component.HMMButtonAuthComponent
 import com.msoula.component.HMMErrorText
+import com.msoula.component.HMMSocialMediaRow
 import com.msoula.component.HMMTextFieldAuthComponent
 import com.msoula.component.HeaderTextComponent
 import com.msoula.di.data.StringResourcesProviderImpl
 import com.msoula.theme.HobbyMatchmakerTheme
 import kotlinx.coroutines.launch
-
 import com.msoula.auth.R.string as StringRes
 
 @Composable
@@ -52,15 +60,10 @@ fun LoginScreen(
     modifier: Modifier = Modifier,
     circularProgressLoading: Boolean,
     loginFormState: LoginFormState,
-    onEmailChanged: (email: String) -> Unit,
-    onPasswordChanged: (password: String) -> Unit,
-    onForgotPasswordClicked: () -> Unit,
-    onHideForgotPasswordDialog: () -> Unit,
-    onLogIn: () -> Unit,
+    authUiEvent: (AuthUIEvent) -> Unit,
+    onGoogleSignInClicked: () -> Unit,
     redirectToSignUpScreen: () -> Unit,
-    onResetPasswordConfirmed: () -> Unit,
     openResetDialog: Boolean,
-    onEmailResetChanged: (String) -> Unit,
     emailResetSent: Boolean
 ) {
     val context = LocalContext.current
@@ -68,96 +71,142 @@ fun LoginScreen(
     val snackBarHostState = remember { SnackbarHostState() }
     val resourcesProvider = StringResourcesProviderImpl(context)
 
+    val annotatedString = buildAnnotatedString {
+        append(stringResource(id = StringRes.new_member) + "  ")
+        withStyle(
+            style = SpanStyle(
+                color = Color.Blue.copy(alpha = 0.7f),
+                textDecoration = TextDecoration.Underline
+            )
+        ) {
+            append(stringResource(id = StringRes.new_member_clickable_part))
+        }
+    }
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackBarHostState) }
     ) { paddingValues ->
-
         LaunchedEffect(emailResetSent) {
             if (emailResetSent) {
-                onHideForgotPasswordDialog()
+                authUiEvent(AuthUIEvent.HideForgotPasswordDialog)
                 scope.launch {
                     snackBarHostState.showSnackbar(message = resourcesProvider.getString(StringRes.email_sent))
                 }
             }
         }
 
-        Column {
-            HeaderTextComponent(
-                text = stringResource(id = StringRes.welcome_back_title)
-            )
+        Box(modifier = modifier.fillMaxSize()) {
+            Column(
+                modifier = modifier
+                    .padding(paddingValues)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                if (openResetDialog) {
+                    ForgotPasswordAlertDialog(
+                        email = loginFormState.emailReset,
+                        paddingValues = paddingValues,
+                        enableSubmit = loginFormState.submitEmailReset,
+                        authUIEvent = authUiEvent
+                    )
+                }
 
-            if (openResetDialog) {
-                ForgotPasswordAlertDialog(
-                    email = loginFormState.emailReset,
-                    onDismissRequest = onHideForgotPasswordDialog,
-                    onResetPasswordConfirmed = onResetPasswordConfirmed,
-                    paddingValues = paddingValues,
-                    enableSubmit = loginFormState.submitEmailReset,
-                    onEmailChanged = onEmailResetChanged
+                HeaderTextComponent(
+                    text = stringResource(id = StringRes.welcome_back_title)
+                )
+
+                if (loginFormState.logInError != null) {
+                    HMMErrorText(modifier = modifier, errorText = loginFormState.logInError)
+                }
+
+                HMMTextFieldAuthComponent(
+                    modifier = modifier,
+                    value = loginFormState.email.trimEnd(),
+                    placeHolderText = stringResource(StringRes.email),
+                    onValueChange = { authUiEvent(AuthUIEvent.OnEmailChanged(it)) }
+                )
+
+                Spacer(modifier = modifier.height(8.dp))
+
+                HMMTextFieldAuthComponent(
+                    modifier = modifier,
+                    value = loginFormState.password.trimEnd(),
+                    placeHolderText = stringResource(id = StringRes.password),
+                    onValueChange = { authUiEvent(AuthUIEvent.OnPasswordChanged(it)) },
+                    visualTransformation = PasswordVisualTransformation()
+                )
+
+                Spacer(modifier = modifier.height(16.dp))
+
+                ClickableText(
+                    text = AnnotatedString(stringResource(id = StringRes.forgot_password)),
+                    onClick = { authUiEvent(AuthUIEvent.OnForgotPasswordClicked) },
+                    style = TextStyle(color = MaterialTheme.colorScheme.onBackground),
+                    modifier = modifier
+                        .wrapContentSize()
+                        .align(Alignment.End)
+                        .padding(end = 16.dp)
+                )
+
+                Spacer(modifier = modifier.height(40.dp))
+
+                HMMButtonAuthComponent(
+                    modifier = modifier,
+                    onClick = { authUiEvent(AuthUIEvent.OnLogIn) },
+                    text = stringResource(id = StringRes.log_in),
+                    enabled = loginFormState.submit,
+                    loading = circularProgressLoading
+                )
+
+                Spacer(modifier = modifier.height(32.dp))
+
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(start = 8.dp, end = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    HorizontalDivider(
+                        modifier.weight(1f),
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                        thickness = 2.dp
+                    )
+                    Text(
+                        text = resourcesProvider.getString(StringRes.continue_with_rs),
+                        modifier = modifier.weight(3f),
+                        textAlign = TextAlign.Center,
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                    )
+
+                    HorizontalDivider(
+                        modifier.weight(1f),
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                        thickness = 2.dp
+                    )
+                }
+
+                Spacer(modifier = modifier.height(32.dp))
+
+                HMMSocialMediaRow(
+                    modifier = modifier,
+                    onFacebookButtonClicked = { },
+                    onGoogleButtonClicked = onGoogleSignInClicked
                 )
             }
 
             Box(
                 modifier = modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 8.dp)
             ) {
-                Column(
+                ClickableText(
                     modifier = modifier
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    loginFormState.logInError?.let {
-                        HMMErrorText(modifier = modifier, errorText = it)
-                    }
-
-                    HMMTextFieldAuthComponent(
-                        modifier = modifier,
-                        value = loginFormState.email,
-                        placeHolderText = stringResource(StringRes.email),
-                        onValueChange = { onEmailChanged(it) }
-                    )
-
-                    Spacer(modifier = modifier.height(8.dp))
-
-                    HMMTextFieldAuthComponent(
-                        modifier = modifier,
-                        value = loginFormState.password,
-                        placeHolderText = stringResource(id = StringRes.password),
-                        onValueChange = { onPasswordChanged(it) },
-                        visualTransformation = PasswordVisualTransformation()
-                    )
-
-                    Spacer(modifier = modifier.height(16.dp))
-
-                    ClickableText(
-                        text = AnnotatedString(stringResource(id = StringRes.forgot_password)),
-                        onClick = { onForgotPasswordClicked() },
-                        style = TextStyle(color = MaterialTheme.colorScheme.onBackground),
-                        modifier = modifier
-                            .wrapContentSize()
-                            .align(Alignment.End)
-                            .padding(end = 16.dp)
-                    )
-
-                    Spacer(modifier = modifier.height(40.dp))
-                    HMMButtonAuthComponent(
-                        modifier = modifier,
-                        onClick = { onLogIn() },
-                        text = stringResource(id = StringRes.log_in),
-                        enabled = loginFormState.submit
-                    )
-                    Spacer(modifier = modifier.height(16.dp))
-                    HMMButtonAuthComponent(
-                        onClick = { redirectToSignUpScreen() },
-                        text = stringResource(id = StringRes.new_member),
-                        enabled = true
-                    )
-                }
-
-                if (circularProgressLoading) {
-                    CircularProgressIndicator()
-                }
+                        .wrapContentSize(),
+                    text = annotatedString,
+                    onClick = { redirectToSignUpScreen() },
+                    style = TextStyle(color = MaterialTheme.colorScheme.onBackground)
+                )
             }
         }
     }
@@ -168,18 +217,14 @@ fun LoginScreen(
 fun LoginScreenPreview(modifier: Modifier = Modifier) {
     HobbyMatchmakerTheme {
         LoginScreen(
+            modifier = modifier,
             circularProgressLoading = false,
             loginFormState = LoginFormState(email = "test@test.fr"),
-            onEmailChanged = {},
-            onPasswordChanged = {},
-            onLogIn = { },
-            redirectToSignUpScreen = {},
-            onForgotPasswordClicked = {},
-            onResetPasswordConfirmed = {},
-            onHideForgotPasswordDialog = {},
+            authUiEvent = {},
             openResetDialog = false,
-            onEmailResetChanged = {},
-            emailResetSent = false
+            emailResetSent = false,
+            redirectToSignUpScreen = {},
+            onGoogleSignInClicked = {}
         )
     }
 }
@@ -188,9 +233,7 @@ fun LoginScreenPreview(modifier: Modifier = Modifier) {
 fun ForgotPasswordAlertDialog(
     modifier: Modifier = Modifier,
     email: String,
-    onEmailChanged: (email: String) -> Unit,
-    onDismissRequest: () -> Unit,
-    onResetPasswordConfirmed: () -> Unit,
+    authUIEvent: (AuthUIEvent) -> Unit,
     paddingValues: PaddingValues,
     enableSubmit: Boolean
 ) {
@@ -206,20 +249,23 @@ fun ForgotPasswordAlertDialog(
         text = {
             HMMTextFieldAuthComponent(
                 value = email,
-                onValueChange = { onEmailChanged(it) },
+                onValueChange = { authUIEvent(AuthUIEvent.OnEmailResetChanged(it)) },
                 placeHolderText = stringResource(StringRes.your_email),
                 modifier = modifier.fillMaxWidth()
             )
         },
-        onDismissRequest = { onDismissRequest() },
+        onDismissRequest = { authUIEvent(AuthUIEvent.HideForgotPasswordDialog) },
         confirmButton = {
-            Button(onClick = { onResetPasswordConfirmed() }, enabled = enableSubmit) {
+            Button(
+                onClick = { authUIEvent(AuthUIEvent.OnResetPasswordConfirmed) },
+                enabled = enableSubmit
+            ) {
                 Text(text = stringResource(id = StringRes.reset_password))
             }
         },
         dismissButton = {
             Button(
-                onClick = { onDismissRequest() },
+                onClick = { authUIEvent(AuthUIEvent.HideForgotPasswordDialog) },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.background,
                     contentColor = MaterialTheme.colorScheme.onBackground

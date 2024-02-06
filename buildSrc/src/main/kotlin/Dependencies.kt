@@ -16,6 +16,11 @@ object Deps {
         const val firebaseUiAuth = "com.firebaseui:firebase-ui-auth:$firebaseUiAuthVersion"
     }
 
+    object Google {
+        private const val version = "20.7.0"
+        const val playServices = "com.google.android.gms:play-services-auth:$version"
+    }
+
     object AndroidX {
         const val appCompat = "androidx.appcompat:appcompat:1.6.1"
         const val coreKtx = "androidx.core:core-ktx:1.12.0"
@@ -25,7 +30,7 @@ object Deps {
         }
 
         object Compose {
-            private const val version = "1.5.4"
+            private const val version = "1.6.0"
 
             const val material = "androidx.compose.material:material:$version"
             const val material3 = "androidx.compose.material3:material3:1.2.0-rc01"
@@ -89,6 +94,7 @@ object TestDeps {
         const val androidX_jUnit = "androidx.test.ext:junit-ktx:1.1.5"
         const val navigationTest = "androidx.navigation:navigation-testing:2.7.6"
     }
+
     object AssertK {
         private const val version = "0.28.0"
         const val assertK = "com.willowtreeapps.assertk:assertk:$version"

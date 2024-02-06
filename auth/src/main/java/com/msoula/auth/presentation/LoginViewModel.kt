@@ -1,7 +1,6 @@
 package com.msoula.auth.presentation
 
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -18,46 +17,49 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import javax.inject.Named
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    @Named("authFormUseCases") private val authFormValidationUseCases: AuthFormValidationUseCase,
-    @Named("authRepository") private val authRepository: AuthRepository,
-    @Named("resourceProvider") private val resourceProvider: StringResourcesProvider,
-    @Named("ioDispatcher") private val ioDispatcher: CoroutineDispatcher,
+    private val authFormValidationUseCases: AuthFormValidationUseCase,
+    private val authRepository: AuthRepository,
+    private val resourceProvider: StringResourcesProvider,
+    private val ioDispatcher: CoroutineDispatcher,
     private val navigator: Navigator
 ) : ViewModel() {
 
-    private val _logInState = MutableStateFlow(LoginFormState())
-    val logInState = _logInState.asStateFlow()
+    private val formDataFlow = MutableStateFlow(LoginFormState())
 
-    val circularProgressLoading = mutableStateOf(false)
-    val openResetDialog = mutableStateOf(false)
-    val resettingEmailSent = mutableStateOf(false)
+    val loginFormState = formDataFlow.map { formData ->
+        LoginFormState(
+            email = formData.email,
+            password = formData.password,
+            emailReset = formData.emailReset,
+            submit = validateInput(formData),
+            submitEmailReset = validateEmailReset(formData.emailReset),
+            logInError = formData.logInError
+        )
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, LoginFormState())
+
+    val circularProgressLoading = MutableStateFlow(false)
+    val openResetDialog = MutableStateFlow(false)
+    val resettingEmailSent = MutableStateFlow(false)
 
     fun onEvent(event: AuthUIEvent) {
         when (event) {
-            is AuthUIEvent.OnEmailChanged -> {
-                _logInState.update { it.copy(email = event.email) }
-                validateInput()
-            }
-
+            is AuthUIEvent.OnEmailChanged -> formDataFlow.update { it.copy(email = event.email.trimEnd()) }
             is AuthUIEvent.OnEmailResetChanged -> {
-                _logInState.update { it.copy(emailReset = event.emailReset) }
+                formDataFlow.update { it.copy(emailReset = event.emailReset.trimEnd()) }
                 validateEmailReset(event.emailReset)
             }
 
-            is AuthUIEvent.OnPasswordChanged -> {
-                _logInState.update { it.copy(password = event.password) }
-                validateInput()
-            }
-
+            is AuthUIEvent.OnPasswordChanged -> formDataFlow.update { it.copy(password = event.password.trimEnd()) }
             AuthUIEvent.OnForgotPasswordClicked -> {
                 if (!openResetDialog.value) {
                     openResetDialog.value = true
@@ -70,10 +72,7 @@ class LoginViewModel @Inject constructor(
                 }
             }
 
-            AuthUIEvent.OnResetPasswordConfirmed -> {
-                launchResetPassword()
-            }
-
+            AuthUIEvent.OnResetPasswordConfirmed -> launchResetPassword()
             AuthUIEvent.OnLogIn -> {
                 circularProgressLoading.value = true
                 logIn()
@@ -83,44 +82,27 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    private fun validateInput() {
-        val emailResult = authFormValidationUseCases.validateEmail(logInState.value.email)
+    private fun validateInput(formData: LoginFormState): Boolean {
+        val emailResult = authFormValidationUseCases.validateEmail(formData.email)
         val passwordResult =
-            authFormValidationUseCases.validatePassword.validateLoginPassword(logInState.value.password)
+            authFormValidationUseCases.validatePassword.validateLoginPassword(formData.password)
 
-        val error = listOf(emailResult, passwordResult).any { !it.successful }
-
-        if (error) {
-            if (logInState.value.submit) _logInState.update { it.copy(submit = false) }
-            return
-        } else {
-            _logInState.update { it.copy(submit = true) }
-        }
+        return listOf(emailResult, passwordResult).all { it.successful }
     }
 
-    private fun validateEmailReset(emailReset: String) {
-        val emailResult = authFormValidationUseCases.validateEmail(emailReset)
-
-        val error = !emailResult.successful
-
-        if (error) {
-            if (logInState.value.submitEmailReset) _logInState.update { it.copy(submitEmailReset = false) }
-            return
-        } else {
-            _logInState.update { it.copy(submitEmailReset = true) }
-        }
-    }
+    private fun validateEmailReset(emailReset: String): Boolean =
+        authFormValidationUseCases.validateEmail(emailReset).successful
 
     private fun logIn() {
         viewModelScope.launch(ioDispatcher) {
             try {
                 when (val result = authRepository.loginWithEmailAndPassword(
-                    logInState.value.email,
-                    logInState.value.password
+                    formDataFlow.value.email,
+                    formDataFlow.value.password
                 )) {
                     is Response.Success -> {
                         circularProgressLoading.value = false
-                        println("HMM-TEST Sucessfully logged in")
+                        println("HMM-TEST Successfully logged in")
                         withContext(Dispatchers.Main) {
                             navigator.navigate(HomeScreenRoute)
                         }
@@ -130,7 +112,7 @@ class LoginViewModel @Inject constructor(
                         circularProgressLoading.value = false
                         when (result.exception) {
                             is FirebaseAuthInvalidCredentialsException -> {
-                                _logInState.update {
+                                formDataFlow.update {
                                     it.copy(
                                         logInError = resourceProvider.getString(R.string.login_error)
                                     )
@@ -145,7 +127,6 @@ class LoginViewModel @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
-                println("HMM-TEST Failed to launch logIn(): $e")
                 Log.e("HMM", "Failed to launch logIn() method with exception: $e")
             }
         }
@@ -159,7 +140,7 @@ class LoginViewModel @Inject constructor(
 
     private suspend fun resetPassword(): Boolean {
         return try {
-            when (authRepository.resetPassword(logInState.value.emailReset)) {
+            when (authRepository.resetPassword(loginFormState.value.emailReset)) {
                 is Response.Success -> {
                     if (openResetDialog.value) {
                         openResetDialog.value = false
@@ -168,7 +149,7 @@ class LoginViewModel @Inject constructor(
                 }
 
                 else -> {
-                    Log.e("HMM", "Could not reset password with ${logInState.value.emailReset}")
+                    Log.e("HMM", "Could not reset password with ${loginFormState.value.emailReset}")
                     false
                 }
             }

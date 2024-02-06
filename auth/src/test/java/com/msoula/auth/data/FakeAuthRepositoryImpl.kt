@@ -14,11 +14,10 @@ import com.msoula.auth.domain.repository.ResetEmailResponse
 import com.msoula.auth.domain.repository.Response
 import com.msoula.auth.domain.repository.SignUpResponse
 import com.msoula.di.domain.use_case.ValidateEmail
-import kotlinx.coroutines.CoroutineScope
 
 class FakeAuthRepositoryImpl : AuthRepository {
 
-    override fun getAuthState(viewModelScope: CoroutineScope): Boolean = true
+    override fun getAuthState(): Boolean = true
 
     override suspend fun logOut(): LogOutResponse {
         return Response.Success(true)

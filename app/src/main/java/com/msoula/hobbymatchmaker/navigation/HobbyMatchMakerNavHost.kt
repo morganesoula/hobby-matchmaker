@@ -7,7 +7,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.msoula.auth.data.AuthUIEvent
 import com.msoula.auth.presentation.LoginScreen
 import com.msoula.auth.presentation.LoginViewModel
 import com.msoula.auth.presentation.SignUpScreen
@@ -20,10 +19,13 @@ import com.msoula.hobbymatchmaker.presentation.HomeScreen
 import com.msoula.hobbymatchmaker.presentation.HomeViewModel
 
 @Composable
-fun HobbyMatchMakerNavHost(navController: NavHostController, navigator: Navigator) {
+fun HobbyMatchMakerNavHost(
+    navController: NavHostController,
+    navigator: Navigator
+) {
     val homeViewModel = hiltViewModel<HomeViewModel>()
-    val signUpViewModel = hiltViewModel<SignUpViewModel>()
     val logInViewModel = hiltViewModel<LoginViewModel>()
+    val signUpViewModel = hiltViewModel<SignUpViewModel>()
 
     val startDestination = if (homeViewModel.checkForActiveSession()) {
         HomeScreenRoute.route
@@ -39,36 +41,19 @@ fun HobbyMatchMakerNavHost(navController: NavHostController, navigator: Navigato
         }
 
         composable(route = LoginScreenRoute.route) {
-            val circularProgressLoading = logInViewModel.circularProgressLoading.value
-            val loginFormState = logInViewModel.logInState.collectAsState().value
-            val rememberedOpenResetDialog = logInViewModel.openResetDialog.value
-            val emailResetSent = logInViewModel.resettingEmailSent.value
+            val loginFormState by logInViewModel.loginFormState.collectAsState()
+            val circularProgressLoading by logInViewModel.circularProgressLoading.collectAsState()
+            val rememberedOpenResetDialog by logInViewModel.openResetDialog.collectAsState()
+            val emailResetSent by logInViewModel.resettingEmailSent.collectAsState()
 
             LoginScreen(
                 circularProgressLoading = circularProgressLoading,
                 loginFormState = loginFormState,
-                onEmailChanged = { email -> logInViewModel.onEvent(AuthUIEvent.OnEmailChanged(email)) },
-                onPasswordChanged = { password ->
-                    logInViewModel.onEvent(
-                        AuthUIEvent.OnPasswordChanged(
-                            password
-                        )
-                    )
-                },
-                onForgotPasswordClicked = { logInViewModel.onEvent(AuthUIEvent.OnForgotPasswordClicked) },
-                onHideForgotPasswordDialog = { logInViewModel.onEvent(AuthUIEvent.HideForgotPasswordDialog) },
-                onLogIn = { logInViewModel.onEvent(AuthUIEvent.OnLogIn) },
+                authUiEvent = logInViewModel::onEvent,
                 redirectToSignUpScreen = { navigator.navigate(SignUpScreenRoute) },
-                onResetPasswordConfirmed = { logInViewModel.onEvent(AuthUIEvent.OnResetPasswordConfirmed) },
                 openResetDialog = rememberedOpenResetDialog,
-                onEmailResetChanged = { emailReset ->
-                    logInViewModel.onEvent(
-                        AuthUIEvent.OnEmailResetChanged(
-                            emailReset
-                        )
-                    )
-                },
-                emailResetSent = emailResetSent
+                emailResetSent = emailResetSent,
+                onGoogleSignInClicked = {}
             )
         }
 
@@ -79,29 +64,7 @@ fun HobbyMatchMakerNavHost(navController: NavHostController, navigator: Navigato
             SignUpScreen(
                 registrationState = registrationState,
                 signUpProgressLoading = signUpProgressLoading,
-                onEmailChanged = { email -> signUpViewModel.onEvent(AuthUIEvent.OnEmailChanged(email)) },
-                onPasswordChanged = { password ->
-                    signUpViewModel.onEvent(
-                        AuthUIEvent.OnPasswordChanged(
-                            password
-                        )
-                    )
-                },
-                onFirstNameChanged = { firstName ->
-                    signUpViewModel.onEvent(
-                        AuthUIEvent.OnFirstNameChanged(
-                            firstName
-                        )
-                    )
-                },
-                onLastNameChanged = { lastName ->
-                    signUpViewModel.onEvent(
-                        AuthUIEvent.OnLastNameChanged(
-                            lastName
-                        )
-                    )
-                },
-                onSignUp = { signUpViewModel.onEvent(AuthUIEvent.OnSignUp) },
+                authUIEvent = signUpViewModel::onEvent,
                 redirectToLogInScreen = { navigator.navigate(LoginScreenRoute) }
             )
         }

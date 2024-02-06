@@ -16,13 +16,15 @@
     <string name="already_a_member">Already using HobbyMatchMaker? Log in</string>
     <string name="forgot_password">Forgot password?</string>
     <string name="log_in">Log In</string>
-    <string name="new_member">Not a member? Sign up</string>
+    <string name="new_member">Not a member? </string>
+    <string name="new_member_clickable_part">Sign up</string>
     <string name="forgot_password_title">Please enter your email address. We will send you an email with instructions to reset your password.</string>
     <string name="your_email">Your email</string>
     <string name="reset_password">Reset password</string>
     <string name="cancel">Cancel</string>"
     <string name="sign_out">Sign Out</string>
     <string name="email_sent">Email sent</string>
+    <string name="continue_with_rs">Or continue with</string>
 
     // ERROR
     <string name="login_error">Incorrect email or password</string>

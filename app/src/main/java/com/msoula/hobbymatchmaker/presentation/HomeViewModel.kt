@@ -14,13 +14,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import javax.inject.Named
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    @Named("authInstance") private val auth: FirebaseAuth,
-    @Named("authRepository") private val authRepository: AuthRepository,
-    @Named("ioDispatcher") private val ioDispatcher: CoroutineDispatcher,
+    private val auth: FirebaseAuth,
+    private val authRepository: AuthRepository,
+    private val ioDispatcher: CoroutineDispatcher,
     private val navigator: Navigator
 ) : ViewModel() {
 
@@ -39,7 +38,7 @@ class HomeViewModel @Inject constructor(
             try {
                 when (authRepository.logOut()) {
                     is Response.Success -> {
-                        authRepository.getAuthState(viewModelScope)
+                        authRepository.getAuthState()
 
                         withContext(Dispatchers.Main) {
                             navigator.navigate(LoginScreenRoute)

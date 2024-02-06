@@ -1,7 +1,6 @@
 package com.msoula.auth.domain.repository
 
 import com.google.firebase.auth.AuthResult
-import kotlinx.coroutines.CoroutineScope
 
 typealias LogOutResponse = Response<Boolean>
 typealias SignUpResponse = Response<AuthResult>
@@ -14,7 +13,7 @@ sealed class Response<out T> {
 }
 
 interface AuthRepository {
-    fun getAuthState(viewModelScope: CoroutineScope): Boolean
+    fun getAuthState(): Boolean
     suspend fun logOut(): LogOutResponse
     suspend fun signUp(email: String, password: String): SignUpResponse
     suspend fun loginWithEmailAndPassword(email: String, password: String): LoginResponse
