@@ -1,9 +1,8 @@
-package com.msoula.di.domain.use_case
+package com.msoula.di.domain.useCase
 
 import com.msoula.di.domain.ValidationResult
 
 class ValidatePassword {
-
     fun validatePassword(password: String): ValidationResult {
         return if (password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%^&*(),.?\":{}|<>])(?=\\S+\$).{8,}\$".toRegex())) {
             ValidationResult(true)

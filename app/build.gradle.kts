@@ -30,7 +30,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -71,6 +71,8 @@ kapt {
 }
 
 dependencies {
+    lintChecks("com.slack.lint.compose:compose-lint-checks:1.3.1")
+
     appModuleDeps()
     unitTestDeps()
     instrumentationTestDeps()

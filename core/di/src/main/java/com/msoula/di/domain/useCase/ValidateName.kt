@@ -1,12 +1,13 @@
-package com.msoula.di.domain.use_case
+package com.msoula.di.domain.useCase
 
 import com.msoula.di.domain.ValidationResult
 
 class ValidateName {
-
     operator fun invoke(name: String): ValidationResult {
         return if (name.matches("^[a-zA-Z]+\$".toRegex())) {
             ValidationResult(true)
-        } else ValidationResult(false)
+        } else {
+            ValidationResult(false)
+        }
     }
 }

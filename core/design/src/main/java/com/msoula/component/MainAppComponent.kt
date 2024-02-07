@@ -11,18 +11,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-
 @Composable
-fun HeaderTextComponent(modifier: Modifier = Modifier, text: String) {
+fun HeaderTextComponent(
+    modifier: Modifier = Modifier,
+    text: String,
+) {
     Spacer(modifier = modifier.height(40.dp))
 
     Text(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
         text = text,
         fontSize = 28.sp,
-        textAlign = TextAlign.Center
+        textAlign = TextAlign.Center,
     )
 
     Spacer(modifier = modifier.height(40.dp))

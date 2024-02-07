@@ -6,7 +6,6 @@ data class SignUpRegistrationState(
     val email: String = "",
     val password: String = "",
     val submit: Boolean = false,
-
-    //Error section
-    val signUpError: String? = null
+    // Error section
+    val signUpError: String? = null,
 )

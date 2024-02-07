@@ -6,7 +6,6 @@ data class LoginFormState(
     val password: String = "",
     val submit: Boolean = false,
     val submitEmailReset: Boolean = false,
-
     // Error section
-    val logInError: String? = null
+    val logInError: String? = null,
 )

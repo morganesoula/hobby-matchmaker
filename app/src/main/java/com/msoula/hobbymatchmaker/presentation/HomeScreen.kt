@@ -16,31 +16,32 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-
 import com.msoula.auth.R.string as StringRes
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    logOut: () -> Unit
+    logOut: () -> Unit,
 ) {
-    Scaffold { paddingValues ->
+    Scaffold(modifier = modifier) { paddingValues ->
         Surface(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
         ) {
-            Column(modifier = modifier.fillMaxSize()) {
+            Column(modifier = Modifier.fillMaxSize()) {
                 Text(
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight(),
-                    text = "Hello there, you are logged in"
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight(),
+                    text = "Hello there, you are logged in",
                 )
 
-                Spacer(modifier = modifier.height(100.dp))
+                Spacer(modifier = Modifier.height(100.dp))
 
-                Button(onClick = { logOut() }, modifier = modifier.wrapContentSize()) {
+                Button(onClick = { logOut() }, modifier = Modifier.wrapContentSize()) {
                     Text(text = stringResource(id = StringRes.sign_out))
                 }
             }

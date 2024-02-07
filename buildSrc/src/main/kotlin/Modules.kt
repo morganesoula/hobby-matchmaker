@@ -1,9 +1,9 @@
 object Modules {
-    const val app = ":app"
-    const val auth = ":auth"
-    const val model = ":core:model"
-    const val network = ":core:network"
-    const val di = ":core:di"
-    const val design = ":core:design"
-    const val navigation = ":core:navigation"
+    const val APP = ":app"
+    const val AUTH = ":auth"
+    const val MODEL = ":core:model"
+    const val NETWORK = ":core:network"
+    const val DI = ":core:di"
+    const val DESIGN = ":core:design"
+    const val NAVIGATION = ":core:navigation"
 }

@@ -7,7 +7,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class StringResourcesProviderImpl @Inject constructor(@ApplicationContext private val context: Context): StringResourcesProvider {
-    override fun getString(stringResId: Int): String = context.getString(stringResId)
-
-}
+class StringResourcesProviderImpl
+    @Inject
+    constructor(
+        @ApplicationContext private val context: Context,
+    ) : StringResourcesProvider {
+        override fun getString(stringResId: Int): String = context.getString(stringResId)
+    }

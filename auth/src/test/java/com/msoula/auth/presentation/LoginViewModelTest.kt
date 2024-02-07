@@ -12,10 +12,10 @@ import assertk.assertions.isTrue
 import com.msoula.auth.data.AuthUIEvent
 import com.msoula.auth.data.FakeAuthRepositoryImpl
 import com.msoula.auth.data.FakeStringResourcesProvider
-import com.msoula.di.domain.use_case.AuthFormValidationUseCase
-import com.msoula.di.domain.use_case.ValidateEmail
-import com.msoula.di.domain.use_case.ValidateName
-import com.msoula.di.domain.use_case.ValidatePassword
+import com.msoula.di.domain.useCase.AuthFormValidationUseCase
+import com.msoula.di.domain.useCase.ValidateEmail
+import com.msoula.di.domain.useCase.ValidateName
+import com.msoula.di.domain.useCase.ValidatePassword
 import com.msoula.di.navigation.NavigatorImpl
 import io.mockk.every
 import io.mockk.mockkStatic
@@ -27,11 +27,10 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
-
 import com.msoula.auth.R.string as StringRes
+
 @OptIn(ExperimentalCoroutinesApi::class)
 class LoginViewModelTest {
-
     private lateinit var loginViewModel: LoginViewModel
     private val resourceProvider = FakeStringResourcesProvider()
     private val navigator = NavigatorImpl()
@@ -43,18 +42,20 @@ class LoginViewModelTest {
         mockkStatic(TextUtils::class)
         mockkStatic(Log::class)
 
-        loginViewModel = LoginViewModel(
-            authFormValidationUseCases = AuthFormValidationUseCase(
-                ValidateEmail(),
-                ValidatePassword(),
-                ValidateName(),
-                ValidateName()
-            ),
-            authRepository = FakeAuthRepositoryImpl(),
-            resourceProvider = resourceProvider,
-            ioDispatcher = Dispatchers.IO,
-            navigator = navigator
-        )
+        loginViewModel =
+            LoginViewModel(
+                authFormValidationUseCases =
+                    AuthFormValidationUseCase(
+                        ValidateEmail(),
+                        ValidatePassword(),
+                        ValidateName(),
+                        ValidateName(),
+                    ),
+                authRepository = FakeAuthRepositoryImpl(),
+                resourceProvider = resourceProvider,
+                ioDispatcher = Dispatchers.IO,
+                navigator = navigator,
+            )
     }
 
     @Test
@@ -93,47 +94,49 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun getResettingEmailSent() = runTest {
-        loginViewModel.onEvent(AuthUIEvent.OnEmailResetChanged("soula.morgane35@gmail.com"))
-        val resetEmail = loginViewModel.resettingEmailSent.value
-        assertThat(resetEmail).isFalse()
+    fun getResettingEmailSent() =
+        runTest {
+            loginViewModel.onEvent(AuthUIEvent.OnEmailResetChanged("soula.morgane35@gmail.com"))
+            val resetEmail = loginViewModel.resettingEmailSent.value
+            assertThat(resetEmail).isFalse()
 
-        loginViewModel.onEvent(AuthUIEvent.OnResetPasswordConfirmed)
-        delay(2000)
+            loginViewModel.onEvent(AuthUIEvent.OnResetPasswordConfirmed)
+            delay(2000)
 
-        val updatedResetEmail = loginViewModel.resettingEmailSent.value
-        assertThat(updatedResetEmail).isTrue()
-    }
+            val updatedResetEmail = loginViewModel.resettingEmailSent.value
+            assertThat(updatedResetEmail).isTrue()
+        }
 
     @Test
-    fun onEvent(): Unit = runBlocking {
-        every { TextUtils.isEmpty(any()) } returns false
-        every { Log.e("HMM", "Invalid credentials") } returns 1
+    fun onEvent(): Unit =
+        runBlocking {
+            every { TextUtils.isEmpty(any()) } returns false
+            every { Log.e("HMM", "Invalid credentials") } returns 1
 
-        loginViewModel.onEvent(AuthUIEvent.OnEmailChanged("test@test.com"))
-        var loginState = loginViewModel.loginFormState.value
-        assertThat(loginState.submit).isFalse()
+            loginViewModel.onEvent(AuthUIEvent.OnEmailChanged("test@test.com"))
+            var loginState = loginViewModel.loginFormState.value
+            assertThat(loginState.submit).isFalse()
 
-        loginViewModel.onEvent(AuthUIEvent.OnPasswordChanged("pass"))
-        loginState = loginViewModel.loginFormState.value
-        assertThat(loginState.submit).isTrue()
+            loginViewModel.onEvent(AuthUIEvent.OnPasswordChanged("pass"))
+            loginState = loginViewModel.loginFormState.value
+            assertThat(loginState.submit).isTrue()
 
-        assertThat(loginViewModel.circularProgressLoading.value).isFalse()
-        loginViewModel.onEvent(AuthUIEvent.OnLogIn)
-        assertThat(loginViewModel.circularProgressLoading.value).isTrue()
+            assertThat(loginViewModel.circularProgressLoading.value).isFalse()
+            loginViewModel.onEvent(AuthUIEvent.OnLogIn)
+            assertThat(loginViewModel.circularProgressLoading.value).isTrue()
 
-        delay(2000)
-        loginState = loginViewModel.loginFormState.value
+            delay(2000)
+            loginState = loginViewModel.loginFormState.value
 
-        assertThat(loginViewModel.circularProgressLoading.value).isFalse()
-        assertThat(loginState.logInError).isNotNull()
-        assertThat(loginState.logInError).isEqualTo(resourceProvider.getString(StringRes.login_error))
+            assertThat(loginViewModel.circularProgressLoading.value).isFalse()
+            assertThat(loginState.logInError).isNotNull()
+            assertThat(loginState.logInError).isEqualTo(resourceProvider.getString(StringRes.login_error))
 
-        loginViewModel.onEvent(AuthUIEvent.OnPasswordChanged("password"))
-        loginViewModel.onEvent(AuthUIEvent.OnLogIn)
-        assertThat(loginViewModel.circularProgressLoading.value).isTrue()
+            loginViewModel.onEvent(AuthUIEvent.OnPasswordChanged("password"))
+            loginViewModel.onEvent(AuthUIEvent.OnLogIn)
+            assertThat(loginViewModel.circularProgressLoading.value).isTrue()
 
-        delay(2000)
-        assertThat(loginViewModel.circularProgressLoading.value).isFalse()
-    }
+            delay(2000)
+            assertThat(loginViewModel.circularProgressLoading.value).isFalse()
+        }
 }

@@ -64,27 +64,30 @@ fun LoginScreen(
     onGoogleSignInClicked: () -> Unit,
     redirectToSignUpScreen: () -> Unit,
     openResetDialog: Boolean,
-    emailResetSent: Boolean
+    emailResetSent: Boolean,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
     val resourcesProvider = StringResourcesProviderImpl(context)
 
-    val annotatedString = buildAnnotatedString {
-        append(stringResource(id = StringRes.new_member) + "  ")
-        withStyle(
-            style = SpanStyle(
-                color = Color.Blue.copy(alpha = 0.7f),
-                textDecoration = TextDecoration.Underline
-            )
-        ) {
-            append(stringResource(id = StringRes.new_member_clickable_part))
+    val annotatedString =
+        buildAnnotatedString {
+            append(stringResource(id = StringRes.new_member) + "  ")
+            withStyle(
+                style =
+                    SpanStyle(
+                        color = Color.Blue.copy(alpha = 0.7f),
+                        textDecoration = TextDecoration.Underline,
+                    ),
+            ) {
+                append(stringResource(id = StringRes.new_member_clickable_part))
+            }
         }
-    }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackBarHostState) }
+        modifier = modifier,
+        snackbarHost = { SnackbarHost(snackBarHostState) },
     ) { paddingValues ->
         LaunchedEffect(emailResetSent) {
             if (emailResetSent) {
@@ -95,117 +98,118 @@ fun LoginScreen(
             }
         }
 
-        Box(modifier = modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize()) {
             Column(
-                modifier = modifier
-                    .padding(paddingValues)
-                    .verticalScroll(rememberScrollState())
+                modifier =
+                    Modifier
+                        .padding(paddingValues)
+                        .verticalScroll(rememberScrollState()),
             ) {
                 if (openResetDialog) {
                     ForgotPasswordAlertDialog(
                         email = loginFormState.emailReset,
                         paddingValues = paddingValues,
                         enableSubmit = loginFormState.submitEmailReset,
-                        authUIEvent = authUiEvent
+                        authUIEvent = authUiEvent,
                     )
                 }
 
                 HeaderTextComponent(
-                    text = stringResource(id = StringRes.welcome_back_title)
+                    text = stringResource(id = StringRes.welcome_back_title),
                 )
 
                 if (loginFormState.logInError != null) {
-                    HMMErrorText(modifier = modifier, errorText = loginFormState.logInError)
+                    HMMErrorText(errorText = loginFormState.logInError)
                 }
 
                 HMMTextFieldAuthComponent(
-                    modifier = modifier,
                     value = loginFormState.email.trimEnd(),
                     placeHolderText = stringResource(StringRes.email),
-                    onValueChange = { authUiEvent(AuthUIEvent.OnEmailChanged(it)) }
+                    onValueChange = { authUiEvent(AuthUIEvent.OnEmailChanged(it)) },
                 )
 
                 Spacer(modifier = modifier.height(8.dp))
 
                 HMMTextFieldAuthComponent(
-                    modifier = modifier,
                     value = loginFormState.password.trimEnd(),
                     placeHolderText = stringResource(id = StringRes.password),
                     onValueChange = { authUiEvent(AuthUIEvent.OnPasswordChanged(it)) },
-                    visualTransformation = PasswordVisualTransformation()
+                    visualTransformation = PasswordVisualTransformation(),
                 )
 
-                Spacer(modifier = modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 ClickableText(
                     text = AnnotatedString(stringResource(id = StringRes.forgot_password)),
                     onClick = { authUiEvent(AuthUIEvent.OnForgotPasswordClicked) },
                     style = TextStyle(color = MaterialTheme.colorScheme.onBackground),
-                    modifier = modifier
-                        .wrapContentSize()
-                        .align(Alignment.End)
-                        .padding(end = 16.dp)
+                    modifier =
+                        Modifier
+                            .wrapContentSize()
+                            .align(Alignment.End)
+                            .padding(end = 16.dp),
                 )
 
-                Spacer(modifier = modifier.height(40.dp))
+                Spacer(modifier = Modifier.height(40.dp))
 
                 HMMButtonAuthComponent(
-                    modifier = modifier,
                     onClick = { authUiEvent(AuthUIEvent.OnLogIn) },
                     text = stringResource(id = StringRes.log_in),
                     enabled = loginFormState.submit,
-                    loading = circularProgressLoading
+                    loading = circularProgressLoading,
                 )
 
-                Spacer(modifier = modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
                 Row(
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .padding(start = 8.dp, end = 8.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(start = 8.dp, end = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
                     HorizontalDivider(
-                        modifier.weight(1f),
+                        Modifier.weight(1f),
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                        thickness = 2.dp
+                        thickness = 2.dp,
                     )
                     Text(
                         text = resourcesProvider.getString(StringRes.continue_with_rs),
-                        modifier = modifier.weight(3f),
+                        modifier = Modifier.weight(3f),
                         textAlign = TextAlign.Center,
                         fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                     )
 
                     HorizontalDivider(
-                        modifier.weight(1f),
+                        Modifier.weight(1f),
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                        thickness = 2.dp
+                        thickness = 2.dp,
                     )
                 }
 
-                Spacer(modifier = modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
                 HMMSocialMediaRow(
-                    modifier = modifier,
                     onFacebookButtonClicked = { },
-                    onGoogleButtonClicked = onGoogleSignInClicked
+                    onGoogleButtonClicked = onGoogleSignInClicked,
                 )
             }
 
             Box(
-                modifier = modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 8.dp)
+                modifier =
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 8.dp),
             ) {
                 ClickableText(
-                    modifier = modifier
-                        .wrapContentSize(),
+                    modifier =
+                        Modifier
+                            .wrapContentSize(),
                     text = annotatedString,
                     onClick = { redirectToSignUpScreen() },
-                    style = TextStyle(color = MaterialTheme.colorScheme.onBackground)
+                    style = TextStyle(color = MaterialTheme.colorScheme.onBackground),
                 )
             }
         }
@@ -224,7 +228,7 @@ fun LoginScreenPreview(modifier: Modifier = Modifier) {
             openResetDialog = false,
             emailResetSent = false,
             redirectToSignUpScreen = {},
-            onGoogleSignInClicked = {}
+            onGoogleSignInClicked = {},
         )
     }
 }
@@ -235,7 +239,7 @@ fun ForgotPasswordAlertDialog(
     email: String,
     authUIEvent: (AuthUIEvent) -> Unit,
     paddingValues: PaddingValues,
-    enableSubmit: Boolean
+    enableSubmit: Boolean,
 ) {
     AlertDialog(
         modifier = modifier.padding(paddingValues),
@@ -243,7 +247,7 @@ fun ForgotPasswordAlertDialog(
             Text(
                 text = stringResource(id = StringRes.forgot_password_title),
                 fontSize = 16.sp,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
         },
         text = {
@@ -251,14 +255,14 @@ fun ForgotPasswordAlertDialog(
                 value = email,
                 onValueChange = { authUIEvent(AuthUIEvent.OnEmailResetChanged(it)) },
                 placeHolderText = stringResource(StringRes.your_email),
-                modifier = modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
         },
         onDismissRequest = { authUIEvent(AuthUIEvent.HideForgotPasswordDialog) },
         confirmButton = {
             Button(
                 onClick = { authUIEvent(AuthUIEvent.OnResetPasswordConfirmed) },
-                enabled = enableSubmit
+                enabled = enableSubmit,
             ) {
                 Text(text = stringResource(id = StringRes.reset_password))
             }
@@ -266,14 +270,14 @@ fun ForgotPasswordAlertDialog(
         dismissButton = {
             Button(
                 onClick = { authUIEvent(AuthUIEvent.HideForgotPasswordDialog) },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.onBackground
-                )
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        contentColor = MaterialTheme.colorScheme.onBackground,
+                    ),
             ) {
                 Text(text = stringResource(id = StringRes.cancel))
             }
-        }
+        },
     )
 }
-

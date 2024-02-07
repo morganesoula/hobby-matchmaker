@@ -13,17 +13,19 @@ import com.msoula.auth.domain.repository.LoginResponse
 import com.msoula.auth.domain.repository.ResetEmailResponse
 import com.msoula.auth.domain.repository.Response
 import com.msoula.auth.domain.repository.SignUpResponse
-import com.msoula.di.domain.use_case.ValidateEmail
+import com.msoula.di.domain.useCase.ValidateEmail
 
 class FakeAuthRepositoryImpl : AuthRepository {
-
     override fun getAuthState(): Boolean = true
 
     override suspend fun logOut(): LogOutResponse {
         return Response.Success(true)
     }
 
-    override suspend fun signUp(email: String, password: String): SignUpResponse {
+    override suspend fun signUp(
+        email: String,
+        password: String,
+    ): SignUpResponse {
         // Add random character just to test Response.Failure
         return if (password.contains("?")) {
             Response.Success(FakeAuthResult())
@@ -32,7 +34,10 @@ class FakeAuthRepositoryImpl : AuthRepository {
         }
     }
 
-    override suspend fun loginWithEmailAndPassword(email: String, password: String): LoginResponse {
+    override suspend fun loginWithEmailAndPassword(
+        email: String,
+        password: String,
+    ): LoginResponse {
         return if (ValidateEmail().invoke(email).successful && password.length >= 8) {
             Response.Success(FakeAuthResult())
         } else {
@@ -58,7 +63,10 @@ class FakeAuthResult : AuthResult {
         TODO("Not yet implemented")
     }
 
-    override fun writeToParcel(dest: Parcel, flags: Int) {
+    override fun writeToParcel(
+        dest: Parcel,
+        flags: Int,
+    ) {
         TODO("Not yet implemented")
     }
 

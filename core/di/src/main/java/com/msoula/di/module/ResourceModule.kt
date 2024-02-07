@@ -13,9 +13,9 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object ResourceModule {
-
     @Provides
     @Singleton
-    fun provideResourceProvider(@ApplicationContext context: Context): StringResourcesProvider =
-        StringResourcesProviderImpl(context)
+    fun provideResourceProvider(
+        @ApplicationContext context: Context,
+    ): StringResourcesProvider = StringResourcesProviderImpl(context)
 }

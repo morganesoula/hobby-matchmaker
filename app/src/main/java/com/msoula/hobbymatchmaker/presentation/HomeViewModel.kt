@@ -16,40 +16,41 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(
-    private val auth: FirebaseAuth,
-    private val authRepository: AuthRepository,
-    private val ioDispatcher: CoroutineDispatcher,
-    private val navigator: Navigator
-) : ViewModel() {
-
-    fun checkForActiveSession(): Boolean {
-        return auth.currentUser?.let {
-            Log.d("HMM", "User is logged in")
-            true
-        } ?: run {
-            Log.d("HMM", "User is not logged in")
-            false
+class HomeViewModel
+    @Inject
+    constructor(
+        private val auth: FirebaseAuth,
+        private val authRepository: AuthRepository,
+        private val ioDispatcher: CoroutineDispatcher,
+        private val navigator: Navigator,
+    ) : ViewModel() {
+        fun checkForActiveSession(): Boolean {
+            return auth.currentUser?.let {
+                Log.d("HMM", "User is logged in")
+                true
+            } ?: run {
+                Log.d("HMM", "User is not logged in")
+                false
+            }
         }
-    }
 
-    fun logOut() {
-        viewModelScope.launch(ioDispatcher) {
-            try {
-                when (authRepository.logOut()) {
-                    is Response.Success -> {
-                        authRepository.getAuthState()
+        fun logOut() {
+            viewModelScope.launch(ioDispatcher) {
+                try {
+                    when (authRepository.logOut()) {
+                        is Response.Success -> {
+                            authRepository.getAuthState()
 
-                        withContext(Dispatchers.Main) {
-                            navigator.navigate(LoginScreenRoute)
+                            withContext(Dispatchers.Main) {
+                                navigator.navigate(LoginScreenRoute)
+                            }
                         }
-                    }
 
-                    else -> Log.e("HMM", "Error while logging out")
+                        else -> Log.e("HMM", "Error while logging out")
+                    }
+                } catch (exception: Exception) {
+                    Log.e("HMM", "Exception while logging out: $exception")
                 }
-            } catch (exception: Exception) {
-                Log.e("HMM", "Exception while logging out: $exception")
             }
         }
     }
-}
