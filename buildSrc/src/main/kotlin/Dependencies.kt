@@ -6,6 +6,12 @@ object Deps {
         const val TEST = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$version"
     }
 
+    object Facebook {
+        private const val version = "16.3.0"
+        const val FACEBOOK_SDK = "com.facebook.android:facebook-android-sdk:$version"
+        const val FACEBOOK_LOGIN = "com.facebook.android:facebook-login:$version"
+    }
+
     object Firebase {
         private const val firebaseVersion = "32.7.0"
         const val FIREBASE_BOM = "com.google.firebase:firebase-bom:$firebaseVersion"
@@ -110,8 +116,15 @@ object TestDeps {
         const val HILT_ANDROID_TESTING = "com.google.dagger:hilt-android-testing:$version"
     }
 
+    object JUNIT {
+        private const val version = "5.10.2"
+        const val JUNIT_JUPITER = "org.junit.jupiter:junit-jupiter:$version"
+    }
+
     object MockK {
-        const val MOCKK = "io.mockk:mockk:1.13.9"
+        private const val version = "1.13.9"
+        const val MOCKK = "io.mockk:mockk:$version"
+        const val MOCKK_ANDROID = "io.mockk:mockk-android:$version"
     }
 
     const val TRUTH = "com.google.truth:truth:1.2.0"

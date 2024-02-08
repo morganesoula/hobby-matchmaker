@@ -29,6 +29,9 @@ fun DependencyHandler.appModuleDeps() {
     implementation(Deps.AndroidX.Activity.ACTIVITY_KTX)
     implementation(Deps.AndroidX.Lifecycle.LIFECYCLE_RUNTIME)
 
+    // Facebook
+    implementation(Deps.Facebook.FACEBOOK_SDK)
+
     // Firebase
     implementation(platform(Deps.Firebase.FIREBASE_BOM))
     implementation(Deps.Firebase.FIREBASE_AUTH)
@@ -74,6 +77,10 @@ fun DependencyHandler.authModuleDeps() {
 
     // DI
     implementation(project(Modules.DI))
+
+    // Facebook
+    implementation(Deps.Facebook.FACEBOOK_SDK)
+    implementation(Deps.Facebook.FACEBOOK_LOGIN)
 
     // Firebase
     implementation(platform(Deps.Firebase.FIREBASE_BOM))
@@ -160,8 +167,12 @@ fun DependencyHandler.unitTestDeps() {
     // Coroutines Test
     testImplementation(TestDeps.Coroutines.COROUTINES)
 
+    // JUnit5
+    testImplementation(TestDeps.JUNIT.JUNIT_JUPITER)
+
     // MocKK
     testImplementation(TestDeps.MockK.MOCKK)
+    testImplementation(TestDeps.MockK.MOCKK_ANDROID)
 
     // Truth
     testImplementation(TestDeps.TRUTH)
@@ -186,15 +197,19 @@ fun DependencyHandler.instrumentationTestDeps() {
 }
 
 @Suppress("detekt.UnusedPrivateMember")
-private fun DependencyHandler.implementation(dependencyNotation: Any): Dependency? = add("implementation", dependencyNotation)
+private fun DependencyHandler.implementation(dependencyNotation: Any): Dependency? =
+    add("implementation", dependencyNotation)
 
 @Suppress("detekt.UnusedPrivateMember")
-private fun DependencyHandler.api(dependencyNotation: Any): Dependency? = add("api", dependencyNotation)
+private fun DependencyHandler.api(dependencyNotation: Any): Dependency? =
+    add("api", dependencyNotation)
 
 @Suppress("detekt.UnusedPrivateMember")
-private fun DependencyHandler.kapt(dependencyNotation: Any): Dependency? = add("kapt", dependencyNotation)
+private fun DependencyHandler.kapt(dependencyNotation: Any): Dependency? =
+    add("kapt", dependencyNotation)
 
-private fun DependencyHandler.testImplementation(dependencyNotation: Any): Dependency? = add("testImplementation", dependencyNotation)
+private fun DependencyHandler.testImplementation(dependencyNotation: Any): Dependency? =
+    add("testImplementation", dependencyNotation)
 
 private fun DependencyHandler.androidTestImplementation(dependencyNotation: Any): Dependency? =
     add("androidTestImplementation", dependencyNotation)

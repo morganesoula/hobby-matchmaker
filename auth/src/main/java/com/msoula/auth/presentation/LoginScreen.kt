@@ -1,5 +1,8 @@
 package com.msoula.auth.presentation
 
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,6 +46,11 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.facebook.CallbackManager
+import com.facebook.FacebookCallback
+import com.facebook.FacebookException
+import com.facebook.login.LoginManager
+import com.facebook.login.LoginResult
 import com.msoula.auth.data.AuthUIEvent
 import com.msoula.auth.data.LoginFormState
 import com.msoula.component.HMMButtonAuthComponent
@@ -63,6 +71,7 @@ fun LoginScreen(
     authUiEvent: (AuthUIEvent) -> Unit,
     onGoogleSignInClicked: () -> Unit,
     redirectToSignUpScreen: () -> Unit,
+    redirectToHomeScreen: () -> Unit,
     openResetDialog: Boolean,
     emailResetSent: Boolean,
 ) {
@@ -70,16 +79,39 @@ fun LoginScreen(
     val scope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
     val resourcesProvider = StringResourcesProviderImpl(context)
+    val callBackManager = remember { CallbackManager.Factory.create() }
+    val loginManager = LoginManager.getInstance()
+
+    val facebookLauncher = rememberLauncherForActivityResult(
+        contract = loginManager.createLogInActivityResultContract(callBackManager)
+    ) { result ->
+        loginManager.onActivityResult(
+            result.resultCode,
+            result.data,
+            object : FacebookCallback<LoginResult> {
+                override fun onCancel() {
+                    Log.d("HMM", "Cancelled facebook login on user part")
+                }
+
+                override fun onError(error: FacebookException) {
+                    Toast.makeText(context, "Facebook error login", Toast.LENGTH_LONG).show()
+                }
+
+                override fun onSuccess(result: LoginResult) {
+                    redirectToHomeScreen()
+                }
+            })
+    }
 
     val annotatedString =
         buildAnnotatedString {
             append(stringResource(id = StringRes.new_member) + "  ")
             withStyle(
                 style =
-                    SpanStyle(
-                        color = Color.Blue.copy(alpha = 0.7f),
-                        textDecoration = TextDecoration.Underline,
-                    ),
+                SpanStyle(
+                    color = Color.Blue.copy(alpha = 0.7f),
+                    textDecoration = TextDecoration.Underline,
+                ),
             ) {
                 append(stringResource(id = StringRes.new_member_clickable_part))
             }
@@ -101,9 +133,9 @@ fun LoginScreen(
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier =
-                    Modifier
-                        .padding(paddingValues)
-                        .verticalScroll(rememberScrollState()),
+                Modifier
+                    .padding(paddingValues)
+                    .verticalScroll(rememberScrollState()),
             ) {
                 if (openResetDialog) {
                     ForgotPasswordAlertDialog(
@@ -144,10 +176,10 @@ fun LoginScreen(
                     onClick = { authUiEvent(AuthUIEvent.OnForgotPasswordClicked) },
                     style = TextStyle(color = MaterialTheme.colorScheme.onBackground),
                     modifier =
-                        Modifier
-                            .wrapContentSize()
-                            .align(Alignment.End)
-                            .padding(end = 16.dp),
+                    Modifier
+                        .wrapContentSize()
+                        .align(Alignment.End)
+                        .padding(end = 16.dp),
                 )
 
                 Spacer(modifier = Modifier.height(40.dp))
@@ -163,9 +195,9 @@ fun LoginScreen(
 
                 Row(
                     modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(start = 8.dp, end = 8.dp),
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(start = 8.dp, end = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
@@ -192,21 +224,28 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(32.dp))
 
                 HMMSocialMediaRow(
-                    onFacebookButtonClicked = { },
+                    onFacebookButtonClicked = {
+                        facebookLauncher.launch(
+                            listOf(
+                                "email",
+                                "public_profile"
+                            )
+                        )
+                    },
                     onGoogleButtonClicked = onGoogleSignInClicked,
                 )
             }
 
             Box(
                 modifier =
-                    Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 8.dp),
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 8.dp),
             ) {
                 ClickableText(
                     modifier =
-                        Modifier
-                            .wrapContentSize(),
+                    Modifier
+                        .wrapContentSize(),
                     text = annotatedString,
                     onClick = { redirectToSignUpScreen() },
                     style = TextStyle(color = MaterialTheme.colorScheme.onBackground),
@@ -227,8 +266,9 @@ fun LoginScreenPreview(modifier: Modifier = Modifier) {
             authUiEvent = {},
             openResetDialog = false,
             emailResetSent = false,
+            redirectToHomeScreen = {},
             redirectToSignUpScreen = {},
-            onGoogleSignInClicked = {},
+            onGoogleSignInClicked = {}
         )
     }
 }
@@ -271,10 +311,10 @@ fun ForgotPasswordAlertDialog(
             Button(
                 onClick = { authUIEvent(AuthUIEvent.HideForgotPasswordDialog) },
                 colors =
-                    ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                        contentColor = MaterialTheme.colorScheme.onBackground,
-                    ),
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.onBackground,
+                ),
             ) {
                 Text(text = stringResource(id = StringRes.cancel))
             }

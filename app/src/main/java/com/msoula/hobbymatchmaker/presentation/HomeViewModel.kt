@@ -3,6 +3,7 @@ package com.msoula.hobbymatchmaker.presentation
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.facebook.AccessToken
 import com.google.firebase.auth.FirebaseAuth
 import com.msoula.auth.domain.repository.AuthRepository
 import com.msoula.auth.domain.repository.Response
@@ -25,10 +26,15 @@ class HomeViewModel
         private val navigator: Navigator,
     ) : ViewModel() {
         fun checkForActiveSession(): Boolean {
-            return auth.currentUser?.let {
+            val accessToken = AccessToken.getCurrentAccessToken()
+
+            return if (auth.currentUser != null) {
                 Log.d("HMM", "User is logged in")
                 true
-            } ?: run {
+            } else if (accessToken != null && !accessToken.isExpired) {
+                Log.d("HMM", "Logged in through Facebook cache")
+                true
+            } else {
                 Log.d("HMM", "User is not logged in")
                 false
             }

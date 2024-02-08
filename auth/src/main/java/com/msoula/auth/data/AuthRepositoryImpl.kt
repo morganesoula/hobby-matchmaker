@@ -1,6 +1,7 @@
 package com.msoula.auth.data
 
 import android.util.Log
+import com.facebook.login.LoginManager
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
@@ -19,6 +20,8 @@ class AuthRepositoryImpl
         private val auth: FirebaseAuth,
         private val oneTapClient: SignInClient,
     ) : AuthRepository {
+        val loginManager = LoginManager.getInstance()
+
         override fun getAuthState(): Boolean {
             val authStateListener =
                 AuthStateListener {
@@ -37,6 +40,7 @@ class AuthRepositoryImpl
         override suspend fun logOut(): LogOutResponse {
             return try {
                 oneTapClient.signOut().await()
+                loginManager.logOut()
                 auth.signOut()
                 Response.Success(true)
             } catch (exception: Exception) {

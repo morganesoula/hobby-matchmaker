@@ -87,6 +87,7 @@ fun ComponentActivity.HobbyMatchMakerNavHost(
                 circularProgressLoading = circularProgressLoading,
                 loginFormState = loginFormState,
                 authUiEvent = loginViewModel::onEvent,
+                redirectToHomeScreen = { navigator.navigate(HomeScreenRoute) },
                 redirectToSignUpScreen = { navigator.navigate(SignUpScreenRoute) },
                 openResetDialog = rememberedOpenResetDialog,
                 emailResetSent = emailResetSent,
@@ -100,7 +101,7 @@ fun ComponentActivity.HobbyMatchMakerNavHost(
                             ).build(),
                         )
                     }
-                },
+                }
             )
         }
 
