@@ -1,6 +1,7 @@
 package com.msoula.hobbymatchmaker
 
 import android.app.Application
+import com.facebook.FacebookSdk
 import com.google.firebase.FirebaseApp
 import dagger.hilt.android.HiltAndroidApp
 

@@ -1,13 +1,38 @@
+import com.android.build.api.variant.BuildConfigField
 import extensions.appModuleDeps
 import extensions.instrumentationTestDeps
 import extensions.unitTestDeps
+import java.io.FileInputStream
+import java.io.FileNotFoundException
+import java.util.Properties
 
 plugins {
-    id(Plugins.ANDROID_APPLICATION)
-    kotlin(Plugins.ANDROID)
-    kotlin(Plugins.KAPT)
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
     id(Plugins.DAGGER_HILT)
     id(Plugins.GOOGLE_SERVICES)
+    kotlin(Plugins.KAPT)
+}
+
+fun getFacebookKey(): String {
+    val propFile = rootProject.file("./facebook.properties")
+
+    if (propFile.exists()) {
+        val properties = Properties()
+        properties.load(FileInputStream(propFile))
+        return properties.getProperty("facebook_client_token")
+    } else {
+        throw FileNotFoundException()
+    }
+}
+
+androidComponents {
+    onVariants {
+        it.buildConfigFields.put(
+            "facebook_client_token",
+            BuildConfigField("String", getFacebookKey(), "get facebook token")
+        )
+    }
 }
 
 android {
@@ -36,12 +61,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_18
+        targetCompatibility = JavaVersion.VERSION_18
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+        jvmTarget = "18"
     }
 
     buildFeatures {
@@ -61,10 +86,6 @@ android {
 
     packaging {
         resources.excludes.add("**/*")
-    }
-
-    kotlin {
-        jvmToolchain(17)
     }
 }
 

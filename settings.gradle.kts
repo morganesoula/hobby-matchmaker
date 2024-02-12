@@ -1,21 +1,8 @@
 pluginManagement {
-    resolutionStrategy {
-        eachPlugin {
-            when (requested.id.id) {
-                "androidx.navigation" -> {
-                    useModule("androidx.navigation:navigation-safe-args-gradle-plugin:2.7.7")
-                }
-                "dagger.hilt.android.plugin" -> {
-                    useModule("com.google.dagger:hilt-android-gradle-plugin:2.46")
-                }
-            }
-        }
-    }
-
     repositories {
-        gradlePluginPortal()
         google()
         mavenCentral()
+        gradlePluginPortal()
     }
 }
 dependencyResolutionManagement {
@@ -24,10 +11,6 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
     }
-}
-
-plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.7.0"
 }
 
 rootProject.name = "Hobby Matchmaker"

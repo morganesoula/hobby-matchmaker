@@ -28,7 +28,7 @@
         </activity>
 
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_application_id" />
-        <meta-data android:name="com.facebook.sdk.ClientToken" android:value="@string/facebook_client_token"/>
+        <meta-data android:name="com.facebook.sdk.ClientToken" android:value="test2"/>
     </application>
 
 </manifest>
