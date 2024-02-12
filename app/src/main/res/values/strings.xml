@@ -4,5 +4,5 @@
 
     // Facebook
     <string name="facebook_application_id" translatable="false">281880531348586</string>
-    <string name="facebook_client_token" translatable="false">6f88f4796b603d36bd2c905328de9f88</string>
+    <string name="facebook_client_token" translatable="false"></string>
 </resources>
