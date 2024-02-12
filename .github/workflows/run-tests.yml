@@ -2,7 +2,7 @@ name: Run Unit Tests
 
 on:
     push:
-        branches: ["main", "develop", "auth"]
+        branches: ["develop", "auth"]
     pull_request:
         branches: ["main", "develop"]
     workflow_dispatch:
