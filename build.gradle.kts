@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules
 plugins {
     id(Plugins.ANDROID_APPLICATION) version (PluginVersion.AGP) apply false
@@ -13,4 +15,8 @@ tasks {
     register("clean", Delete::class) {
         delete(layout.buildDirectory)
     }
+}
+
+tasks.withType(JavaCompile::class.java) {
+    options.compilerArgs = mutableListOf("-jvmtoolchain", "1.17")
 }
