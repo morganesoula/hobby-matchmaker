@@ -33,10 +33,20 @@ jobs:
             - name: Setup Android SDK
               uses: android-actions/setup-android@v3
 
-            - name: Access Facebook key
+            - name: Get Facebook client token
               env:
-                FACEBOOK_CLIENT_TOKEN: $
-              run: echo FACEBOOK_CLIENT_TOKEN=\"$facebook_client_token\" > ./facebook.properties
+                FACEBOOK_CLIENT_TOKEN: ${{ secrets.FACEBOOK_CLIENT_TOKEN }}
+              run: echo "Got key"
+
+            - name: Access Facebook properties file
+              run: |
+                 echo "facebook_client_token=$FACEBOOK_CLIENT_TOKEN" > ./facebook.properties
+
+            - name: Upload Facebook properties
+              uses: actions/upload-artifact@v2
+              with:
+                  name: facebook.properties
+                  path: facebook.properties
 
             - name: Grant execute permission for gradlew
               run: chmod +x ./gradlew
