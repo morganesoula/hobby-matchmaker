@@ -62,6 +62,10 @@ android {
     packaging {
         resources.excludes.add("**/*")
     }
+
+    kotlin {
+        jvmToolchain(17)
+    }
 }
 
 kapt {
