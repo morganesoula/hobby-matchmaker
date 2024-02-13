@@ -11,15 +11,9 @@ import org.gradle.kotlin.dsl.project
 
 fun DependencyHandler.appModuleDeps() {
     // Compose
-    val composeBom = platform("androidx.compose:compose-bom:2023.10.01")
-    implementation(composeBom)
     implementation(Deps.AndroidX.Compose.PREVIEW)
-    androidTestImplementation(composeBom)
-
-    // Core
     implementation(Deps.AndroidX.Compose.MATERIAL)
     implementation(Deps.AndroidX.Compose.MATERIAL3)
-
     implementation(Deps.AndroidX.Compose.ACTIVITY)
     implementation(Deps.AndroidX.Compose.VIEW_MODEL)
 
@@ -131,10 +125,6 @@ fun DependencyHandler.coreModelModuleDeps() {
 
 fun DependencyHandler.coreDesignModuleDeps() {
     // Compose
-    val composeBom = platform("androidx.compose:compose-bom:2023.10.01")
-    implementation(composeBom)
-    androidTestImplementation(composeBom)
-
     implementation(Deps.AndroidX.Compose.MATERIAL)
     implementation(Deps.AndroidX.Compose.MATERIAL3)
 
