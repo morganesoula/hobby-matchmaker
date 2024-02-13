@@ -14,7 +14,6 @@ fun DependencyHandler.appModuleDeps() {
     val composeBom = platform("androidx.compose:compose-bom:2023.10.01")
     implementation(composeBom)
     implementation(Deps.AndroidX.Compose.PREVIEW)
-    implementation(Deps.AndroidX.Compose.RUNTIME)
     androidTestImplementation(composeBom)
 
     // Core

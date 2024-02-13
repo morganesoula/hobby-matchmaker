@@ -44,7 +44,6 @@ object Deps {
             const val UI_TEST = "androidx.compose.ui:ui-test-junit4"
             const val ACTIVITY = "androidx.activity:activity-compose:1.8.2"
             const val VIEW_MODEL = "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2"
-            const val RUNTIME = "androidx.compose.runtime:runtime:$version"
         }
 
         object Lifecycle {
