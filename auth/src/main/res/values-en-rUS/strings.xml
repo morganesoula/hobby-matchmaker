@@ -25,6 +25,8 @@
     <string name="sign_out">Sign Out</string>
     <string name="email_sent">Email sent</string>
     <string name="continue_with_rs">Or continue with</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
 
     // ERROR
     <string name="login_error">Incorrect email or password</string>

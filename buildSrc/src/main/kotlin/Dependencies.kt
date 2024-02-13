@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:property-naming")
+
 object Deps {
     object Coroutines {
         private const val version = "1.7.3"
@@ -40,10 +42,12 @@ object Deps {
 
             const val MATERIAL = "androidx.compose.material:material:$version"
             const val MATERIAL3 = "androidx.compose.material3:material3:1.2.0-rc01"
+            const val ICONS = "androidx.compose.material:material-icons-extended:$version"
             const val PREVIEW = "androidx.compose.ui:ui-tooling:$version"
             const val UI_TEST = "androidx.compose.ui:ui-test-junit4"
             const val ACTIVITY = "androidx.activity:activity-compose:1.8.2"
             const val VIEW_MODEL = "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2"
+            const val RUNTIME = "androidx.compose.runtime:runtime:$version"
         }
 
         object Lifecycle {

@@ -3,8 +3,7 @@ import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
-class MainGradlePlugin: Plugin<Project> {
-
+class MainGradlePlugin : Plugin<Project> {
     override fun apply(project: Project) {
         applyPlugins(project)
         setProjectConfig(project)
@@ -38,7 +37,7 @@ class MainGradlePlugin: Plugin<Project> {
             }
 
             composeOptions {
-                kotlinCompilerExtensionVersion = "1.5.9"
+                kotlinCompilerExtensionVersion = "1.5.8"
             }
         }
     }

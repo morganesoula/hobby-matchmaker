@@ -26,6 +26,8 @@
     <string name="sign_out">Déconnexion</string>
     <string name="email_sent">E-mail envoy\u00E9</string>
     <string name="continue_with_rs">Ou se connecter avec</string>
+    <string name="show_password">Montrer le mot de passe</string>
+    <string name="hide_password">Cacher le mot de passe</string>
 
     // ERROR
     <string name="login_error">Identifiant ou mot de passe incorrect</string>

@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
@@ -29,6 +30,7 @@ import com.msoula.hobbymatchmaker.presentation.HomeScreen
 import com.msoula.hobbymatchmaker.presentation.HomeViewModel
 import kotlinx.coroutines.launch
 
+@Stable
 @Composable
 fun ComponentActivity.HobbyMatchMakerNavHost(
     navController: NavHostController,
@@ -101,7 +103,7 @@ fun ComponentActivity.HobbyMatchMakerNavHost(
                             ).build(),
                         )
                     }
-                }
+                },
             )
         }
 

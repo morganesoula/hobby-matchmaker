@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:function-signature")
+
 package extensions
 
 import Deps
@@ -15,6 +17,7 @@ fun DependencyHandler.appModuleDeps() {
     implementation(Deps.AndroidX.Compose.MATERIAL)
     implementation(Deps.AndroidX.Compose.MATERIAL3)
     implementation(Deps.AndroidX.Compose.ACTIVITY)
+    implementation(Deps.AndroidX.Compose.RUNTIME)
     implementation(Deps.AndroidX.Compose.VIEW_MODEL)
 
     // AndroidX
@@ -59,12 +62,14 @@ fun DependencyHandler.appModuleDeps() {
 }
 
 fun DependencyHandler.authModuleDeps() {
+    // Compose
     implementation(Deps.AndroidX.Compose.MATERIAL3)
+    implementation(Deps.AndroidX.Compose.ICONS)
     implementation(Deps.AndroidX.Compose.PREVIEW)
     androidTestImplementation(Deps.AndroidX.Compose.UI_TEST)
-
     implementation(Deps.AndroidX.Compose.ACTIVITY)
     implementation(Deps.AndroidX.Compose.VIEW_MODEL)
+    implementation(Deps.AndroidX.Compose.RUNTIME)
 
     // Coroutine
     implementation(Deps.Coroutines.CORE)
@@ -98,6 +103,7 @@ fun DependencyHandler.authModuleDeps() {
 
 fun DependencyHandler.coreNetworkModuleDeps() {
     implementation(project(Modules.DESIGN))
+    implementation(Deps.AndroidX.Compose.RUNTIME)
 }
 
 fun DependencyHandler.coreDiModuleDeps() {
@@ -117,16 +123,19 @@ fun DependencyHandler.coreDiModuleDeps() {
 
     // Navigation
     implementation(Deps.AndroidX.Navigation.COMPOSE_NAVIGATION)
+    implementation(Deps.AndroidX.Compose.RUNTIME)
 }
 
 fun DependencyHandler.coreModelModuleDeps() {
     implementation(project(Modules.DESIGN))
+    implementation(Deps.AndroidX.Compose.RUNTIME)
 }
 
 fun DependencyHandler.coreDesignModuleDeps() {
     // Compose
     implementation(Deps.AndroidX.Compose.MATERIAL)
     implementation(Deps.AndroidX.Compose.MATERIAL3)
+    implementation(Deps.AndroidX.Compose.RUNTIME)
 
     // Core
     implementation(Deps.AndroidX.CORE_KTX)
@@ -140,6 +149,7 @@ fun DependencyHandler.coreNavigationModuleDeps() {
 
     // Compose
     implementation(Deps.AndroidX.Compose.ACTIVITY)
+    implementation(Deps.AndroidX.Compose.RUNTIME)
 
     // Navigation
     implementation(Deps.AndroidX.Navigation.NAVIGATION_UI)

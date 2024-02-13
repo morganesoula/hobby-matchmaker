@@ -15,21 +15,33 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,6 +52,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
@@ -82,36 +95,38 @@ fun LoginScreen(
     val callBackManager = remember { CallbackManager.Factory.create() }
     val loginManager = LoginManager.getInstance()
 
-    val facebookLauncher = rememberLauncherForActivityResult(
-        contract = loginManager.createLogInActivityResultContract(callBackManager)
-    ) { result ->
-        loginManager.onActivityResult(
-            result.resultCode,
-            result.data,
-            object : FacebookCallback<LoginResult> {
-                override fun onCancel() {
-                    Log.d("HMM", "Cancelled facebook login on user part")
-                }
+    val facebookLauncher =
+        rememberLauncherForActivityResult(
+            contract = loginManager.createLogInActivityResultContract(callBackManager),
+        ) { result ->
+            loginManager.onActivityResult(
+                result.resultCode,
+                result.data,
+                object : FacebookCallback<LoginResult> {
+                    override fun onCancel() {
+                        Log.d("HMM", "Cancelled facebook login on user part")
+                    }
 
-                override fun onError(error: FacebookException) {
-                    Toast.makeText(context, "Facebook error login", Toast.LENGTH_LONG).show()
-                }
+                    override fun onError(error: FacebookException) {
+                        Toast.makeText(context, "Facebook error login", Toast.LENGTH_LONG).show()
+                    }
 
-                override fun onSuccess(result: LoginResult) {
-                    redirectToHomeScreen()
-                }
-            })
-    }
+                    override fun onSuccess(result: LoginResult) {
+                        redirectToHomeScreen()
+                    }
+                },
+            )
+        }
 
     val annotatedString =
         buildAnnotatedString {
             append(stringResource(id = StringRes.new_member) + "  ")
             withStyle(
                 style =
-                SpanStyle(
-                    color = Color.Blue.copy(alpha = 0.7f),
-                    textDecoration = TextDecoration.Underline,
-                ),
+                    SpanStyle(
+                        color = Color.Blue.copy(alpha = 0.7f),
+                        textDecoration = TextDecoration.Underline,
+                    ),
             ) {
                 append(stringResource(id = StringRes.new_member_clickable_part))
             }
@@ -121,6 +136,9 @@ fun LoginScreen(
         modifier = modifier,
         snackbarHost = { SnackbarHost(snackBarHostState) },
     ) { paddingValues ->
+
+        var hiddenPassword by rememberSaveable { mutableStateOf(true) }
+
         LaunchedEffect(emailResetSent) {
             if (emailResetSent) {
                 authUiEvent(AuthUIEvent.HideForgotPasswordDialog)
@@ -133,9 +151,9 @@ fun LoginScreen(
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier =
-                Modifier
-                    .padding(paddingValues)
-                    .verticalScroll(rememberScrollState()),
+                    Modifier
+                        .padding(paddingValues)
+                        .verticalScroll(rememberScrollState()),
             ) {
                 if (openResetDialog) {
                     ForgotPasswordAlertDialog(
@@ -162,11 +180,38 @@ fun LoginScreen(
 
                 Spacer(modifier = modifier.height(8.dp))
 
-                HMMTextFieldAuthComponent(
+                TextField(
+                    modifier =
+                        modifier
+                            .padding(start = 24.dp, end = 24.dp)
+                            .fillMaxWidth(),
                     value = loginFormState.password.trimEnd(),
-                    placeHolderText = stringResource(id = StringRes.password),
                     onValueChange = { authUiEvent(AuthUIEvent.OnPasswordChanged(it)) },
-                    visualTransformation = PasswordVisualTransformation(),
+                    placeholder = { Text(text = stringResource(id = StringRes.password)) },
+                    shape = RoundedCornerShape(16.dp),
+                    colors =
+                        TextFieldDefaults.colors(
+                            cursorColor = MaterialTheme.colorScheme.secondary,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                        ),
+                    visualTransformation = if (hiddenPassword) PasswordVisualTransformation() else VisualTransformation.None,
+                    trailingIcon = {
+                        IconButton(onClick = { hiddenPassword = !hiddenPassword }) {
+                            val description =
+                                if (hiddenPassword) {
+                                    stringResource(id = StringRes.show_password)
+                                } else {
+                                    stringResource(
+                                        id = StringRes.hide_password,
+                                    )
+                                }
+                            Icon(
+                                imageVector = if (hiddenPassword) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                contentDescription = description,
+                            )
+                        }
+                    },
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -176,10 +221,10 @@ fun LoginScreen(
                     onClick = { authUiEvent(AuthUIEvent.OnForgotPasswordClicked) },
                     style = TextStyle(color = MaterialTheme.colorScheme.onBackground),
                     modifier =
-                    Modifier
-                        .wrapContentSize()
-                        .align(Alignment.End)
-                        .padding(end = 16.dp),
+                        Modifier
+                            .wrapContentSize()
+                            .align(Alignment.End)
+                            .padding(end = 16.dp),
                 )
 
                 Spacer(modifier = Modifier.height(40.dp))
@@ -195,9 +240,9 @@ fun LoginScreen(
 
                 Row(
                     modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(start = 8.dp, end = 8.dp),
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(start = 8.dp, end = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
@@ -228,8 +273,8 @@ fun LoginScreen(
                         facebookLauncher.launch(
                             listOf(
                                 "email",
-                                "public_profile"
-                            )
+                                "public_profile",
+                            ),
                         )
                     },
                     onGoogleButtonClicked = onGoogleSignInClicked,
@@ -238,14 +283,14 @@ fun LoginScreen(
 
             Box(
                 modifier =
-                Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 8.dp),
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 8.dp),
             ) {
                 ClickableText(
                     modifier =
-                    Modifier
-                        .wrapContentSize(),
+                        Modifier
+                            .wrapContentSize(),
                     text = annotatedString,
                     onClick = { redirectToSignUpScreen() },
                     style = TextStyle(color = MaterialTheme.colorScheme.onBackground),
@@ -268,7 +313,7 @@ fun LoginScreenPreview(modifier: Modifier = Modifier) {
             emailResetSent = false,
             redirectToHomeScreen = {},
             redirectToSignUpScreen = {},
-            onGoogleSignInClicked = {}
+            onGoogleSignInClicked = {},
         )
     }
 }
@@ -311,10 +356,10 @@ fun ForgotPasswordAlertDialog(
             Button(
                 onClick = { authUIEvent(AuthUIEvent.HideForgotPasswordDialog) },
                 colors =
-                ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.onBackground,
-                ),
+                    ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        contentColor = MaterialTheme.colorScheme.onBackground,
+                    ),
             ) {
                 Text(text = stringResource(id = StringRes.cancel))
             }

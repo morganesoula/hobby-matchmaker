@@ -30,7 +30,7 @@ androidComponents {
     onVariants {
         it.buildConfigFields.put(
             "facebook_client_token",
-            BuildConfigField("String", getFacebookKey(), "get facebook token")
+            BuildConfigField("String", getFacebookKey(), "get facebook token"),
         )
     }
 }
@@ -81,7 +81,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.9"
+        kotlinCompilerExtensionVersion = "1.5.8"
     }
 
     packaging {
