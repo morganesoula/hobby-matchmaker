@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.msoula.auth.data.AuthUIEvent
@@ -27,6 +26,7 @@ import com.msoula.component.HMMButtonAuthComponent
 import com.msoula.component.HMMErrorText
 import com.msoula.component.HMMFormHelperText
 import com.msoula.component.HMMTextFieldAuthComponent
+import com.msoula.component.HMMTextFieldPasswordComponent
 import com.msoula.component.HeaderTextComponent
 import com.msoula.auth.R.string as StringRes
 
@@ -35,8 +35,8 @@ fun SignUpScreen(
     modifier: Modifier = Modifier,
     registrationState: SignUpRegistrationState,
     signUpProgressLoading: Boolean,
-    ignoredAuthUIEvent: (AuthUIEvent) -> Unit,
-    ignoredRedirectToLogInScreen: () -> Unit,
+    authUIEvent: (AuthUIEvent) -> Unit,
+    redirectToLogInScreen: () -> Unit,
 ) {
     val emailTipVisibility = remember { mutableStateOf(false) }
     val passwordTipVisibility = remember { mutableStateOf(false) }
@@ -46,9 +46,9 @@ fun SignUpScreen(
             HeaderTextComponent(text = stringResource(id = StringRes.welcome_title))
             Box(
                 modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
                 contentAlignment = Alignment.Center,
             ) {
                 Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
@@ -59,14 +59,14 @@ fun SignUpScreen(
                     HMMTextFieldAuthComponent(
                         placeHolderText = stringResource(id = StringRes.firstname),
                         value = registrationState.firstName.trimEnd(),
-                        onValueChange = { ignoredAuthUIEvent(AuthUIEvent.OnFirstNameChanged(it)) },
+                        onValueChange = { authUIEvent(AuthUIEvent.OnFirstNameChanged(it)) },
                         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                     )
                     Spacer(modifier = Modifier.height(8.dp))
 
                     HMMTextFieldAuthComponent(
                         value = registrationState.lastName.trimEnd(),
-                        onValueChange = { ignoredAuthUIEvent(AuthUIEvent.OnLastNameChanged(it)) },
+                        onValueChange = { authUIEvent(AuthUIEvent.OnLastNameChanged(it)) },
                         placeHolderText = stringResource(id = StringRes.lastname),
                         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                     )
@@ -80,11 +80,11 @@ fun SignUpScreen(
 
                     HMMTextFieldAuthComponent(
                         modifier =
-                            modifier.onFocusChanged {
-                                emailTipVisibility.value = it.isFocused
-                            },
+                        modifier.onFocusChanged {
+                            emailTipVisibility.value = it.isFocused
+                        },
                         value = registrationState.email.trimEnd(),
-                        onValueChange = { ignoredAuthUIEvent(AuthUIEvent.OnEmailChanged(it)) },
+                        onValueChange = { authUIEvent(AuthUIEvent.OnEmailChanged(it)) },
                         placeHolderText = stringResource(id = StringRes.email),
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -95,27 +95,27 @@ fun SignUpScreen(
                         hint = stringResource(id = StringRes.password_hint),
                     )
 
-                    HMMTextFieldAuthComponent(
-                        modifier =
-                            Modifier.onFocusChanged {
-                                passwordTipVisibility.value = it.isFocused
-                            },
-                        value = registrationState.password.trimEnd(),
-                        onValueChange = { ignoredAuthUIEvent(AuthUIEvent.OnPasswordChanged(it)) },
-                        placeHolderText = stringResource(id = StringRes.password),
-                        visualTransformation = PasswordVisualTransformation(),
+                    HMMTextFieldPasswordComponent(
+                        modifier = Modifier.onFocusChanged {
+                            passwordTipVisibility.value = it.isFocused
+                        },
+                        value = registrationState.password,
+                        onValueChange = { authUIEvent(AuthUIEvent.OnPasswordChanged(it)) },
+                        placeholder = stringResource(id = StringRes.password),
+                        showPasswordContentDescription = stringResource(id = StringRes.show_password),
+                        hidePasswordContentDescription = stringResource(id = StringRes.hide_password)
                     )
 
                     Spacer(modifier = Modifier.height(32.dp))
                     HMMButtonAuthComponent(
-                        onClick = { ignoredAuthUIEvent(AuthUIEvent.OnSignUp) },
+                        onClick = { authUIEvent(AuthUIEvent.OnSignUp) },
                         enabled = registrationState.submit,
                         text = stringResource(id = StringRes.sign_up),
                         loading = signUpProgressLoading,
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     HMMButtonAuthComponent(
-                        onClick = { ignoredRedirectToLogInScreen() },
+                        onClick = { redirectToLogInScreen() },
                         text = stringResource(id = StringRes.already_a_member),
                         enabled = true,
                     )
@@ -131,7 +131,7 @@ fun SignUpScreenPreview() {
     SignUpScreen(
         registrationState = SignUpRegistrationState(),
         signUpProgressLoading = false,
-        ignoredAuthUIEvent = {},
-        ignoredRedirectToLogInScreen = {},
+        authUIEvent = {},
+        redirectToLogInScreen = {},
     )
 }

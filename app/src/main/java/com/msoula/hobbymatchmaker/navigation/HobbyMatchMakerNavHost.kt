@@ -64,7 +64,7 @@ fun ComponentActivity.HobbyMatchMakerNavHost(
         }
 
         composable(route = LoginScreenRoute.ROUTE) {
-            val loginFormState by loginViewModel.loginFormState.collectAsState()
+            val loginFormState by loginViewModel.formDataFlow.collectAsState()
             val circularProgressLoading by loginViewModel.circularProgressLoading.collectAsState()
             val rememberedOpenResetDialog by loginViewModel.openResetDialog.collectAsState()
             val emailResetSent by loginViewModel.resettingEmailSent.collectAsState()
@@ -108,14 +108,14 @@ fun ComponentActivity.HobbyMatchMakerNavHost(
         }
 
         composable(SignUpScreenRoute.ROUTE) {
-            val registrationState by signUpViewModel.registrationFormState.collectAsState()
+            val registrationState by signUpViewModel.formDataFlow.collectAsState()
             val signUpProgressLoading by signUpViewModel.signUpCircularProgress.collectAsState()
 
             SignUpScreen(
                 registrationState = registrationState,
                 signUpProgressLoading = signUpProgressLoading,
-                ignoredAuthUIEvent = signUpViewModel::onEvent,
-                ignoredRedirectToLogInScreen = { navigator.navigate(LoginScreenRoute) },
+                authUIEvent = signUpViewModel::onEvent,
+                redirectToLogInScreen = { navigator.navigate(LoginScreenRoute) },
             )
         }
     }

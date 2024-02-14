@@ -64,7 +64,6 @@ fun DependencyHandler.appModuleDeps() {
 fun DependencyHandler.authModuleDeps() {
     // Compose
     implementation(Deps.AndroidX.Compose.MATERIAL3)
-    implementation(Deps.AndroidX.Compose.ICONS)
     implementation(Deps.AndroidX.Compose.PREVIEW)
     androidTestImplementation(Deps.AndroidX.Compose.UI_TEST)
     implementation(Deps.AndroidX.Compose.ACTIVITY)
@@ -136,6 +135,7 @@ fun DependencyHandler.coreDesignModuleDeps() {
     implementation(Deps.AndroidX.Compose.MATERIAL)
     implementation(Deps.AndroidX.Compose.MATERIAL3)
     implementation(Deps.AndroidX.Compose.RUNTIME)
+    implementation(Deps.AndroidX.Compose.ICONS)
 
     // Core
     implementation(Deps.AndroidX.CORE_KTX)

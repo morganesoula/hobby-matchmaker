@@ -1,5 +1,9 @@
 package com.msoula.auth.data
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class SignUpRegistrationState(
     val firstName: String = "",
     val lastName: String = "",
@@ -8,4 +12,4 @@ data class SignUpRegistrationState(
     val submit: Boolean = false,
     // Error section
     val signUpError: String? = null,
-)
+): Parcelable

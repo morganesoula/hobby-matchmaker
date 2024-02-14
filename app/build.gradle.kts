@@ -12,6 +12,7 @@ plugins {
     id(Plugins.DAGGER_HILT)
     id(Plugins.GOOGLE_SERVICES)
     kotlin(Plugins.KAPT)
+    id("kotlin-parcelize")
 }
 
 fun getFacebookKey(): String {

@@ -1,5 +1,9 @@
 package com.msoula.auth.data
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class LoginFormState(
     val email: String = "",
     val emailReset: String = "",
@@ -8,4 +12,4 @@ data class LoginFormState(
     val submitEmailReset: Boolean = false,
     // Error section
     val logInError: String? = null,
-)
+): Parcelable
