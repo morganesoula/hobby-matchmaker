@@ -33,20 +33,13 @@ jobs:
             - name: Setup Android SDK
               uses: android-actions/setup-android@v3
 
-            - name: Get Facebook client token
+            - name: Create Facebook file
+              run: cat /home/runner/work/hobby-matchmaker/hobby-matchmaker/app/facebook.properties | base64
+
+            - name: Fill facebook file
               env:
-                FACEBOOK_CLIENT_TOKEN: ${{ secrets.FACEBOOK_CLIENT_TOKEN }}
-              run: echo "Got key"
-
-            - name: Access Facebook properties file
-              run: |
-                 echo "facebook_client_token=$FACEBOOK_CLIENT_TOKEN" > ./facebook.properties
-
-            - name: Upload Facebook properties
-              uses: actions/upload-artifact@v2
-              with:
-                  name: facebook.properties
-                  path: facebook.properties
+                  DATA: ${{ secrets.FACEBOOK_CLIENT_TOKEN }}
+              run: echo "facebook_client_token=$DATA" > /home/runner/work/hobby-matchmaker/hobby-matchmaker/app/facebook.properties
 
             - name: Create google-services file
               run: cat /home/runner/work/hobby-matchmaker/hobby-matchmaker/app/google-services.json | base64
