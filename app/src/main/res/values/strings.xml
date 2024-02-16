@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">Hobby Matchmaker</string>
+    <string name="app_name" translatable="false">Hobby Matchmaker</string>
+    <string name="default_web_client_id" translatable="false">402985273077-ijpv11p99mv6vgii80etm1ee9j1ll9ui.apps.googleusercontent.com</string>
+
+    // Facebook
+    <string name="facebook_application_id" translatable="false">281880531348586</string>
 </resources>

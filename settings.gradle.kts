@@ -1,12 +1,6 @@
 pluginManagement {
     repositories {
-        google {
-            content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
-            }
-        }
+        google()
         mavenCentral()
         gradlePluginPortal()
     }
@@ -21,3 +15,10 @@ dependencyResolutionManagement {
 
 rootProject.name = "Hobby Matchmaker"
 include(":app")
+include(":auth")
+include(":core")
+include(":core:network")
+include(":core:model")
+include(":core:di")
+include(":core:design")
+include(":core:navigation")

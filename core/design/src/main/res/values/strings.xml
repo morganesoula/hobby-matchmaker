@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name" translatable="false">Hobby Matchmaker</string>
+    <string name="default_web_client_id" translatable="false">402985273077-ijpv11p99mv6vgii80etm1ee9j1ll9ui.apps.googleusercontent.com</string>
+
+    <string name="facebook_alt">Facebook Logo</string>
+    <string name="google_alt">Google Logo</string>
+</resources>

@@ -1,0 +1,54 @@
+name: Run Unit Tests
+
+on:
+    pull_request:
+        branches: [ "main", "develop" ]
+    workflow_dispatch:
+
+jobs:
+    run-tests:
+        runs-on: ubuntu-latest
+        steps:
+            -   uses: actions/checkout@v4
+            -   name: Cache Gradle dependencies
+                uses: actions/cache@v4
+                with:
+                    path: |
+                        ~/.gradle/caches
+                        ~/.gradle/wrapper
+                    key: >
+                        ${{ runner.os }}-gradle-
+                        ${{ hashFiles('**/*.gradle', '**/gradle-wrapper.properties') }}
+                    restore-keys: ${{ runner.os }}-gradle-
+
+            -   name: Set up JDK 17
+                uses: actions/setup-java@v3
+                with:
+                    java-version: '17'
+                    distribution: 'zulu'
+                    cache: gradle
+
+            -   name: Setup Android SDK
+                uses: android-actions/setup-android@v3
+
+            -   name: Create Facebook file
+                run: cat /home/runner/work/hobby-matchmaker/hobby-matchmaker/facebook.properties | base64
+
+            -   name: Fill facebook file
+                env:
+                    DATA: ${{ secrets.FACEBOOK_CLIENT_TOKEN }}
+                run: echo "facebook_client_token=$DATA" > /home/runner/work/hobby-matchmaker/hobby-matchmaker/facebook.properties
+
+            -   name: Create google-services file
+                run: cat /home/runner/work/hobby-matchmaker/hobby-matchmaker/app/google-services.json | base64
+
+            -   name: Fill google-services file
+                env:
+                    DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
+                run: echo $DATA > /home/runner/work/hobby-matchmaker/hobby-matchmaker/app/google-services.json
+
+            -   name: Grant execute permission for gradlew
+                run: chmod +x ./gradlew
+
+            -   name: Run Unit tests
+                run: ./gradlew test
