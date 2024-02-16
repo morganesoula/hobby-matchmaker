@@ -2,6 +2,7 @@ package com.msoula.auth.presentation
 
 import android.text.TextUtils
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import assertk.assertThat
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
@@ -31,6 +32,7 @@ import com.msoula.auth.R.string as StringRes
 class SignUpViewModelTest {
     private lateinit var signUpViewModel: SignUpViewModel
     private val resourcesProvider = FakeStringResourcesProvider()
+    private val savedStateHandle = SavedStateHandle()
 
     @Before
     fun setUp() {
@@ -52,12 +54,13 @@ class SignUpViewModelTest {
                 resourceProvider = resourcesProvider,
                 ioDispatcher = Dispatchers.IO,
                 navigator = NavigatorImpl(),
+                savedStateHandle = savedStateHandle
             )
     }
 
     @Test
     fun getRegistrationState() {
-        val initialState = signUpViewModel.registrationFormState.value
+        val initialState = signUpViewModel.formDataFlow.value
 
         assertThat(initialState.firstName).isEmpty()
         assertThat(initialState.lastName).isEmpty()
@@ -69,7 +72,7 @@ class SignUpViewModelTest {
         signUpViewModel.onEvent(AuthUIEvent.OnLastNameChanged("lastName"))
         signUpViewModel.onEvent(AuthUIEvent.OnPasswordChanged("Password123!"))
 
-        val updatedInitialState = signUpViewModel.registrationFormState.value
+        val updatedInitialState = signUpViewModel.formDataFlow.value
 
         assertThat(updatedInitialState.firstName).isEqualTo("firstName")
         assertThat(updatedInitialState.lastName).isEqualTo("lastName")
@@ -93,7 +96,7 @@ class SignUpViewModelTest {
             assertThat(signUpViewModel.signUpCircularProgress.value).isFalse()
             delay(2000)
 
-            val initialState = signUpViewModel.registrationFormState.value
+            val initialState = signUpViewModel.formDataFlow.value
             assertThat(initialState.signUpError).isNotNull()
             assertThat(initialState.signUpError).isEqualTo(resourcesProvider.getString(StringRes.signup_error))
 
