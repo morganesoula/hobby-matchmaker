@@ -233,17 +233,3 @@ private fun DependencyHandler.testImplementation(dependencyNotation: Any): Depen
 
 private fun DependencyHandler.androidTestImplementation(dependencyNotation: Any): Dependency? =
     add("androidTestImplementation", dependencyNotation)
-
-private fun DependencyHandler.project(
-    path: String,
-    configuration: String? = null,
-): ProjectDependency? {
-    val notation =
-        if (configuration != null) {
-            mapOf("path" to path, "configuration" to configuration)
-        } else {
-            mapOf("path" to path)
-        }
-
-    return uncheckedCast(project(notation))
-}
