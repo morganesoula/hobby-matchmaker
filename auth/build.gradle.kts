@@ -1,5 +1,4 @@
 import extensions.authModuleDeps
-import extensions.instrumentationTestDeps
 import extensions.unitTestDeps
 
 plugins {
@@ -23,5 +22,4 @@ androidComponents {
 dependencies {
     authModuleDeps()
     unitTestDeps()
-    instrumentationTestDeps()
 }

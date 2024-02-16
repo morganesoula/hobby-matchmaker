@@ -143,7 +143,6 @@ fun DependencyHandler.coreDesignModuleDeps() {
 
 fun DependencyHandler.coreNavigationModuleDeps() {
     implementation(Deps.AndroidX.Navigation.NAVIGATION_UI)
-
     // Librairie
     implementation(project(Modules.DESIGN))
 
@@ -151,9 +150,30 @@ fun DependencyHandler.coreNavigationModuleDeps() {
     implementation(Deps.AndroidX.Compose.ACTIVITY)
     implementation(Deps.AndroidX.Compose.RUNTIME)
 
+    // Hilt
+    implementation(Deps.Dagger.HILT_ANDROID)
+    kapt(Deps.Dagger.HILT_ANDROID_COMPILER)
+
     // Navigation
     implementation(Deps.AndroidX.Navigation.NAVIGATION_UI)
     implementation(Deps.AndroidX.Navigation.COMPOSE_NAVIGATION)
+}
+
+fun DependencyHandler.featureMoviesModuleDeps() {
+    // Librairie
+    implementation(project(Modules.DESIGN))
+
+    // Compose
+    implementation(Deps.AndroidX.Compose.ACTIVITY)
+    implementation(Deps.AndroidX.Compose.MATERIAL3)
+    implementation(Deps.AndroidX.Compose.RUNTIME)
+
+    // Core
+    implementation(Deps.AndroidX.CORE_KTX)
+
+    // Hilt
+    implementation(Deps.Dagger.HILT_ANDROID)
+    kapt(Deps.Dagger.HILT_ANDROID_COMPILER)
 }
 
 fun DependencyHandler.unitTestDeps() {

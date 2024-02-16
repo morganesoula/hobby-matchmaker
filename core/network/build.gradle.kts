@@ -1,5 +1,4 @@
 import extensions.coreNetworkModuleDeps
-import extensions.instrumentationTestDeps
 import extensions.unitTestDeps
 
 plugins {
@@ -22,5 +21,4 @@ androidComponents {
 dependencies {
     coreNetworkModuleDeps()
     unitTestDeps()
-    instrumentationTestDeps()
 }

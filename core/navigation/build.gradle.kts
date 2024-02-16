@@ -1,5 +1,4 @@
 import extensions.coreNavigationModuleDeps
-import extensions.instrumentationTestDeps
 import extensions.unitTestDeps
 
 plugins {
@@ -22,5 +21,4 @@ androidComponents {
 dependencies {
     coreNavigationModuleDeps()
     unitTestDeps()
-    instrumentationTestDeps()
 }

@@ -6,4 +6,5 @@ object Modules {
     const val DI = ":core:di"
     const val DESIGN = ":core:design"
     const val NAVIGATION = ":core:navigation"
+    const val MOVIE = ":feature:movies"
 }
