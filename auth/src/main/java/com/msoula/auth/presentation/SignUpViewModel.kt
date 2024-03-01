@@ -9,11 +9,11 @@ import com.msoula.auth.R
 import com.msoula.auth.data.AuthUIEvent
 import com.msoula.auth.data.SignUpRegistrationState
 import com.msoula.auth.domain.repository.AuthRepository
-import com.msoula.auth.domain.repository.Response
 import com.msoula.di.domain.StringResourcesProvider
 import com.msoula.di.domain.useCase.AuthFormValidationUseCase
 import com.msoula.di.navigation.HomeScreenRoute
 import com.msoula.di.navigation.Navigator
+import com.msoula.network.ResponseHMM
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -126,15 +126,15 @@ constructor(
                     formDataFlow.value.password,
                 )
         ) {
-            is Response.Success -> {
+            is ResponseHMM.Success -> {
                 signUpCircularProgress.value = false
                 savedStateHandle.clearAll<SignUpRegistrationState>()
 
                 navigator.navigate(HomeScreenRoute)
             }
 
-            is Response.Failure -> {
-                when (val exception = result.exception) {
+            is ResponseHMM.Failure -> {
+                when (val exception = result.throwable) {
                     is FirebaseAuthUserCollisionException -> {
                         signUpCircularProgress.value = false
                         savedStateHandle.updateStateHandle<SignUpRegistrationState>(
@@ -163,6 +163,8 @@ constructor(
                     }
                 }
             }
+
+            else -> Unit
         }
     }
 }

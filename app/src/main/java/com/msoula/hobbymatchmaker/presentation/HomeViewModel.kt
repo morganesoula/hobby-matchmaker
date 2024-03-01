@@ -6,9 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.facebook.AccessToken
 import com.google.firebase.auth.FirebaseAuth
 import com.msoula.auth.domain.repository.AuthRepository
-import com.msoula.auth.domain.repository.Response
 import com.msoula.di.navigation.LoginScreenRoute
 import com.msoula.di.navigation.Navigator
+import com.msoula.network.ResponseHMM
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -44,7 +44,7 @@ class HomeViewModel
             viewModelScope.launch(ioDispatcher) {
                 try {
                     when (authRepository.logOut()) {
-                        is Response.Success -> {
+                        is ResponseHMM.Success -> {
                             authRepository.getAuthState()
 
                             withContext(Dispatchers.Main) {

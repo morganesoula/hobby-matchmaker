@@ -6,9 +6,7 @@ import Deps
 import Modules
 import TestDeps
 import org.gradle.api.artifacts.Dependency
-import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.artifacts.dsl.DependencyHandler
-import org.gradle.internal.Cast.uncheckedCast
 import org.gradle.kotlin.dsl.project
 
 fun DependencyHandler.appModuleDeps() {
@@ -49,6 +47,7 @@ fun DependencyHandler.appModuleDeps() {
     implementation(project(Modules.MODEL))
     implementation(project(Modules.DESIGN))
     implementation(project(Modules.NAVIGATION))
+    implementation(project(Modules.MOVIE))
 
     implementation(Deps.AndroidX.Compose.MATERIAL)
     api(Deps.AndroidX.APP_COMPAT)
@@ -91,18 +90,22 @@ fun DependencyHandler.authModuleDeps() {
 
     // Retrofit
     implementation(Deps.Retrofit.RETROFIT)
-    implementation(Deps.Retrofit.MOSHI_CONVERTER)
     implementation(Deps.OkHttp.OK_HTTP)
     implementation(Deps.OkHttp.LOGGING)
 
     // Librairie
     implementation(project(Modules.DESIGN))
     implementation(project(Modules.NAVIGATION))
+    implementation(project(Modules.NETWORK))
 }
 
 fun DependencyHandler.coreNetworkModuleDeps() {
+    // Libraries
     implementation(project(Modules.DESIGN))
     implementation(Deps.AndroidX.Compose.RUNTIME)
+
+    // Retrofit
+    implementation(Deps.Retrofit.RETROFIT)
 }
 
 fun DependencyHandler.coreDiModuleDeps() {
@@ -119,10 +122,14 @@ fun DependencyHandler.coreDiModuleDeps() {
 
     // Librairie
     implementation(project(Modules.DESIGN))
+    implementation(project(Modules.DATABASE))
 
     // Navigation
     implementation(Deps.AndroidX.Navigation.COMPOSE_NAVIGATION)
     implementation(Deps.AndroidX.Compose.RUNTIME)
+
+    // Room
+    api(Deps.AndroidX.Room.RUNTIME)
 }
 
 fun DependencyHandler.coreModelModuleDeps() {
@@ -161,19 +168,50 @@ fun DependencyHandler.coreNavigationModuleDeps() {
 
 fun DependencyHandler.featureMoviesModuleDeps() {
     // Librairie
+    implementation(project(Modules.DATABASE))
     implementation(project(Modules.DESIGN))
+    implementation(project(Modules.NETWORK))
+
+    // AndroidX
+    implementation(Deps.AndroidX.Lifecycle.LIFECYCLE_RUNTIME)
 
     // Compose
     implementation(Deps.AndroidX.Compose.ACTIVITY)
     implementation(Deps.AndroidX.Compose.MATERIAL3)
+    implementation(Deps.AndroidX.Compose.PREVIEW)
     implementation(Deps.AndroidX.Compose.RUNTIME)
 
     // Core
     implementation(Deps.AndroidX.CORE_KTX)
 
+    // Coil
+    implementation(Deps.Coil.COIL)
+    implementation(Deps.Coil.COIL_COMPOSE)
+
     // Hilt
     implementation(Deps.Dagger.HILT_ANDROID)
     kapt(Deps.Dagger.HILT_ANDROID_COMPILER)
+
+    // Retrofit
+    implementation(Deps.Retrofit.RETROFIT)
+    implementation(Deps.Retrofit.GSON)
+    implementation(Deps.OkHttp.OK_HTTP)
+    implementation(Deps.OkHttp.LOGGING)
+
+    // Room
+    api(Deps.AndroidX.Room.RUNTIME)
+    kapt(Deps.AndroidX.Room.COMPILER)
+    implementation(Deps.AndroidX.Room.ROOM_KTX)
+}
+
+fun DependencyHandler.coreDatabaseModuleDeps() {
+    // Paging (For some reason, don't delete this line or you will have a Gradle issue)
+    implementation(Deps.AndroidX.Paging.COMPOSE)
+
+    // Room
+    api(Deps.AndroidX.Room.RUNTIME)
+    kapt(Deps.AndroidX.Room.COMPILER)
+    implementation(Deps.AndroidX.Room.ROOM_KTX)
 }
 
 fun DependencyHandler.unitTestDeps() {

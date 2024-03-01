@@ -27,18 +27,6 @@ fun getFacebookKey(): String {
     }
 }
 
-fun getTMDBKey(): String {
-    val propFile = rootProject.file("./facebook.properties")
-
-    if (propFile.exists()) {
-        val properties = Properties()
-        properties.load(FileInputStream(propFile))
-        return properties.getProperty("facebook_client_token")
-    } else {
-        throw FileNotFoundException()
-    }
-}
-
 androidComponents {
     onVariants {
         it.buildConfigFields.put(
@@ -98,7 +86,7 @@ android {
     }
 
     packaging {
-        resources.excludes.add("**/*")
+        resources.excludes.add("META-INF/gradle/incremental.annotation.processors")
     }
 }
 

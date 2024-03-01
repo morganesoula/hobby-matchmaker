@@ -1,10 +1,10 @@
 object Modules {
-    const val APP = ":app"
     const val AUTH = ":auth"
-    const val MODEL = ":core:model"
-    const val NETWORK = ":core:network"
-    const val DI = ":core:di"
+    const val DATABASE = ":core:database"
     const val DESIGN = ":core:design"
-    const val NAVIGATION = ":core:navigation"
+    const val DI = ":core:di"
+    const val MODEL = ":core:model"
     const val MOVIE = ":feature:movies"
+    const val NAVIGATION = ":core:navigation"
+    const val NETWORK = ":core:network"
 }

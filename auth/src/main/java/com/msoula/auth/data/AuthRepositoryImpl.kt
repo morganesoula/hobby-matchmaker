@@ -9,8 +9,8 @@ import com.msoula.auth.domain.repository.AuthRepository
 import com.msoula.auth.domain.repository.LogOutResponse
 import com.msoula.auth.domain.repository.LoginResponse
 import com.msoula.auth.domain.repository.ResetEmailResponse
-import com.msoula.auth.domain.repository.Response
 import com.msoula.auth.domain.repository.SignUpResponse
+import com.msoula.network.ResponseHMM
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -42,9 +42,9 @@ class AuthRepositoryImpl
                 oneTapClient.signOut().await()
                 loginManager.logOut()
                 auth.signOut()
-                Response.Success(true)
+                ResponseHMM.Success(true)
             } catch (exception: Exception) {
-                Response.Failure(exception)
+                ResponseHMM.Failure(exception)
             }
         }
 
@@ -58,9 +58,9 @@ class AuthRepositoryImpl
                         email,
                         password,
                     ).await()
-                Response.Success(result)
+                ResponseHMM.Success(result)
             } catch (exception: Exception) {
-                Response.Failure(exception)
+                ResponseHMM.Failure(exception)
             }
         }
 
@@ -70,18 +70,18 @@ class AuthRepositoryImpl
         ): LoginResponse {
             return try {
                 val result = auth.signInWithEmailAndPassword(email, password).await()
-                Response.Success(result)
+                ResponseHMM.Success(result)
             } catch (exception: Exception) {
-                Response.Failure(exception)
+                ResponseHMM.Failure(exception)
             }
         }
 
         override suspend fun resetPassword(email: String): ResetEmailResponse {
             return try {
                 auth.sendPasswordResetEmail(email)
-                Response.Success(true)
+                ResponseHMM.Success(true)
             } catch (exception: Exception) {
-                Response.Failure(exception)
+                ResponseHMM.Failure(exception)
             }
         }
     }

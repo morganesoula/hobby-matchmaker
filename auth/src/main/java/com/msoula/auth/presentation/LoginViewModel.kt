@@ -10,11 +10,11 @@ import com.msoula.auth.data.AuthUIEvent
 import com.msoula.auth.data.LoginFormState
 import com.msoula.auth.data.SignInResult
 import com.msoula.auth.domain.repository.AuthRepository
-import com.msoula.auth.domain.repository.Response
 import com.msoula.di.domain.StringResourcesProvider
 import com.msoula.di.domain.useCase.AuthFormValidationUseCase
 import com.msoula.di.navigation.HomeScreenRoute
 import com.msoula.di.navigation.Navigator
+import com.msoula.network.ResponseHMM
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -123,7 +123,7 @@ constructor(
                             formDataFlow.value.password,
                         )
                 ) {
-                    is Response.Success -> {
+                    is ResponseHMM.Success -> {
                         circularProgressLoading.value = false
                         savedStateHandle.clearAll<LoginFormState>()
 
@@ -132,9 +132,9 @@ constructor(
                         }
                     }
 
-                    is Response.Failure -> {
+                    is ResponseHMM.Failure -> {
                         circularProgressLoading.value = false
-                        when (result.exception) {
+                        when (result.throwable) {
                             is FirebaseAuthInvalidCredentialsException -> {
                                 savedStateHandle.updateStateHandle<LoginFormState>(savedStateHandleKey) {
                                     it.copy(
@@ -151,6 +151,8 @@ constructor(
                             }
                         }
                     }
+
+                    else -> Unit
                 }
             } catch (e: Exception) {
                 Log.e("HMM", "Failed to launch logIn() method with exception: $e")
@@ -167,7 +169,7 @@ constructor(
     private suspend fun resetPassword(): Boolean {
         return try {
             when (authRepository.resetPassword(formDataFlow.value.emailReset)) {
-                is Response.Success -> {
+                is ResponseHMM.Success -> {
                     if (openResetDialog.value) {
                         openResetDialog.value = false
                     }

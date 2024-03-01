@@ -28,6 +28,7 @@ import com.msoula.di.navigation.Navigator
 import com.msoula.di.navigation.SignUpScreenRoute
 import com.msoula.hobbymatchmaker.presentation.HomeScreen
 import com.msoula.hobbymatchmaker.presentation.HomeViewModel
+import com.msoula.movies.presentation.MovieViewModel
 import kotlinx.coroutines.launch
 
 @Stable
@@ -38,6 +39,7 @@ fun ComponentActivity.HobbyMatchMakerNavHost(
     homeViewModel: HomeViewModel = hiltViewModel(),
     loginViewModel: LoginViewModel = hiltViewModel(),
     signUpViewModel: SignUpViewModel = hiltViewModel(),
+    movieViewModel: MovieViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
 
@@ -58,7 +60,11 @@ fun ComponentActivity.HobbyMatchMakerNavHost(
 
     NavHost(navController, startDestination = startDestination) {
         composable(route = HomeScreenRoute.ROUTE) {
+            val moveStateUi = movieViewModel.movieStateUi.collectAsState()
+
             HomeScreen(
+                movieStateUI = moveStateUi.value,
+                onSwipeLeft = movieViewModel::onCardSwipeEvent,
                 logOut = { homeViewModel.logOut() },
             )
         }

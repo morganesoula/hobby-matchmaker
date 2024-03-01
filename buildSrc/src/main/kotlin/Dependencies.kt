@@ -2,10 +2,8 @@
 
 object Deps {
     object Coroutines {
-        private const val version = "1.7.3"
+        private const val version = "1.8.0"
         const val CORE = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version"
-        const val ANDROID = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$version"
-        const val TEST = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$version"
     }
 
     object Facebook {
@@ -15,10 +13,10 @@ object Deps {
     }
 
     object Firebase {
-        private const val firebaseVersion = "32.7.0"
+        private const val firebaseVersion = "32.7.2"
         const val FIREBASE_BOM = "com.google.firebase:firebase-bom:$firebaseVersion"
         const val FIREBASE_AUTH = "com.google.firebase:firebase-auth"
-        const val FIREBASE_CORE_KTX = "com.google.firebase:firebase-auth-ktx:22.3.0"
+        const val FIREBASE_CORE_KTX = "com.google.firebase:firebase-auth-ktx:22.3.1"
 
         private const val firebaseUiAuthVersion = "7.2.0"
         const val FIREBASE_UI_AUTH = "com.firebaseui:firebase-ui-auth:$firebaseUiAuthVersion"
@@ -41,25 +39,29 @@ object Deps {
             private const val version = "1.6.1"
 
             const val MATERIAL = "androidx.compose.material:material:$version"
-            const val MATERIAL3 = "androidx.compose.material3:material3:1.2.0-rc01"
+            const val MATERIAL3 = "androidx.compose.material3:material3:1.2.0"
             const val ICONS = "androidx.compose.material:material-icons-extended:$version"
             const val PREVIEW = "androidx.compose.ui:ui-tooling:$version"
-            const val UI_TEST = "androidx.compose.ui:ui-test-junit4"
+            const val UI_TEST = "androidx.compose.ui:ui-test-junit4:$version"
             const val ACTIVITY = "androidx.activity:activity-compose:1.8.2"
-            const val VIEW_MODEL = "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2"
+            const val VIEW_MODEL = "androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0"
             const val RUNTIME = "androidx.compose.runtime:runtime:$version"
         }
 
         object Lifecycle {
-            private const val version = "2.6.2"
+            private const val version = "2.7.0"
             const val LIFECYCLE_RUNTIME = "androidx.lifecycle:lifecycle-runtime-ktx:$version"
-            const val VIEW_MODEL = "androidx.lifecycle:lifecycle-viewmodel-ktx:$version"
         }
 
         object Navigation {
-            private const val version = "2.7.6"
+            private const val version = "2.7.7"
             const val NAVIGATION_UI = "androidx.navigation:navigation-ui-ktx:$version"
             const val COMPOSE_NAVIGATION = "androidx.navigation:navigation-compose:$version"
+        }
+
+        object Paging {
+            private const val version = "3.2.1"
+            const val COMPOSE = "androidx.paging:paging-compose:$version"
         }
 
         object Room {
@@ -85,13 +87,15 @@ object Deps {
 
     object Retrofit {
         private const val version = "2.9.0"
+
         const val RETROFIT = "com.squareup.retrofit2:retrofit:$version"
-        const val MOSHI_CONVERTER = "com.squareup.retrofit2:converter-moshi:$version"
+        const val GSON = "com.squareup.retrofit2:converter-gson:$version"
     }
 
     object Coil {
-        private const val version = "2.5.0"
-        const val COIL_COMPOSE = "io.coil-kt:coil:$version"
+        private const val version = "2.6.0"
+        const val COIL = "io.coil-kt:coil:$version"
+        const val COIL_COMPOSE = "io.coil-kt:coil-compose:$version"
     }
 }
 
@@ -99,10 +103,9 @@ object TestDeps {
     object AndroidX {
         private const val version = "1.5.0"
         const val CORE_KTX = "androidx.test:core-ktx:$version"
-        const val RULES = "androidx.test:rules:$version"
         const val CORE_TESTING = "androidx.arch.core:core-testing:2.2.0"
         const val ANDROIDX_JUNIT = "androidx.test.ext:junit-ktx:1.1.5"
-        const val NAVIGATION_TEST = "androidx.navigation:navigation-testing:2.7.6"
+        const val NAVIGATION_TEST = "androidx.navigation:navigation-testing:2.7.7"
     }
 
     object AssertK {
@@ -111,7 +114,7 @@ object TestDeps {
     }
 
     object Coroutines {
-        private const val version = "1.7.3"
+        private const val version = "1.8.0"
         const val COROUTINES = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$version"
     }
 
@@ -131,5 +134,5 @@ object TestDeps {
         const val MOCKK_ANDROID = "io.mockk:mockk-android:$version"
     }
 
-    const val TRUTH = "com.google.truth:truth:1.2.0"
+    const val TRUTH = "com.google.truth:truth:1.4.1"
 }

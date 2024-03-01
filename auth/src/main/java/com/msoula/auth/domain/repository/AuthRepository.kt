@@ -1,17 +1,12 @@
 package com.msoula.auth.domain.repository
 
 import com.google.firebase.auth.AuthResult
+import com.msoula.network.ResponseHMM
 
-typealias LogOutResponse = Response<Boolean>
-typealias SignUpResponse = Response<AuthResult>
-typealias LoginResponse = Response<AuthResult>
-typealias ResetEmailResponse = Response<Boolean>
-
-sealed class Response<out T> {
-    data class Success<out T>(val data: T?) : Response<T>()
-
-    data class Failure(val exception: Exception) : Response<Nothing>()
-}
+typealias LogOutResponse = ResponseHMM<Boolean>
+typealias SignUpResponse = ResponseHMM<AuthResult>
+typealias LoginResponse = ResponseHMM<AuthResult>
+typealias ResetEmailResponse = ResponseHMM<Boolean>
 
 interface AuthRepository {
     fun getAuthState(): Boolean
