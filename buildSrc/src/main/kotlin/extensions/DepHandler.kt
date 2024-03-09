@@ -23,6 +23,9 @@ fun DependencyHandler.appModuleDeps() {
     implementation(Deps.AndroidX.APP_COMPAT)
     implementation(Deps.AndroidX.Activity.ACTIVITY_KTX)
     implementation(Deps.AndroidX.Lifecycle.LIFECYCLE_RUNTIME)
+    implementation(Deps.AndroidX.Lifecycle.RUNTIME_COMPOSE)
+    implementation(Deps.AndroidX.Splashscreen.SPLASHSCREEN)
+    implementation(Deps.AndroidX.Kotlin.KOTLIN_COLLECTION)
 
     // Facebook
     implementation(Deps.Facebook.FACEBOOK_SDK)
@@ -174,6 +177,7 @@ fun DependencyHandler.featureMoviesModuleDeps() {
 
     // AndroidX
     implementation(Deps.AndroidX.Lifecycle.LIFECYCLE_RUNTIME)
+    implementation(Deps.AndroidX.Kotlin.KOTLIN_COLLECTION)
 
     // Compose
     implementation(Deps.AndroidX.Compose.ACTIVITY)

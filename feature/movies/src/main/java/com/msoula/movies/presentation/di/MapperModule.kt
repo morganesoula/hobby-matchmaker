@@ -2,6 +2,7 @@ package com.msoula.movies.presentation.di
 
 import com.msoula.movies.data.mapper.MapMovieEntityToMovie
 import com.msoula.movies.data.mapper.MapMoviePogoToMovieEntity
+import com.msoula.movies.data.mapper.MapMovieToMovieEntity
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,4 +17,7 @@ object MapperModule {
 
     @Provides
     fun providesMapPogoToMovieEntity(): MapMoviePogoToMovieEntity = MapMoviePogoToMovieEntity()
+
+    @Provides
+    fun providesMapMovieToMovieEntity(): MapMovieToMovieEntity = MapMovieToMovieEntity()
 }

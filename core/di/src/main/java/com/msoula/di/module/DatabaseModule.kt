@@ -22,7 +22,9 @@ object DatabaseModule {
             context,
             HMMDatabase::class.java,
             "database-hmm"
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
 
     @Provides
     @Singleton

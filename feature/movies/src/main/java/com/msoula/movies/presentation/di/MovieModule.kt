@@ -1,18 +1,30 @@
 package com.msoula.movies.presentation.di
 
+import android.content.Context
 import com.example.movies.BuildConfig
 import com.msoula.database.data.dao.MovieDAO
+import com.msoula.movies.data.ImageHelper
 import com.msoula.movies.data.MovieRepositoryImpl
+import com.msoula.movies.data.MovieService
 import com.msoula.movies.data.TMDBService
 import com.msoula.movies.data.mapper.MapMovieEntityToMovie
 import com.msoula.movies.data.mapper.MapMoviePogoToMovieEntity
+import com.msoula.movies.data.mapper.MapMovieToMovieEntity
 import com.msoula.movies.domain.MovieRepository
-import com.msoula.movies.domain.use_case.GetMovieUseCase
-import com.msoula.movies.domain.use_case.getMovies
+import com.msoula.movies.domain.use_case.DeleteAllMovies
+import com.msoula.movies.domain.use_case.InsertMovieUseCase
+import com.msoula.movies.domain.use_case.ObserveMoviesUseCase
+import com.msoula.movies.domain.use_case.SetMovieFavoriteUseCase
+import com.msoula.movies.domain.use_case.deleteAllMovies
+import com.msoula.movies.domain.use_case.insertMovie
+import com.msoula.movies.domain.use_case.observeMovies
+import com.msoula.movies.domain.use_case.setMovieFavorite
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -69,23 +81,76 @@ object MovieModule {
     }
 
     @Provides
+    fun provideImageHelper(
+        @ApplicationContext context: Context,
+        coroutineDispatcher: CoroutineDispatcher
+    ): ImageHelper =
+        ImageHelper(coroutineDispatcher, context)
+
+    @Provides
+    fun provideMovieService(
+        movieDAO: MovieDAO,
+        tmdbService: TMDBService,
+        mapperPogoToMovieEntity: MapMoviePogoToMovieEntity,
+        imageHelper: ImageHelper
+    ): MovieService =
+        MovieService(
+            movieDAO,
+            tmdbService,
+            mapperPogoToMovieEntity,
+            imageHelper
+        )
+
+    @Provides
     @Singleton
     fun provideMovieRepository(
-        tmdbService: TMDBService,
         movieDAO: MovieDAO,
-        mapperPogoToMovieEntity: MapMoviePogoToMovieEntity
+        movieService: MovieService,
+        mapperMovieToMovieEntity: MapMovieToMovieEntity,
+        mapperMovieEntityToMovie: MapMovieEntityToMovie,
     ): MovieRepository = MovieRepositoryImpl(
-        tmdbService,
         movieDAO,
-        mapperPogoToMovieEntity
+        movieService,
+        mapperMovieToMovieEntity,
+        mapperMovieEntityToMovie
     )
 
     @Provides
-    fun provideGetMovieUseCase(
-        movieRepository: MovieRepository,
-        mapper: MapMovieEntityToMovie
-    ): GetMovieUseCase =
-        GetMovieUseCase {
-            getMovies(movieRepository, mapper)
+    fun provideGetMovieByPopularityUseCase(
+        movieRepository: MovieRepository
+    ): ObserveMoviesUseCase =
+        ObserveMoviesUseCase {
+            observeMovies(movieRepository)
+        }
+
+    @Provides
+    fun provideDeleteAllMoviesUseCase(
+        movieRepository: MovieRepository
+    ): DeleteAllMovies =
+        DeleteAllMovies {
+            deleteAllMovies(movieRepository)
+        }
+
+    @Provides
+    fun provideUpdateMovieUseCase(
+        movieRepository: MovieRepository
+    ): SetMovieFavoriteUseCase =
+        SetMovieFavoriteUseCase { movieId, isFavorite ->
+            setMovieFavorite(
+                movieRepository,
+                movieId,
+                isFavorite
+            )
+        }
+
+    @Provides
+    fun provideInsertMovieUseCase(
+        movieRepository: MovieRepository
+    ): InsertMovieUseCase =
+        InsertMovieUseCase {
+            insertMovie(
+                movieRepository,
+                it
+            )
         }
 }

@@ -1,55 +1,79 @@
 package com.msoula.movies.presentation
 
+import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.msoula.component.event.SwipeCardEvent
 import com.msoula.movies.data.MovieUiStateResult
-import com.msoula.movies.domain.use_case.GetMovieUseCase
+import com.msoula.movies.data.model.Movie
+import com.msoula.movies.data.model.toListMovieUI
+import com.msoula.movies.domain.use_case.DeleteAllMovies
+import com.msoula.movies.domain.use_case.InsertMovieUseCase
+import com.msoula.movies.domain.use_case.ObserveMoviesUseCase
+import com.msoula.movies.domain.use_case.SetMovieFavoriteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class MovieViewModel @Inject constructor(
-    private val getMovieUseCase: GetMovieUseCase
+    private val observeMoviesUseCase: ObserveMoviesUseCase,
+    private val setMovieFavoriteUseCase: SetMovieFavoriteUseCase,
+    private val deleteAllMovies: DeleteAllMovies,
+    private val insertMovieUseCase: InsertMovieUseCase,
 ) : ViewModel() {
+    private val _displayingData = MutableStateFlow(false)
+    val displayingData = _displayingData.asStateFlow()
 
-    init {
-        initMovies()
-    }
+    val viewState: StateFlow<MovieUiStateResult> by lazy {
+        observeMoviesUseCase()
+            .mapLatest { movies ->
+                when {
+                    movies.isNullOrEmpty() -> {
+                        MovieUiStateResult.Empty
+                    }
 
-    private val _movieStateUi = MutableStateFlow(MovieStateUI())
-    val movieStateUi = _movieStateUi.asStateFlow()
-
-    private fun initMovies() {
-        viewModelScope.launch {
-            getMovieUseCase()
-                .collect { result ->
-                    when (result) {
-                        is MovieUiStateResult.Loading -> _movieStateUi.update { it.copy(isLoading = true) }
-                        is MovieUiStateResult.Error -> _movieStateUi.update { it.copy(error = result.throwable?.message) }
-                        is MovieUiStateResult.Fetched -> {
-                            _movieStateUi.update { it.copy(movies = result.list) }
-                        }
+                    else -> {
+                        Log.d("HMM", "List fetched in ViewModel is: $movies")
+                        MovieUiStateResult.Fetched(list = movies.toListMovieUI())
                     }
                 }
+            }
+            .flowOn(Dispatchers.Main)
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                MovieUiStateResult.Loading
+            )
+    }
+
+    fun onCardEvent(event: CardEvent) {
+        when (event) {
+            is CardEvent.OnDoubleTap -> {
+                Log.d("HMM", "Into VM on Update with ${event.movie.isFavorite}")
+                viewModelScope.launch {
+                    setMovieFavoriteUseCase(event.movie.id, !event.movie.isFavorite)
+                }
+            }
         }
     }
 
-    fun onCardSwipeEvent(cardSwipeEvent: SwipeCardEvent) {
-        when (cardSwipeEvent) {
-            is SwipeCardEvent.OnSwipeLeft -> {
-                _movieStateUi.update {
-                    it.copy(
-                        movies = movieStateUi.value.movies.filterNot { movie -> movie.id == cardSwipeEvent.movieId }
-                    )
-                }
-            }
-
-            is SwipeCardEvent.OnSwipeRight -> {}
+    private fun clear() {
+        viewModelScope.launch {
+            deleteAllMovies()
         }
     }
 }

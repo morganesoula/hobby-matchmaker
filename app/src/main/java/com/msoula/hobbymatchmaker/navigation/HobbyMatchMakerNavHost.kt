@@ -7,10 +7,10 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -60,20 +60,20 @@ fun ComponentActivity.HobbyMatchMakerNavHost(
 
     NavHost(navController, startDestination = startDestination) {
         composable(route = HomeScreenRoute.ROUTE) {
-            val moveStateUi = movieViewModel.movieStateUi.collectAsState()
+            val moveStateUIResult = movieViewModel.viewState.collectAsStateWithLifecycle()
 
             HomeScreen(
-                movieStateUI = moveStateUi.value,
-                onSwipeLeft = movieViewModel::onCardSwipeEvent,
+                movieStateUIResult = moveStateUIResult.value,
                 logOut = { homeViewModel.logOut() },
+                onDoubleTap = movieViewModel::onCardEvent
             )
         }
 
         composable(route = LoginScreenRoute.ROUTE) {
-            val loginFormState by loginViewModel.formDataFlow.collectAsState()
-            val circularProgressLoading by loginViewModel.circularProgressLoading.collectAsState()
-            val rememberedOpenResetDialog by loginViewModel.openResetDialog.collectAsState()
-            val emailResetSent by loginViewModel.resettingEmailSent.collectAsState()
+            val loginFormState by loginViewModel.formDataFlow.collectAsStateWithLifecycle()
+            val circularProgressLoading by loginViewModel.circularProgressLoading.collectAsStateWithLifecycle()
+            val rememberedOpenResetDialog by loginViewModel.openResetDialog.collectAsStateWithLifecycle()
+            val emailResetSent by loginViewModel.resettingEmailSent.collectAsStateWithLifecycle()
 
             val launcher =
                 rememberLauncherForActivityResult(
@@ -114,8 +114,8 @@ fun ComponentActivity.HobbyMatchMakerNavHost(
         }
 
         composable(SignUpScreenRoute.ROUTE) {
-            val registrationState by signUpViewModel.formDataFlow.collectAsState()
-            val signUpProgressLoading by signUpViewModel.signUpCircularProgress.collectAsState()
+            val registrationState by signUpViewModel.formDataFlow.collectAsStateWithLifecycle()
+            val signUpProgressLoading by signUpViewModel.signUpCircularProgress.collectAsStateWithLifecycle()
 
             SignUpScreen(
                 registrationState = registrationState,

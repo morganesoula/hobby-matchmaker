@@ -4,14 +4,14 @@ import com.msoula.movies.data.network.MovieNetwork
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-private const val PARAMS_SORT_BY = "sort_by"
 private const val PARAMS_LANGUAGE = "language"
+private const val PARAMS_PAGE = "page"
 
 interface TMDBService {
 
-    @GET("discover/movie")
+    @GET("movie/popular")
     suspend fun getMoviesByPopularityDesc(
-        @Query(PARAMS_SORT_BY) sorted: String,
-        @Query(PARAMS_LANGUAGE) language: String
+        @Query(PARAMS_LANGUAGE) language: String,
+        @Query(PARAMS_PAGE) page: Int
     ): MovieNetwork
 }

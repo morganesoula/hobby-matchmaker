@@ -18,45 +18,46 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel
-    @Inject
-    constructor(
-        private val auth: FirebaseAuth,
-        private val authRepository: AuthRepository,
-        private val ioDispatcher: CoroutineDispatcher,
-        private val navigator: Navigator,
-    ) : ViewModel() {
-        fun checkForActiveSession(): Boolean {
-            val accessToken = AccessToken.getCurrentAccessToken()
+@Inject
+constructor(
+    private val auth: FirebaseAuth,
+    private val authRepository: AuthRepository,
+    private val ioDispatcher: CoroutineDispatcher,
+    private val navigator: Navigator,
+) : ViewModel() {
 
-            return if (auth.currentUser != null) {
-                Log.d("HMM", "User is logged in")
-                true
-            } else if (accessToken != null && !accessToken.isExpired) {
-                Log.d("HMM", "Logged in through Facebook cache")
-                true
-            } else {
-                Log.d("HMM", "User is not logged in")
-                false
-            }
+    fun checkForActiveSession(): Boolean {
+        val accessToken = AccessToken.getCurrentAccessToken()
+
+        return if (auth.currentUser != null) {
+            Log.d("HMM", "User is logged in")
+            true
+        } else if (accessToken != null && !accessToken.isExpired) {
+            Log.d("HMM", "Logged in through Facebook cache")
+            true
+        } else {
+            Log.d("HMM", "User is not logged in")
+            false
         }
+    }
 
-        fun logOut() {
-            viewModelScope.launch(ioDispatcher) {
-                try {
-                    when (authRepository.logOut()) {
-                        is ResponseHMM.Success -> {
-                            authRepository.getAuthState()
+    fun logOut() {
+        viewModelScope.launch(ioDispatcher) {
+            try {
+                when (authRepository.logOut()) {
+                    is ResponseHMM.Success -> {
+                        authRepository.getAuthState()
 
-                            withContext(Dispatchers.Main) {
-                                navigator.navigate(LoginScreenRoute)
-                            }
+                        withContext(Dispatchers.Main) {
+                            navigator.navigate(LoginScreenRoute)
                         }
-
-                        else -> Log.e("HMM", "Error while logging out")
                     }
-                } catch (exception: Exception) {
-                    Log.e("HMM", "Exception while logging out: $exception")
+
+                    else -> Log.e("HMM", "Error while logging out")
                 }
+            } catch (exception: Exception) {
+                Log.e("HMM", "Exception while logging out: $exception")
             }
         }
     }
+}

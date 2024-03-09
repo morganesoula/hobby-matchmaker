@@ -10,10 +10,25 @@ class MapMovieEntityToMovie : Mapper<MovieEntity, Movie> {
         return Movie(
             id = entity.id,
             title = entity.title,
-            posterJPG = entity.posterPath
+            posterJPG = entity.remotePosterPath,
+            localPosterPath = entity.localPosterPath,
+            seen = entity.seen,
+            isFavorite = entity.favourite
         )
     }
+}
 
+class MapMovieToMovieEntity : Mapper<Movie, MovieEntity> {
+    override fun map(entity: Movie): MovieEntity {
+        return MovieEntity(
+            id = entity.id,
+            title = entity.title,
+            remotePosterPath = entity.posterJPG,
+            localPosterPath = entity.localPosterPath,
+            favourite = entity.isFavorite,
+            seen = entity.seen
+        )
+    }
 }
 
 class MapMoviePogoToMovieEntity : Mapper<MoviePogo, MovieEntity> {
@@ -21,7 +36,7 @@ class MapMoviePogoToMovieEntity : Mapper<MoviePogo, MovieEntity> {
         return MovieEntity(
             id = entity.id,
             title = entity.title,
-            posterPath = entity.poster
+            remotePosterPath = entity.poster
         )
     }
 }

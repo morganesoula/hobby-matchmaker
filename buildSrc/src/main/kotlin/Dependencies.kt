@@ -48,9 +48,16 @@ object Deps {
             const val RUNTIME = "androidx.compose.runtime:runtime:$version"
         }
 
+        object Kotlin {
+            private const val version = "0.3.7"
+            const val KOTLIN_COLLECTION =
+                "org.jetbrains.kotlinx:kotlinx-collections-immutable:$version"
+        }
+
         object Lifecycle {
             private const val version = "2.7.0"
             const val LIFECYCLE_RUNTIME = "androidx.lifecycle:lifecycle-runtime-ktx:$version"
+            const val RUNTIME_COMPOSE = "androidx.lifecycle:lifecycle-runtime-compose:$version"
         }
 
         object Navigation {
@@ -69,6 +76,11 @@ object Deps {
             const val RUNTIME = "androidx.room:room-runtime:$version"
             const val ROOM_KTX = "androidx.room:room-ktx:$version"
             const val COMPILER = "androidx.room:room-compiler:$version"
+        }
+
+        object Splashscreen {
+            private const val version = "1.0.1"
+            const val SPLASHSCREEN = "androidx.core:core-splashscreen:$version"
         }
     }
 
