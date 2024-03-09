@@ -6,19 +6,22 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.msoula.movies.data.MovieUiStateResult
 import com.msoula.movies.presentation.CardEvent
 import com.msoula.movies.presentation.EmptyMovieScreen
 import com.msoula.movies.presentation.ErrorMovieScreen
 import com.msoula.movies.presentation.MovieScreen
+import com.msoula.movies.presentation.MovieViewModel
 
 @Composable
 fun HomeScreen(
     logOut: () -> Unit,
-    movieStateUIResult: MovieUiStateResult,
     modifier: Modifier = Modifier,
-    onDoubleTap: (CardEvent) -> Unit
+    movieViewModel: MovieViewModel = hiltViewModel<MovieViewModel>()
 ) {
     Scaffold(modifier = modifier) { paddingValues ->
         Surface(
@@ -27,18 +30,33 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            when (movieStateUIResult) {
-                is MovieUiStateResult.Loading -> CircularProgressIndicator()
-                is MovieUiStateResult.Empty -> EmptyMovieScreen()
-                is MovieUiStateResult.Fetched -> MovieScreen(
-                    movies = movieStateUIResult.list,
-                    onDoubleTap = onDoubleTap
-                )
+            val viewState by movieViewModel.viewState.collectAsStateWithLifecycle()
 
-                is MovieUiStateResult.Error -> ErrorMovieScreen(
-                    error = movieStateUIResult.throwable?.message ?: "Invalid error exception"
-                )
-            }
+            HomeContent(
+                viewState = viewState,
+                onCardEvent = movieViewModel::onCardEvent
+            )
         }
+    }
+}
+
+@Composable
+fun HomeContent(
+    viewState: MovieUiStateResult,
+    modifier: Modifier = Modifier,
+    onCardEvent: (CardEvent) -> Unit
+) {
+    when (viewState) {
+        is MovieUiStateResult.Loading -> CircularProgressIndicator()
+        is MovieUiStateResult.Empty -> EmptyMovieScreen()
+        is MovieUiStateResult.Fetched -> MovieScreen(
+            movies = viewState.list,
+            onCardEvent = onCardEvent
+        )
+
+        is MovieUiStateResult.Error -> ErrorMovieScreen(
+            error = viewState.throwable?.message
+                ?: "Invalid error exception"
+        )
     }
 }

@@ -1,6 +1,5 @@
 package com.msoula.movies.data
 
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.msoula.movies.data.model.MovieUi
 
 sealed class MovieUiStateResult {

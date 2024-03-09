@@ -1,13 +1,9 @@
 package com.msoula.movies.presentation
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.movies.data.MovieUiStateResult
-import com.msoula.movies.data.model.Movie
 import com.msoula.movies.data.model.toListMovieUI
 import com.msoula.movies.domain.use_case.DeleteAllMovies
 import com.msoula.movies.domain.use_case.InsertMovieUseCase
@@ -20,7 +16,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn

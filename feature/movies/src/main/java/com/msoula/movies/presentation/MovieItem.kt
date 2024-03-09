@@ -48,7 +48,7 @@ fun MovieItem(
     movie: MovieUi,
     state: LazyListState,
     index: Int,
-    onDoubleTap: (CardEvent) -> Unit
+    onCardEvent: (CardEvent) -> Unit
 ) {
     val painter = rememberAsyncImagePainter(model = File(movie.coverUrl))
 
@@ -99,7 +99,7 @@ fun MovieItem(
                     detectTapGestures(onDoubleTap = {
                         Log.i("HMM", "Into View with movie: $movie")
                         heartVisible = true
-                        onDoubleTap(CardEvent.OnDoubleTap(movie))
+                        onCardEvent(CardEvent.OnDoubleTap(movie))
                     })
                 },
             shape = RoundedCornerShape(16.dp),

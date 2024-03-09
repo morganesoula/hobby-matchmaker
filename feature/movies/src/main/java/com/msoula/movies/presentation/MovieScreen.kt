@@ -15,7 +15,7 @@ import com.msoula.movies.data.model.MovieUi
 
 @Composable
 fun MovieScreen(
-    modifier: Modifier = Modifier, movies: List<MovieUi>, onDoubleTap: (CardEvent) -> Unit
+    modifier: Modifier = Modifier, movies: List<MovieUi>, onCardEvent: (CardEvent) -> Unit
 ) {
     val state = rememberLazyListState()
 
@@ -35,14 +35,14 @@ fun MovieScreen(
                 movie = movie,
                 state = state,
                 index = movies.indexOf(movie),
-                onDoubleTap = onDoubleTap
+                onCardEvent = onCardEvent
             )
         }
     }
 }
 
 @Composable
-fun ErrorMovieScrMoneen(modifier: Modifier = Modifier, error: String) {
+fun ErrorMovieScreen(modifier: Modifier = Modifier, error: String) {
     Text(modifier = modifier, text = "Error while fetching: $error")
 }
 
@@ -61,6 +61,6 @@ fun MovieScreenPreview() {
             MovieUi(3, "", isFavorite = false),
             MovieUi(4, "", isFavorite = false)
         ),
-        onDoubleTap = {}
+        onCardEvent = {}
     )
 }
