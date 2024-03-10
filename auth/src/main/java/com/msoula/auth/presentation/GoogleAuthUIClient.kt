@@ -3,6 +3,7 @@ package com.msoula.auth.presentation
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
+import android.util.Log
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.BeginSignInRequest.GoogleIdTokenRequestOptions
 import com.google.android.gms.auth.api.identity.SignInClient
@@ -28,6 +29,7 @@ class GoogleAuthUIClient
                     oneTapClient.beginSignIn(buildSignInrequest()).await()
                 } catch (e: Exception) {
                     if (e is CancellationException) throw e
+                    Log.e("HMM", "Error while trying to signIn with Google: ${e.message}")
                     null
                 }
 

@@ -17,13 +17,19 @@ interface MovieDAO {
     fun observeMovies(): Flow<List<MovieEntity>>
 
     @Query("UPDATE movies SET local_poster_path = :localPath WHERE poster_path = :remotePosterPath")
-    fun updateMovieWithPosterLocalPath(remotePosterPath: String, localPath: String)
+    fun updateMovieWithPosterLocalPath(
+        remotePosterPath: String,
+        localPath: String,
+    )
 
     @Query("DELETE FROM movies")
     suspend fun clearAll()
 
     @Query("UPDATE movies SET favourite = :isFavourite WHERE id = :movieId")
-    suspend fun updateMovieFavorite(movieId: Int, isFavourite: Boolean)
+    suspend fun updateMovieFavorite(
+        movieId: Int,
+        isFavourite: Boolean,
+    )
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMovie(movieEntity: MovieEntity)

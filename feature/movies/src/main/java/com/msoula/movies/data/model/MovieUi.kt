@@ -6,5 +6,5 @@ import androidx.compose.runtime.Immutable
 data class MovieUi(
     val id: Int,
     val coverUrl: String,
-    val isFavorite: Boolean
+    val isFavorite: Boolean,
 )

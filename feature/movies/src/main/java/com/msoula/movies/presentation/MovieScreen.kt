@@ -15,34 +15,44 @@ import com.msoula.movies.data.model.MovieUi
 
 @Composable
 fun MovieScreen(
-    modifier: Modifier = Modifier, movies: List<MovieUi>, onCardEvent: (CardEvent) -> Unit
+    modifier: Modifier = Modifier,
+    movies: List<MovieUi>,
+    onCardEvent: (CardEvent) -> Unit,
 ) {
     val state = rememberLazyListState()
 
     LazyRow(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-        state = state
+        state = state,
     ) {
         items(movies) { movie ->
-            if (movie != movies[0]) Spacer(modifier = Modifier.width(10.dp)) else Spacer(
-                modifier = Modifier.width(
-                    50.dp
+            if (movie != movies[0]) {
+                Spacer(modifier = Modifier.width(10.dp))
+            } else {
+                Spacer(
+                    modifier =
+                        Modifier.width(
+                            50.dp,
+                        ),
                 )
-            )
+            }
 
             MovieItem(
                 movie = movie,
                 state = state,
                 index = movies.indexOf(movie),
-                onCardEvent = onCardEvent
+                onCardEvent = onCardEvent,
             )
         }
     }
 }
 
 @Composable
-fun ErrorMovieScreen(modifier: Modifier = Modifier, error: String) {
+fun ErrorMovieScreen(
+    modifier: Modifier = Modifier,
+    error: String,
+) {
     Text(modifier = modifier, text = "Error while fetching: $error")
 }
 
@@ -55,12 +65,13 @@ fun EmptyMovieScreen(modifier: Modifier = Modifier) {
 @Composable
 fun MovieScreenPreview() {
     MovieScreen(
-        movies = listOf(
-            MovieUi(1, "", isFavorite = false),
-            MovieUi(2, "", isFavorite = false),
-            MovieUi(3, "", isFavorite = false),
-            MovieUi(4, "", isFavorite = false)
-        ),
-        onCardEvent = {}
+        movies =
+            listOf(
+                MovieUi(1, "", isFavorite = false),
+                MovieUi(2, "", isFavorite = false),
+                MovieUi(3, "", isFavorite = false),
+                MovieUi(4, "", isFavorite = false),
+            ),
+        onCardEvent = {},
     )
 }

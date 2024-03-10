@@ -14,14 +14,15 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
-
     @Provides
     @Singleton
-    fun providesDatabase(@ApplicationContext context: Context): HMMDatabase =
+    fun providesDatabase(
+        @ApplicationContext context: Context,
+    ): HMMDatabase =
         Room.databaseBuilder(
             context,
             HMMDatabase::class.java,
-            "database-hmm"
+            "database-hmm",
         )
             .fallbackToDestructiveMigration()
             .build()

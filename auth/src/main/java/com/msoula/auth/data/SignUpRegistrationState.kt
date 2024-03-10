@@ -12,4 +12,4 @@ data class SignUpRegistrationState(
     val submit: Boolean = false,
     // Error section
     val signUpError: String? = null,
-): Parcelable
+) : Parcelable

@@ -21,20 +21,20 @@ import com.msoula.movies.presentation.MovieViewModel
 fun HomeScreen(
     logOut: () -> Unit,
     modifier: Modifier = Modifier,
-    movieViewModel: MovieViewModel = hiltViewModel<MovieViewModel>()
+    movieViewModel: MovieViewModel = hiltViewModel<MovieViewModel>(),
 ) {
     Scaffold(modifier = modifier) { paddingValues ->
         Surface(
             modifier =
-            Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
         ) {
             val viewState by movieViewModel.viewState.collectAsStateWithLifecycle()
 
             HomeContent(
                 viewState = viewState,
-                onCardEvent = movieViewModel::onCardEvent
+                onCardEvent = movieViewModel::onCardEvent,
             )
         }
     }
@@ -44,19 +44,24 @@ fun HomeScreen(
 fun HomeContent(
     viewState: MovieUiStateResult,
     modifier: Modifier = Modifier,
-    onCardEvent: (CardEvent) -> Unit
+    onCardEvent: (CardEvent) -> Unit,
 ) {
     when (viewState) {
         is MovieUiStateResult.Loading -> CircularProgressIndicator()
-        is MovieUiStateResult.Empty -> EmptyMovieScreen()
-        is MovieUiStateResult.Fetched -> MovieScreen(
-            movies = viewState.list,
-            onCardEvent = onCardEvent
-        )
+        is MovieUiStateResult.Empty -> EmptyMovieScreen(modifier = modifier)
+        is MovieUiStateResult.Fetched ->
+            MovieScreen(
+                modifier = modifier,
+                movies = viewState.list,
+                onCardEvent = onCardEvent,
+            )
 
-        is MovieUiStateResult.Error -> ErrorMovieScreen(
-            error = viewState.throwable?.message
-                ?: "Invalid error exception"
-        )
+        is MovieUiStateResult.Error ->
+            ErrorMovieScreen(
+                modifier = modifier,
+                error =
+                    viewState.throwable?.message
+                        ?: "Invalid error exception",
+            )
     }
 }

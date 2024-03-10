@@ -13,7 +13,7 @@ class MapMovieEntityToMovie : Mapper<MovieEntity, Movie> {
             posterJPG = entity.remotePosterPath,
             localPosterPath = entity.localPosterPath,
             seen = entity.seen,
-            isFavorite = entity.favourite
+            isFavorite = entity.favourite,
         )
     }
 }
@@ -26,7 +26,7 @@ class MapMovieToMovieEntity : Mapper<Movie, MovieEntity> {
             remotePosterPath = entity.posterJPG,
             localPosterPath = entity.localPosterPath,
             favourite = entity.isFavorite,
-            seen = entity.seen
+            seen = entity.seen,
         )
     }
 }
@@ -36,7 +36,7 @@ class MapMoviePogoToMovieEntity : Mapper<MoviePogo, MovieEntity> {
         return MovieEntity(
             id = entity.id,
             title = entity.title,
-            remotePosterPath = entity.poster
+            remotePosterPath = entity.poster,
         )
     }
 }

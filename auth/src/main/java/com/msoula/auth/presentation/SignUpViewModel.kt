@@ -22,149 +22,149 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel
-@Inject
-constructor(
-    private val authFormValidationUseCases: AuthFormValidationUseCase,
-    private val authRepository: AuthRepository,
-    private val resourceProvider: StringResourcesProvider,
-    private val ioDispatcher: CoroutineDispatcher,
-    private val navigator: Navigator,
-    private val savedStateHandle: SavedStateHandle
-) : ViewModel() {
+    @Inject
+    constructor(
+        private val authFormValidationUseCases: AuthFormValidationUseCase,
+        private val authRepository: AuthRepository,
+        private val resourceProvider: StringResourcesProvider,
+        private val ioDispatcher: CoroutineDispatcher,
+        private val navigator: Navigator,
+        private val savedStateHandle: SavedStateHandle,
+    ) : ViewModel() {
+        private val savedStateHandleKey: String = "signUpState"
+        val formDataFlow = savedStateHandle.getStateFlow(savedStateHandleKey, SignUpRegistrationState())
+        val signUpCircularProgress = MutableStateFlow(false)
 
-    private val savedStateHandleKey: String = "signUpState"
-    val formDataFlow = savedStateHandle.getStateFlow(savedStateHandleKey, SignUpRegistrationState())
-    val signUpCircularProgress = MutableStateFlow(false)
-
-    fun onEvent(event: AuthUIEvent) {
-        when (event) {
-            is AuthUIEvent.OnEmailChanged -> {
-                savedStateHandle.updateStateHandle<SignUpRegistrationState>(savedStateHandleKey) {
-                    it.copy(
-                        email = event.email.trimEnd()
-                    )
+        fun onEvent(event: AuthUIEvent) {
+            when (event) {
+                is AuthUIEvent.OnEmailChanged -> {
+                    savedStateHandle.updateStateHandle<SignUpRegistrationState>(savedStateHandleKey) {
+                        it.copy(
+                            email = event.email.trimEnd(),
+                        )
+                    }
+                    validateInput()
                 }
-                validateInput()
-            }
 
-            is AuthUIEvent.OnFirstNameChanged -> {
-                savedStateHandle.updateStateHandle<SignUpRegistrationState>(savedStateHandleKey) {
-                    it.copy(
-                        firstName = event.firstName.trimEnd()
-                    )
+                is AuthUIEvent.OnFirstNameChanged -> {
+                    savedStateHandle.updateStateHandle<SignUpRegistrationState>(savedStateHandleKey) {
+                        it.copy(
+                            firstName = event.firstName.trimEnd(),
+                        )
+                    }
+                    validateInput()
                 }
-                validateInput()
-            }
 
-            is AuthUIEvent.OnLastNameChanged -> {
-                savedStateHandle.updateStateHandle<SignUpRegistrationState>(savedStateHandleKey) {
-                    it.copy(
-                        lastName = event.lastName.trimEnd()
-                    )
+                is AuthUIEvent.OnLastNameChanged -> {
+                    savedStateHandle.updateStateHandle<SignUpRegistrationState>(savedStateHandleKey) {
+                        it.copy(
+                            lastName = event.lastName.trimEnd(),
+                        )
+                    }
+                    validateInput()
                 }
-                validateInput()
-            }
 
-            is AuthUIEvent.OnPasswordChanged -> {
-                savedStateHandle.updateStateHandle<SignUpRegistrationState>(savedStateHandleKey) {
-                    it.copy(
-                        password = event.password
-                    )
+                is AuthUIEvent.OnPasswordChanged -> {
+                    savedStateHandle.updateStateHandle<SignUpRegistrationState>(savedStateHandleKey) {
+                        it.copy(
+                            password = event.password,
+                        )
+                    }
+                    validateInput()
                 }
-                validateInput()
-            }
 
-            AuthUIEvent.OnSignUp -> launchSignUp()
-            else -> Unit
-        }
-    }
-
-    private fun validateInput() {
-        val emailResult = authFormValidationUseCases.validateEmail(formDataFlow.value.email)
-        val passwordResult =
-            authFormValidationUseCases.validatePassword.validatePassword(formDataFlow.value.password)
-        val firstNameResult =
-            authFormValidationUseCases.validateFirstName(formDataFlow.value.firstName.trimEnd())
-        val lastNameResult =
-            authFormValidationUseCases.validateLastName(formDataFlow.value.lastName.trimEnd())
-
-        val error = listOf(
-            emailResult,
-            passwordResult,
-            firstNameResult,
-            lastNameResult,
-        ).any { !it.successful }
-
-        if (error) {
-            savedStateHandle.updateStateHandle<SignUpRegistrationState>(savedStateHandleKey) {
-                it.copy(
-                    submit = false
-                )
-            }
-            return
-        } else {
-            savedStateHandle.updateStateHandle<SignUpRegistrationState>(savedStateHandleKey) {
-                it.copy(
-                    submit = true
-                )
+                AuthUIEvent.OnSignUp -> launchSignUp()
+                else -> Unit
             }
         }
-    }
 
-    private fun launchSignUp() {
-        viewModelScope.launch(ioDispatcher) {
-            createFirebaseAccount()
-        }
-    }
+        private fun validateInput() {
+            val emailResult = authFormValidationUseCases.validateEmail(formDataFlow.value.email)
+            val passwordResult =
+                authFormValidationUseCases.validatePassword.validatePassword(formDataFlow.value.password)
+            val firstNameResult =
+                authFormValidationUseCases.validateFirstName(formDataFlow.value.firstName.trimEnd())
+            val lastNameResult =
+                authFormValidationUseCases.validateLastName(formDataFlow.value.lastName.trimEnd())
 
-    private suspend fun createFirebaseAccount() {
-        signUpCircularProgress.value = true
-        when (
-            val result =
-                authRepository.signUp(
-                    formDataFlow.value.email,
-                    formDataFlow.value.password,
-                )
-        ) {
-            is ResponseHMM.Success -> {
-                signUpCircularProgress.value = false
-                savedStateHandle.clearAll<SignUpRegistrationState>()
+            val error =
+                listOf(
+                    emailResult,
+                    passwordResult,
+                    firstNameResult,
+                    lastNameResult,
+                ).any { !it.successful }
 
-                navigator.navigate(HomeScreenRoute)
+            if (error) {
+                savedStateHandle.updateStateHandle<SignUpRegistrationState>(savedStateHandleKey) {
+                    it.copy(
+                        submit = false,
+                    )
+                }
+                return
+            } else {
+                savedStateHandle.updateStateHandle<SignUpRegistrationState>(savedStateHandleKey) {
+                    it.copy(
+                        submit = true,
+                    )
+                }
             }
+        }
 
-            is ResponseHMM.Failure -> {
-                when (val exception = result.throwable) {
-                    is FirebaseAuthUserCollisionException -> {
-                        signUpCircularProgress.value = false
-                        savedStateHandle.updateStateHandle<SignUpRegistrationState>(
-                            savedStateHandleKey
-                        ) {
-                            it.copy(
-                                signUpError =
-                                resourceProvider.getString(
-                                    R.string.signup_error,
+        private fun launchSignUp() {
+            viewModelScope.launch(ioDispatcher) {
+                createFirebaseAccount()
+            }
+        }
+
+        private suspend fun createFirebaseAccount() {
+            signUpCircularProgress.value = true
+            when (
+                val result =
+                    authRepository.signUp(
+                        formDataFlow.value.email,
+                        formDataFlow.value.password,
+                    )
+            ) {
+                is ResponseHMM.Success -> {
+                    signUpCircularProgress.value = false
+                    savedStateHandle.clearAll<SignUpRegistrationState>()
+
+                    navigator.navigate(HomeScreenRoute)
+                }
+
+                is ResponseHMM.Failure -> {
+                    when (val exception = result.throwable) {
+                        is FirebaseAuthUserCollisionException -> {
+                            signUpCircularProgress.value = false
+                            savedStateHandle.updateStateHandle<SignUpRegistrationState>(
+                                savedStateHandleKey,
+                            ) {
+                                it.copy(
+                                    signUpError =
+                                        resourceProvider.getString(
+                                            R.string.signup_error,
+                                        ),
                                 )
-                            )
+                            }
+                            Log.e("HMM", "Email already associated")
                         }
-                        Log.e("HMM", "Email already associated")
-                    }
 
-                    else -> {
-                        signUpCircularProgress.value = false
-                        savedStateHandle.updateStateHandle<SignUpRegistrationState>(
-                            savedStateHandleKey
-                        ) {
-                            it.copy(
-                                signUpError = exception.message
-                            )
+                        else -> {
+                            signUpCircularProgress.value = false
+                            savedStateHandle.updateStateHandle<SignUpRegistrationState>(
+                                savedStateHandleKey,
+                            ) {
+                                it.copy(
+                                    signUpError = exception.message,
+                                )
+                            }
+                            Log.e("HMM", "Could not create an account")
                         }
-                        Log.e("HMM", "Could not create an account")
                     }
                 }
-            }
 
-            else -> Unit
+                else -> Unit
+            }
         }
     }
-}

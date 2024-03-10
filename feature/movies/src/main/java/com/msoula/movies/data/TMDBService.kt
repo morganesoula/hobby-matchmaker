@@ -8,10 +8,9 @@ private const val PARAMS_LANGUAGE = "language"
 private const val PARAMS_PAGE = "page"
 
 interface TMDBService {
-
     @GET("movie/popular")
     suspend fun getMoviesByPopularityDesc(
         @Query(PARAMS_LANGUAGE) language: String,
-        @Query(PARAMS_PAGE) page: Int
+        @Query(PARAMS_PAGE) page: Int,
     ): MovieNetwork
 }

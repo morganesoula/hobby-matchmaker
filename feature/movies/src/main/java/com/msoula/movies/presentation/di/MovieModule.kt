@@ -11,14 +11,14 @@ import com.msoula.movies.data.mapper.MapMovieEntityToMovie
 import com.msoula.movies.data.mapper.MapMoviePogoToMovieEntity
 import com.msoula.movies.data.mapper.MapMovieToMovieEntity
 import com.msoula.movies.domain.MovieRepository
-import com.msoula.movies.domain.use_case.DeleteAllMovies
-import com.msoula.movies.domain.use_case.InsertMovieUseCase
-import com.msoula.movies.domain.use_case.ObserveMoviesUseCase
-import com.msoula.movies.domain.use_case.SetMovieFavoriteUseCase
-import com.msoula.movies.domain.use_case.deleteAllMovies
-import com.msoula.movies.domain.use_case.insertMovie
-import com.msoula.movies.domain.use_case.observeMovies
-import com.msoula.movies.domain.use_case.setMovieFavorite
+import com.msoula.movies.domain.useCases.DeleteAllMovies
+import com.msoula.movies.domain.useCases.InsertMovieUseCase
+import com.msoula.movies.domain.useCases.ObserveMoviesUseCase
+import com.msoula.movies.domain.useCases.SetMovieFavoriteUseCase
+import com.msoula.movies.domain.useCases.deleteAllMovies
+import com.msoula.movies.domain.useCases.insertMovie
+import com.msoula.movies.domain.useCases.observeMovies
+import com.msoula.movies.domain.useCases.setMovieFavorite
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,20 +37,21 @@ private const val BASE_URL = "https://api.themoviedb.org/3/"
 @Module
 @InstallIn(SingletonComponent::class)
 object MovieModule {
-
     @Provides
     @Singleton
     fun providesAuthInterceptor(): Interceptor {
         return Interceptor { chain ->
-            val newUrl = chain.request().url
-                .newBuilder()
-                .addQueryParameter("api_key", API_KEY)
-                .build()
+            val newUrl =
+                chain.request().url
+                    .newBuilder()
+                    .addQueryParameter("api_key", API_KEY)
+                    .build()
 
-            val newRequest = chain.request()
-                .newBuilder()
-                .url(newUrl)
-                .build()
+            val newRequest =
+                chain.request()
+                    .newBuilder()
+                    .url(newUrl)
+                    .build()
 
             chain.proceed(newRequest)
         }
@@ -83,22 +84,21 @@ object MovieModule {
     @Provides
     fun provideImageHelper(
         @ApplicationContext context: Context,
-        coroutineDispatcher: CoroutineDispatcher
-    ): ImageHelper =
-        ImageHelper(coroutineDispatcher, context)
+        coroutineDispatcher: CoroutineDispatcher,
+    ): ImageHelper = ImageHelper(coroutineDispatcher, context)
 
     @Provides
     fun provideMovieService(
         movieDAO: MovieDAO,
         tmdbService: TMDBService,
         mapperPogoToMovieEntity: MapMoviePogoToMovieEntity,
-        imageHelper: ImageHelper
+        imageHelper: ImageHelper,
     ): MovieService =
         MovieService(
             movieDAO,
             tmdbService,
             mapperPogoToMovieEntity,
-            imageHelper
+            imageHelper,
         )
 
     @Provides
@@ -108,49 +108,42 @@ object MovieModule {
         movieService: MovieService,
         mapperMovieToMovieEntity: MapMovieToMovieEntity,
         mapperMovieEntityToMovie: MapMovieEntityToMovie,
-    ): MovieRepository = MovieRepositoryImpl(
-        movieDAO,
-        movieService,
-        mapperMovieToMovieEntity,
-        mapperMovieEntityToMovie
-    )
+    ): MovieRepository =
+        MovieRepositoryImpl(
+            movieDAO,
+            movieService,
+            mapperMovieToMovieEntity,
+            mapperMovieEntityToMovie,
+        )
 
     @Provides
-    fun provideGetMovieByPopularityUseCase(
-        movieRepository: MovieRepository
-    ): ObserveMoviesUseCase =
+    fun provideGetMovieByPopularityUseCase(movieRepository: MovieRepository): ObserveMoviesUseCase =
         ObserveMoviesUseCase {
             observeMovies(movieRepository)
         }
 
     @Provides
-    fun provideDeleteAllMoviesUseCase(
-        movieRepository: MovieRepository
-    ): DeleteAllMovies =
+    fun provideDeleteAllMoviesUseCase(movieRepository: MovieRepository): DeleteAllMovies =
         DeleteAllMovies {
             deleteAllMovies(movieRepository)
         }
 
     @Provides
-    fun provideUpdateMovieUseCase(
-        movieRepository: MovieRepository
-    ): SetMovieFavoriteUseCase =
+    fun provideUpdateMovieUseCase(movieRepository: MovieRepository): SetMovieFavoriteUseCase =
         SetMovieFavoriteUseCase { movieId, isFavorite ->
             setMovieFavorite(
                 movieRepository,
                 movieId,
-                isFavorite
+                isFavorite,
             )
         }
 
     @Provides
-    fun provideInsertMovieUseCase(
-        movieRepository: MovieRepository
-    ): InsertMovieUseCase =
+    fun provideInsertMovieUseCase(movieRepository: MovieRepository): InsertMovieUseCase =
         InsertMovieUseCase {
             insertMovie(
                 movieRepository,
-                it
+                it,
             )
         }
 }

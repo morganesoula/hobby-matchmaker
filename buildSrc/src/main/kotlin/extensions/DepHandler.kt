@@ -71,6 +71,8 @@ fun DependencyHandler.authModuleDeps() {
     implementation(Deps.AndroidX.Compose.ACTIVITY)
     implementation(Deps.AndroidX.Compose.VIEW_MODEL)
     implementation(Deps.AndroidX.Compose.RUNTIME)
+    implementation(Deps.AndroidX.Lifecycle.LIFECYCLE_RUNTIME)
+    implementation(Deps.AndroidX.Lifecycle.RUNTIME_COMPOSE)
 
     // Coroutine
     implementation(Deps.Coroutines.CORE)
@@ -89,6 +91,7 @@ fun DependencyHandler.authModuleDeps() {
 
     // Hilt
     implementation(Deps.Dagger.HILT_ANDROID)
+    implementation(Deps.Dagger.HILT_NAVIGATION_COMPOSE)
     kapt(Deps.Dagger.HILT_ANDROID_COMPILER)
 
     // Retrofit

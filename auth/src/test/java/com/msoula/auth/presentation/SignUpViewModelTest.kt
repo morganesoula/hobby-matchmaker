@@ -54,7 +54,7 @@ class SignUpViewModelTest {
                 resourceProvider = resourcesProvider,
                 ioDispatcher = Dispatchers.IO,
                 navigator = NavigatorImpl(),
-                savedStateHandle = savedStateHandle
+                savedStateHandle = savedStateHandle,
             )
     }
 

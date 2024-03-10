@@ -1,6 +1,5 @@
 package com.msoula.hobbymatchmaker.app
 
-import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
@@ -10,7 +9,7 @@ import com.msoula.hobbymatchmaker.navigation.HobbyMatchMakerNavHost
 
 @Stable
 @Composable
-fun ComponentActivity.HobbyMatchMakerApp(navigator: Navigator) {
+fun HobbyMatchMakerApp(navigator: Navigator) {
     val navController = rememberNavController()
 
     DisposableEffect(key1 = navController) {

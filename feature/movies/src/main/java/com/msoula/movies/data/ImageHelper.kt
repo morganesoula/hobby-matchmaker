@@ -12,52 +12,58 @@ import javax.inject.Inject
 
 private const val IMG_PREFIX = "https://image.tmdb.org/t/p/w500"
 
-class ImageHelper @Inject constructor(
-    private val coroutineDispatcher: CoroutineDispatcher,
-    private val context: Context
-) {
-
-    suspend fun saveRemoteImageAndUpdateMovie(
-        remotePosterPath: String,
-        updateMovie: (localImagePath: String) -> Unit
+class ImageHelper
+    @Inject
+    constructor(
+        private val coroutineDispatcher: CoroutineDispatcher,
+        private val context: Context,
     ) {
-        val localImagePath = downloadImage(remotePosterPath)
+        suspend fun saveRemoteImageAndUpdateMovie(
+            remotePosterPath: String,
+            updateMovie: (localImagePath: String) -> Unit,
+        ) {
+            val localImagePath = downloadImage(remotePosterPath)
 
-        localImagePath?.let {
-            updateMovie(it)
-        }
-    }
-
-    private suspend fun downloadImage(remotePosterPath: String): String? {
-        Log.i("HMM", "Downloading image")
-        val response = CoroutineScope(coroutineDispatcher).async {
-            val bitmap = BitmapFactory.decodeStream(URL(IMG_PREFIX + remotePosterPath).openStream())
-            val savedImagePath = saveImageToLocal(bitmap, remotePosterPath)
-            savedImagePath
-        }.await()
-
-        return response
-    }
-
-    private fun saveImageToLocal(bitmap: Bitmap, imageName: String): String? {
-        var absolutePath = ""
-        try {
-            val cleanImageName = imageName.removePrefix("/")
-            absolutePath = if (context.getFileStreamPath(cleanImageName).exists()) {
-                context.getFileStreamPath(cleanImageName).absolutePath
-            } else {
-                val outputStream = context.openFileOutput(cleanImageName, Context.MODE_PRIVATE)
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-                outputStream.flush()
-                outputStream.close()
-
-                context.getFileStreamPath(cleanImageName).absolutePath
+            localImagePath?.let {
+                updateMovie(it)
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Log.e("HMM", "Exception occurred while saving image: ${e.message}")
         }
 
-        return absolutePath
+        private suspend fun downloadImage(remotePosterPath: String): String? {
+            Log.i("HMM", "Downloading image")
+            val response =
+                CoroutineScope(coroutineDispatcher).async {
+                    val bitmap = BitmapFactory.decodeStream(URL(IMG_PREFIX + remotePosterPath).openStream())
+                    val savedImagePath = saveImageToLocal(bitmap, remotePosterPath)
+                    savedImagePath
+                }.await()
+
+            return response
+        }
+
+        private fun saveImageToLocal(
+            bitmap: Bitmap,
+            imageName: String,
+        ): String? {
+            var absolutePath = ""
+            try {
+                val cleanImageName = imageName.removePrefix("/")
+                absolutePath =
+                    if (context.getFileStreamPath(cleanImageName).exists()) {
+                        context.getFileStreamPath(cleanImageName).absolutePath
+                    } else {
+                        val outputStream = context.openFileOutput(cleanImageName, Context.MODE_PRIVATE)
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                        outputStream.flush()
+                        outputStream.close()
+
+                        context.getFileStreamPath(cleanImageName).absolutePath
+                    }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Log.e("HMM", "Exception occurred while saving image: ${e.message}")
+            }
+
+            return absolutePath
+        }
     }
-}

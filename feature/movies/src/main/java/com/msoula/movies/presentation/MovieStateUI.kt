@@ -7,5 +7,5 @@ import kotlinx.collections.immutable.persistentListOf
 data class MovieStateUI(
     val movies: PersistentList<MovieUi> = persistentListOf(),
     val isLoading: Boolean = true,
-    val error: String? = null
+    val error: String? = null,
 )

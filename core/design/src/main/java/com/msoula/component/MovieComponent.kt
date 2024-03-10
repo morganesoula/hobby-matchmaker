@@ -42,7 +42,7 @@ fun HMMSwipeCard(
     onSwipeRight: () -> Unit = {},
     swipeThreshold: Float = 400f,
     sensitivityFactor: Float = 3f,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     var offset by remember { mutableStateOf(0f) }
     var dismissRight by remember { mutableStateOf(false) }
@@ -65,28 +65,30 @@ fun HMMSwipeCard(
         }
     }
 
-    Box(modifier = modifier
-        .background(MaterialTheme.colorScheme.background)
-        .offset { IntOffset(offset.roundToInt(), 0) }
-        .pointerInput(Unit) {
-            detectHorizontalDragGestures(onDragEnd = {
-                offset = 0f
-            }) { change, dragAmount ->
+    Box(
+        modifier =
+            modifier
+                .background(MaterialTheme.colorScheme.background)
+                .offset { IntOffset(offset.roundToInt(), 0) }
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures(onDragEnd = {
+                        offset = 0f
+                    }) { change, dragAmount ->
 
-                offset += (dragAmount / density) * sensitivityFactor
+                        offset += (dragAmount / density) * sensitivityFactor
 
-                when {
-                    offset > swipeThreshold -> dismissLeft = true
-                    offset < -swipeThreshold -> dismissLeft = true
+                        when {
+                            offset > swipeThreshold -> dismissLeft = true
+                            offset < -swipeThreshold -> dismissLeft = true
+                        }
+
+                        if (change.positionChange() != Offset.Zero) change.consume()
+                    }
                 }
-
-                if (change.positionChange() != Offset.Zero) change.consume()
-            }
-        }
-        .graphicsLayer(
-            alpha = 10f - animateFloatAsState(if (dismissRight) 1f else 0f, label = "").value,
-            rotationZ = animateFloatAsState(offset / 50, label = "").value
-        )
+                .graphicsLayer(
+                    alpha = 10f - animateFloatAsState(if (dismissRight) 1f else 0f, label = "").value,
+                    rotationZ = animateFloatAsState(offset / 50, label = "").value,
+                ),
     ) {
         content()
     }
@@ -96,13 +98,14 @@ fun HMMSwipeCard(
 fun HMMShimmerEffect(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
-    contentAfterLoading: @Composable () -> Unit
+    contentAfterLoading: @Composable () -> Unit,
 ) {
     if (isLoading) {
         Box(
-            modifier = modifier
-                .size(300.dp, 450.dp)
-                .shimmerEffect()
+            modifier =
+                modifier
+                    .size(300.dp, 450.dp)
+                    .shimmerEffect(),
         )
         Spacer(modifier = Modifier.width(16.dp))
     } else {
@@ -110,32 +113,37 @@ fun HMMShimmerEffect(
     }
 }
 
-fun Modifier.shimmerEffect(): Modifier = composed {
-    var size by remember {
-        mutableStateOf(IntSize.Zero)
-    }
-
-    val transition = rememberInfiniteTransition(label = "")
-    val startOffsetX by transition.animateFloat(
-        initialValue = -2 * size.width.toFloat(),
-        targetValue = 2 * size.width.toFloat(),
-        animationSpec = infiniteRepeatable(
-            animation = tween(1000)
-        ), label = ""
-    )
-
-    background(
-        brush = Brush.linearGradient(
-            colors = listOf(
-                Color(0xFFB8B5B5),
-                Color(0xFF8F8B8B),
-                Color(0xFFB8B5B5)
-            ),
-            start = Offset(startOffsetX, 0f),
-            end = Offset(startOffsetX + size.width.toFloat(), size.height.toFloat())
-        )
-    )
-        .onGloballyPositioned {
-            size = it.size
+fun Modifier.shimmerEffect(): Modifier =
+    composed {
+        var size by remember {
+            mutableStateOf(IntSize.Zero)
         }
-}
+
+        val transition = rememberInfiniteTransition(label = "")
+        val startOffsetX by transition.animateFloat(
+            initialValue = -2 * size.width.toFloat(),
+            targetValue = 2 * size.width.toFloat(),
+            animationSpec =
+                infiniteRepeatable(
+                    animation = tween(1000),
+                ),
+            label = "",
+        )
+
+        background(
+            brush =
+                Brush.linearGradient(
+                    colors =
+                        listOf(
+                            Color(0xFFB8B5B5),
+                            Color(0xFF8F8B8B),
+                            Color(0xFFB8B5B5),
+                        ),
+                    start = Offset(startOffsetX, 0f),
+                    end = Offset(startOffsetX + size.width.toFloat(), size.height.toFloat()),
+                ),
+        )
+            .onGloballyPositioned {
+                size = it.size
+            }
+    }

@@ -1,4 +1,4 @@
-package com.msoula.movies.domain.use_case
+package com.msoula.movies.domain.useCases
 
 import android.util.Log
 import com.msoula.movies.data.model.Movie
@@ -7,9 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 fun interface ObserveMoviesUseCase : () -> Flow<List<Movie>?>
 
-fun observeMovies(
-    movieRepository: MovieRepository
-): Flow<List<Movie>?> {
+fun observeMovies(movieRepository: MovieRepository): Flow<List<Movie>?> {
     Log.d("HMM", "Into UseCase")
     return movieRepository.observeMovies()
 }

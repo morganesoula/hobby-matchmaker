@@ -29,6 +29,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -43,40 +44,40 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import com.msoula.auth.data.AuthUIEvent
-import com.msoula.auth.data.LoginFormState
 import com.msoula.component.HMMButtonAuthComponent
 import com.msoula.component.HMMErrorText
-import com.msoula.component.HMMSocialMediaRow
 import com.msoula.component.HMMTextFieldAuthComponent
 import com.msoula.component.HMMTextFieldPasswordComponent
 import com.msoula.component.HeaderTextComponent
 import com.msoula.di.data.StringResourcesProviderImpl
-import com.msoula.theme.HobbyMatchmakerTheme
 import kotlinx.coroutines.launch
 import com.msoula.auth.R.string as StringRes
 
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
-    circularProgressLoading: Boolean,
-    loginFormState: LoginFormState,
-    authUiEvent: (AuthUIEvent) -> Unit,
-    onGoogleSignInClicked: () -> Unit,
+    loginViewModel: LoginViewModel = hiltViewModel<LoginViewModel>(),
     redirectToSignUpScreen: () -> Unit,
     redirectToHomeScreen: () -> Unit,
-    openResetDialog: Boolean,
-    emailResetSent: Boolean,
+    googleAuthUIClient: GoogleAuthUIClient,
 ) {
     val context = LocalContext.current
+
+    val loginFormState by loginViewModel.formDataFlow.collectAsStateWithLifecycle()
+    val circularProgressLoading by loginViewModel.circularProgressLoading.collectAsStateWithLifecycle()
+    val openResetDialog by loginViewModel.openResetDialog.collectAsStateWithLifecycle()
+    val emailResetSent by loginViewModel.resettingEmailSent.collectAsStateWithLifecycle()
+
     val scope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
     val resourcesProvider = StringResourcesProviderImpl(context)
@@ -111,10 +112,10 @@ fun LoginScreen(
             append(stringResource(id = StringRes.new_member) + "  ")
             withStyle(
                 style =
-                SpanStyle(
-                    color = if (isSystemInDarkTheme()) Color(0, 191, 255) else Color.Blue,
-                    textDecoration = TextDecoration.Underline,
-                ),
+                    SpanStyle(
+                        color = if (isSystemInDarkTheme()) Color(0, 191, 255) else Color.Blue,
+                        textDecoration = TextDecoration.Underline,
+                    ),
             ) {
                 append(stringResource(id = StringRes.new_member_clickable_part))
             }
@@ -127,7 +128,7 @@ fun LoginScreen(
 
         LaunchedEffect(emailResetSent) {
             if (emailResetSent) {
-                authUiEvent(AuthUIEvent.HideForgotPasswordDialog)
+                loginViewModel.onEvent(AuthUIEvent.HideForgotPasswordDialog)
                 scope.launch {
                     snackBarHostState.showSnackbar(message = resourcesProvider.getString(StringRes.email_sent))
                 }
@@ -137,16 +138,16 @@ fun LoginScreen(
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier =
-                Modifier
-                    .padding(paddingValues)
-                    .verticalScroll(rememberScrollState()),
+                    Modifier
+                        .padding(paddingValues)
+                        .verticalScroll(rememberScrollState()),
             ) {
                 if (openResetDialog) {
                     ForgotPasswordAlertDialog(
                         email = loginFormState.emailReset,
                         paddingValues = paddingValues,
                         enableSubmit = loginFormState.submitEmailReset,
-                        authUIEvent = authUiEvent,
+                        authUIEvent = loginViewModel::onEvent,
                     )
                 }
 
@@ -155,42 +156,50 @@ fun LoginScreen(
                 )
 
                 if (loginFormState.logInError != null) {
-                    HMMErrorText(errorText = loginFormState.logInError)
+                    HMMErrorText(errorText = loginFormState.logInError!!)
                 }
 
                 HMMTextFieldAuthComponent(
                     value = loginFormState.email.trimEnd(),
                     placeHolderText = stringResource(StringRes.email),
-                    onValueChange = { authUiEvent(AuthUIEvent.OnEmailChanged(it)) },
+                    onValueChange = {
+                        loginViewModel.onEvent(AuthUIEvent.OnEmailChanged(it))
+                    },
                 )
 
                 Spacer(modifier = modifier.height(8.dp))
 
                 HMMTextFieldPasswordComponent(
                     value = loginFormState.password,
-                    onValueChange = { authUiEvent(AuthUIEvent.OnPasswordChanged(it)) },
+                    onValueChange = {
+                        loginViewModel.onEvent(AuthUIEvent.OnPasswordChanged(it))
+                    },
                     placeholder = stringResource(id = StringRes.password),
                     showPasswordContentDescription = stringResource(id = StringRes.show_password),
-                    hidePasswordContentDescription = stringResource(id = StringRes.hide_password)
+                    hidePasswordContentDescription = stringResource(id = StringRes.hide_password),
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 ClickableText(
                     text = AnnotatedString(stringResource(id = StringRes.forgot_password)),
-                    onClick = { authUiEvent(AuthUIEvent.OnForgotPasswordClicked) },
+                    onClick = {
+                        loginViewModel.onEvent(AuthUIEvent.OnForgotPasswordClicked)
+                    },
                     style = TextStyle(color = MaterialTheme.colorScheme.onBackground),
                     modifier =
-                    Modifier
-                        .wrapContentSize()
-                        .align(Alignment.End)
-                        .padding(end = 16.dp),
+                        Modifier
+                            .wrapContentSize()
+                            .align(Alignment.End)
+                            .padding(end = 16.dp),
                 )
 
                 Spacer(modifier = Modifier.height(40.dp))
 
                 HMMButtonAuthComponent(
-                    onClick = { authUiEvent(AuthUIEvent.OnLogIn) },
+                    onClick = {
+                        loginViewModel.onEvent(AuthUIEvent.OnLogIn)
+                    },
                     text = stringResource(id = StringRes.log_in),
                     enabled = loginFormState.submit,
                     loading = circularProgressLoading,
@@ -200,9 +209,9 @@ fun LoginScreen(
 
                 Row(
                     modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(start = 8.dp, end = 8.dp),
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(start = 8.dp, end = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
@@ -237,44 +246,31 @@ fun LoginScreen(
                             ),
                         )
                     },
-                    onGoogleButtonClicked = onGoogleSignInClicked,
+                    googleAuthUIClient = googleAuthUIClient,
+                    onGoogleSignInEvent = { signInResult ->
+                        loginViewModel.onGoogleSignInEvent(
+                            signInResult,
+                        )
+                    },
                 )
             }
 
             Box(
                 modifier =
-                Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 8.dp),
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 8.dp),
             ) {
                 ClickableText(
                     modifier =
-                    Modifier
-                        .wrapContentSize(),
+                        Modifier
+                            .wrapContentSize(),
                     text = annotatedString,
                     onClick = { redirectToSignUpScreen() },
                     style = TextStyle(color = MaterialTheme.colorScheme.onBackground),
                 )
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun LoginScreenPreview(modifier: Modifier = Modifier) {
-    HobbyMatchmakerTheme {
-        LoginScreen(
-            modifier = modifier,
-            circularProgressLoading = false,
-            loginFormState = LoginFormState(email = "test@test.fr"),
-            authUiEvent = {},
-            openResetDialog = false,
-            emailResetSent = false,
-            redirectToHomeScreen = {},
-            redirectToSignUpScreen = {},
-            onGoogleSignInClicked = {},
-        )
     }
 }
 
@@ -316,10 +312,10 @@ fun ForgotPasswordAlertDialog(
             Button(
                 onClick = { authUIEvent(AuthUIEvent.HideForgotPasswordDialog) },
                 colors =
-                ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.onBackground,
-                ),
+                    ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        contentColor = MaterialTheme.colorScheme.onBackground,
+                    ),
             ) {
                 Text(text = stringResource(id = StringRes.cancel))
             }

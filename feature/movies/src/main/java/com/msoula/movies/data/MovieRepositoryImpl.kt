@@ -14,9 +14,8 @@ class MovieRepositoryImpl(
     private val movieDAO: MovieDAO,
     private val movieService: MovieService,
     private val mapperMovieToEntity: MapMovieToMovieEntity,
-    private val mapperEntityToMovie: MapMovieEntityToMovie
+    private val mapperEntityToMovie: MapMovieEntityToMovie,
 ) : MovieRepository {
-
     override fun observeMovies(): Flow<List<Movie>?> {
         Log.d("HMM", "Fetching movies in Repository")
         return movieService.observeMovies()
@@ -38,7 +37,10 @@ class MovieRepositoryImpl(
         }
     }
 
-    override suspend fun updateMovie(movieId: Int, isFavorite: Boolean) {
+    override suspend fun updateMovie(
+        movieId: Int,
+        isFavorite: Boolean,
+    ) {
         try {
             movieService.updateMovie(movieId, isFavorite)
         } catch (exception: Exception) {
@@ -57,4 +59,3 @@ class MovieRepositoryImpl(
         }
     }
 }
-

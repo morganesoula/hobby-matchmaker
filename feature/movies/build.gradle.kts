@@ -30,7 +30,7 @@ androidComponents {
     onVariants {
         it.buildConfigFields.put(
             "tmdb_key",
-            BuildConfigField("String", getTMDBKey(), "get tmdb key")
+            BuildConfigField("String", getTMDBKey(), "get tmdb key"),
         )
     }
 }

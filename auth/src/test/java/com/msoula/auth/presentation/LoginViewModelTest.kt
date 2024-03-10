@@ -57,7 +57,7 @@ class LoginViewModelTest {
                 resourceProvider = resourceProvider,
                 ioDispatcher = Dispatchers.IO,
                 navigator = navigator,
-                savedStateHandle = savedStateHandle
+                savedStateHandle = savedStateHandle,
             )
     }
 

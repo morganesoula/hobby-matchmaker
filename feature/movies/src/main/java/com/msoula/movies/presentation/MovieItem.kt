@@ -48,20 +48,23 @@ fun MovieItem(
     movie: MovieUi,
     state: LazyListState,
     index: Int,
-    onCardEvent: (CardEvent) -> Unit
+    onCardEvent: (CardEvent) -> Unit,
 ) {
     val painter = rememberAsyncImagePainter(model = File(movie.coverUrl))
 
     // Row displaying
     val scale by remember {
         derivedStateOf {
-            val currentItem = state.layoutInfo.visibleItemsInfo.firstOrNull { it.index == index }
-                ?: return@derivedStateOf 1.0f
+            val currentItem =
+                state.layoutInfo.visibleItemsInfo.firstOrNull { it.index == index }
+                    ?: return@derivedStateOf 1.0f
             val halfRowWidth = state.layoutInfo.viewportSize.width / 2
-            (1f - minOf(
-                1f,
-                abs(currentItem.offset + (currentItem.size / 2) - halfRowWidth).toFloat() / halfRowWidth
-            ) * 0.10f)
+            (
+                1f - minOf(
+                    1f,
+                    abs(currentItem.offset + (currentItem.size / 2) - halfRowWidth).toFloat() / halfRowWidth,
+                ) * 0.10f
+            )
         }
     }
 
@@ -71,13 +74,13 @@ fun MovieItem(
     val heartColor by animateColorAsState(
         targetValue = Color.Red,
         animationSpec = tween(durationMillis = 2000, easing = FastOutLinearInEasing),
-        label = "define heart color"
+        label = "define heart color",
     )
 
     val heartSize by animateDpAsState(
         targetValue = if (heartVisible) 60.dp else 0.dp,
         animationSpec = tween(durationMillis = 2000),
-        label = "define heart size"
+        label = "define heart size",
     )
 
     LaunchedEffect(key1 = heartVisible) {
@@ -89,38 +92,40 @@ fun MovieItem(
 
     HMMShimmerEffect(modifier = modifier, isLoading = false) {
         Card(
-            modifier = Modifier
-                .width(300.dp)
-                .height(440.dp)
-                .padding(end = 10.dp)
-                .scale(scale)
-                .zIndex(scale * 10)
-                .pointerInput(Unit) {
-                    detectTapGestures(onDoubleTap = {
-                        Log.i("HMM", "Into View with movie: $movie")
-                        heartVisible = true
-                        onCardEvent(CardEvent.OnDoubleTap(movie))
-                    })
-                },
+            modifier =
+                Modifier
+                    .width(300.dp)
+                    .height(440.dp)
+                    .padding(end = 10.dp)
+                    .scale(scale)
+                    .zIndex(scale * 10)
+                    .pointerInput(Unit) {
+                        detectTapGestures(onDoubleTap = {
+                            Log.i("HMM", "Into View with movie: $movie")
+                            heartVisible = true
+                            onCardEvent(CardEvent.OnDoubleTap(movie))
+                        })
+                    },
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
         ) {
             Box {
                 HMMShimmerEffect(isLoading = false) {
                     Image(
                         painter = painter,
                         contentDescription = null,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
                     )
 
                     if (heartVisible) {
                         Icon(
                             imageVector = Icons.Default.Favorite,
                             contentDescription = "",
-                            modifier = Modifier
-                                .size(heartSize)
-                                .align(Alignment.Center),
-                            tint = heartColor
+                            modifier =
+                                Modifier
+                                    .size(heartSize)
+                                    .align(Alignment.Center),
+                            tint = heartColor,
                         )
                     }
                 }
