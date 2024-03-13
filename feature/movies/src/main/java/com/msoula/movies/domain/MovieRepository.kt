@@ -9,7 +9,7 @@ interface MovieRepository {
     suspend fun deleteAllMovies()
 
     suspend fun updateMovie(
-        movieId: Int,
+        id: Long,
         isFavorite: Boolean,
     )
 

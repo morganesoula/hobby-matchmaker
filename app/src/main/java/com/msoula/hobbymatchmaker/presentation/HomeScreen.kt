@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.presentation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -47,14 +48,15 @@ fun HomeContent(
     onCardEvent: (CardEvent) -> Unit,
 ) {
     when (viewState) {
-        is MovieUiStateResult.Loading -> CircularProgressIndicator()
+        is MovieUiStateResult.Loading -> CircularProgressIndicator(modifier.wrapContentSize())
         is MovieUiStateResult.Empty -> EmptyMovieScreen(modifier = modifier)
-        is MovieUiStateResult.Fetched ->
+        is MovieUiStateResult.Fetched -> {
             MovieScreen(
                 modifier = modifier,
                 movies = viewState.list,
                 onCardEvent = onCardEvent,
             )
+        }
 
         is MovieUiStateResult.Error ->
             ErrorMovieScreen(

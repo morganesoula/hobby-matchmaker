@@ -1,6 +1,5 @@
 package com.msoula.movies.presentation
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.movies.data.MovieUiStateResult
@@ -44,7 +43,6 @@ class MovieViewModel
                         }
 
                         else -> {
-                            Log.d("HMM", "List fetched in ViewModel is: $movies")
                             MovieUiStateResult.Fetched(list = movies.toListMovieUI())
                         }
                     }
@@ -52,7 +50,7 @@ class MovieViewModel
                 .flowOn(Dispatchers.Main)
                 .stateIn(
                     viewModelScope,
-                    SharingStarted.WhileSubscribed(5000),
+                    SharingStarted.WhileSubscribed(),
                     MovieUiStateResult.Loading,
                 )
         }
@@ -60,7 +58,6 @@ class MovieViewModel
         fun onCardEvent(event: CardEvent) {
             when (event) {
                 is CardEvent.OnDoubleTap -> {
-                    Log.d("HMM", "Into VM on Update with ${event.movie.isFavorite}")
                     viewModelScope.launch {
                         setMovieFavoriteUseCase(event.movie.id, !event.movie.isFavorite)
                     }

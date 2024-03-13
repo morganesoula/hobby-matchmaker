@@ -93,12 +93,14 @@ object MovieModule {
         tmdbService: TMDBService,
         mapperPogoToMovieEntity: MapMoviePogoToMovieEntity,
         imageHelper: ImageHelper,
+        dispatcher: CoroutineDispatcher,
     ): MovieService =
         MovieService(
             movieDAO,
             tmdbService,
             mapperPogoToMovieEntity,
             imageHelper,
+            dispatcher,
         )
 
     @Provides

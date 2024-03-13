@@ -1,9 +1,8 @@
 package com.msoula.movies.presentation
 
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -11,7 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.msoula.movies.data.model.MovieUi
+import com.msoula.movies.presentation.model.MovieUi
 
 @Composable
 fun MovieScreen(
@@ -19,30 +18,20 @@ fun MovieScreen(
     movies: List<MovieUi>,
     onCardEvent: (CardEvent) -> Unit,
 ) {
-    val state = rememberLazyListState()
+    val listState = rememberLazyListState()
 
     LazyRow(
         modifier = modifier,
+        contentPadding = PaddingValues(start = 60.dp),
         verticalAlignment = Alignment.CenterVertically,
-        state = state,
+        state = listState,
     ) {
-        items(movies) { movie ->
-            if (movie != movies[0]) {
-                Spacer(modifier = Modifier.width(10.dp))
-            } else {
-                Spacer(
-                    modifier =
-                        Modifier.width(
-                            50.dp,
-                        ),
-                )
-            }
-
+        itemsIndexed(movies, key = { _, movie -> movie.id }) { index, currentMovie ->
             MovieItem(
-                movie = movie,
-                state = state,
-                index = movies.indexOf(movie),
+                movie = currentMovie,
+                index = index,
                 onCardEvent = onCardEvent,
+                state = listState,
             )
         }
     }
@@ -67,10 +56,10 @@ fun MovieScreenPreview() {
     MovieScreen(
         movies =
             listOf(
-                MovieUi(1, "", isFavorite = false),
-                MovieUi(2, "", isFavorite = false),
-                MovieUi(3, "", isFavorite = false),
-                MovieUi(4, "", isFavorite = false),
+                MovieUi(1, "", isFavorite = false, playFavoriteAnimation = false),
+                MovieUi(2, "", isFavorite = false, playFavoriteAnimation = false),
+                MovieUi(3, "", isFavorite = false, playFavoriteAnimation = false),
+                MovieUi(4, "", isFavorite = false, playFavoriteAnimation = false),
             ),
         onCardEvent = {},
     )

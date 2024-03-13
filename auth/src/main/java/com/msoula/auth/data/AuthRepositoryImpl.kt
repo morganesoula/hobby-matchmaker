@@ -15,73 +15,73 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class AuthRepositoryImpl
-    @Inject
-    constructor(
-        private val auth: FirebaseAuth,
-        private val oneTapClient: SignInClient,
-    ) : AuthRepository {
-        val loginManager = LoginManager.getInstance()
+@Inject
+constructor(
+    private val auth: FirebaseAuth,
+    private val oneTapClient: SignInClient,
+) : AuthRepository {
+    private val loginManager = LoginManager.getInstance()
 
-        override fun getAuthState(): Boolean {
-            val authStateListener =
-                AuthStateListener {
-                    if (auth.currentUser == null) {
-                        Log.d("HMM", "Inside getAuthState with user null")
-                    } else {
-                        Log.d("HMM", "Inside getAuthState but not completed it")
-                    }
+    override fun getAuthState(): Boolean {
+        val authStateListener =
+            AuthStateListener {
+                if (auth.currentUser == null) {
+                    Log.d("HMM", "Inside getAuthState with user null")
+                } else {
+                    Log.d("HMM", "Inside getAuthState but not completed it")
                 }
-
-            auth.addAuthStateListener(authStateListener)
-
-            return auth.currentUser == null
-        }
-
-        override suspend fun logOut(): LogOutResponse {
-            return try {
-                oneTapClient.signOut().await()
-                loginManager.logOut()
-                auth.signOut()
-                ResponseHMM.Success(true)
-            } catch (exception: Exception) {
-                ResponseHMM.Failure(exception)
             }
-        }
 
-        override suspend fun signUp(
-            email: String,
-            password: String,
-        ): SignUpResponse {
-            return try {
-                val result =
-                    auth.createUserWithEmailAndPassword(
-                        email,
-                        password,
-                    ).await()
-                ResponseHMM.Success(result)
-            } catch (exception: Exception) {
-                ResponseHMM.Failure(exception)
-            }
-        }
+        auth.addAuthStateListener(authStateListener)
 
-        override suspend fun loginWithEmailAndPassword(
-            email: String,
-            password: String,
-        ): LoginResponse {
-            return try {
-                val result = auth.signInWithEmailAndPassword(email, password).await()
-                ResponseHMM.Success(result)
-            } catch (exception: Exception) {
-                ResponseHMM.Failure(exception)
-            }
-        }
+        return auth.currentUser == null
+    }
 
-        override suspend fun resetPassword(email: String): ResetEmailResponse {
-            return try {
-                auth.sendPasswordResetEmail(email)
-                ResponseHMM.Success(true)
-            } catch (exception: Exception) {
-                ResponseHMM.Failure(exception)
-            }
+    override suspend fun logOut(): LogOutResponse {
+        return try {
+            oneTapClient.signOut().await()
+            loginManager.logOut()
+            auth.signOut()
+            ResponseHMM.Success(true)
+        } catch (exception: Exception) {
+            ResponseHMM.Failure(exception)
         }
     }
+
+    override suspend fun signUp(
+        email: String,
+        password: String,
+    ): SignUpResponse {
+        return try {
+            val result =
+                auth.createUserWithEmailAndPassword(
+                    email,
+                    password,
+                ).await()
+            ResponseHMM.Success(result)
+        } catch (exception: Exception) {
+            ResponseHMM.Failure(exception)
+        }
+    }
+
+    override suspend fun loginWithEmailAndPassword(
+        email: String,
+        password: String,
+    ): LoginResponse {
+        return try {
+            val result = auth.signInWithEmailAndPassword(email, password).await()
+            ResponseHMM.Success(result)
+        } catch (exception: Exception) {
+            ResponseHMM.Failure(exception)
+        }
+    }
+
+    override suspend fun resetPassword(email: String): ResetEmailResponse {
+        return try {
+            auth.sendPasswordResetEmail(email)
+            ResponseHMM.Success(true)
+        } catch (exception: Exception) {
+            ResponseHMM.Failure(exception)
+        }
+    }
+}

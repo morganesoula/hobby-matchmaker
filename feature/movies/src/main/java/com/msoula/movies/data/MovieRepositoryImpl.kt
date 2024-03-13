@@ -17,10 +17,8 @@ class MovieRepositoryImpl(
     private val mapperEntityToMovie: MapMovieEntityToMovie,
 ) : MovieRepository {
     override fun observeMovies(): Flow<List<Movie>?> {
-        Log.d("HMM", "Fetching movies in Repository")
         return movieService.observeMovies()
             .map { list ->
-                Log.d("HMM", "List in Repository is $list")
                 return@map mapperEntityToMovie.mapList(list)
             }
             .onEmpty {
@@ -38,11 +36,11 @@ class MovieRepositoryImpl(
     }
 
     override suspend fun updateMovie(
-        movieId: Int,
+        id: Long,
         isFavorite: Boolean,
     ) {
         try {
-            movieService.updateMovie(movieId, isFavorite)
+            movieService.updateMovie(id, isFavorite)
         } catch (exception: Exception) {
             exception.printStackTrace()
             Log.e("HMM", "Error updating movie: $exception")

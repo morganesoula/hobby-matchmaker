@@ -1,15 +1,13 @@
 package com.msoula.movies.domain.useCases
 
-import android.util.Log
 import com.msoula.movies.domain.MovieRepository
 
-fun interface SetMovieFavoriteUseCase : suspend (Int, Boolean) -> Unit
+fun interface SetMovieFavoriteUseCase : suspend (Long, Boolean) -> Unit
 
 suspend fun setMovieFavorite(
     movieRepository: MovieRepository,
-    movieId: Int,
+    id: Long,
     isFavorite: Boolean,
 ) {
-    Log.d("HMM", "Into SetFavoriteUseCase with $isFavorite")
-    movieRepository.updateMovie(movieId, isFavorite)
+    movieRepository.updateMovie(id, isFavorite)
 }

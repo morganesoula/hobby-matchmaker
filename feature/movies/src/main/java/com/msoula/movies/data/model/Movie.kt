@@ -1,17 +1,23 @@
 package com.msoula.movies.data.model
 
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
+import com.msoula.movies.presentation.model.MovieUi
 
 data class Movie(
-    val id: Int = -1,
-    val title: String = "",
-    val posterJPG: String = "",
-    val localPosterPath: String = "",
-    val isFavorite: Boolean = false,
-    val seen: Boolean = false,
+    val id: Long,
+    val title: String,
+    val posterJPG: String,
+    val localPosterPath: String,
+    val isFavorite: Boolean,
+    val seen: Boolean,
 )
 
-fun Movie.toMovieUI(): MovieUi = MovieUi(id = this.id, coverUrl = this.localPosterPath, isFavorite = this.isFavorite)
+fun Movie.toMovieUI(): MovieUi =
+    MovieUi(
+        id = this.id,
+        coverUrl = this.localPosterPath,
+        isFavorite = this.isFavorite,
+        playFavoriteAnimation = false,
+    )
 
-fun List<Movie>.toListMovieUI(): SnapshotStateList<MovieUi> = this.map { it.toMovieUI() }.toMutableStateList()
+fun List<Movie>.toListMovieUI(): MutableList<MovieUi> = this.map { it.toMovieUI() }.toMutableStateList()

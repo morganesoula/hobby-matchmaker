@@ -34,7 +34,7 @@ class MapMovieToMovieEntity : Mapper<Movie, MovieEntity> {
 class MapMoviePogoToMovieEntity : Mapper<MoviePogo, MovieEntity> {
     override fun map(entity: MoviePogo): MovieEntity {
         return MovieEntity(
-            id = entity.id,
+            id = entity.id.toLong(),
             title = entity.title,
             remotePosterPath = entity.poster,
         )

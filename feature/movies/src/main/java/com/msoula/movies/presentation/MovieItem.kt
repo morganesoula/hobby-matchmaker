@@ -1,9 +1,7 @@
 package com.msoula.movies.presentation
 
-import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -22,12 +20,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -37,8 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import coil.compose.rememberAsyncImagePainter
 import com.msoula.component.HMMShimmerEffect
-import com.msoula.movies.data.model.MovieUi
-import kotlinx.coroutines.delay
+import com.msoula.movies.presentation.model.MovieUi
 import java.io.File
 import kotlin.math.abs
 
@@ -46,8 +40,8 @@ import kotlin.math.abs
 fun MovieItem(
     modifier: Modifier = Modifier,
     movie: MovieUi,
-    state: LazyListState,
     index: Int,
+    state: LazyListState,
     onCardEvent: (CardEvent) -> Unit,
 ) {
     val painter = rememberAsyncImagePainter(model = File(movie.coverUrl))
@@ -69,26 +63,11 @@ fun MovieItem(
     }
 
     // Like animation
-    var heartVisible by remember { mutableStateOf(false) }
-
     val heartColor by animateColorAsState(
         targetValue = Color.Red,
         animationSpec = tween(durationMillis = 2000, easing = FastOutLinearInEasing),
         label = "define heart color",
     )
-
-    val heartSize by animateDpAsState(
-        targetValue = if (heartVisible) 60.dp else 0.dp,
-        animationSpec = tween(durationMillis = 2000),
-        label = "define heart size",
-    )
-
-    LaunchedEffect(key1 = heartVisible) {
-        if (heartVisible) {
-            delay(2000)
-            heartVisible = false
-        }
-    }
 
     HMMShimmerEffect(modifier = modifier, isLoading = false) {
         Card(
@@ -98,36 +77,36 @@ fun MovieItem(
                     .height(440.dp)
                     .padding(end = 10.dp)
                     .scale(scale)
-                    .zIndex(scale * 10)
-                    .pointerInput(Unit) {
-                        detectTapGestures(onDoubleTap = {
-                            Log.i("HMM", "Into View with movie: $movie")
-                            heartVisible = true
-                            onCardEvent(CardEvent.OnDoubleTap(movie))
-                        })
-                    },
+                    .zIndex(scale * 10),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
         ) {
-            Box {
-                HMMShimmerEffect(isLoading = false) {
-                    Image(
-                        painter = painter,
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                    )
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .pointerInput(movie) {
+                            detectTapGestures(onDoubleTap = {
+                                onCardEvent(CardEvent.OnDoubleTap(movie))
+                            })
+                        },
+            ) {
+                Image(
+                    painter = painter,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                )
 
-                    if (heartVisible) {
-                        Icon(
-                            imageVector = Icons.Default.Favorite,
-                            contentDescription = "",
-                            modifier =
-                                Modifier
-                                    .size(heartSize)
-                                    .align(Alignment.Center),
-                            tint = heartColor,
-                        )
-                    }
+                if (movie.isFavorite) {
+                    Icon(
+                        imageVector = Icons.Default.Favorite,
+                        contentDescription = "heart icon visible",
+                        modifier =
+                            Modifier
+                                .size(60.dp)
+                                .align(Alignment.Center),
+                        tint = heartColor,
+                    )
                 }
             }
         }

@@ -4,11 +4,13 @@ import android.util.Log
 import com.msoula.database.data.dao.MovieDAO
 import com.msoula.database.data.local.MovieEntity
 import com.msoula.movies.data.mapper.MapMoviePogoToMovieEntity
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class MovieService
@@ -18,12 +20,11 @@ class MovieService
         private val tmdbService: TMDBService,
         private val mapperPogoToEntity: MapMoviePogoToMovieEntity,
         private val imageHelper: ImageHelper,
+        private val dispatcher: CoroutineDispatcher,
     ) {
         fun observeMovies(): Flow<List<MovieEntity>> {
-            Log.d("HMM", "Fetching movies in Service")
             return movieDAO.observeMovies()
                 .map {
-                    Log.d("HMM", "List in Service is: $it")
                     it
                 }
                 .onEach { list ->
@@ -34,15 +35,13 @@ class MovieService
         }
 
         suspend fun updateMovie(
-            movieId: Int,
+            id: Long,
             isFavorite: Boolean,
         ) {
-            Log.d("HMM", "Updating movie in Service")
-            movieDAO.updateMovieFavorite(movieId, isFavorite)
+            movieDAO.updateMovieFavorite(id, isFavorite)
         }
 
         private suspend fun refreshMovies() {
-            Log.i("HMM", "Refreshing movies")
             val resultPage1 =
                 flow {
                     emit(
@@ -89,7 +88,9 @@ class MovieService
                     Log.e("HMM", "Error upserting list of movies")
                 }
 
-                saveLocalPoster(listOfMovieEntity.map { it.remotePosterPath })
+                withContext(dispatcher) {
+                    saveLocalPoster(listOfMovieEntity.map { it.remotePosterPath })
+                }
             }
         }
 
