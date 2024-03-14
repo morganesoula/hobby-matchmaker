@@ -55,6 +55,8 @@ class MovieViewModel
                 )
         }
 
+        // create function
+
         fun onCardEvent(event: CardEvent) {
             when (event) {
                 is CardEvent.OnDoubleTap -> {

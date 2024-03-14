@@ -20,6 +20,7 @@ fun MovieScreen(
 ) {
     val listState = rememberLazyListState()
 
+    //TODO update two last playAnimation / shouldPlayHeartAnimation
     LazyRow(
         modifier = modifier,
         contentPadding = PaddingValues(start = 60.dp),
@@ -32,6 +33,8 @@ fun MovieScreen(
                 index = index,
                 onCardEvent = onCardEvent,
                 state = listState,
+                playAnimation = false,
+                shouldPlayHeartAnimation = {}
             )
         }
     }

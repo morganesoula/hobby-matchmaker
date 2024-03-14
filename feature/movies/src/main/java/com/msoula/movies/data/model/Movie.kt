@@ -17,7 +17,8 @@ fun Movie.toMovieUI(): MovieUi =
         id = this.id,
         coverUrl = this.localPosterPath,
         isFavorite = this.isFavorite,
-        playFavoriteAnimation = false,
+        playFavoriteAnimation = true,
     )
 
-fun List<Movie>.toListMovieUI(): MutableList<MovieUi> = this.map { it.toMovieUI() }.toMutableStateList()
+fun List<Movie>.toListMovieUI(): MutableList<MovieUi> =
+    this.map { it.toMovieUI() }.toMutableStateList()

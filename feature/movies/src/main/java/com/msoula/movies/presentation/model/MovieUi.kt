@@ -7,5 +7,5 @@ data class MovieUi(
     val id: Long,
     val coverUrl: String,
     val isFavorite: Boolean,
-    val playFavoriteAnimation: Boolean,
+    val playFavoriteAnimation: Boolean = true,
 )
