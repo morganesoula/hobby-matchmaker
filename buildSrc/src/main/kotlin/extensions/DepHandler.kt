@@ -43,14 +43,16 @@ fun DependencyHandler.appModuleDeps() {
     // Lifecycle
     implementation(Deps.AndroidX.Lifecycle.LIFECYCLE_RUNTIME)
 
-    // Libraries
+    // Modules
     implementation(project(Modules.AUTH))
     implementation(project(Modules.NETWORK))
     implementation(project(Modules.DI))
     implementation(project(Modules.MODEL))
     implementation(project(Modules.DESIGN))
     implementation(project(Modules.NAVIGATION))
-    implementation(project(Modules.MOVIE))
+    implementation(project(Modules.MOVIE_DATA))
+    implementation(project(Modules.MOVIE_DOMAIN))
+    implementation(project(Modules.MOVIE_PRESENTATION))
 
     implementation(Deps.AndroidX.Compose.MATERIAL)
     api(Deps.AndroidX.APP_COMPAT)
@@ -99,14 +101,14 @@ fun DependencyHandler.authModuleDeps() {
     implementation(Deps.OkHttp.OK_HTTP)
     implementation(Deps.OkHttp.LOGGING)
 
-    // Librairie
+    // Modules
     implementation(project(Modules.DESIGN))
     implementation(project(Modules.NAVIGATION))
     implementation(project(Modules.NETWORK))
 }
 
 fun DependencyHandler.coreNetworkModuleDeps() {
-    // Libraries
+    // Modules
     implementation(project(Modules.DESIGN))
     implementation(Deps.AndroidX.Compose.RUNTIME)
 
@@ -126,9 +128,10 @@ fun DependencyHandler.coreDiModuleDeps() {
     // Firebase
     implementation(Deps.Firebase.FIREBASE_CORE_KTX)
 
-    // Librairie
+    // Modules
     implementation(project(Modules.DESIGN))
     implementation(project(Modules.DATABASE))
+    implementation(project(Modules.DAO))
 
     // Navigation
     implementation(Deps.AndroidX.Navigation.COMPOSE_NAVIGATION)
@@ -156,7 +159,7 @@ fun DependencyHandler.coreDesignModuleDeps() {
 
 fun DependencyHandler.coreNavigationModuleDeps() {
     implementation(Deps.AndroidX.Navigation.NAVIGATION_UI)
-    // Librairie
+    // Modules
     implementation(project(Modules.DESIGN))
 
     // Compose
@@ -172,11 +175,76 @@ fun DependencyHandler.coreNavigationModuleDeps() {
     implementation(Deps.AndroidX.Navigation.COMPOSE_NAVIGATION)
 }
 
+fun DependencyHandler.featureMoviesDataDeps() {
+    // Modules
+    implementation(project(Modules.NETWORK))
+    implementation(project(Modules.MOVIE_DOMAIN))
+    implementation(project(Modules.DAO))
+
+    // Core
+    implementation(Deps.AndroidX.CORE_KTX)
+    implementation(Deps.AndroidX.Compose.RUNTIME)
+
+    // Hilt
+    implementation(Deps.Dagger.HILT_ANDROID)
+    kapt(Deps.Dagger.HILT_ANDROID_COMPILER)
+
+    // Retrofit
+    implementation(Deps.Retrofit.RETROFIT)
+    implementation(Deps.Retrofit.GSON)
+    implementation(Deps.OkHttp.OK_HTTP)
+    implementation(Deps.OkHttp.LOGGING)
+
+    // Room
+    api(Deps.AndroidX.Room.RUNTIME)
+    kapt(Deps.AndroidX.Room.COMPILER)
+    implementation(Deps.AndroidX.Room.ROOM_KTX)
+}
+
+fun DependencyHandler.featureMoviesDomainDeps() {
+    // Core
+    implementation(Deps.AndroidX.CORE_KTX)
+    implementation(Deps.AndroidX.Compose.RUNTIME)
+
+    // Hilt
+    implementation(Deps.Dagger.HILT_ANDROID)
+    kapt(Deps.Dagger.HILT_ANDROID_COMPILER)
+}
+
+fun DependencyHandler.featureMoviesPresentationDeps() {
+    // Modules
+    implementation(project(Modules.DESIGN))
+    implementation(project(Modules.MOVIE_DOMAIN))
+
+    // AndroidX
+    implementation(Deps.AndroidX.Lifecycle.LIFECYCLE_RUNTIME)
+    implementation(Deps.AndroidX.Kotlin.KOTLIN_COLLECTION)
+
+    // Coil
+    implementation(Deps.Coil.COIL)
+    implementation(Deps.Coil.COIL_COMPOSE)
+
+    // Core
+    implementation(Deps.AndroidX.CORE_KTX)
+    implementation(Deps.AndroidX.Compose.RUNTIME)
+
+    // Compose
+    implementation(Deps.AndroidX.Compose.ACTIVITY)
+    implementation(Deps.AndroidX.Compose.MATERIAL3)
+    implementation(Deps.AndroidX.Compose.PREVIEW)
+    implementation(Deps.AndroidX.Compose.RUNTIME)
+
+    // Hilt
+    implementation(Deps.Dagger.HILT_ANDROID)
+    kapt(Deps.Dagger.HILT_ANDROID_COMPILER)
+}
+
 fun DependencyHandler.featureMoviesModuleDeps() {
-    // Librairie
+    // Modules
     implementation(project(Modules.DATABASE))
     implementation(project(Modules.DESIGN))
     implementation(project(Modules.NETWORK))
+    implementation(project(Modules.MOVIE_DOMAIN))
 
     // AndroidX
     implementation(Deps.AndroidX.Lifecycle.LIFECYCLE_RUNTIME)
@@ -212,8 +280,22 @@ fun DependencyHandler.featureMoviesModuleDeps() {
 }
 
 fun DependencyHandler.coreDatabaseModuleDeps() {
+    // Modules
+    implementation(project(Modules.MOVIE_DATA))
+    implementation(project(Modules.DAO))
+
     // Paging (For some reason, don't delete this line or you will have a Gradle issue)
     implementation(Deps.AndroidX.Paging.COMPOSE)
+
+    // Room
+    api(Deps.AndroidX.Room.RUNTIME)
+    kapt(Deps.AndroidX.Room.COMPILER)
+    implementation(Deps.AndroidX.Room.ROOM_KTX)
+}
+
+fun DependencyHandler.coreDaoModuleDeps() {
+    // Core
+    implementation(Deps.AndroidX.Compose.RUNTIME)
 
     // Room
     api(Deps.AndroidX.Room.RUNTIME)

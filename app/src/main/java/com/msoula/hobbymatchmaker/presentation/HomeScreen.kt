@@ -11,12 +11,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.msoula.movies.data.MovieUiStateResult
-import com.msoula.movies.presentation.CardEvent
-import com.msoula.movies.presentation.EmptyMovieScreen
-import com.msoula.movies.presentation.ErrorMovieScreen
-import com.msoula.movies.presentation.MovieScreen
-import com.msoula.movies.presentation.MovieViewModel
+import com.msoula.hobbymatchmaker.features.movies.presentation.CardEvent
+import com.msoula.hobbymatchmaker.features.movies.presentation.MovieViewModel
+import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiStateResult
+import com.msoula.hobbymatchmaker.features.movies.presentation.screens.EmptyMovieScreen
+import com.msoula.hobbymatchmaker.features.movies.presentation.screens.ErrorMovieScreen
+import com.msoula.hobbymatchmaker.features.movies.presentation.screens.MovieScreen
 
 @Composable
 fun HomeScreen(

@@ -7,7 +7,7 @@ import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.msoula.di.navigation.Navigator
 import com.msoula.hobbymatchmaker.app.HobbyMatchMakerApp
-import com.msoula.movies.presentation.MovieViewModel
+import com.msoula.hobbymatchmaker.features.movies.presentation.MovieViewModel
 import com.msoula.theme.HobbyMatchmakerTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

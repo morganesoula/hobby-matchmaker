@@ -4,7 +4,10 @@ object Modules {
     const val DESIGN = ":core:design"
     const val DI = ":core:di"
     const val MODEL = ":core:model"
-    const val MOVIE = ":feature:movies"
     const val NAVIGATION = ":core:navigation"
     const val NETWORK = ":core:network"
+    const val MOVIE_DOMAIN = ":feature:movies:domain"
+    const val MOVIE_DATA = ":feature:movies:data"
+    const val MOVIE_PRESENTATION = ":feature:movies:presentation"
+    const val DAO = ":core:dao"
 }

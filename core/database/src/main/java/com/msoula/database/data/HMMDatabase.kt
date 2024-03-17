@@ -2,10 +2,10 @@ package com.msoula.database.data
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.msoula.database.data.dao.MovieDAO
-import com.msoula.database.data.local.MovieEntity
+import com.msoula.hobbymatchmaker.core.dao.MovieDAO
+import com.msoula.hobbymatchmaker.core.dao.models.MovieEntityModel
 
-@Database(entities = [MovieEntity::class], version = 7)
+@Database(entities = [MovieEntityModel::class], version = 7)
 abstract class HMMDatabase : RoomDatabase() {
     abstract fun movieDAO(): MovieDAO
 }

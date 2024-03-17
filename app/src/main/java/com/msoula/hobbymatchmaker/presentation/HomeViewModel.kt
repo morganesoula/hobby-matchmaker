@@ -25,6 +25,7 @@ class HomeViewModel
         private val ioDispatcher: CoroutineDispatcher,
         private val navigator: Navigator,
     ) : ViewModel() {
+
         fun checkForActiveSession(): Boolean {
             val accessToken = AccessToken.getCurrentAccessToken()
 

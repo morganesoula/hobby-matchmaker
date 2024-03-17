@@ -3,7 +3,7 @@ package com.msoula.di.module
 import android.content.Context
 import androidx.room.Room
 import com.msoula.database.data.HMMDatabase
-import com.msoula.database.data.dao.MovieDAO
+import com.msoula.hobbymatchmaker.core.dao.MovieDAO
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
