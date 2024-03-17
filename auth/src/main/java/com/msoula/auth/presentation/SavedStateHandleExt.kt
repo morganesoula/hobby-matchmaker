@@ -2,7 +2,10 @@ package com.msoula.auth.presentation
 
 import androidx.lifecycle.SavedStateHandle
 
-fun <T> SavedStateHandle.updateStateHandle(key: String, update: (T) -> T) {
+fun <T> SavedStateHandle.updateStateHandle(
+    key: String,
+    update: (T) -> T,
+) {
     val oldValue = this.get<T>(key)
     val newValue = oldValue?.let(update) ?: return
     this[key] = newValue

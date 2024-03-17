@@ -6,9 +6,7 @@ import Deps
 import Modules
 import TestDeps
 import org.gradle.api.artifacts.Dependency
-import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.artifacts.dsl.DependencyHandler
-import org.gradle.internal.Cast.uncheckedCast
 import org.gradle.kotlin.dsl.project
 
 fun DependencyHandler.appModuleDeps() {
@@ -25,6 +23,9 @@ fun DependencyHandler.appModuleDeps() {
     implementation(Deps.AndroidX.APP_COMPAT)
     implementation(Deps.AndroidX.Activity.ACTIVITY_KTX)
     implementation(Deps.AndroidX.Lifecycle.LIFECYCLE_RUNTIME)
+    implementation(Deps.AndroidX.Lifecycle.RUNTIME_COMPOSE)
+    implementation(Deps.AndroidX.Splashscreen.SPLASHSCREEN)
+    implementation(Deps.AndroidX.Kotlin.KOTLIN_COLLECTION)
 
     // Facebook
     implementation(Deps.Facebook.FACEBOOK_SDK)
@@ -42,13 +43,16 @@ fun DependencyHandler.appModuleDeps() {
     // Lifecycle
     implementation(Deps.AndroidX.Lifecycle.LIFECYCLE_RUNTIME)
 
-    // Libraries
+    // Modules
     implementation(project(Modules.AUTH))
     implementation(project(Modules.NETWORK))
     implementation(project(Modules.DI))
     implementation(project(Modules.MODEL))
     implementation(project(Modules.DESIGN))
     implementation(project(Modules.NAVIGATION))
+    implementation(project(Modules.MOVIE_DATA))
+    implementation(project(Modules.MOVIE_DOMAIN))
+    implementation(project(Modules.MOVIE_PRESENTATION))
 
     implementation(Deps.AndroidX.Compose.MATERIAL)
     api(Deps.AndroidX.APP_COMPAT)
@@ -69,6 +73,8 @@ fun DependencyHandler.authModuleDeps() {
     implementation(Deps.AndroidX.Compose.ACTIVITY)
     implementation(Deps.AndroidX.Compose.VIEW_MODEL)
     implementation(Deps.AndroidX.Compose.RUNTIME)
+    implementation(Deps.AndroidX.Lifecycle.LIFECYCLE_RUNTIME)
+    implementation(Deps.AndroidX.Lifecycle.RUNTIME_COMPOSE)
 
     // Coroutine
     implementation(Deps.Coroutines.CORE)
@@ -87,22 +93,27 @@ fun DependencyHandler.authModuleDeps() {
 
     // Hilt
     implementation(Deps.Dagger.HILT_ANDROID)
+    implementation(Deps.Dagger.HILT_NAVIGATION_COMPOSE)
     kapt(Deps.Dagger.HILT_ANDROID_COMPILER)
 
     // Retrofit
     implementation(Deps.Retrofit.RETROFIT)
-    implementation(Deps.Retrofit.MOSHI_CONVERTER)
     implementation(Deps.OkHttp.OK_HTTP)
     implementation(Deps.OkHttp.LOGGING)
 
-    // Librairie
+    // Modules
     implementation(project(Modules.DESIGN))
     implementation(project(Modules.NAVIGATION))
+    implementation(project(Modules.NETWORK))
 }
 
 fun DependencyHandler.coreNetworkModuleDeps() {
+    // Modules
     implementation(project(Modules.DESIGN))
     implementation(Deps.AndroidX.Compose.RUNTIME)
+
+    // Retrofit
+    implementation(Deps.Retrofit.RETROFIT)
 }
 
 fun DependencyHandler.coreDiModuleDeps() {
@@ -117,12 +128,17 @@ fun DependencyHandler.coreDiModuleDeps() {
     // Firebase
     implementation(Deps.Firebase.FIREBASE_CORE_KTX)
 
-    // Librairie
+    // Modules
     implementation(project(Modules.DESIGN))
+    implementation(project(Modules.DATABASE))
+    implementation(project(Modules.DAO))
 
     // Navigation
     implementation(Deps.AndroidX.Navigation.COMPOSE_NAVIGATION)
     implementation(Deps.AndroidX.Compose.RUNTIME)
+
+    // Room
+    api(Deps.AndroidX.Room.RUNTIME)
 }
 
 fun DependencyHandler.coreModelModuleDeps() {
@@ -143,17 +159,148 @@ fun DependencyHandler.coreDesignModuleDeps() {
 
 fun DependencyHandler.coreNavigationModuleDeps() {
     implementation(Deps.AndroidX.Navigation.NAVIGATION_UI)
-
-    // Librairie
+    // Modules
     implementation(project(Modules.DESIGN))
 
     // Compose
     implementation(Deps.AndroidX.Compose.ACTIVITY)
     implementation(Deps.AndroidX.Compose.RUNTIME)
 
+    // Hilt
+    implementation(Deps.Dagger.HILT_ANDROID)
+    kapt(Deps.Dagger.HILT_ANDROID_COMPILER)
+
     // Navigation
     implementation(Deps.AndroidX.Navigation.NAVIGATION_UI)
     implementation(Deps.AndroidX.Navigation.COMPOSE_NAVIGATION)
+}
+
+fun DependencyHandler.featureMoviesDataDeps() {
+    // Modules
+    implementation(project(Modules.NETWORK))
+    implementation(project(Modules.MOVIE_DOMAIN))
+    implementation(project(Modules.DAO))
+
+    // Core
+    implementation(Deps.AndroidX.CORE_KTX)
+    implementation(Deps.AndroidX.Compose.RUNTIME)
+
+    // Hilt
+    implementation(Deps.Dagger.HILT_ANDROID)
+    kapt(Deps.Dagger.HILT_ANDROID_COMPILER)
+
+    // Retrofit
+    implementation(Deps.Retrofit.RETROFIT)
+    implementation(Deps.Retrofit.GSON)
+    implementation(Deps.OkHttp.OK_HTTP)
+    implementation(Deps.OkHttp.LOGGING)
+
+    // Room
+    api(Deps.AndroidX.Room.RUNTIME)
+    kapt(Deps.AndroidX.Room.COMPILER)
+    implementation(Deps.AndroidX.Room.ROOM_KTX)
+}
+
+fun DependencyHandler.featureMoviesDomainDeps() {
+    // Core
+    implementation(Deps.AndroidX.CORE_KTX)
+    implementation(Deps.AndroidX.Compose.RUNTIME)
+
+    // Hilt
+    implementation(Deps.Dagger.HILT_ANDROID)
+    kapt(Deps.Dagger.HILT_ANDROID_COMPILER)
+}
+
+fun DependencyHandler.featureMoviesPresentationDeps() {
+    // Modules
+    implementation(project(Modules.DESIGN))
+    implementation(project(Modules.MOVIE_DOMAIN))
+
+    // AndroidX
+    implementation(Deps.AndroidX.Lifecycle.LIFECYCLE_RUNTIME)
+    implementation(Deps.AndroidX.Kotlin.KOTLIN_COLLECTION)
+
+    // Coil
+    implementation(Deps.Coil.COIL)
+    implementation(Deps.Coil.COIL_COMPOSE)
+
+    // Core
+    implementation(Deps.AndroidX.CORE_KTX)
+    implementation(Deps.AndroidX.Compose.RUNTIME)
+
+    // Compose
+    implementation(Deps.AndroidX.Compose.ACTIVITY)
+    implementation(Deps.AndroidX.Compose.MATERIAL3)
+    implementation(Deps.AndroidX.Compose.PREVIEW)
+    implementation(Deps.AndroidX.Compose.RUNTIME)
+
+    // Hilt
+    implementation(Deps.Dagger.HILT_ANDROID)
+    kapt(Deps.Dagger.HILT_ANDROID_COMPILER)
+}
+
+fun DependencyHandler.featureMoviesModuleDeps() {
+    // Modules
+    implementation(project(Modules.DATABASE))
+    implementation(project(Modules.DESIGN))
+    implementation(project(Modules.NETWORK))
+    implementation(project(Modules.MOVIE_DOMAIN))
+
+    // AndroidX
+    implementation(Deps.AndroidX.Lifecycle.LIFECYCLE_RUNTIME)
+    implementation(Deps.AndroidX.Kotlin.KOTLIN_COLLECTION)
+
+    // Compose
+    implementation(Deps.AndroidX.Compose.ACTIVITY)
+    implementation(Deps.AndroidX.Compose.MATERIAL3)
+    implementation(Deps.AndroidX.Compose.PREVIEW)
+    implementation(Deps.AndroidX.Compose.RUNTIME)
+
+    // Core
+    implementation(Deps.AndroidX.CORE_KTX)
+
+    // Coil
+    implementation(Deps.Coil.COIL)
+    implementation(Deps.Coil.COIL_COMPOSE)
+
+    // Hilt
+    implementation(Deps.Dagger.HILT_ANDROID)
+    kapt(Deps.Dagger.HILT_ANDROID_COMPILER)
+
+    // Retrofit
+    implementation(Deps.Retrofit.RETROFIT)
+    implementation(Deps.Retrofit.GSON)
+    implementation(Deps.OkHttp.OK_HTTP)
+    implementation(Deps.OkHttp.LOGGING)
+
+    // Room
+    api(Deps.AndroidX.Room.RUNTIME)
+    kapt(Deps.AndroidX.Room.COMPILER)
+    implementation(Deps.AndroidX.Room.ROOM_KTX)
+}
+
+fun DependencyHandler.coreDatabaseModuleDeps() {
+    // Modules
+    implementation(project(Modules.MOVIE_DATA))
+    implementation(project(Modules.DAO))
+
+    // Paging (For some reason, don't delete this line or you will have a Gradle issue)
+    implementation(Deps.AndroidX.Paging.COMPOSE)
+
+    // Room
+    api(Deps.AndroidX.Room.RUNTIME)
+    kapt(Deps.AndroidX.Room.COMPILER)
+    implementation(Deps.AndroidX.Room.ROOM_KTX)
+}
+
+fun DependencyHandler.coreDaoModuleDeps() {
+    // Core
+    implementation(Deps.AndroidX.Compose.RUNTIME)
+
+    // Room
+    api(Deps.AndroidX.Room.RUNTIME)
+    kapt(Deps.AndroidX.Room.COMPILER)
+    implementation(Deps.AndroidX.Room.ROOM_KTX)
 }
 
 fun DependencyHandler.unitTestDeps() {
@@ -213,17 +360,3 @@ private fun DependencyHandler.testImplementation(dependencyNotation: Any): Depen
 
 private fun DependencyHandler.androidTestImplementation(dependencyNotation: Any): Dependency? =
     add("androidTestImplementation", dependencyNotation)
-
-private fun DependencyHandler.project(
-    path: String,
-    configuration: String? = null,
-): ProjectDependency? {
-    val notation =
-        if (configuration != null) {
-            mapOf("path" to path, "configuration" to configuration)
-        } else {
-            mapOf("path" to path)
-        }
-
-    return uncheckedCast(project(notation))
-}

@@ -1,5 +1,4 @@
 import extensions.coreModelModuleDeps
-import extensions.instrumentationTestDeps
 import extensions.unitTestDeps
 
 plugins {
@@ -22,5 +21,4 @@ androidComponents {
 dependencies {
     coreModelModuleDeps()
     unitTestDeps()
-    instrumentationTestDeps()
 }

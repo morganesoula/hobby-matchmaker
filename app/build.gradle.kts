@@ -86,7 +86,7 @@ android {
     }
 
     packaging {
-        resources.excludes.add("**/*")
+        resources.excludes.add("META-INF/gradle/incremental.annotation.processors")
     }
 }
 

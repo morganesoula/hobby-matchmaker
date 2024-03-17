@@ -12,4 +12,4 @@ data class LoginFormState(
     val submitEmailReset: Boolean = false,
     // Error section
     val logInError: String? = null,
-): Parcelable
+) : Parcelable

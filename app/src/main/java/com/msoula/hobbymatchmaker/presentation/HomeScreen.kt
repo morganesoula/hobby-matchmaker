@@ -1,27 +1,28 @@
 package com.msoula.hobbymatchmaker.presentation
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import com.msoula.auth.R.string as StringRes
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.msoula.hobbymatchmaker.features.movies.presentation.CardEvent
+import com.msoula.hobbymatchmaker.features.movies.presentation.MovieViewModel
+import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiStateResult
+import com.msoula.hobbymatchmaker.features.movies.presentation.screens.EmptyMovieScreen
+import com.msoula.hobbymatchmaker.features.movies.presentation.screens.ErrorMovieScreen
+import com.msoula.hobbymatchmaker.features.movies.presentation.screens.MovieScreen
 
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier,
     logOut: () -> Unit,
+    modifier: Modifier = Modifier,
+    movieViewModel: MovieViewModel = hiltViewModel<MovieViewModel>(),
 ) {
     Scaffold(modifier = modifier) { paddingValues ->
         Surface(
@@ -30,21 +31,39 @@ fun HomeScreen(
                     .fillMaxSize()
                     .padding(paddingValues),
         ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                Text(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight(),
-                    text = "Hello there, you are logged in",
-                )
+            val viewState by movieViewModel.viewState.collectAsStateWithLifecycle()
 
-                Spacer(modifier = Modifier.height(100.dp))
-
-                Button(onClick = { logOut() }, modifier = Modifier.wrapContentSize()) {
-                    Text(text = stringResource(id = StringRes.sign_out))
-                }
-            }
+            HomeContent(
+                viewState = viewState,
+                onCardEvent = movieViewModel::onCardEvent,
+            )
         }
+    }
+}
+
+@Composable
+fun HomeContent(
+    viewState: MovieUiStateResult,
+    modifier: Modifier = Modifier,
+    onCardEvent: (CardEvent) -> Unit,
+) {
+    when (viewState) {
+        is MovieUiStateResult.Loading -> CircularProgressIndicator(modifier.wrapContentSize())
+        is MovieUiStateResult.Empty -> EmptyMovieScreen(modifier = modifier)
+        is MovieUiStateResult.Fetched -> {
+            MovieScreen(
+                modifier = modifier,
+                movies = viewState.list,
+                onCardEvent = onCardEvent,
+            )
+        }
+
+        is MovieUiStateResult.Error ->
+            ErrorMovieScreen(
+                modifier = modifier,
+                error =
+                    viewState.throwable?.message
+                        ?: "Invalid error exception",
+            )
     }
 }
