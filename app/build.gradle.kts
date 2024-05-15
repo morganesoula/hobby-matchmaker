@@ -1,7 +1,4 @@
 import com.android.build.api.variant.BuildConfigField
-import extensions.appModuleDeps
-import extensions.instrumentationTestDeps
-import extensions.unitTestDeps
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.util.Properties
@@ -51,9 +48,25 @@ android {
         vectorDrawables.useSupportLibrary = true
     }
 
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
+
     buildTypes {
-        release {
+        debug {
             isMinifyEnabled = false
+            isDebuggable = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
+        }
+
+        release {
+            isMinifyEnabled = true
+            isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
@@ -97,9 +110,72 @@ kapt {
 }
 
 dependencies {
-    lintChecks("com.slack.lint.compose:compose-lint-checks:1.3.1")
+    lintChecks(libs.compose.lint.checks)
 
-    appModuleDeps()
-    unitTestDeps()
-    instrumentationTestDeps()
+    // Compose
+    implementation(libs.ui.tooling)
+    implementation(libs.material)
+    implementation(libs.material3)
+    implementation(libs.activity.compose)
+    implementation(libs.runtime)
+    implementation(libs.lifecycle.viewmodel.compose)
+
+    // AndroidX
+    implementation(libs.core.ktx)
+    api(libs.appcompat)
+    implementation(libs.activity.ktx)
+    implementation(libs.lifecycle.runtime.compose)
+    implementation(libs.lifecycle.runtime.ktx)
+    implementation(libs.core.splashscreen)
+    implementation(libs.kotlinx.collections.immutable)
+
+    // Facebook
+    implementation(libs.facebook.android.sdk)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firebase.auth)
+    implementation(libs.firebase.ui.auth)
+
+    // Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+    implementation(libs.hilt.navigation.compose)
+
+    // Modules
+    implementation(project(Modules.AUTHENTICATION_DATA))
+    implementation(project(Modules.AUTHENTICATION_DOMAIN))
+    implementation(project(Modules.COMMON))
+    implementation(project(Modules.DATABASE))
+    implementation(project(Modules.DAO))
+    implementation(project(Modules.DESIGN))
+    implementation(project(Modules.DI))
+    implementation(project(Modules.LOGIN_PRESENTATION))
+    implementation(project(Modules.MODEL))
+    implementation(project(Modules.MOVIE_DATA))
+    implementation(project(Modules.MOVIE_DOMAIN))
+    implementation(project(Modules.MOVIE_PRESENTATION))
+    implementation(project(Modules.NAVIGATION))
+    implementation(project(Modules.NETWORK))
+
+    // Navigation
+    implementation(libs.navigation.ui.ktx)
+
+    // Unit Test
+    testImplementation(libs.assertk)
+    testImplementation(libs.hilt.android.testing)
+    testImplementation(libs.test.core.ktx)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.mockk)
+    testImplementation(libs.mockk.android)
+    testImplementation(libs.truth)
+
+    // Instrumentation Test
+    androidTestImplementation(libs.junit.ktx)
+    androidTestImplementation(libs.core.testing)
+    androidTestImplementation(libs.navigation.testing)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
+    androidTestImplementation(libs.mockk)
+    androidTestImplementation(libs.truth)
 }

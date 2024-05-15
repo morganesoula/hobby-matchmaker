@@ -5,6 +5,7 @@ import com.msoula.hobbymatchmaker.features.movies.domain.data_sources.MovieLocal
 import com.msoula.hobbymatchmaker.features.movies.domain.data_sources.MovieRemoteDataSource
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.MovieRepository
 import com.msoula.hobbymatchmaker.features.movies.domain.use_cases.DeleteAllMoviesUseCase
+import com.msoula.hobbymatchmaker.features.movies.domain.use_cases.FetchMoviesUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.use_cases.InsertMovieUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.use_cases.ObserveAllMoviesUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.use_cases.SetMovieFavoriteUseCase
@@ -49,4 +50,8 @@ object MovieDomainModule {
     @Provides
     fun provideInsertMovieUseCase(movieRepository: MovieRepository): InsertMovieUseCase =
         InsertMovieUseCase(movieRepository)
+
+    @Provides
+    fun provideFetchMovieUseCase(movieRepository: MovieRepository): FetchMoviesUseCase =
+        FetchMoviesUseCase(movieRepository)
 }

@@ -1,6 +1,3 @@
-import extensions.coreModelModuleDeps
-import extensions.unitTestDeps
-
 plugins {
     `android-library`
     `kotlin-android`
@@ -9,7 +6,7 @@ plugins {
 apply<MainGradlePlugin>()
 
 android {
-    namespace = "com.msoula.model"
+    namespace = "com.msoula.hobbymatchmaker.core.model"
 }
 
 androidComponents {
@@ -19,6 +16,9 @@ androidComponents {
 }
 
 dependencies {
-    coreModelModuleDeps()
-    unitTestDeps()
+    // Core
+    implementation(libs.runtime)
+
+    // Modules
+    implementation(project(Modules.DESIGN))
 }

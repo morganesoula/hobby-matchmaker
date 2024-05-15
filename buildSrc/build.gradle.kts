@@ -11,10 +11,10 @@ repositories {
 }
 
 dependencies {
-    implementation("com.android.tools.build:gradle:8.3.0")
-    implementation("androidx.compose.runtime:runtime:1.6.3")
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22")
-    implementation("com.squareup:javapoet:1.13.0")
+    implementation(libs.gradle)
+    implementation(libs.runtime)
+    implementation(libs.kotlin.gradle.plugin)
+    implementation(libs.javapoet)
 }
 
 val compileKotlin: KotlinCompile by tasks

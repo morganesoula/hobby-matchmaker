@@ -5,10 +5,10 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:8.3.0")
-        classpath("androidx.compose.runtime:runtime:1.6.3")
-        classpath("com.google.dagger:hilt-android-gradle-plugin:2.50")
-        classpath("com.google.gms:google-services:${PluginVersion.G_SERVICES}")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22")
+        classpath(libs.gradle)
+        classpath(libs.runtime)
+        classpath(libs.hilt.android.gradle.plugin)
+        classpath(libs.google.services)
+        classpath(libs.kotlin.gradle.plugin)
     }
 }

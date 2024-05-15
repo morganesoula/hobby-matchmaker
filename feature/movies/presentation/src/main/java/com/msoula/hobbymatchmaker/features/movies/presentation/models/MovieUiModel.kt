@@ -8,4 +8,5 @@ data class MovieUiModel(
     val coverFilePath: String,
     val isFavorite: Boolean,
     val playFavoriteAnimation: Boolean = true,
+    val title: String
 )

@@ -1,71 +1,66 @@
 package com.msoula.hobbymatchmaker.features.movies.data.data_sources.remote
 
-import android.util.Log
+import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.core.common.mapError
+import com.msoula.hobbymatchmaker.core.common.mapSuccess
+import com.msoula.hobbymatchmaker.core.network.execute
 import com.msoula.hobbymatchmaker.features.movies.data.data_sources.remote.mappers.toMovieDomainModel
-import com.msoula.hobbymatchmaker.features.movies.data.data_sources.remote.models.MovieRemoteModel
 import com.msoula.hobbymatchmaker.features.movies.data.data_sources.remote.services.TMDBService
-import com.msoula.hobbymatchmaker.features.movies.domain.data_sources.MovieLocalDataSource
 import com.msoula.hobbymatchmaker.features.movies.domain.data_sources.MovieRemoteDataSource
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
+import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
+import com.msoula.hobbymatchmaker.features.movies.domain.utils.ImageHelper
 import javax.inject.Inject
 
 class MovieRemoteDataSourceImpl @Inject constructor(
     private val tmdbService: TMDBService,
-    private val movieLocalDataSource: MovieLocalDataSource
+    private val imageHelper: ImageHelper
 ) : MovieRemoteDataSource {
 
-    override suspend fun fetchMovies() {
-        Log.d("HMM", "Into MovieRemoteDataSourceImpl and fetchMovies method")
-        val resultPage1 =
-            flow {
-                emit(
-                    tmdbService
-                        .getMoviesByPopularityDesc(
-                            language = "fr-FR",
-                            page = 1,
-                        ),
-                )
-            }
-
-        val resultPage2 =
-            flow {
-                emit(
-                    tmdbService
-                        .getMoviesByPopularityDesc(
-                            language = "fr-FR",
-                            page = 2,
-                        ),
-                )
-            }
-
-        val resultPage3 =
-            flow {
-                emit(
-                    tmdbService
-                        .getMoviesByPopularityDesc(
-                            language = "fr-FR",
-                            page = 3,
-                        ),
-                )
-            }
-
-        combine(resultPage1, resultPage2, resultPage3) { page1, page2, page3 ->
-            val combinedList = mutableListOf<MovieRemoteModel>()
-            combinedList.addAll(page1.results ?: emptyList())
-            combinedList.addAll(page2.results ?: emptyList())
-            combinedList.addAll(page3.results ?: emptyList())
-            combinedList.toList()
-        }.map {
-            Log.d("HMM", "Mapping list $it in MovieRemoteDataSourceImpl")
-            it.map { movieModel -> movieModel.toMovieDomainModel() }
-        }.collectLatest { remoteList ->
-            remoteList.toList().forEach { movieDomainModel ->
-                Log.d("HMM", "Inserting movie from remoteList in MovieRemoteDataSourceImpl")
-                movieLocalDataSource.insertMovie(movieDomainModel)
-            }
+    override suspend fun fetchMovies(): Result<List<MovieDomainModel>> {
+        val list = buildList {
+            fetchMoviesByPage("fr-FR", 1).mapSuccess { movies1 ->
+                addAll(movies1)
+                fetchMoviesByPage("fr-FR", 2).mapSuccess { movies2 ->
+                    addAll(movies2)
+                    fetchMoviesByPage("fr-FR", 3).mapSuccess { movies3 ->
+                        addAll(movies3)
+                    }.mapError { error3 -> return@mapError error3 }
+                }.mapError { error2 -> return@mapError error2 }
+            }.mapError { error1 -> return@mapError error1 }
         }
+
+        val updatedList = updateLocalPosterPath(list)
+        return Result.Success(updatedList)
+    }
+
+    private suspend fun fetchMoviesByPage(
+        language: String,
+        page: Int
+    ): Result<List<MovieDomainModel>> {
+        return execute({
+            tmdbService.getMoviesByPopularityDesc(
+                language,
+                page
+            )
+        }).mapSuccess { response ->
+            response.results?.map {
+                it.toMovieDomainModel()
+            } ?: emptyList()
+        }
+    }
+
+    private suspend fun updateLocalPosterPath(list: List<MovieDomainModel>): List<MovieDomainModel> {
+        val mutableMovieList = list.toMutableList()
+
+        for ((index, movie) in mutableMovieList.withIndex()) {
+            mutableMovieList[index] =
+                movie.copy(
+                    localCoverFilePath = imageHelper.getRemoteImage(
+                        movie.coverFileName
+                    )
+                )
+        }
+
+        return mutableMovieList.map { it }
     }
 }

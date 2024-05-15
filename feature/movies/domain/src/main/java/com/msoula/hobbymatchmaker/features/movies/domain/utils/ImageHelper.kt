@@ -18,17 +18,17 @@ class ImageHelper @Inject constructor(
 ) {
     suspend fun saveRemoteImageAndUpdateMovie(
         coverFileName: String,
-        updateMovie: suspend (localImagePath: String) -> Unit,
+        updateMovie: suspend (localImagePath: String) -> Unit
     ) {
+        Log.d("HMM", "Into SaveRemoteImageAndUpdateMovie")
         val localImagePath = downloadImage(coverFileName)
 
-        localImagePath?.let {
-            updateMovie(it)
-        }
+        updateMovie(localImagePath)
     }
 
-    private suspend fun downloadImage(remotePosterPath: String): String? {
-        Log.i("HMM", "Downloading image")
+    suspend fun getRemoteImage(coverFileName: String): String = downloadImage(coverFileName)
+
+    private suspend fun downloadImage(remotePosterPath: String): String {
         val response =
             CoroutineScope(coroutineDispatcher).async {
                 val bitmap =
@@ -37,13 +37,14 @@ class ImageHelper @Inject constructor(
                 savedImagePath
             }.await()
 
+        Log.d("HMM", "Response in downloadImage is $response")
         return response
     }
 
     private fun saveImageToLocal(
         bitmap: Bitmap,
         imageName: String,
-    ): String? {
+    ): String {
         var absolutePath = ""
         try {
             val cleanImageName = imageName.removePrefix("/")
@@ -63,6 +64,7 @@ class ImageHelper @Inject constructor(
             Log.e("HMM", "Exception occurred while saving image: ${e.message}")
         }
 
+        Log.d("HMM", "Into saveImageToLocal with path: $absolutePath")
         return absolutePath
     }
 }

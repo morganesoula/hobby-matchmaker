@@ -1,7 +1,7 @@
 package com.msoula.hobbymatchmaker.features.movies.data.data_sources.local
 
 import android.util.Log
-import com.msoula.hobbymatchmaker.core.dao.MovieDAO
+import com.msoula.hobbymatchmaker.core.database.dao.MovieDAO
 import com.msoula.hobbymatchmaker.features.movies.data.data_sources.local.mappers.toMovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.data.data_sources.local.mappers.toMovieEntityModel
 import com.msoula.hobbymatchmaker.features.movies.domain.data_sources.MovieLocalDataSource
@@ -15,14 +15,11 @@ class MovieLocalDataSourceImpl(
 ) : MovieLocalDataSource {
 
     override fun observeMovies(): Flow<List<MovieDomainModel>> {
-        Log.d("HMM", "Into MovieLocalDataSourceImpl")
         return movieDAO.observeMovies()
             .map { list ->
-                Log.d("HMM", "Into MovieLocalDataSourceImpl with list: $list")
                 list.map { movieEntity -> movieEntity.toMovieDomainModel() }
             }
             .onEmpty {
-                Log.d("HMM", "Into MovieLocalDataSourceImpl and it's empty")
                 return@onEmpty
             }
     }
@@ -62,6 +59,7 @@ class MovieLocalDataSourceImpl(
         coverFileName: String,
         localCoverFilePath: String
     ) {
+        Log.d("HMM", "Into LocalDataSourceImpl and updating movie with $localCoverFilePath")
         movieDAO.updateMovieWithLocalCoverFilePath(coverFileName, localCoverFilePath)
     }
 

@@ -3,11 +3,8 @@ package com.msoula.hobbymatchmaker
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.msoula.di.navigation.Navigator
 import com.msoula.hobbymatchmaker.app.HobbyMatchMakerApp
-import com.msoula.hobbymatchmaker.features.movies.presentation.MovieViewModel
+import com.msoula.hobbymatchmaker.core.di.navigation.Navigator
 import com.msoula.theme.HobbyMatchmakerTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -17,15 +14,13 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var navigator: Navigator
 
-    private val movieViewModel: MovieViewModel by viewModels<MovieViewModel>()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        installSplashScreen().apply {
+        /* installSplashScreen().apply {
             setKeepOnScreenCondition {
-                movieViewModel.displayingData.value
+
             }
-        }
+        } */
 
         setContent {
             HobbyMatchmakerTheme {

@@ -4,4 +4,7 @@
 
     // Facebook
     <string name="facebook_application_id" translatable="false">281880531348586</string>
+
+    // Route
+    <string name="home_route_name" translatable="false">Home</string>
 </resources>

@@ -1,6 +1,6 @@
 package com.msoula.hobbymatchmaker.features.movies.data.data_sources.local.mappers
 
-import com.msoula.hobbymatchmaker.core.dao.models.MovieEntityModel
+import com.msoula.hobbymatchmaker.core.database.dao.models.MovieEntityModel
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 
 fun MovieDomainModel.toMovieEntityModel(): MovieEntityModel {

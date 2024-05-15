@@ -1,15 +1,13 @@
-import extensions.coreNavigationModuleDeps
-import extensions.unitTestDeps
-
 plugins {
     `android-library`
     `kotlin-android`
+    kotlin(Plugins.KAPT)
 }
 
 apply<MainGradlePlugin>()
 
 android {
-    namespace = "com.msoula.navigation"
+    namespace = "com.msoula.hobbymatchmaker.core.navigation"
 }
 
 androidComponents {
@@ -19,6 +17,18 @@ androidComponents {
 }
 
 dependencies {
-    coreNavigationModuleDeps()
-    unitTestDeps()
+    // Compose
+    implementation(libs.activity.compose)
+    implementation(libs.runtime)
+
+    // Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+
+    // Modules
+    implementation(project(Modules.DESIGN))
+
+    // Navigation
+    implementation(libs.navigation.ui.ktx)
+    implementation(libs.compose.navigation)
 }

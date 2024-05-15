@@ -1,14 +1,12 @@
 package com.msoula.hobbymatchmaker.features.movies.domain.repositories
 
+import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.features.movies.domain.data_sources.MovieLocalDataSource
 import com.msoula.hobbymatchmaker.features.movies.domain.data_sources.MovieRemoteDataSource
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flow
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class MovieRepository(
     private val movieLocalDataSource: MovieLocalDataSource,
     private val movieRemoteDataSource: MovieRemoteDataSource
@@ -16,14 +14,6 @@ class MovieRepository(
 
     fun observeMovies(): Flow<List<MovieDomainModel>> {
         return movieLocalDataSource.observeMovies()
-            .flatMapConcat { list ->
-                if (list.isEmpty()) {
-                    movieRemoteDataSource.fetchMovies()
-                    flow { emit(emptyList()) }
-                } else {
-                    flow { emit(list) }
-                }
-            }
     }
 
     suspend fun deleteAllMovies() {
@@ -32,7 +22,7 @@ class MovieRepository(
 
     suspend fun updateMovieWithFavoriteValue(
         id: Long,
-        isFavorite: Boolean,
+        isFavorite: Boolean
     ) {
         movieLocalDataSource.updateMovieWithFavoriteValue(id, isFavorite)
     }
@@ -47,4 +37,11 @@ class MovieRepository(
     ) {
         movieLocalDataSource.updateMovieWithLocalCoverFilePath(coverFileName, localCoverFilePath)
     }
+
+    suspend fun fetchMovies(): Result<Unit> =
+        movieRemoteDataSource.fetchMovies()
+            .mapSuccess { movies ->
+                movieLocalDataSource.upsertAll(movies)
+                Result.Success(Unit)
+            }
 }

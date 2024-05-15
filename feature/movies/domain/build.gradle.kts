@@ -1,11 +1,9 @@
-import extensions.featureMoviesDomainDeps
-import extensions.unitTestDeps
-
 plugins {
     `android-library`
     `kotlin-android`
     id(Plugins.DAGGER_HILT)
     kotlin(Plugins.SERIALIZATION) version PluginVersion.SERIALIZATION
+    kotlin(Plugins.KAPT)
 }
 
 apply<MainGradlePlugin>()
@@ -15,6 +13,17 @@ android {
 }
 
 dependencies {
-    featureMoviesDomainDeps()
-    unitTestDeps()
+    // Arrow
+    implementation(libs.arrow.core)
+
+    // Core
+    implementation(libs.core.ktx)
+    implementation(libs.runtime)
+
+    // Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+
+    // Modules
+    implementation(project(Modules.COMMON))
 }

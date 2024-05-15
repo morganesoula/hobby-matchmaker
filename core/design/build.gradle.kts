@@ -1,6 +1,3 @@
-import extensions.coreDesignModuleDeps
-import extensions.unitTestDeps
-
 plugins {
     `android-library`
     `kotlin-android`
@@ -9,7 +6,7 @@ plugins {
 apply<MainGradlePlugin>()
 
 android {
-    namespace = "com.msoula.design"
+    namespace = "com.msoula.hobbymatchmaker.core.design"
 }
 
 androidComponents {
@@ -19,6 +16,12 @@ androidComponents {
 }
 
 dependencies {
-    coreDesignModuleDeps()
-    unitTestDeps()
+    // Compose
+    implementation(libs.material)
+    implementation(libs.material3)
+    implementation(libs.runtime)
+    implementation(libs.material.icons)
+
+    // Core
+    implementation(libs.core.ktx)
 }
