@@ -7,13 +7,12 @@ import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.SignUpUseCase
 import com.msoula.hobbymatchmaker.core.common.mapError
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
-import com.msoula.hobbymatchmaker.core.di.navigation.AppScreenRoute
-import com.msoula.hobbymatchmaker.core.di.navigation.Navigator
 import com.msoula.hobbymatchmaker.core.login.domain.use_cases.LoginFormValidationUseCase
 import com.msoula.hobbymatchmaker.core.login.presentation.extensions.clearAll
 import com.msoula.hobbymatchmaker.core.login.presentation.extensions.updateStateHandle
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEventModel
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_up.models.SignUpStateModel
+import com.msoula.hobbymatchmaker.core.navigation.contracts.SignUpNavigation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,8 +24,8 @@ class SignUpViewModel @Inject constructor(
     private val loginFormValidationUseCase: LoginFormValidationUseCase,
     private val signUpUseCase: SignUpUseCase,
     private val ioDispatcher: CoroutineDispatcher,
-    private val navigator: Navigator,
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
+    private val signUpNavigation: SignUpNavigation
 ) : ViewModel() {
 
     private val savedStateHandleKey: String = "signUpState"
@@ -126,7 +125,7 @@ class SignUpViewModel @Inject constructor(
                 signUpCircularProgress.value = false
                 savedStateHandle.clearAll<SignUpStateModel>()
 
-                navigator.navigate(AppScreenRoute)
+                signUpNavigation.redirectToAppScreen()
             }
             .mapError { error ->
                 signUpCircularProgress.value = false
@@ -142,4 +141,6 @@ class SignUpViewModel @Inject constructor(
                 error
             }
     }
+
+    fun redirectToSignInScreen() = signUpNavigation.redirectToSignInScreen()
 }

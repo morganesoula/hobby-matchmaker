@@ -42,7 +42,7 @@ import androidx.compose.ui.zIndex
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.msoula.component.HMMShimmerEffect
+import com.msoula.hobbymatchmaker.core.design.component.HMMShimmerEffect
 import com.msoula.hobbymatchmaker.features.movies.presentation.R
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiModel

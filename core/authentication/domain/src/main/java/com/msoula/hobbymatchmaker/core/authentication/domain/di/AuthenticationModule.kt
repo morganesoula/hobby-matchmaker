@@ -1,12 +1,14 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.di
 
+import com.msoula.hobbymatchmaker.core.authentication.domain.data_sources.AuthenticationLocalDataSource
 import com.msoula.hobbymatchmaker.core.authentication.domain.data_sources.AuthenticationRemoteDataSource
 import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepository
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.LogOutUseCase
-import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.ObserveAuthState
+import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.ObserveAuthenticationStateUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.ResetPasswordUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.SignInUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.SignUpUseCase
+import com.msoula.hobbymatchmaker.core.session.domain.use_cases.SaveAuthenticationStateUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,26 +22,34 @@ object AuthenticationModule {
     @Provides
     @Singleton
     fun provideAuthenticationRepository(
-        remoteDataSource: AuthenticationRemoteDataSource
-    ): AuthenticationRepository = AuthenticationRepository(remoteDataSource)
+        remoteDataSource: AuthenticationRemoteDataSource,
+        localDataSource: AuthenticationLocalDataSource
+    ): AuthenticationRepository = AuthenticationRepository(remoteDataSource, localDataSource)
 
     @Provides
-    fun provideLogOutUseCase(authenticationRepository: AuthenticationRepository): LogOutUseCase =
-        LogOutUseCase(authenticationRepository)
+    fun provideLogOutUseCase(
+        authenticationRepository: AuthenticationRepository,
+        saveAuthenticationStateUseCase: SaveAuthenticationStateUseCase
+    ): LogOutUseCase =
+        LogOutUseCase(authenticationRepository, saveAuthenticationStateUseCase)
 
     @Provides
     fun provideResetPasswordUseCase(authenticationRepository: AuthenticationRepository): ResetPasswordUseCase =
         ResetPasswordUseCase(authenticationRepository)
 
     @Provides
-    fun provideSignInUseCase(authenticationRepository: AuthenticationRepository): SignInUseCase =
-        SignInUseCase(authenticationRepository)
+    fun provideSignInUseCase(
+        authenticationRepository: AuthenticationRepository,
+        saveAuthenticationStateUseCase: SaveAuthenticationStateUseCase
+    ): SignInUseCase =
+        SignInUseCase(authenticationRepository, saveAuthenticationStateUseCase)
 
     @Provides
     fun provideSignUpUseCase(authenticationRepository: AuthenticationRepository): SignUpUseCase =
         SignUpUseCase(authenticationRepository)
 
     @Provides
-    fun provideObserveAuthState(authenticationRepository: AuthenticationRepository): ObserveAuthState =
-        ObserveAuthState(authenticationRepository)
+    @Singleton
+    fun provideObserveAuthenticationStateUseCase(authenticationRepository: AuthenticationRepository): ObserveAuthenticationStateUseCase =
+        ObserveAuthenticationStateUseCase(authenticationRepository)
 }

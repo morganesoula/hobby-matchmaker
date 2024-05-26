@@ -46,7 +46,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
@@ -68,17 +67,18 @@ import com.msoula.hobbymatchmaker.core.login.presentation.R.string as StringRes
 @Composable
 fun SignInScreen(
     modifier: Modifier = Modifier,
-    loginViewModel: SignInViewModel = hiltViewModel<SignInViewModel>(),
+    signInViewModel: SignInViewModel,
     redirectToSignUpScreen: () -> Unit,
-    redirectToHomeScreen: () -> Unit,
-    googleAuthUIClient: GoogleAuthUIClient,
+    redirectToAppScreen: () -> Unit,
+    onFacebookSignInEvent: () -> Unit,
+    googleAuthUIClient: GoogleAuthUIClient
 ) {
     val context = LocalContext.current
 
-    val loginFormState by loginViewModel.formDataFlow.collectAsStateWithLifecycle()
-    val circularProgressLoading by loginViewModel.circularProgressLoading.collectAsStateWithLifecycle()
-    val openResetDialog by loginViewModel.openResetDialog.collectAsStateWithLifecycle()
-    val emailResetSent by loginViewModel.resettingEmailSent.collectAsStateWithLifecycle()
+    val loginFormState by signInViewModel.formDataFlow.collectAsStateWithLifecycle()
+    val circularProgressLoading by signInViewModel.circularProgressLoading.collectAsStateWithLifecycle()
+    val openResetDialog by signInViewModel.openResetDialog.collectAsStateWithLifecycle()
+    val emailResetSent by signInViewModel.resettingEmailSent.collectAsStateWithLifecycle()
 
     val scope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
@@ -88,7 +88,7 @@ fun SignInScreen(
 
     val facebookLauncher =
         rememberLauncherForActivityResult(
-            contract = loginManager.createLogInActivityResultContract(callBackManager),
+            contract = loginManager.createLogInActivityResultContract(callBackManager)
         ) { result ->
             loginManager.onActivityResult(
                 result.resultCode,
@@ -103,9 +103,9 @@ fun SignInScreen(
                     }
 
                     override fun onSuccess(result: LoginResult) {
-                        redirectToHomeScreen()
+                        onFacebookSignInEvent()
                     }
-                },
+                }
             )
         }
 
@@ -117,7 +117,7 @@ fun SignInScreen(
                 SpanStyle(
                     color = if (isSystemInDarkTheme()) Color(0, 191, 255) else Color.Blue,
                     textDecoration = TextDecoration.Underline,
-                ),
+                )
             ) {
                 append(stringResource(id = StringRes.new_member_clickable_part))
             }
@@ -130,7 +130,7 @@ fun SignInScreen(
 
         LaunchedEffect(emailResetSent) {
             if (emailResetSent) {
-                loginViewModel.onEvent(AuthenticationUIEventModel.HideForgotPasswordDialog)
+                signInViewModel.onEvent(AuthenticationUIEventModel.HideForgotPasswordDialog)
                 scope.launch {
                     snackBarHostState.showSnackbar(message = resourcesProvider.getString(StringRes.email_sent))
                 }
@@ -142,14 +142,14 @@ fun SignInScreen(
                 modifier =
                 Modifier
                     .padding(paddingValues)
-                    .verticalScroll(rememberScrollState()),
+                    .verticalScroll(rememberScrollState())
             ) {
                 if (openResetDialog) {
                     ForgotPasswordAlertDialog(
                         email = loginFormState.emailReset,
                         paddingValues = paddingValues,
                         enableSubmit = loginFormState.submitEmailReset,
-                        authUIEvent = loginViewModel::onEvent,
+                        authUIEvent = signInViewModel::onEvent
                     )
                 }
 
@@ -165,7 +165,7 @@ fun SignInScreen(
                     value = loginFormState.email.trimEnd(),
                     placeHolderText = stringResource(StringRes.email),
                     onValueChange = {
-                        loginViewModel.onEvent(AuthenticationUIEventModel.OnEmailChanged(it))
+                        signInViewModel.onEvent(AuthenticationUIEventModel.OnEmailChanged(it))
                     },
                 )
 
@@ -174,11 +174,11 @@ fun SignInScreen(
                 HMMTextFieldPasswordComponent(
                     value = loginFormState.password,
                     onValueChange = {
-                        loginViewModel.onEvent(AuthenticationUIEventModel.OnPasswordChanged(it))
+                        signInViewModel.onEvent(AuthenticationUIEventModel.OnPasswordChanged(it))
                     },
                     placeholder = stringResource(id = StringRes.password),
                     showPasswordContentDescription = stringResource(id = StringRes.show_password),
-                    hidePasswordContentDescription = stringResource(id = StringRes.hide_password),
+                    hidePasswordContentDescription = stringResource(id = StringRes.hide_password)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -186,25 +186,25 @@ fun SignInScreen(
                 ClickableText(
                     text = AnnotatedString(stringResource(id = StringRes.forgot_password)),
                     onClick = {
-                        loginViewModel.onEvent(AuthenticationUIEventModel.OnForgotPasswordClicked)
+                        signInViewModel.onEvent(AuthenticationUIEventModel.OnForgotPasswordClicked)
                     },
                     style = TextStyle(color = MaterialTheme.colorScheme.onBackground),
                     modifier =
                     Modifier
                         .wrapContentSize()
                         .align(Alignment.End)
-                        .padding(end = 16.dp),
+                        .padding(end = 16.dp)
                 )
 
                 Spacer(modifier = Modifier.height(40.dp))
 
                 HMMButtonAuthComponent(
                     onClick = {
-                        loginViewModel.onEvent(AuthenticationUIEventModel.OnLogIn)
+                        signInViewModel.onEvent(AuthenticationUIEventModel.OnLogIn)
                     },
                     text = stringResource(id = StringRes.log_in),
                     enabled = loginFormState.submit,
-                    loading = circularProgressLoading,
+                    loading = circularProgressLoading
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -215,25 +215,25 @@ fun SignInScreen(
                         .fillMaxWidth()
                         .padding(start = 8.dp, end = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     HorizontalDivider(
                         Modifier.weight(1f),
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                        thickness = 2.dp,
+                        thickness = 2.dp
                     )
                     Text(
                         text = resourcesProvider.getString(StringRes.continue_with_rs),
                         modifier = Modifier.weight(3f),
                         textAlign = TextAlign.Center,
                         fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
                     )
 
                     HorizontalDivider(
                         Modifier.weight(1f),
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                        thickness = 2.dp,
+                        thickness = 2.dp
                     )
                 }
 
@@ -245,15 +245,13 @@ fun SignInScreen(
                             listOf(
                                 "email",
                                 "public_profile",
-                            ),
+                            )
                         )
                     },
                     googleAuthUIClient = googleAuthUIClient,
                     onGoogleSignInEvent = { signInResult ->
-                        loginViewModel.onGoogleSignInEvent(
-                            signInResult,
-                        )
-                    },
+                        signInViewModel.onSocialMediaSignInEvent()
+                    }
                 )
             }
 
@@ -261,15 +259,14 @@ fun SignInScreen(
                 modifier =
                 Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 8.dp),
+                    .padding(bottom = 8.dp)
             ) {
                 ClickableText(
                     modifier =
-                    Modifier
-                        .wrapContentSize(),
+                    Modifier.wrapContentSize(),
                     text = annotatedString,
                     onClick = { redirectToSignUpScreen() },
-                    style = TextStyle(color = MaterialTheme.colorScheme.onBackground),
+                    style = TextStyle(color = MaterialTheme.colorScheme.onBackground)
                 )
             }
         }
@@ -282,7 +279,7 @@ fun ForgotPasswordAlertDialog(
     email: String,
     authUIEvent: (AuthenticationUIEventModel) -> Unit,
     paddingValues: PaddingValues,
-    enableSubmit: Boolean,
+    enableSubmit: Boolean
 ) {
     AlertDialog(
         modifier = modifier.padding(paddingValues),
@@ -290,7 +287,7 @@ fun ForgotPasswordAlertDialog(
             Text(
                 text = stringResource(id = StringRes.forgot_password_title),
                 fontSize = 16.sp,
-                textAlign = TextAlign.Center,
+                textAlign = TextAlign.Center
             )
         },
         text = {
@@ -298,14 +295,14 @@ fun ForgotPasswordAlertDialog(
                 value = email,
                 onValueChange = { authUIEvent(AuthenticationUIEventModel.OnEmailResetChanged(it)) },
                 placeHolderText = stringResource(StringRes.your_email),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
             )
         },
         onDismissRequest = { authUIEvent(AuthenticationUIEventModel.HideForgotPasswordDialog) },
         confirmButton = {
             Button(
                 onClick = { authUIEvent(AuthenticationUIEventModel.OnResetPasswordConfirmed) },
-                enabled = enableSubmit,
+                enabled = enableSubmit
             ) {
                 Text(text = stringResource(id = StringRes.reset_password))
             }
@@ -321,6 +318,6 @@ fun ForgotPasswordAlertDialog(
             ) {
                 Text(text = stringResource(id = StringRes.cancel))
             }
-        },
+        }
     )
 }

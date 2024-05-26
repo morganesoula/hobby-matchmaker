@@ -14,6 +14,7 @@
     <string name="password_hint">• 8 characters • 1 number • 1 uppercase \n• 1 lowercase • 1 special character</string>
     <string name="sign_up">Sign Up</string>
     <string name="already_a_member">Already using HobbyMatchMaker? Log in</string>
+    <string name="already_a_member_connect">Log in</string>
     <string name="forgot_password">Forgot password?</string>
     <string name="log_in">Log In</string>
     <string name="new_member">Not a member? </string>

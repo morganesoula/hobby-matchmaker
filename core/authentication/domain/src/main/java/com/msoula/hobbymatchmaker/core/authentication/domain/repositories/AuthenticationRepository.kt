@@ -1,25 +1,26 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.repositories
 
+import com.msoula.hobbymatchmaker.core.authentication.domain.data_sources.AuthenticationLocalDataSource
 import com.msoula.hobbymatchmaker.core.authentication.domain.data_sources.AuthenticationRemoteDataSource
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutError
-import com.msoula.hobbymatchmaker.core.authentication.domain.models.UserDomainModel
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.mapError
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import kotlinx.coroutines.flow.Flow
 
 class AuthenticationRepository(
-    private val remoteDataSource: AuthenticationRemoteDataSource
+    private val remoteDataSource: AuthenticationRemoteDataSource,
+    private val localDataSource: AuthenticationLocalDataSource
 ) {
 
-    fun observeAuthState(): Flow<UserDomainModel?> =
-        remoteDataSource.getCurrentAuthenticationUser()
+    fun observeAuthenticationState(): Flow<Boolean> =
+        localDataSource.observeAuthenticationState()
 
     suspend fun logOut(): Result<Boolean> {
         return try {
-            remoteDataSource.oneTapClientSignOut()
             remoteDataSource.loginManagerSignOut()
             remoteDataSource.authenticationSignOut()
+            remoteDataSource.oneTapClientSignOut()
             Result.Success(true)
         } catch (exception: Exception) {
             Result.Failure(LogOutError(message = exception.message ?: "Error while logging out"))

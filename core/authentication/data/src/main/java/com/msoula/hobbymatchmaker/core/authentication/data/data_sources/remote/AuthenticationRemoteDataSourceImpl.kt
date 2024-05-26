@@ -11,7 +11,6 @@ import com.msoula.hobbymatchmaker.core.authentication.data.data_sources.remote.m
 import com.msoula.hobbymatchmaker.core.authentication.domain.data_sources.AuthenticationRemoteDataSource
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.UserDomainModel
 import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -24,22 +23,21 @@ class AuthenticationRemoteDataSourceImpl(
 
     override fun authenticationSignOut() {
         auth.signOut()
+        Log.d("HMM", "Logged out from Email/Pwd")
     }
 
     override suspend fun oneTapClientSignOut() {
         oneTapClient.signOut()
+        Log.d("HMM", "Logged out from Google")
     }
 
     override fun loginManagerSignOut() {
         facebookManager.logOut()
+        Log.d("HMM", "Logged out from Facebook")
     }
 
     override fun getCurrentAuthenticationUser(): Flow<UserDomainModel?> = flow {
         emit(auth.toUserDomainModel())
-    }
-
-    override suspend fun setAuthStateListener(authStateListener: FirebaseAuth.AuthStateListener) {
-        auth.addAuthStateListener(authStateListener)
     }
 
     override suspend fun createUserWithEmailAndPassword(
@@ -78,10 +76,6 @@ class AuthenticationRemoteDataSourceImpl(
                     )
             }
 
-        result.mapSuccess {
-            createAuthStateListener()
-        }
-
         return result
     }
 
@@ -98,13 +92,5 @@ class AuthenticationRemoteDataSourceImpl(
         }
 
         return result
-    }
-
-    private suspend fun createAuthStateListener() {
-        val authenticationStateListener = FirebaseAuth.AuthStateListener {
-            Log.d("HMM", "Inside getAuthState")
-        }
-
-        setAuthStateListener(authenticationStateListener)
     }
 }

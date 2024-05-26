@@ -48,4 +48,6 @@ dependencies {
     implementation(project(Modules.DESIGN))
     implementation(project(Modules.DI))
     implementation(project(Modules.LOGIN_DOMAIN))
+    implementation(project(Modules.NAVIGATION))
+    implementation(project(Modules.SESSION_DOMAIN))
 }

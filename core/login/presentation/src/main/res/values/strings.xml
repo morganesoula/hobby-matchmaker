@@ -14,7 +14,8 @@
     <string name="at_least">Attendu: </string>
     <string name="password_hint"> • 8 caractères • 1 chiffre • 1 majuscule \n• 1 minuscule • 1 caractère spécial</string>
     <string name="sign_up">S\'inscrire</string>
-    <string name="already_a_member">Vous utilisez déjà HobbyMatchMaker ? Connectez-vous</string>
+    <string name="already_a_member">Déjà membre ?</string>
+    <string name="already_a_member_connect">Connectez-vous</string>
     <string name="forgot_password">Mot de passe oublié ?</string>
     <string name="log_in">Se connecter</string>
     <string name="new_member">Pas encore membre ?</string>

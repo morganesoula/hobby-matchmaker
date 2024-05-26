@@ -1,6 +1,9 @@
 plugins {
     `android-library`
     `kotlin-android`
+    id(Plugins.DAGGER_HILT)
+    kotlin(Plugins.KAPT)
+    kotlin(Plugins.SERIALIZATION) version PluginVersion.SERIALIZATION
 }
 
 apply<MainGradlePlugin>()
@@ -19,9 +22,20 @@ dependencies {
     // Compose
     implementation(libs.runtime)
 
+    // Datastore
+    implementation(libs.datastore.core)
+    implementation(libs.datastore.preferences)
+
+    // Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+
     // Modules
     implementation(project(Modules.DESIGN))
 
     // Retrofit
     implementation(libs.retrofit)
+
+    // Serialization
+    implementation(libs.kotlinx.serialization)
 }

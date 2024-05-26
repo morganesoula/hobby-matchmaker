@@ -10,14 +10,13 @@ import com.msoula.hobbymatchmaker.core.common.mapError
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.di.domain.StringResourcesProvider
 import com.msoula.hobbymatchmaker.core.di.domain.useCase.AuthFormValidationUseCase
-import com.msoula.hobbymatchmaker.core.di.navigation.AppScreenRoute
-import com.msoula.hobbymatchmaker.core.di.navigation.Navigator
 import com.msoula.hobbymatchmaker.core.login.presentation.R
 import com.msoula.hobbymatchmaker.core.login.presentation.extensions.clearAll
 import com.msoula.hobbymatchmaker.core.login.presentation.extensions.updateStateHandle
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEventModel
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.models.SignInFormStateModel
-import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.models.SignInResultModel
+import com.msoula.hobbymatchmaker.core.navigation.contracts.SignInNavigation
+import com.msoula.hobbymatchmaker.core.session.domain.use_cases.SaveAuthenticationStateUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -33,8 +32,9 @@ class SignInViewModel @Inject constructor(
     private val signInUseCase: SignInUseCase,
     private val resetPasswordUseCase: ResetPasswordUseCase,
     private val ioDispatcher: CoroutineDispatcher,
-    private val navigator: Navigator,
-    private val resourceProvider: StringResourcesProvider
+    private val resourceProvider: StringResourcesProvider,
+    private val saveAuthenticationStateUseCase: SaveAuthenticationStateUseCase,
+    private val signInNavigation: SignInNavigation
 ) : ViewModel() {
 
     private val savedStateHandleKey: String = "loginState"
@@ -96,13 +96,14 @@ class SignInViewModel @Inject constructor(
         }
     }
 
-    fun onGoogleSignInEvent(result: SignInResultModel) {
-        if (result.data != null) {
-            Log.d("HMM", "Data is not null so navigating to HomeScreen page")
-            navigator.navigate(AppScreenRoute)
-        } else {
-            Log.e("HMM", "Data is null so what do we do now?")
+    fun onSocialMediaSignInEvent() {
+        viewModelScope.launch(ioDispatcher) {
+            saveAndUpdateDataStore()
         }
+    }
+
+    private suspend fun saveAndUpdateDataStore() {
+        saveAuthenticationStateUseCase(true)
     }
 
     private fun validateInput() {
@@ -142,7 +143,7 @@ class SignInViewModel @Inject constructor(
                     savedStateHandle.clearAll<SignInFormStateModel>()
 
                     withContext(Dispatchers.Main) {
-                        navigator.navigate(AppScreenRoute)
+                        redirectToAppScreen()
                     }
                 }
                 .mapError { error ->
@@ -186,4 +187,16 @@ class SignInViewModel @Inject constructor(
                 error
             }
     }
+
+    fun redirectToAppScreen() {
+        viewModelScope.launch(ioDispatcher) {
+            saveAuthenticationStateUseCase(true)
+
+            withContext(Dispatchers.Main) {
+                signInNavigation.redirectToAppScreen()
+            }
+        }
+    }
+
+    fun redirectToSignUpScreen() = signInNavigation.redirectToSignUpScreen()
 }

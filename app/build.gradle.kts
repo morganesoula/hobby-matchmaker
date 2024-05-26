@@ -126,7 +126,6 @@ dependencies {
     implementation(libs.activity.ktx)
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.lifecycle.runtime.ktx)
-    implementation(libs.core.splashscreen)
     implementation(libs.kotlinx.collections.immutable)
 
     // Facebook
@@ -151,12 +150,13 @@ dependencies {
     implementation(project(Modules.DESIGN))
     implementation(project(Modules.DI))
     implementation(project(Modules.LOGIN_PRESENTATION))
-    implementation(project(Modules.MODEL))
     implementation(project(Modules.MOVIE_DATA))
     implementation(project(Modules.MOVIE_DOMAIN))
     implementation(project(Modules.MOVIE_PRESENTATION))
     implementation(project(Modules.NAVIGATION))
     implementation(project(Modules.NETWORK))
+    implementation(project(Modules.SESSION_DOMAIN))
+    implementation(project(Modules.SPLASHSCREEN_PRESENTATION))
 
     // Navigation
     implementation(libs.navigation.ui.ktx)

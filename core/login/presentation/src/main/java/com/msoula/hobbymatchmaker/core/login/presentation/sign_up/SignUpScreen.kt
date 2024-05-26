@@ -1,14 +1,18 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.sign_up
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,8 +21,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -45,99 +55,134 @@ fun SignUpScreen(
     val emailTipVisibility = remember { mutableStateOf(false) }
     val passwordTipVisibility = remember { mutableStateOf(false) }
 
-    Scaffold(modifier = modifier) { paddingValues ->
-        Column {
-            HeaderTextComponent(text = stringResource(id = StringRes.welcome_title))
-            Box(
-                modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center,
+    val annotatedString =
+        buildAnnotatedString {
+            append(stringResource(id = StringRes.already_a_member) + " ")
+            withStyle(
+                style =
+                SpanStyle(
+                    color = if (isSystemInDarkTheme()) Color(0, 191, 255) else Color.Blue,
+                    textDecoration = TextDecoration.Underline
+                )
             ) {
-                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                    if (registrationState.signUpError != null) {
-                        HMMErrorText(
-                            modifier = Modifier,
-                            errorText = registrationState.signUpError!!,
+                append(stringResource(id = StringRes.already_a_member_connect))
+            }
+        }
+
+    Scaffold(modifier = modifier) { paddingValues ->
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column {
+                HeaderTextComponent(text = stringResource(id = StringRes.welcome_title))
+                Box(
+                    modifier =
+                    Modifier
+                        .wrapContentSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                        if (registrationState.signUpError != null) {
+                            HMMErrorText(
+                                modifier = Modifier,
+                                errorText = registrationState.signUpError!!
+                            )
+                        }
+
+                        HMMTextFieldAuthComponent(
+                            placeHolderText = stringResource(id = StringRes.firstname),
+                            value = registrationState.firstName.trimEnd(),
+                            onValueChange = {
+                                signUpViewModel.onEvent(
+                                    AuthenticationUIEventModel.OnFirstNameChanged(
+                                        it
+                                    )
+                                )
+                            },
+                            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        HMMTextFieldAuthComponent(
+                            value = registrationState.lastName.trimEnd(),
+                            onValueChange = {
+                                signUpViewModel.onEvent(
+                                    AuthenticationUIEventModel.OnLastNameChanged(
+                                        it
+                                    )
+                                )
+                            },
+                            placeHolderText = stringResource(id = StringRes.lastname),
+                            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        HMMFormHelperText(
+                            isVisible = emailTipVisibility.value,
+                            titleHint = stringResource(id = StringRes.example),
+                            hint = "john@test.com"
+                        )
+
+                        HMMTextFieldAuthComponent(
+                            modifier =
+                            modifier.onFocusChanged {
+                                emailTipVisibility.value = it.isFocused
+                            },
+                            value = registrationState.email.trimEnd(),
+                            onValueChange = {
+                                signUpViewModel.onEvent(AuthenticationUIEventModel.OnEmailChanged(it))
+                            },
+                            placeHolderText = stringResource(id = StringRes.email)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        HMMFormHelperText(
+                            isVisible = passwordTipVisibility.value,
+                            titleHint = stringResource(id = StringRes.at_least),
+                            hint = stringResource(id = StringRes.password_hint)
+                        )
+
+                        HMMTextFieldPasswordComponent(
+                            modifier =
+                            Modifier.onFocusChanged {
+                                passwordTipVisibility.value = it.isFocused
+                            },
+                            value = registrationState.password,
+                            onValueChange = {
+                                signUpViewModel.onEvent(
+                                    AuthenticationUIEventModel.OnPasswordChanged(
+                                        it
+                                    )
+                                )
+                            },
+                            placeholder = stringResource(id = StringRes.password),
+                            showPasswordContentDescription = stringResource(id = StringRes.show_password),
+                            hidePasswordContentDescription = stringResource(id = StringRes.hide_password)
+                        )
+
+                        Spacer(modifier = Modifier.height(32.dp))
+                        HMMButtonAuthComponent(
+                            onClick = {
+                                signUpViewModel.onEvent(AuthenticationUIEventModel.OnSignUp)
+                            },
+                            enabled = registrationState.submit,
+                            text = stringResource(id = StringRes.sign_up),
+                            loading = signUpProgressLoading
                         )
                     }
-
-                    HMMTextFieldAuthComponent(
-                        placeHolderText = stringResource(id = StringRes.firstname),
-                        value = registrationState.firstName.trimEnd(),
-                        onValueChange = {
-                            signUpViewModel.onEvent(AuthenticationUIEventModel.OnFirstNameChanged(it))
-                        },
-                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    HMMTextFieldAuthComponent(
-                        value = registrationState.lastName.trimEnd(),
-                        onValueChange = {
-                            signUpViewModel.onEvent(AuthenticationUIEventModel.OnLastNameChanged(it))
-                        },
-                        placeHolderText = stringResource(id = StringRes.lastname),
-                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    HMMFormHelperText(
-                        isVisible = emailTipVisibility.value,
-                        titleHint = stringResource(id = StringRes.example),
-                        hint = "john@test.com",
-                    )
-
-                    HMMTextFieldAuthComponent(
-                        modifier =
-                        modifier.onFocusChanged {
-                            emailTipVisibility.value = it.isFocused
-                        },
-                        value = registrationState.email.trimEnd(),
-                        onValueChange = {
-                            signUpViewModel.onEvent(AuthenticationUIEventModel.OnEmailChanged(it))
-                        },
-                        placeHolderText = stringResource(id = StringRes.email),
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    HMMFormHelperText(
-                        isVisible = passwordTipVisibility.value,
-                        titleHint = stringResource(id = StringRes.at_least),
-                        hint = stringResource(id = StringRes.password_hint),
-                    )
-
-                    HMMTextFieldPasswordComponent(
-                        modifier =
-                        Modifier.onFocusChanged {
-                            passwordTipVisibility.value = it.isFocused
-                        },
-                        value = registrationState.password,
-                        onValueChange = {
-                            signUpViewModel.onEvent(AuthenticationUIEventModel.OnPasswordChanged(it))
-                        },
-                        placeholder = stringResource(id = StringRes.password),
-                        showPasswordContentDescription = stringResource(id = StringRes.show_password),
-                        hidePasswordContentDescription = stringResource(id = StringRes.hide_password),
-                    )
-
-                    Spacer(modifier = Modifier.height(32.dp))
-                    HMMButtonAuthComponent(
-                        onClick = {
-                            signUpViewModel.onEvent(AuthenticationUIEventModel.OnSignUp)
-                        },
-                        enabled = registrationState.submit,
-                        text = stringResource(id = StringRes.sign_up),
-                        loading = signUpProgressLoading,
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    HMMButtonAuthComponent(
-                        onClick = { redirectToLogInScreen() },
-                        text = stringResource(id = StringRes.already_a_member),
-                        enabled = true,
-                    )
                 }
+            }
+
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 8.dp)
+            ) {
+                ClickableText(
+                    modifier = Modifier.wrapContentSize(),
+                    text = annotatedString,
+                    onClick = { redirectToLogInScreen() },
+                    style = TextStyle(color = MaterialTheme.colorScheme.onBackground)
+                )
             }
         }
     }
@@ -147,6 +192,6 @@ fun SignUpScreen(
 @Composable
 fun SignUpScreenPreview() {
     SignUpScreen(
-        redirectToLogInScreen = {},
+        redirectToLogInScreen = {}
     )
 }
