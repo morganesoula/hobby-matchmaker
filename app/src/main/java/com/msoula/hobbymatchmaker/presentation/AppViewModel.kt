@@ -5,15 +5,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.facebook.AccessToken
 import com.google.firebase.auth.FirebaseAuth
+import com.msoula.hobbymatchmaker.core.authentication.domain.models.ConnexionMode
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.LogOutUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.ObserveAuthenticationStateUseCase
 import com.msoula.hobbymatchmaker.core.common.AuthUiStateModel
+import com.msoula.hobbymatchmaker.core.session.domain.use_cases.FetchConnexionModeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
@@ -26,7 +29,8 @@ class AppViewModel @Inject constructor(
     private val auth: FirebaseAuth,
     private val ioDispatcher: CoroutineDispatcher,
     private val logOutUseCase: LogOutUseCase,
-    private val observeAuthenticationStateUseCase: ObserveAuthenticationStateUseCase
+    private val observeAuthenticationStateUseCase: ObserveAuthenticationStateUseCase,
+    private val fetchConnexionModeUseCase: FetchConnexionModeUseCase
 ) : ViewModel() {
 
     val authenticationState: StateFlow<AuthUiStateModel> by lazy {
@@ -42,10 +46,14 @@ class AppViewModel @Inject constructor(
             )
     }
 
-
     fun logOut() {
         viewModelScope.launch(ioDispatcher) {
-            logOutUseCase()
+            val connexionMode: ConnexionMode = fetchConnexionModeUseCase().first().let { mode ->
+                mode?.let { ConnexionMode.valueOf(mode) } ?: ConnexionMode.EMAIL
+            }
+
+            Log.d("HMM", "Into logOut method with connexion mode $connexionMode")
+            logOutUseCase(connexionMode)
         }
     }
 

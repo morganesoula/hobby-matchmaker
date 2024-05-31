@@ -4,6 +4,9 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.AuthCredential
+import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.LoginWithFacebookUseCase
+import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.LoginWithGoogleUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.ResetPasswordUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.SignInUseCase
 import com.msoula.hobbymatchmaker.core.common.mapError
@@ -16,7 +19,9 @@ import com.msoula.hobbymatchmaker.core.login.presentation.extensions.updateState
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEventModel
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.models.SignInFormStateModel
 import com.msoula.hobbymatchmaker.core.navigation.contracts.SignInNavigation
+import com.msoula.hobbymatchmaker.core.session.domain.models.ConnexionMode
 import com.msoula.hobbymatchmaker.core.session.domain.use_cases.SaveAuthenticationStateUseCase
+import com.msoula.hobbymatchmaker.core.session.domain.use_cases.SaveConnexionModeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -34,6 +39,9 @@ class SignInViewModel @Inject constructor(
     private val ioDispatcher: CoroutineDispatcher,
     private val resourceProvider: StringResourcesProvider,
     private val saveAuthenticationStateUseCase: SaveAuthenticationStateUseCase,
+    private val saveConnexionModeUseCase: SaveConnexionModeUseCase,
+    private val loginWithFacebookUseCase: LoginWithFacebookUseCase,
+    private val loginWithGoogleUseCase: LoginWithGoogleUseCase,
     private val signInNavigation: SignInNavigation
 ) : ViewModel() {
 
@@ -96,14 +104,30 @@ class SignInViewModel @Inject constructor(
         }
     }
 
-    fun onSocialMediaSignInEvent() {
+    fun handleFacebookLogin(credential: AuthCredential) {
         viewModelScope.launch(ioDispatcher) {
-            saveAndUpdateDataStore()
+            loginWithFacebookUseCase(credential)
+                .mapSuccess {
+                    updateDataStoreAndRedirect()
+                }
         }
     }
 
-    private suspend fun saveAndUpdateDataStore() {
+    fun handleGoogleLogin(token: String) {
+        viewModelScope.launch(ioDispatcher) {
+            loginWithGoogleUseCase(token)
+                .mapSuccess {
+                    updateDataStoreAndRedirect()
+                }
+        }
+    }
+
+    private suspend fun updateDataStoreAndRedirect() {
         saveAuthenticationStateUseCase(true)
+
+        withContext(Dispatchers.Main) {
+            redirectToAppScreen()
+        }
     }
 
     private fun validateInput() {
@@ -139,6 +163,8 @@ class SignInViewModel @Inject constructor(
                 formDataFlow.value.password
             )
                 .mapSuccess {
+                    saveConnexionModeUseCase(ConnexionMode.EMAIL.name)
+
                     circularProgressLoading.value = false
                     savedStateHandle.clearAll<SignInFormStateModel>()
 
@@ -188,7 +214,7 @@ class SignInViewModel @Inject constructor(
             }
     }
 
-    fun redirectToAppScreen() {
+    private fun redirectToAppScreen() {
         viewModelScope.launch(ioDispatcher) {
             saveAuthenticationStateUseCase(true)
 

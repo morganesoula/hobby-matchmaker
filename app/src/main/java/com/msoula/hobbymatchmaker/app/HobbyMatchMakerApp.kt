@@ -6,7 +6,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
-import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.utils.GoogleAuthUIClient
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.msoula.hobbymatchmaker.core.navigation.Navigator
 import com.msoula.hobbymatchmaker.navigation.HobbyMatchMakerNavHost
 import com.msoula.hobbymatchmaker.presentation.AppViewModel
@@ -16,7 +16,7 @@ import com.msoula.hobbymatchmaker.presentation.AppViewModel
 @Composable
 fun HobbyMatchMakerApp(
     navigator: Navigator,
-    googleAuthUIClient: GoogleAuthUIClient,
+    googleSignInClient: GoogleSignInClient,
     appViewModel: AppViewModel = hiltViewModel()
 ) {
     val navController = rememberNavController()
@@ -28,5 +28,5 @@ fun HobbyMatchMakerApp(
         }
     }
 
-    HobbyMatchMakerNavHost(navController, appViewModel, googleAuthUIClient)
+    HobbyMatchMakerNavHost(navController, appViewModel, googleSignInClient)
 }

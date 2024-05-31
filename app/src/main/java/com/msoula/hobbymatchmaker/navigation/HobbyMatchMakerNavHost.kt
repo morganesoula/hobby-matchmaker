@@ -9,10 +9,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.firebase.auth.AuthCredential
 import com.msoula.hobbymatchmaker.core.common.AuthUiStateModel
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.SignInScreen
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.SignInViewModel
-import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.utils.GoogleAuthUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_up.SignUpScreen
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_up.SignUpViewModel
 import com.msoula.hobbymatchmaker.core.navigation.AppScreenRoute
@@ -29,7 +30,7 @@ import com.msoula.hobbymatchmaker.presentation.AppViewModel
 fun HobbyMatchMakerNavHost(
     navController: NavHostController,
     appViewModel: AppViewModel,
-    googleAuthUIClient: GoogleAuthUIClient
+    googleSignInClient: GoogleSignInClient
 ) {
     val authenticationState by appViewModel.authenticationState.collectAsStateWithLifecycle()
 
@@ -48,13 +49,17 @@ fun HobbyMatchMakerNavHost(
             val signInViewModel: SignInViewModel = hiltViewModel<SignInViewModel>()
 
             SignInScreen(
-                redirectToAppScreen = signInViewModel::redirectToAppScreen,
                 redirectToSignUpScreen = signInViewModel::redirectToSignUpScreen,
-                onFacebookSignInEvent = {
-                    signInViewModel.onSocialMediaSignInEvent()
-                },
                 signInViewModel = signInViewModel,
-                googleAuthUIClient = googleAuthUIClient
+                handleFacebookAccessToken = { credential: AuthCredential ->
+                    signInViewModel.handleFacebookLogin(
+                        credential
+                    )
+                },
+                handleGoogleAccessToken = { token: String ->
+                    signInViewModel.handleGoogleLogin(token)
+                },
+                googleSignInClient = googleSignInClient
             )
         }
 

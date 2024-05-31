@@ -28,8 +28,8 @@
             </intent-filter>
         </activity>
 
-        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_application_id" />
-        <meta-data android:name="com.facebook.sdk.ClientToken" android:value="test2"/>
+        <meta-data tools:replace="android:value" android:name="com.facebook.sdk.ApplicationId" android:value="${facebookApplicationID}" />
+        <meta-data android:name="com.facebook.sdk.ClientToken" android:value="${facebookClientToken}"/>
     </application>
 
 </manifest>

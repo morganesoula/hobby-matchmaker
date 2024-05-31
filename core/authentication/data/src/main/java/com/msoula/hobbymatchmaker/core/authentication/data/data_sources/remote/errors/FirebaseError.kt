@@ -5,3 +5,4 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 class CreateUserError(override val message: String) : AppError
 class SignInError(override val message: String) : AppError
 class ResetPasswordError(override val message: String) : AppError
+class FacebookError(override val message: String) : AppError

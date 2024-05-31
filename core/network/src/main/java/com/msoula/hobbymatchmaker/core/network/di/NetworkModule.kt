@@ -16,7 +16,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
-private const val API_KEY = BuildConfig.tmdb_key
+private const val API_KEY = BuildConfig.TMDB_KEY
 private const val BASE_URL = "https://api.themoviedb.org/3/"
 
 @Module

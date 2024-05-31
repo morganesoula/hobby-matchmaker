@@ -3,6 +3,7 @@ package com.msoula.hobbymatchmaker.core.login.presentation.sign_in
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -52,6 +53,11 @@ import com.facebook.FacebookCallback
 import com.facebook.FacebookException
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.AuthCredential
+import com.google.firebase.auth.FacebookAuthProvider
 import com.msoula.hobbymatchmaker.core.design.component.HMMButtonAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMErrorText
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldAuthComponent
@@ -60,7 +66,6 @@ import com.msoula.hobbymatchmaker.core.design.component.HeaderTextComponent
 import com.msoula.hobbymatchmaker.core.di.data.StringResourcesProviderImpl
 import com.msoula.hobbymatchmaker.core.login.presentation.components.SocialMediaRowCustom
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEventModel
-import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.utils.GoogleAuthUIClient
 import kotlinx.coroutines.launch
 import com.msoula.hobbymatchmaker.core.login.presentation.R.string as StringRes
 
@@ -69,9 +74,9 @@ fun SignInScreen(
     modifier: Modifier = Modifier,
     signInViewModel: SignInViewModel,
     redirectToSignUpScreen: () -> Unit,
-    redirectToAppScreen: () -> Unit,
-    onFacebookSignInEvent: () -> Unit,
-    googleAuthUIClient: GoogleAuthUIClient
+    handleFacebookAccessToken: (credential: AuthCredential) -> Unit,
+    handleGoogleAccessToken: (idToken: String) -> Unit,
+    googleSignInClient: GoogleSignInClient
 ) {
     val context = LocalContext.current
 
@@ -103,10 +108,27 @@ fun SignInScreen(
                     }
 
                     override fun onSuccess(result: LoginResult) {
-                        onFacebookSignInEvent()
+                        val credential =
+                            FacebookAuthProvider.getCredential(result.accessToken.token)
+
+                        handleFacebookAccessToken(credential)
                     }
                 }
             )
+        }
+
+    val googleLauncher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+
+            try {
+                val account = task.getResult(ApiException::class.java)
+                account?.idToken?.let { idToken ->
+                    handleGoogleAccessToken(idToken)
+                }
+            } catch (exception: ApiException) {
+                Log.e("HMM", "Google sign in failed")
+            }
         }
 
     val annotatedString =
@@ -248,9 +270,9 @@ fun SignInScreen(
                             )
                         )
                     },
-                    googleAuthUIClient = googleAuthUIClient,
-                    onGoogleSignInEvent = { signInResult ->
-                        signInViewModel.onSocialMediaSignInEvent()
+                    onGoogleButtonClicked = {
+                        val signInIntent = googleSignInClient.signInIntent
+                        googleLauncher.launch(signInIntent)
                     }
                 )
             }

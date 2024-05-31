@@ -1,6 +1,4 @@
-import com.android.build.api.variant.BuildConfigField
 import java.io.FileInputStream
-import java.io.FileNotFoundException
 import java.util.Properties
 
 plugins {
@@ -12,25 +10,11 @@ plugins {
     id("kotlin-parcelize")
 }
 
-fun getFacebookKey(): String {
-    val propFile = rootProject.file("./facebook.properties")
+val secretsPropertiesFile = rootProject.file("secrets.properties")
+val secretProperties = Properties()
 
-    if (propFile.exists()) {
-        val properties = Properties()
-        properties.load(FileInputStream(propFile))
-        return properties.getProperty("facebook_client_token")
-    } else {
-        throw FileNotFoundException()
-    }
-}
-
-androidComponents {
-    onVariants {
-        it.buildConfigFields.put(
-            "facebook_client_token",
-            BuildConfigField("String", getFacebookKey(), "get facebook token"),
-        )
-    }
+if (secretsPropertiesFile.exists()) {
+    secretProperties.load(FileInputStream(secretsPropertiesFile))
 }
 
 android {
@@ -43,6 +27,15 @@ android {
         targetSdk = AndroidConfig.TARGET_SDK
         versionCode = AndroidConfig.VERSION_CODE
         versionName = AndroidConfig.VERSION_NAME
+
+        manifestPlaceholders["facebookApplicationID"] =
+            secretProperties["facebook_application_id"] ?: ""
+        manifestPlaceholders["facebookClientToken"] =
+            secretProperties["facebook_client_token"] ?: ""
+
+        buildConfigField(
+            "String", "WEB_CLIENT_ID", "\"${secretProperties["google_web_client_id"]}\""
+        )
 
         testInstrumentationRunner = AndroidConfig.TEST_INSTRUMENTATION_RUNNER
         vectorDrawables.useSupportLibrary = true
@@ -155,6 +148,7 @@ dependencies {
     implementation(project(Modules.MOVIE_PRESENTATION))
     implementation(project(Modules.NAVIGATION))
     implementation(project(Modules.NETWORK))
+    implementation(project(Modules.SESSION_DATA))
     implementation(project(Modules.SESSION_DOMAIN))
     implementation(project(Modules.SPLASHSCREEN_PRESENTATION))
 

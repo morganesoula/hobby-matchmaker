@@ -10,4 +10,8 @@ class AuthenticationLocalDataSourceImpl(private val authenticationDataStore: Aut
     override fun observeAuthenticationState(): Flow<Boolean> {
         return authenticationDataStore.observeAuthState()
     }
+
+    override fun fetchConnexionMode(): Flow<String?> {
+        return authenticationDataStore.fetchConnexionMode()
+    }
 }

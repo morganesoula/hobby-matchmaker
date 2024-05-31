@@ -13,6 +13,7 @@ object Modules {
     const val MOVIE_PRESENTATION = ":feature:movies:presentation"
     const val NAVIGATION = ":core:navigation"
     const val NETWORK = ":core:network"
+    const val SESSION_DATA = ":core:session:data"
     const val SESSION_DOMAIN = ":core:session:domain"
     const val SPLASHSCREEN_PRESENTATION = ":core:splashscreen:presentation"
 }
