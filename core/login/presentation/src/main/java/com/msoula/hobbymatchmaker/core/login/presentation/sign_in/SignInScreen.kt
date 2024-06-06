@@ -127,7 +127,7 @@ fun SignInScreen(
                     handleGoogleAccessToken(idToken)
                 }
             } catch (exception: ApiException) {
-                Log.e("HMM", "Google sign in failed")
+                Log.e("HMM", "Google sign in failed with message: ${exception.message}")
             }
         }
 

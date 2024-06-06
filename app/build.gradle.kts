@@ -34,7 +34,7 @@ android {
             secretProperties["facebook_client_token"] ?: ""
 
         buildConfigField(
-            "String", "WEB_CLIENT_ID", "\"${secretProperties["google_web_client_id"]}\""
+            "String", "WEB_CLIENT_ID", "\"${secretProperties["web_client_id"]}\""
         )
 
         testInstrumentationRunner = AndroidConfig.TEST_INSTRUMENTATION_RUNNER

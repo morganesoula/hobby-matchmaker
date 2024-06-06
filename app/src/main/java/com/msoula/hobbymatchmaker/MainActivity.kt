@@ -73,13 +73,11 @@ class MainActivity : ComponentActivity() {
     private fun setAuthenticationListener() {
         authStateListener = AuthStateListener { firebaseAuth ->
             val user = firebaseAuth.currentUser
-            Log.d("HMM", "Inside AuthListener with user: $user")
 
             user?.let { firebaseUser ->
                 val email = firebaseUser.email
 
                 val providers = firebaseUser.providerData.map { it.providerId }
-                Log.d("HMM", "Providers are $providers")
 
                 val connexionMode = when {
                     providers.contains("google.com") -> ConnexionMode.GOOGLE

@@ -19,9 +19,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.extensions.updateState
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEventModel
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.models.SignInFormStateModel
 import com.msoula.hobbymatchmaker.core.navigation.contracts.SignInNavigation
-import com.msoula.hobbymatchmaker.core.session.domain.models.ConnexionMode
 import com.msoula.hobbymatchmaker.core.session.domain.use_cases.SaveAuthenticationStateUseCase
-import com.msoula.hobbymatchmaker.core.session.domain.use_cases.SaveConnexionModeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -39,7 +37,6 @@ class SignInViewModel @Inject constructor(
     private val ioDispatcher: CoroutineDispatcher,
     private val resourceProvider: StringResourcesProvider,
     private val saveAuthenticationStateUseCase: SaveAuthenticationStateUseCase,
-    private val saveConnexionModeUseCase: SaveConnexionModeUseCase,
     private val loginWithFacebookUseCase: LoginWithFacebookUseCase,
     private val loginWithGoogleUseCase: LoginWithGoogleUseCase,
     private val signInNavigation: SignInNavigation
@@ -156,6 +153,7 @@ class SignInViewModel @Inject constructor(
     private fun validateEmailReset(emailReset: String): Boolean =
         authFormValidationUseCases.validateEmailUseCase(emailReset).successful
 
+    //TODO Check why error doesn't show
     private fun logIn() {
         viewModelScope.launch(ioDispatcher) {
             signInUseCase(
@@ -163,8 +161,6 @@ class SignInViewModel @Inject constructor(
                 formDataFlow.value.password
             )
                 .mapSuccess {
-                    saveConnexionModeUseCase(ConnexionMode.EMAIL.name)
-
                     circularProgressLoading.value = false
                     savedStateHandle.clearAll<SignInFormStateModel>()
 
@@ -173,6 +169,7 @@ class SignInViewModel @Inject constructor(
                     }
                 }
                 .mapError { error ->
+                    Log.d("HMM", "SignInViewModel - Error while signing in: ${error.message}")
                     circularProgressLoading.value = false
                     savedStateHandle.updateStateHandle<SignInFormStateModel>(
                         savedStateHandleKey
@@ -181,7 +178,7 @@ class SignInViewModel @Inject constructor(
                             logInError =
                             resourceProvider.getString(
                                 R.string.login_error,
-                            ),
+                            )
                         )
                     }
                     Log.e("HMM", "Invalid credentials")

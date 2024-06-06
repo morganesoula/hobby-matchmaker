@@ -6,7 +6,6 @@ import com.msoula.hobbymatchmaker.core.session.domain.repositories.UserRepositor
 import com.msoula.hobbymatchmaker.core.session.domain.use_cases.ClearUserUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.use_cases.FetchConnexionModeUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.use_cases.SaveAuthenticationStateUseCase
-import com.msoula.hobbymatchmaker.core.session.domain.use_cases.SaveConnexionModeUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.use_cases.SaveUserUseCase
 import dagger.Module
 import dagger.Provides
@@ -30,11 +29,6 @@ object SessionModule {
     @Provides
     fun provideFetchConnexionModeUseCase(authenticationDataStore: AuthenticationDataStore): FetchConnexionModeUseCase {
         return FetchConnexionModeUseCase(authenticationDataStore)
-    }
-
-    @Provides
-    fun provideSaveConnexionModeUseCase(authenticationDataStore: AuthenticationDataStore): SaveConnexionModeUseCase {
-        return SaveConnexionModeUseCase(authenticationDataStore)
     }
 
     @Provides
