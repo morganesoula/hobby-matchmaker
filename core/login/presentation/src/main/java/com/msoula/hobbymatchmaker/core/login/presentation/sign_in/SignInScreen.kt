@@ -28,6 +28,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -91,29 +92,32 @@ fun SignInScreen(
 
     val facebookLauncher =
         rememberLauncherForActivityResult(
-            contract = loginManager.createLogInActivityResultContract(callBackManager)
-        ) { result ->
-            loginManager.onActivityResult(
-                result.resultCode,
-                result.data,
-                object : FacebookCallback<LoginResult> {
-                    override fun onCancel() {
-                        Log.d("HMM", "Cancelled facebook login on user part")
-                    }
+            loginManager.createLogInActivityResultContract(callBackManager, null)
+        ) {}
 
-                    override fun onError(error: FacebookException) {
-                        Toast.makeText(context, "Facebook error login", Toast.LENGTH_LONG).show()
-                    }
+    DisposableEffect(Unit) {
+        loginManager.registerCallback(callBackManager, object : FacebookCallback<LoginResult> {
+            override fun onCancel() {
+                Log.d("HMM", "Cancelled facebook login on user part")
+            }
 
-                    override fun onSuccess(result: LoginResult) {
-                        val credential =
-                            FacebookAuthProvider.getCredential(result.accessToken.token)
+            override fun onError(error: FacebookException) {
+                Toast.makeText(context, "Facebook error login", Toast.LENGTH_LONG).show()
+            }
 
-                        handleFacebookAccessToken(credential)
-                    }
+            override fun onSuccess(result: LoginResult) {
+                coroutineScope.launch {
+                    val credential = FacebookAuthProvider.getCredential(result.accessToken.token)
+                    handleFacebookAccessToken(credential)
                 }
-            )
+            }
+        })
+
+        onDispose {
+            loginManager.unregisterCallback(callBackManager)
         }
+    }
+
 
     val annotatedString =
         buildAnnotatedString {
@@ -247,12 +251,7 @@ fun SignInScreen(
 
                 SocialMediaRowCustom(
                     onFacebookButtonClicked = {
-                        facebookLauncher.launch(
-                            listOf(
-                                "email",
-                                "public_profile",
-                            )
-                        )
+                        facebookLauncher.launch(listOf("email", "public_profile"))
                     },
                     onGoogleButtonClicked = {
                         coroutineScope.launch {

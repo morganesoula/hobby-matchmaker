@@ -1,10 +1,7 @@
 package com.msoula.hobbymatchmaker.presentation
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.facebook.AccessToken
-import com.google.firebase.auth.FirebaseAuth
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ConnexionMode
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.LogOutUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.ObserveAuthenticationStateUseCase
@@ -26,7 +23,6 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class AppViewModel @Inject constructor(
-    private val auth: FirebaseAuth,
     private val ioDispatcher: CoroutineDispatcher,
     private val logOutUseCase: LogOutUseCase,
     private val observeAuthenticationStateUseCase: ObserveAuthenticationStateUseCase,
@@ -53,26 +49,6 @@ class AppViewModel @Inject constructor(
             }
 
             logOutUseCase(connexionMode)
-        }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        Log.d("HMM", "AppViewModel is killed, sorry buddy")
-    }
-
-    fun checkForActiveSession(): Boolean {
-        val accessToken = AccessToken.getCurrentAccessToken()
-
-        return if (auth.currentUser != null) {
-            Log.d("HMM", "User is logged in")
-            true
-        } else if (accessToken != null && !accessToken.isExpired) {
-            Log.d("HMM", "Logged in through Facebook cache")
-            true
-        } else {
-            Log.d("HMM", "User is not logged in")
-            false
         }
     }
 }
