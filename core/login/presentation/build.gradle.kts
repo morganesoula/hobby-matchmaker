@@ -5,7 +5,6 @@ plugins {
     kotlin(Plugins.SERIALIZATION) version PluginVersion.SERIALIZATION
     kotlin(Plugins.KAPT)
 }
-
 apply<MainGradlePlugin>()
 
 android {
@@ -26,6 +25,11 @@ dependencies {
     // Core
     implementation(libs.core.ktx)
     implementation(libs.runtime)
+
+    // Credentials Manager
+    implementation(libs.credentials)
+    implementation(libs.credentials.play.services)
+    implementation(libs.google.identity)
 
     // Facebook
     implementation(libs.facebook.android.sdk)

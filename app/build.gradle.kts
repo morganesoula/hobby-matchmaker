@@ -33,10 +33,6 @@ android {
         manifestPlaceholders["facebookClientToken"] =
             secretProperties["facebook_client_token"] ?: ""
 
-        buildConfigField(
-            "String", "WEB_CLIENT_ID", "\"${secretProperties["web_client_id"]}\""
-        )
-
         testInstrumentationRunner = AndroidConfig.TEST_INSTRUMENTATION_RUNNER
         vectorDrawables.useSupportLibrary = true
     }

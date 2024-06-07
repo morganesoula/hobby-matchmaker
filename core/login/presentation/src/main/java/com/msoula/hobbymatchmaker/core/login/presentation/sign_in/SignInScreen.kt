@@ -3,7 +3,6 @@ package com.msoula.hobbymatchmaker.core.login.presentation.sign_in
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,15 +46,13 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.credentials.GetCredentialResponse
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FacebookAuthProvider
 import com.msoula.hobbymatchmaker.core.design.component.HMMButtonAuthComponent
@@ -75,10 +72,11 @@ fun SignInScreen(
     signInViewModel: SignInViewModel,
     redirectToSignUpScreen: () -> Unit,
     handleFacebookAccessToken: (credential: AuthCredential) -> Unit,
-    handleGoogleAccessToken: (idToken: String) -> Unit,
-    googleSignInClient: GoogleSignInClient
+    handleGoogleSignIn: (result: GetCredentialResponse?, googleAuthClient: GoogleAuthClient) -> Unit,
+    googleAuthClient: GoogleAuthClient
 ) {
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     val loginFormState by signInViewModel.formDataFlow.collectAsStateWithLifecycle()
     val circularProgressLoading by signInViewModel.circularProgressLoading.collectAsStateWithLifecycle()
@@ -115,20 +113,6 @@ fun SignInScreen(
                     }
                 }
             )
-        }
-
-    val googleLauncher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
-            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-
-            try {
-                val account = task.getResult(ApiException::class.java)
-                account?.idToken?.let { idToken ->
-                    handleGoogleAccessToken(idToken)
-                }
-            } catch (exception: ApiException) {
-                Log.e("HMM", "Google sign in failed with message: ${exception.message}")
-            }
         }
 
     val annotatedString =
@@ -271,8 +255,10 @@ fun SignInScreen(
                         )
                     },
                     onGoogleButtonClicked = {
-                        val signInIntent = googleSignInClient.signInIntent
-                        googleLauncher.launch(signInIntent)
+                        coroutineScope.launch {
+                            val credential = googleAuthClient.launchGetCredential()
+                            handleGoogleSignIn(credential, googleAuthClient)
+                        }
                     }
                 )
             }

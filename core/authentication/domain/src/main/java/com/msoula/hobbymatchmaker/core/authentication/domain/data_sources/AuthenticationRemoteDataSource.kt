@@ -10,7 +10,7 @@ interface AuthenticationRemoteDataSource {
     fun loginManagerSignOut()
     fun getCurrentAuthenticationUser(): Flow<UserDomainModel?>
     suspend fun signInWithCredentials(credential: AuthCredential): Result<Boolean>
-    suspend fun oneTapClientSignOut()
+    suspend fun credentialManagerLogOut()
     suspend fun createUserWithEmailAndPassword(email: String, password: String): Result<Boolean>
     suspend fun signInWithEmailAndPassword(email: String, password: String): Result<Boolean>
     suspend fun resetPassword(email: String): Result<Boolean>

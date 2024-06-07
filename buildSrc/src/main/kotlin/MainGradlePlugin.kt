@@ -2,6 +2,7 @@ import com.android.build.gradle.LibraryExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import java.io.FileInputStream
 import java.util.Properties
 
 class MainGradlePlugin : Plugin<Project> {
@@ -20,6 +21,13 @@ class MainGradlePlugin : Plugin<Project> {
     }
 
     private fun setProjectConfig(project: Project) {
+        val secretsPropertiesFile = project.rootProject.file("secrets.properties")
+        val secretProperties = Properties()
+
+        if (secretsPropertiesFile.exists()) {
+            secretProperties.load(FileInputStream(secretsPropertiesFile))
+        }
+
         val tmdbPropertiesFile = project.rootProject.file("./tmdb.properties")
         val tmdbProperties = Properties()
 
@@ -35,6 +43,7 @@ class MainGradlePlugin : Plugin<Project> {
                 testInstrumentationRunner = AndroidConfig.TEST_INSTRUMENTATION_RUNNER
 
                 buildConfigField("String", "TMDB_KEY", "\"${tmdbProperties["tmdb_key"]}\"")
+                buildConfigField("String", "WEB_CLIENT_ID", "\"${secretProperties["web_client_id"]}\"")
             }
 
             compileOptions {

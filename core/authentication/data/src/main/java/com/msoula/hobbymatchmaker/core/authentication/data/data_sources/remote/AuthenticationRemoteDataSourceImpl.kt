@@ -1,8 +1,9 @@
 package com.msoula.hobbymatchmaker.core.authentication.data.data_sources.remote
 
 import android.util.Log
+import androidx.credentials.ClearCredentialStateRequest
+import androidx.credentials.CredentialManager
 import com.facebook.login.LoginManager
-import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.msoula.hobbymatchmaker.core.authentication.data.data_sources.remote.errors.CreateUserError
@@ -20,7 +21,7 @@ import kotlin.coroutines.resume
 
 class AuthenticationRemoteDataSourceImpl(
     private val auth: FirebaseAuth,
-    private val oneTapClient: SignInClient
+    private val credentialManager: CredentialManager
 ) : AuthenticationRemoteDataSource {
 
     private val facebookManager = LoginManager.getInstance()
@@ -30,8 +31,8 @@ class AuthenticationRemoteDataSourceImpl(
         Log.d("HMM", "Logged out from Email/Pwd")
     }
 
-    override suspend fun oneTapClientSignOut() {
-        oneTapClient.signOut()
+    override suspend fun credentialManagerLogOut() {
+        credentialManager.clearCredentialState(ClearCredentialStateRequest())
         Log.d("HMM", "Logged out from Google")
     }
 

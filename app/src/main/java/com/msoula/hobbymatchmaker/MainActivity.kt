@@ -4,14 +4,13 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.credentials.CredentialManager
 import androidx.lifecycle.lifecycleScope
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import com.msoula.hobbymatchmaker.app.HobbyMatchMakerApp
 import com.msoula.hobbymatchmaker.core.design.theme.HobbyMatchmakerTheme
+import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.GoogleAuthClient
 import com.msoula.hobbymatchmaker.core.navigation.Navigator
 import com.msoula.hobbymatchmaker.core.session.domain.models.ConnexionMode
 import com.msoula.hobbymatchmaker.core.session.domain.models.UserDomainModel
@@ -38,15 +37,16 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var authStateListener: AuthStateListener
 
+    private val googleAuthClient = GoogleAuthClient(CredentialManager.create(this), this)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setAuthenticationListener()
-        val googleSignInClient = initGoogleAuth()
 
         setContent {
             HobbyMatchmakerTheme {
-                HobbyMatchMakerApp(navigator, googleSignInClient)
+                HobbyMatchMakerApp(navigator, googleAuthClient)
             }
         }
     }
@@ -59,15 +59,6 @@ class MainActivity : ComponentActivity() {
     override fun onStop() {
         super.onStop()
         auth.removeAuthStateListener(authStateListener)
-    }
-
-    private fun initGoogleAuth(): GoogleSignInClient {
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(BuildConfig.WEB_CLIENT_ID)
-            .requestEmail()
-            .build()
-
-        return GoogleSignIn.getClient(this, gso)
     }
 
     private fun setAuthenticationListener() {

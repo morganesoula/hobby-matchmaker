@@ -1,7 +1,6 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.repositories
 
 import com.google.firebase.auth.AuthCredential
-import com.google.firebase.auth.GoogleAuthProvider
 import com.msoula.hobbymatchmaker.core.authentication.domain.data_sources.AuthenticationLocalDataSource
 import com.msoula.hobbymatchmaker.core.authentication.domain.data_sources.AuthenticationRemoteDataSource
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutError
@@ -24,7 +23,7 @@ class AuthenticationRepository(
             when (connexionMode) {
                 ConnexionMode.FACEBOOK -> remoteDataSource.loginManagerSignOut()
                 ConnexionMode.EMAIL -> remoteDataSource.authenticationSignOut()
-                ConnexionMode.GOOGLE -> remoteDataSource.oneTapClientSignOut()
+                ConnexionMode.GOOGLE -> remoteDataSource.credentialManagerLogOut()
             }
             Result.Success(true)
         } catch (exception: Exception) {
@@ -62,12 +61,8 @@ class AuthenticationRepository(
             }
 
     suspend fun signInWithCredential(
-        facebookCredential: AuthCredential? = null,
-        googleToken: String? = null
+        authCredential: AuthCredential
     ): Result<Boolean> {
-        val credentialToUse =
-            facebookCredential ?: GoogleAuthProvider.getCredential(googleToken, null)
-
-        return remoteDataSource.signInWithCredentials(credentialToUse)
+        return remoteDataSource.signInWithCredentials(authCredential)
     }
 }

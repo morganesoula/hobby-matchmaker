@@ -52,7 +52,6 @@ class AppViewModel @Inject constructor(
                 mode?.let { ConnexionMode.valueOf(mode) } ?: ConnexionMode.EMAIL
             }
 
-            Log.d("HMM", "Into logOut method with connexion mode $connexionMode")
             logOutUseCase(connexionMode)
         }
     }

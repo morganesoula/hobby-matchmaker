@@ -1,12 +1,12 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.sign_in
 
 import android.util.Log
+import androidx.credentials.GetCredentialResponse
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.AuthCredential
-import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.LoginWithFacebookUseCase
-import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.LoginWithGoogleUseCase
+import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.LoginWithSocialMediaUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.ResetPasswordUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.SignInUseCase
 import com.msoula.hobbymatchmaker.core.common.mapError
@@ -37,8 +37,7 @@ class SignInViewModel @Inject constructor(
     private val ioDispatcher: CoroutineDispatcher,
     private val resourceProvider: StringResourcesProvider,
     private val saveAuthenticationStateUseCase: SaveAuthenticationStateUseCase,
-    private val loginWithFacebookUseCase: LoginWithFacebookUseCase,
-    private val loginWithGoogleUseCase: LoginWithGoogleUseCase,
+    private val loginWithSocialMediaUseCase: LoginWithSocialMediaUseCase,
     private val signInNavigation: SignInNavigation
 ) : ViewModel() {
 
@@ -103,19 +102,23 @@ class SignInViewModel @Inject constructor(
 
     fun handleFacebookLogin(credential: AuthCredential) {
         viewModelScope.launch(ioDispatcher) {
-            loginWithFacebookUseCase(credential)
+            loginWithSocialMediaUseCase(credential)
                 .mapSuccess {
                     updateDataStoreAndRedirect()
                 }
         }
     }
 
-    fun handleGoogleLogin(token: String) {
+    fun handleGoogleLogin(result: GetCredentialResponse?, googleAuthClient: GoogleAuthClient) {
         viewModelScope.launch(ioDispatcher) {
-            loginWithGoogleUseCase(token)
-                .mapSuccess {
-                    updateDataStoreAndRedirect()
-                }
+            result?.let {
+                val authCredential = googleAuthClient.handleSignIn(it)
+
+                loginWithSocialMediaUseCase(authCredential)
+                    .mapSuccess {
+                        updateDataStoreAndRedirect()
+                    }
+            } ?: Log.e("HMM", "Could not get getCredentialResponse")
         }
     }
 

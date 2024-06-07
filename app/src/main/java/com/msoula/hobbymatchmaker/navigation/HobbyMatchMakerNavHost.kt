@@ -4,14 +4,15 @@ import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.credentials.GetCredentialResponse
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.AuthCredential
 import com.msoula.hobbymatchmaker.core.common.AuthUiStateModel
+import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.GoogleAuthClient
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.SignInScreen
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.SignInViewModel
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_up.SignUpScreen
@@ -30,7 +31,7 @@ import com.msoula.hobbymatchmaker.presentation.AppViewModel
 fun HobbyMatchMakerNavHost(
     navController: NavHostController,
     appViewModel: AppViewModel,
-    googleSignInClient: GoogleSignInClient
+    googleAuthClient: GoogleAuthClient
 ) {
     val authenticationState by appViewModel.authenticationState.collectAsStateWithLifecycle()
 
@@ -56,10 +57,10 @@ fun HobbyMatchMakerNavHost(
                         credential
                     )
                 },
-                handleGoogleAccessToken = { token: String ->
-                    signInViewModel.handleGoogleLogin(token)
+                handleGoogleSignIn = { result: GetCredentialResponse?, googleAuthClient: GoogleAuthClient ->
+                    signInViewModel.handleGoogleLogin(result, googleAuthClient)
                 },
-                googleSignInClient = googleSignInClient
+                googleAuthClient = googleAuthClient
             )
         }
 

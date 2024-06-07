@@ -4,8 +4,7 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.data_sources.Authen
 import com.msoula.hobbymatchmaker.core.authentication.domain.data_sources.AuthenticationRemoteDataSource
 import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepository
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.LogOutUseCase
-import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.LoginWithFacebookUseCase
-import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.LoginWithGoogleUseCase
+import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.LoginWithSocialMediaUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.ObserveAuthenticationStateUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.ResetPasswordUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.SignInUseCase
@@ -55,10 +54,7 @@ object AuthenticationModule {
         ObserveAuthenticationStateUseCase(authenticationRepository)
 
     @Provides
-    fun provideLoginWithFacebookUseCase(authenticationRepository: AuthenticationRepository): LoginWithFacebookUseCase =
-        LoginWithFacebookUseCase(authenticationRepository)
+    fun provideLoginWithSocialMediaUsecase(authenticationRepository: AuthenticationRepository): LoginWithSocialMediaUseCase =
+        LoginWithSocialMediaUseCase(authenticationRepository)
 
-    @Provides
-    fun provideLoginWithGoogleUseCase(authenticationRepository: AuthenticationRepository): LoginWithGoogleUseCase =
-        LoginWithGoogleUseCase(authenticationRepository)
 }
