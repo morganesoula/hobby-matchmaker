@@ -6,7 +6,6 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class SignUpStateModel(
     val firstName: String = "",
-    val lastName: String = "",
     val email: String = "",
     val password: String = "",
     val submit: Boolean = false,

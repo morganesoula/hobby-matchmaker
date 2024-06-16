@@ -4,7 +4,7 @@ import com.msoula.hobbymatchmaker.core.common.ValidationResult
 
 class ValidateEmailUseCase {
     operator fun invoke(email: String): ValidationResult {
-        return if (email.matches("^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})$".toRegex())) {
+        return if (email.matches("^[A-Za-z](.*)(@)(.+)(\\.)(.+)$".toRegex())) {
             ValidationResult(true)
         } else {
             ValidationResult(false)

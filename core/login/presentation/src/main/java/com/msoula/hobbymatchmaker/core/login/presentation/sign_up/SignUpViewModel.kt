@@ -4,26 +4,38 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.msoula.hobbymatchmaker.core.authentication.data.data_sources.remote.errors.CreateUserError
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.SignUpUseCase
 import com.msoula.hobbymatchmaker.core.common.mapError
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
+import com.msoula.hobbymatchmaker.core.common.onEach
+import com.msoula.hobbymatchmaker.core.di.domain.StringResourcesProvider
 import com.msoula.hobbymatchmaker.core.login.domain.use_cases.LoginFormValidationUseCase
+import com.msoula.hobbymatchmaker.core.login.presentation.R
 import com.msoula.hobbymatchmaker.core.login.presentation.extensions.clearAll
 import com.msoula.hobbymatchmaker.core.login.presentation.extensions.updateStateHandle
-import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEventModel
+import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_up.models.SignUpStateModel
 import com.msoula.hobbymatchmaker.core.navigation.contracts.SignUpNavigation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
+@OptIn(FlowPreview::class)
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
     private val loginFormValidationUseCase: LoginFormValidationUseCase,
     private val signUpUseCase: SignUpUseCase,
     private val ioDispatcher: CoroutineDispatcher,
+    private val resourceProvider: StringResourcesProvider,
     private val savedStateHandle: SavedStateHandle,
     private val signUpNavigation: SignUpNavigation
 ) : ViewModel() {
@@ -32,80 +44,88 @@ class SignUpViewModel @Inject constructor(
     val formDataFlow = savedStateHandle.getStateFlow(savedStateHandleKey, SignUpStateModel())
     val signUpCircularProgress = MutableStateFlow(false)
 
-    fun onEvent(event: AuthenticationUIEventModel) {
+    private val _email = MutableStateFlow(savedStateHandle["email"] ?: "")
+    private val _firstName = MutableStateFlow(savedStateHandle["firstName"] ?: "")
+    private val _password = MutableStateFlow(savedStateHandle["password"] ?: "")
+
+    init {
+        viewModelScope.launch {
+            combine(
+                _email,
+                _firstName,
+                _password
+            ) { email, firstName, password ->
+                SignUpStateModel(
+                    email = email,
+                    firstName = firstName,
+                    password = password
+                )
+            }
+                .debounce(250.milliseconds)
+                .collectLatest { validateInput() }
+        }
+    }
+
+    fun onEvent(event: AuthenticationUIEvent) {
         when (event) {
-            is AuthenticationUIEventModel.OnEmailChanged -> {
-                savedStateHandle.updateStateHandle<SignUpStateModel>(savedStateHandleKey) {
+            is AuthenticationUIEvent.OnEmailChanged -> {
+                _email.value = event.email
+                updateFormState {
                     it.copy(
-                        email = event.email.trimEnd(),
+                        email = event.email.trimEnd()
                     )
                 }
-                validateInput()
             }
 
-            is AuthenticationUIEventModel.OnFirstNameChanged -> {
-                savedStateHandle.updateStateHandle<SignUpStateModel>(savedStateHandleKey) {
+            is AuthenticationUIEvent.OnFirstNameChanged -> {
+                _firstName.value = event.firstName
+                updateFormState {
                     it.copy(
-                        firstName = event.firstName.trimEnd(),
+                        firstName = event.firstName
                     )
                 }
-                validateInput()
             }
 
-            is AuthenticationUIEventModel.OnLastNameChanged -> {
-                savedStateHandle.updateStateHandle<SignUpStateModel>(savedStateHandleKey) {
+            is AuthenticationUIEvent.OnPasswordChanged -> {
+                _password.value = event.password
+                updateFormState {
                     it.copy(
-                        lastName = event.lastName.trimEnd(),
+                        password = event.password
                     )
                 }
-                validateInput()
             }
 
-            is AuthenticationUIEventModel.OnPasswordChanged -> {
-                savedStateHandle.updateStateHandle<SignUpStateModel>(savedStateHandleKey) {
-                    it.copy(
-                        password = event.password,
-                    )
-                }
-                validateInput()
-            }
-
-            AuthenticationUIEventModel.OnSignUp -> launchSignUp()
+            AuthenticationUIEvent.OnSignUp -> launchSignUp()
             else -> Unit
         }
     }
 
     private fun validateInput() {
-        val emailResult = loginFormValidationUseCase.validateEmail(formDataFlow.value.email)
+        val formState = formDataFlow.value
+
+        val emailResult = loginFormValidationUseCase.validateEmail(formState.email)
         val passwordResult =
-            loginFormValidationUseCase.validatePassword.validatePassword(formDataFlow.value.password)
+            loginFormValidationUseCase.validatePassword.validatePassword(formState.password)
         val firstNameResult =
-            loginFormValidationUseCase.validateFirstName(formDataFlow.value.firstName.trimEnd())
-        val lastNameResult =
-            loginFormValidationUseCase.validateLastName(formDataFlow.value.lastName.trimEnd())
+            loginFormValidationUseCase.validateFirstName(formState.firstName.trimEnd())
 
-        val error =
-            listOf(
-                emailResult,
-                passwordResult,
-                firstNameResult,
-                lastNameResult,
-            ).any { !it.successful }
+        val results = listOf(emailResult, passwordResult, firstNameResult)
+        val hasError = results.any { !it.successful }
 
-        if (error) {
-            savedStateHandle.updateStateHandle<SignUpStateModel>(savedStateHandleKey) {
-                it.copy(
-                    submit = false,
-                )
-            }
-            return
-        } else {
-            savedStateHandle.updateStateHandle<SignUpStateModel>(savedStateHandleKey) {
-                it.copy(
-                    submit = true,
-                )
-            }
+        updateFormState {
+            it.copy(
+                submit = !hasError,
+                signUpError = if (formState.firstName.isNotEmpty()) firstNameResult.errorMessage?.let { error ->
+                    resourceProvider.getString(
+                        error
+                    )
+                } ?: "" else ""
+            )
         }
+    }
+
+    private fun updateFormState(update: (SignUpStateModel) -> SignUpStateModel) {
+        savedStateHandle.updateStateHandle(savedStateHandleKey, update)
     }
 
     private fun launchSignUp() {
@@ -121,26 +141,39 @@ class SignUpViewModel @Inject constructor(
             formDataFlow.value.email,
             formDataFlow.value.password
         )
+            .onEach {
+                viewModelScope.launch {
+                    abortCircularProgress()
+                }
+            }
             .mapSuccess {
-                signUpCircularProgress.value = false
                 savedStateHandle.clearAll<SignUpStateModel>()
-
                 signUpNavigation.redirectToAppScreen()
             }
             .mapError { error ->
-                signUpCircularProgress.value = false
-                savedStateHandle.updateStateHandle<SignUpStateModel>(
-                    savedStateHandleKey,
-                ) {
-                    it.copy(
-                        signUpError = error.message,
+                Log.e("HMM", "Could not create an account with error: $error")
+                val errorMessageToDisplay: String = when (error) {
+                    is CreateUserError.EmailAlreadyExists -> resourceProvider.getString(
+                        R.string.email_already_exists_error
                     )
+                    is CreateUserError.UserDisabled -> resourceProvider.getString(
+                        R.string.user_disabled_error
+                    )
+                    is CreateUserError.TooManyRequests -> resourceProvider.getString(
+                        R.string.too_many_requests_error
+                    )
+                    is CreateUserError.InternalError -> resourceProvider.getString(
+                        R.string.internal_error
+                    )
+
+                    else -> error.message
                 }
 
-                Log.e("HMM", "Could not create an account")
+                updateFormState { it.copy(signUpError = errorMessageToDisplay) }
                 error
             }
     }
 
     fun redirectToSignInScreen() = signUpNavigation.redirectToSignInScreen()
+    private fun abortCircularProgress() = signUpCircularProgress.update { false }
 }

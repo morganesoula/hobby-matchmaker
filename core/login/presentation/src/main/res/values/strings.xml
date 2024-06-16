@@ -25,7 +25,7 @@
     <string name="reset_password">R\u00E9initialiser</string>
     <string name="cancel">Annuler</string>
     <string name="sign_out">Déconnexion</string>
-    <string name="email_sent">E-mail envoy\u00E9</string>
+    <string name="email_sent">Merci de v\u00E9rifier votre boite de r\u00E9ception</string>
     <string name="continue_with_rs">Ou se connecter avec</string>
     <string name="show_password">Montrer le mot de passe</string>
     <string name="hide_password">Cacher le mot de passe</string>
@@ -33,4 +33,10 @@
     // ERROR
     <string name="login_error">Identifiant ou mot de passe incorrect</string>
     <string name="signup_error">Cet email est déjà associé à un compte existant</string>
+    <string name="email_already_exists_error">Cet e-mail est déjà associ\u00E9 à un compte existant</string>
+    <string name="user_disabled_error">Ce compte est d\\u00E9sactiv\\u00E9</string>
+    <string name="too_many_requests_error">Trop de tentatives: merci de réessayer ultérieurement</string>
+    <string name="internal_error">Une erreur interne est survenue: les \\u00E9quipes de développement ont \\u00E9t\\u00E9 notifi\\u00E9es</string>
+    <string name="user_not_found_error">Utilisateur inconnu. Merci de vous inscrire</string>
+    <string name="reset_password_error">Impossible de réinitialiser votre mot de passe</string>
 </resources>

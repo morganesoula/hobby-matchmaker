@@ -10,8 +10,4 @@ class ValidatePasswordUseCase {
             ValidationResult(false)
         }
     }
-
-    fun validateLoginPassword(password: String): ValidationResult {
-        return ValidationResult(password.isNotEmpty())
-    }
 }

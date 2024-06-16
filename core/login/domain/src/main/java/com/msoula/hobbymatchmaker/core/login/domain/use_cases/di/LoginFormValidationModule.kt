@@ -18,7 +18,6 @@ object LoginFormValidationModule {
         LoginFormValidationUseCase(
             ValidateEmailUseCase(),
             ValidatePasswordUseCase(),
-            ValidateNameUseCase(),
             ValidateNameUseCase()
         )
 }

@@ -47,6 +47,7 @@ dependencies {
     kapt(libs.hilt.compiler)
 
     // Modules
+    implementation(project(Modules.AUTHENTICATION_DATA))
     implementation(project(Modules.AUTHENTICATION_DOMAIN))
     implementation(project(Modules.COMMON))
     implementation(project(Modules.DESIGN))

@@ -6,7 +6,6 @@ import com.msoula.hobbymatchmaker.core.navigation.SignUpScreenRoute
 import com.msoula.hobbymatchmaker.core.navigation.contracts.SignInNavigation
 
 class SignInNavigationImpl(val navigator: Navigator) : SignInNavigation {
-
     override fun redirectToAppScreen() = navigator.navigate(AppScreenRoute)
     override fun redirectToSignUpScreen() = navigator.navigate(SignUpScreenRoute)
 }

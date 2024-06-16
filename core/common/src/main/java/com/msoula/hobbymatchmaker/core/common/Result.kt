@@ -29,3 +29,8 @@ fun <R> Result<R>.mapError(transform: (value: AppError) -> AppError): Result<R> 
         is Result.Success -> Result.Success(this.data)
     }
 
+fun <T> Result<T>.onEach(action: (Result<T>) -> Unit): Result<T> {
+    action(this@onEach)
+    return this
+}
+

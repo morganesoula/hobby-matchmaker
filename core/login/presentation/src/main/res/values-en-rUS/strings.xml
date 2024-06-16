@@ -24,7 +24,7 @@
     <string name="reset_password">Reset password</string>
     <string name="cancel">Cancel</string>"
     <string name="sign_out">Sign Out</string>
-    <string name="email_sent">Email sent</string>
+    <string name="email_sent">Please check your inbox</string>
     <string name="continue_with_rs">Or continue with</string>
     <string name="show_password">Show password</string>
     <string name="hide_password">Hide password</string>
@@ -32,4 +32,10 @@
     // ERROR
     <string name="login_error">Incorrect email or password</string>
     <string name="signup_error">This email is already associated with an existing account</string>
+    <string name="email_already_exists_error">This email is already associated with an existing account</string>
+    <string name="user_disabled_error">This account is disabled</string>
+    <string name="too_many_requests_error">Too many attempts: please try again later</string>
+    <string name="internal_error">An internal error occured: the development teams have been notified</string>
+    <string name="user_not_found_error">User not found. Please register first</string>
+    <string name="reset_password_error">Could not reset your password</string>
 </resources>

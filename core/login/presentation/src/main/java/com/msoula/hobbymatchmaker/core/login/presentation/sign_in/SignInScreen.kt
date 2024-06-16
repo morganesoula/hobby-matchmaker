@@ -1,12 +1,15 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.sign_in
 
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -37,6 +40,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -44,11 +49,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.credentials.GetCredentialResponse
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
@@ -63,8 +69,13 @@ import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldPasswordComp
 import com.msoula.hobbymatchmaker.core.design.component.HeaderTextComponent
 import com.msoula.hobbymatchmaker.core.di.data.StringResourcesProviderImpl
 import com.msoula.hobbymatchmaker.core.login.presentation.components.SocialMediaRowCustom
-import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEventModel
+import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationEvent
+import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import com.msoula.hobbymatchmaker.core.login.presentation.R.string as StringRes
 
 @Composable
@@ -84,10 +95,9 @@ fun SignInScreen(
     val openResetDialog by signInViewModel.openResetDialog.collectAsStateWithLifecycle()
     val emailResetSent by signInViewModel.resettingEmailSent.collectAsStateWithLifecycle()
 
-    val scope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
-    val resourcesProvider = StringResourcesProviderImpl(context)
     val callBackManager = remember { CallbackManager.Factory.create() }
+    val resourcesProvider = StringResourcesProviderImpl(context)
     val loginManager = LoginManager.getInstance()
 
     val facebookLauncher =
@@ -95,53 +105,34 @@ fun SignInScreen(
             loginManager.createLogInActivityResultContract(callBackManager, null)
         ) {}
 
-    DisposableEffect(Unit) {
-        loginManager.registerCallback(callBackManager, object : FacebookCallback<LoginResult> {
-            override fun onCancel() {
-                Log.d("HMM", "Cancelled facebook login on user part")
-            }
+    val annotatedString = createAnnotatedString(isDarkTheme = isSystemInDarkTheme())
 
-            override fun onError(error: FacebookException) {
-                Toast.makeText(context, "Facebook error login", Toast.LENGTH_LONG).show()
-            }
+    RegisterFacebookCallback(
+        loginManager = loginManager,
+        callBackManager = callBackManager,
+        coroutineScope = coroutineScope,
+        handleFacebookAccessToken = handleFacebookAccessToken,
+        context = context
+    )
 
-            override fun onSuccess(result: LoginResult) {
-                coroutineScope.launch {
-                    val credential = FacebookAuthProvider.getCredential(result.accessToken.token)
-                    handleFacebookAccessToken(credential)
+    ObserveAsEvents(signInViewModel.oneTimeEventChannelFlow) { event ->
+        coroutineScope.launch {
+            when (event) {
+                is AuthenticationEvent.OnFacebookFailedConnection, is AuthenticationEvent.OnGoogleFailedConnection, is AuthenticationEvent.OnResetPasswordFailed -> {
+                    snackBarHostState.showSnackbar(message = event.message)
                 }
             }
-        })
-
-        onDispose {
-            loginManager.unregisterCallback(callBackManager)
         }
     }
-
-
-    val annotatedString =
-        buildAnnotatedString {
-            append(stringResource(id = StringRes.new_member) + "  ")
-            withStyle(
-                style =
-                SpanStyle(
-                    color = if (isSystemInDarkTheme()) Color(0, 191, 255) else Color.Blue,
-                    textDecoration = TextDecoration.Underline,
-                )
-            ) {
-                append(stringResource(id = StringRes.new_member_clickable_part))
-            }
-        }
 
     Scaffold(
         modifier = modifier,
         snackbarHost = { SnackbarHost(snackBarHostState) },
     ) { paddingValues ->
-
         LaunchedEffect(emailResetSent) {
             if (emailResetSent) {
-                signInViewModel.onEvent(AuthenticationUIEventModel.HideForgotPasswordDialog)
-                scope.launch {
+                signInViewModel.onEvent(AuthenticationUIEvent.HideForgotPasswordDialog)
+                coroutineScope.launch {
                     snackBarHostState.showSnackbar(message = resourcesProvider.getString(StringRes.email_sent))
                 }
             }
@@ -171,94 +162,32 @@ fun SignInScreen(
                     HMMErrorText(errorText = loginFormState.logInError!!)
                 }
 
-                HMMTextFieldAuthComponent(
-                    value = loginFormState.email.trimEnd(),
-                    placeHolderText = stringResource(StringRes.email),
-                    onValueChange = {
-                        signInViewModel.onEvent(AuthenticationUIEventModel.OnEmailChanged(it))
+                SignInScreenMainContent(
+                    email = loginFormState.email.trimEnd(),
+                    onEmailChanged = {
+                        signInViewModel.onEvent(
+                            AuthenticationUIEvent.OnEmailChanged(
+                                it
+                            )
+                        )
                     },
-                )
-
-                Spacer(modifier = modifier.height(8.dp))
-
-                HMMTextFieldPasswordComponent(
-                    value = loginFormState.password,
-                    onValueChange = {
-                        signInViewModel.onEvent(AuthenticationUIEventModel.OnPasswordChanged(it))
+                    password = loginFormState.password,
+                    onPasswordChanged = {
+                        signInViewModel.onEvent(AuthenticationUIEvent.OnPasswordChanged(it))
                     },
-                    placeholder = stringResource(id = StringRes.password),
-                    showPasswordContentDescription = stringResource(id = StringRes.show_password),
-                    hidePasswordContentDescription = stringResource(id = StringRes.hide_password)
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                ClickableText(
-                    text = AnnotatedString(stringResource(id = StringRes.forgot_password)),
-                    onClick = {
-                        signInViewModel.onEvent(AuthenticationUIEventModel.OnForgotPasswordClicked)
+                    onForgotPasswordClicked = {
+                        signInViewModel.onEvent(AuthenticationUIEvent.OnForgotPasswordClicked)
                     },
-                    style = TextStyle(color = MaterialTheme.colorScheme.onBackground),
-                    modifier =
-                    Modifier
-                        .wrapContentSize()
-                        .align(Alignment.End)
-                        .padding(end = 16.dp)
-                )
-
-                Spacer(modifier = Modifier.height(40.dp))
-
-                HMMButtonAuthComponent(
-                    onClick = {
-                        signInViewModel.onEvent(AuthenticationUIEventModel.OnLogIn)
+                    onSignInClicked = {
+                        signInViewModel.onEvent(AuthenticationUIEvent.OnSignIn)
                     },
-                    text = stringResource(id = StringRes.log_in),
-                    enabled = loginFormState.submit,
-                    loading = circularProgressLoading
-                )
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                Row(
-                    modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(start = 8.dp, end = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    HorizontalDivider(
-                        Modifier.weight(1f),
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                        thickness = 2.dp
-                    )
-                    Text(
-                        text = resourcesProvider.getString(StringRes.continue_with_rs),
-                        modifier = Modifier.weight(3f),
-                        textAlign = TextAlign.Center,
-                        fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-                    )
-
-                    HorizontalDivider(
-                        Modifier.weight(1f),
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                        thickness = 2.dp
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                SocialMediaRowCustom(
-                    onFacebookButtonClicked = {
-                        facebookLauncher.launch(listOf("email", "public_profile"))
-                    },
-                    onGoogleButtonClicked = {
-                        coroutineScope.launch {
-                            val credential = googleAuthClient.launchGetCredential()
-                            handleGoogleSignIn(credential, googleAuthClient)
-                        }
-                    }
+                    canSubmit = loginFormState.submit,
+                    circularProgressLoading = circularProgressLoading,
+                    dividerConnectText = resourcesProvider.getString(StringRes.continue_with_rs),
+                    facebookLauncher = facebookLauncher,
+                    scope = coroutineScope,
+                    googleAuthClient = googleAuthClient,
+                    handleGoogleSignIn = handleGoogleSignIn
                 )
             }
 
@@ -281,13 +210,185 @@ fun SignInScreen(
 }
 
 @Composable
+fun RegisterFacebookCallback(
+    loginManager: LoginManager,
+    callBackManager: CallbackManager,
+    coroutineScope: CoroutineScope,
+    handleFacebookAccessToken: (credential: AuthCredential) -> Unit,
+    context: Context
+) {
+    DisposableEffect(Unit) {
+        loginManager.registerCallback(callBackManager, object : FacebookCallback<LoginResult> {
+            override fun onCancel() {
+                Log.d("HMM", "Cancelled facebook login on user part")
+            }
+
+            override fun onError(error: FacebookException) {
+                Toast.makeText(context, "Facebook error login", Toast.LENGTH_LONG).show()
+            }
+
+            override fun onSuccess(result: LoginResult) {
+                coroutineScope.launch {
+                    val credential = FacebookAuthProvider.getCredential(result.accessToken.token)
+                    handleFacebookAccessToken(credential)
+                }
+            }
+        })
+
+        onDispose {
+            loginManager.unregisterCallback(callBackManager)
+        }
+    }
+}
+
+@Composable
+fun createAnnotatedString(isDarkTheme: Boolean): AnnotatedString {
+    val color = if (isDarkTheme) Color(0, 191, 255) else Color.Blue
+
+    return buildAnnotatedString {
+        append(stringResource(id = StringRes.new_member) + "  ")
+        pushStyle(
+            SpanStyle(
+                color = color,
+                textDecoration = TextDecoration.Underline,
+            )
+        )
+        append(stringResource(id = StringRes.new_member_clickable_part))
+        pop()
+    }
+}
+
+@Composable
+fun <T> ObserveAsEvents(flow: Flow<T>, onEvent: (T) -> Unit) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    LaunchedEffect(lifecycleOwner.lifecycle) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            withContext(Dispatchers.Main.immediate) {
+                flow.collect(onEvent)
+            }
+        }
+    }
+}
+
+@Composable
+fun ColumnScope.SignInScreenMainContent(
+    modifier: Modifier = Modifier,
+    email: String,
+    onEmailChanged: (String) -> Unit,
+    password: String,
+    onPasswordChanged: (String) -> Unit,
+    onForgotPasswordClicked: () -> Unit,
+    onSignInClicked: () -> Unit,
+    canSubmit: Boolean,
+    circularProgressLoading: Boolean,
+    dividerConnectText: String,
+    facebookLauncher: ManagedActivityResultLauncher<Collection<String>, CallbackManager.ActivityResultParameters>,
+    scope: CoroutineScope,
+    googleAuthClient: GoogleAuthClient,
+    handleGoogleSignIn: (result: GetCredentialResponse?, googleAuthClient: GoogleAuthClient) -> Unit
+) {
+    HMMTextFieldAuthComponent(
+        value = email,
+        placeHolderText = stringResource(StringRes.email),
+        onValueChange = {
+            onEmailChanged(it)
+        }
+    )
+
+    Spacer(modifier = modifier.height(8.dp))
+
+    HMMTextFieldPasswordComponent(
+        value = password,
+        onValueChange = {
+            onPasswordChanged(it)
+        },
+        placeholder = stringResource(id = StringRes.password),
+        showPasswordContentDescription = stringResource(id = StringRes.show_password),
+        hidePasswordContentDescription = stringResource(id = StringRes.hide_password)
+    )
+
+    Spacer(modifier = Modifier.height(16.dp))
+
+    ClickableText(
+        text = AnnotatedString(stringResource(id = StringRes.forgot_password)),
+        onClick = {
+            onForgotPasswordClicked()
+        },
+        style = TextStyle(color = MaterialTheme.colorScheme.onBackground),
+        modifier =
+        Modifier
+            .wrapContentSize()
+            .align(Alignment.End)
+            .padding(end = 16.dp)
+    )
+
+    Spacer(modifier = Modifier.height(40.dp))
+
+    HMMButtonAuthComponent(
+        onClick = {
+            onSignInClicked()
+        },
+        text = stringResource(id = StringRes.log_in),
+        enabled = canSubmit,
+        loading = circularProgressLoading
+    )
+
+    Spacer(modifier = Modifier.height(32.dp))
+
+    Row(
+        modifier =
+        Modifier
+            .fillMaxWidth()
+            .padding(start = 8.dp, end = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        HorizontalDivider(
+            Modifier.weight(1f),
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+            thickness = 2.dp
+        )
+        Text(
+            text = dividerConnectText,
+            modifier = Modifier.weight(3f),
+            textAlign = TextAlign.Center,
+            fontSize = 16.sp,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+        )
+
+        HorizontalDivider(
+            Modifier.weight(1f),
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+            thickness = 2.dp
+        )
+    }
+
+    Spacer(modifier = Modifier.height(32.dp))
+
+    SocialMediaRowCustom(
+        onFacebookButtonClicked = {
+            facebookLauncher.launch(listOf("email", "public_profile"))
+        },
+        onGoogleButtonClicked = {
+            scope.launch {
+                val credential = googleAuthClient.launchGetCredential()
+                handleGoogleSignIn(credential, googleAuthClient)
+            }
+        }
+    )
+}
+
+@Composable
 fun ForgotPasswordAlertDialog(
     modifier: Modifier = Modifier,
     email: String,
-    authUIEvent: (AuthenticationUIEventModel) -> Unit,
+    authUIEvent: (AuthenticationUIEvent) -> Unit,
     paddingValues: PaddingValues,
     enableSubmit: Boolean
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     AlertDialog(
         modifier = modifier.padding(paddingValues),
         title = {
@@ -300,15 +401,21 @@ fun ForgotPasswordAlertDialog(
         text = {
             HMMTextFieldAuthComponent(
                 value = email,
-                onValueChange = { authUIEvent(AuthenticationUIEventModel.OnEmailResetChanged(it)) },
+                onValueChange = {
+                    Log.d("HMM", "Changing reset email with: $it")
+                    authUIEvent(AuthenticationUIEvent.OnEmailResetChanged(it))
+                },
                 placeHolderText = stringResource(StringRes.your_email),
                 modifier = Modifier.fillMaxWidth()
             )
         },
-        onDismissRequest = { authUIEvent(AuthenticationUIEventModel.HideForgotPasswordDialog) },
+        onDismissRequest = { authUIEvent(AuthenticationUIEvent.HideForgotPasswordDialog) },
         confirmButton = {
             Button(
-                onClick = { authUIEvent(AuthenticationUIEventModel.OnResetPasswordConfirmed) },
+                onClick = {
+                    keyboardController?.hide()
+                    authUIEvent(AuthenticationUIEvent.OnResetPasswordConfirmed)
+                },
                 enabled = enableSubmit
             ) {
                 Text(text = stringResource(id = StringRes.reset_password))
@@ -316,12 +423,12 @@ fun ForgotPasswordAlertDialog(
         },
         dismissButton = {
             Button(
-                onClick = { authUIEvent(AuthenticationUIEventModel.HideForgotPasswordDialog) },
+                onClick = { authUIEvent(AuthenticationUIEvent.HideForgotPasswordDialog) },
                 colors =
                 ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.onBackground,
-                ),
+                    contentColor = MaterialTheme.colorScheme.onBackground
+                )
             ) {
                 Text(text = stringResource(id = StringRes.cancel))
             }
