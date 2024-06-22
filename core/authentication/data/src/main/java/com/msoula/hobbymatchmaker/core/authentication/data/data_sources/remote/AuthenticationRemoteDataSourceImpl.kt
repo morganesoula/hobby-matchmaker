@@ -8,9 +8,9 @@ import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.msoula.hobbymatchmaker.core.authentication.data.data_sources.remote.errors.CreateUserError
-import com.msoula.hobbymatchmaker.core.authentication.data.data_sources.remote.errors.FacebookError
 import com.msoula.hobbymatchmaker.core.authentication.data.data_sources.remote.errors.ResetPasswordError
 import com.msoula.hobbymatchmaker.core.authentication.data.data_sources.remote.errors.SignInError
+import com.msoula.hobbymatchmaker.core.authentication.data.data_sources.remote.errors.SocialMediaError
 import com.msoula.hobbymatchmaker.core.authentication.data.data_sources.remote.mappers.toUserDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.data_sources.AuthenticationRemoteDataSource
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.UserDomainModel
@@ -115,7 +115,7 @@ class AuthenticationRemoteDataSourceImpl(
             Result.Success(true)
         } catch (e: Exception) {
             Result.Failure(
-                FacebookError(
+                SocialMediaError(
                     message = e.message ?: "Could not sign in with credentials: $credential"
                 )
             )

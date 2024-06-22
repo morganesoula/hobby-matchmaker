@@ -4,5 +4,4 @@ import kotlinx.coroutines.flow.Flow
 
 interface AuthenticationLocalDataSource {
     fun observeAuthenticationState(): Flow<Boolean>
-    fun fetchConnexionMode(): Flow<String?>
 }

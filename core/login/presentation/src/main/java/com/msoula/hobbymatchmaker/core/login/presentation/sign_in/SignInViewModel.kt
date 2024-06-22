@@ -99,7 +99,29 @@ class SignInViewModel @Inject constructor(
 
     fun handleFacebookLogin(credential: AuthCredential) {
         launchCircularProgress()
+        handleSocialMediaLogin(
+            credential,
+            AuthenticationEvent::OnFacebookFailedConnection,
+            "Facebook login failed"
+        )
+    }
 
+    fun handleGoogleLogin(result: GetCredentialResponse?, googleAuthClient: GoogleAuthClient) {
+        result?.let {
+            val authCredential = googleAuthClient.handleSignIn(it)
+            handleSocialMediaLogin(
+                authCredential,
+                AuthenticationEvent::OnGoogleFailedConnection,
+                "Google login failed"
+            )
+        } ?: Log.e("HMM", "Could not get credentials response from UI")
+    }
+
+    private fun handleSocialMediaLogin(
+        credential: AuthCredential,
+        onFailureEvent: (String) -> AuthenticationEvent,
+        errorMessage: String
+    ) {
         viewModelScope.launch(ioDispatcher) {
             loginWithSocialMediaUseCase(credential)
                 .onEach {
@@ -111,43 +133,12 @@ class SignInViewModel @Inject constructor(
                     updateDataStoreAndRedirect()
                 }
                 .mapError { error ->
+                    Log.e("HMM", errorMessage)
                     viewModelScope.launch {
-                        sendEvent(
-                            AuthenticationEvent.OnFacebookFailedConnection(
-                                error.message
-                            )
-                        )
+                        sendEvent(onFailureEvent(error.message))
                     }
                     error
                 }
-        }
-    }
-
-    fun handleGoogleLogin(result: GetCredentialResponse?, googleAuthClient: GoogleAuthClient) {
-        viewModelScope.launch(ioDispatcher) {
-            result?.let {
-                val authCredential = googleAuthClient.handleSignIn(it)
-
-                loginWithSocialMediaUseCase(authCredential)
-                    .onEach {
-                        viewModelScope.launch {
-                            abortCircularProgress()
-                        }
-                    }
-                    .mapSuccess {
-                        updateDataStoreAndRedirect()
-                    }
-                    .mapError { error ->
-                        viewModelScope.launch {
-                            sendEvent(
-                                AuthenticationEvent.OnGoogleFailedConnection(
-                                    error.message
-                                )
-                            )
-                        }
-                        error
-                    }
-            } ?: Log.e("HMM", "Could not get getCredentialResponse")
         }
     }
 
@@ -198,6 +189,7 @@ class SignInViewModel @Inject constructor(
                         is SignInError.UserNotFound -> resourceProvider.getString(
                             R.string.user_not_found_error
                         )
+
                         is SignInError.UserDisabled -> resourceProvider.getString(
                             R.string.user_disabled_error
                         )
@@ -237,7 +229,10 @@ class SignInViewModel @Inject constructor(
                 }
             }
             .mapError { error ->
-                Log.e("HMM", "Could not reset password with ${formDataFlow.value.emailReset} - $error")
+                Log.e(
+                    "HMM",
+                    "Could not reset password with ${formDataFlow.value.emailReset} - $error"
+                )
                 sendEvent(AuthenticationEvent.OnResetPasswordFailed(resourceProvider.getString(R.string.reset_password_error)))
                 resetEmailSentValue(false)
                 error

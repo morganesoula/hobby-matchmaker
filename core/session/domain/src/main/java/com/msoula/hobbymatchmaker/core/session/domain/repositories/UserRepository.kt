@@ -4,8 +4,8 @@ import com.msoula.hobbymatchmaker.core.session.domain.data_sources.UserLocalData
 import com.msoula.hobbymatchmaker.core.session.domain.models.UserDomainModel
 
 class UserRepository(private val userLocalDataSource: UserLocalDataSource) {
-    suspend fun fetchUser(): UserDomainModel? =
-        userLocalDataSource.fetchUser()
+    suspend fun getUser(): UserDomainModel? =
+        userLocalDataSource.getUser()
 
     suspend fun saveUser(user: UserDomainModel) =
         userLocalDataSource.saveUser(user)

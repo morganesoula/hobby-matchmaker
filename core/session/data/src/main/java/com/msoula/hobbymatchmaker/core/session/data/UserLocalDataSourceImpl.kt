@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.firstOrNull
 class UserLocalDataSourceImpl(private val dataStore: AuthenticationDataStore) :
     UserLocalDataSource {
 
-    override suspend fun fetchUser(): UserDomainModel? =
+    override suspend fun getUser(): UserDomainModel? =
         dataStore.user.firstOrNull()?.toUserDomainModel()
 
     override suspend fun saveUser(user: UserDomainModel) {

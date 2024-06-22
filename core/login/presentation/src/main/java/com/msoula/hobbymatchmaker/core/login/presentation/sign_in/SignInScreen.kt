@@ -143,7 +143,9 @@ fun SignInScreen(
                 modifier =
                 Modifier
                     .padding(paddingValues)
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
                 if (openResetDialog) {
                     ForgotPasswordAlertDialog(
@@ -293,16 +295,18 @@ fun ColumnScope.SignInScreenMainContent(
         placeHolderText = stringResource(StringRes.email),
         onValueChange = {
             onEmailChanged(it)
-        }
+        },
+        modifier = Modifier.fillMaxWidth()
     )
 
-    Spacer(modifier = modifier.height(8.dp))
+    Spacer(modifier = modifier.height(16.dp))
 
     HMMTextFieldPasswordComponent(
         value = password,
         onValueChange = {
             onPasswordChanged(it)
         },
+        modifier = Modifier.fillMaxWidth(),
         placeholder = stringResource(id = StringRes.password),
         showPasswordContentDescription = stringResource(id = StringRes.show_password),
         hidePasswordContentDescription = stringResource(id = StringRes.hide_password)
@@ -334,7 +338,7 @@ fun ColumnScope.SignInScreenMainContent(
         loading = circularProgressLoading
     )
 
-    Spacer(modifier = Modifier.height(32.dp))
+    Spacer(modifier = Modifier.height(40.dp))
 
     Row(
         modifier =
@@ -342,7 +346,7 @@ fun ColumnScope.SignInScreenMainContent(
             .fillMaxWidth()
             .padding(start = 8.dp, end = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceEvenly
+        horizontalArrangement = Arrangement.SpaceAround
     ) {
         HorizontalDivider(
             Modifier.weight(1f),

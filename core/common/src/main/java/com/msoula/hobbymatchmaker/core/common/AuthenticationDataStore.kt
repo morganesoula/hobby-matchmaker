@@ -34,12 +34,6 @@ class AuthenticationDataStore @Inject constructor(
         }
     }
 
-    suspend fun saveConnexionMode(connexionMode: String) {
-        dataStore.edit { preferences ->
-            preferences[CONNEXION_MODE] = connexionMode
-        }
-    }
-
     fun observeAuthState() = dataStore.data
         .catch { exception ->
             if (exception is IOException) emit(emptyPreferences())
