@@ -22,10 +22,6 @@ dependencies {
     // Compose
     implementation(libs.runtime)
 
-    // Datastore
-    implementation(libs.datastore.core)
-    implementation(libs.datastore.preferences)
-
     // Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)

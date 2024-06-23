@@ -11,12 +11,8 @@ import com.msoula.hobbymatchmaker.core.authentication.data.data_sources.remote.e
 import com.msoula.hobbymatchmaker.core.authentication.data.data_sources.remote.errors.ResetPasswordError
 import com.msoula.hobbymatchmaker.core.authentication.data.data_sources.remote.errors.SignInError
 import com.msoula.hobbymatchmaker.core.authentication.data.data_sources.remote.errors.SocialMediaError
-import com.msoula.hobbymatchmaker.core.authentication.data.data_sources.remote.mappers.toUserDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.data_sources.AuthenticationRemoteDataSource
-import com.msoula.hobbymatchmaker.core.authentication.domain.models.UserDomainModel
 import com.msoula.hobbymatchmaker.core.common.Result
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 
 class AuthenticationRemoteDataSourceImpl(
@@ -39,10 +35,6 @@ class AuthenticationRemoteDataSourceImpl(
     override fun loginManagerSignOut() {
         facebookManager.logOut()
         Log.d("HMM", "Logged out from Facebook")
-    }
-
-    override fun getCurrentAuthenticationUser(): Flow<UserDomainModel?> = flow {
-        emit(auth.toUserDomainModel())
     }
 
     override suspend fun createUserWithEmailAndPassword(

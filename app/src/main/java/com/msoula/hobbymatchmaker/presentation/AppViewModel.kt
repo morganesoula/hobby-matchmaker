@@ -2,11 +2,12 @@ package com.msoula.hobbymatchmaker.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.msoula.hobbymatchmaker.core.authentication.domain.models.ConnexionMode
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.LogOutUseCase
-import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.ObserveAuthenticationStateUseCase
 import com.msoula.hobbymatchmaker.core.common.AuthUiStateModel
-import com.msoula.hobbymatchmaker.core.session.domain.use_cases.FetchConnexionModeUseCase
+import com.msoula.hobbymatchmaker.core.common.mapSuccess
+import com.msoula.hobbymatchmaker.core.session.domain.use_cases.GetConnexionModeUseCase
+import com.msoula.hobbymatchmaker.core.session.domain.use_cases.ObserveIsConnectedUseCase
+import com.msoula.hobbymatchmaker.core.session.domain.use_cases.SetIsConnectedUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -25,12 +26,13 @@ import javax.inject.Inject
 class AppViewModel @Inject constructor(
     private val ioDispatcher: CoroutineDispatcher,
     private val logOutUseCase: LogOutUseCase,
-    private val observeAuthenticationStateUseCase: ObserveAuthenticationStateUseCase,
-    private val fetchConnexionModeUseCase: FetchConnexionModeUseCase
+    private val observeIsConnectedUseCase: ObserveIsConnectedUseCase,
+    private val getConnexionModeUseCase: GetConnexionModeUseCase,
+    private val setIsConnectedUseCase: SetIsConnectedUseCase
 ) : ViewModel() {
 
     val authenticationState: StateFlow<AuthUiStateModel> by lazy {
-        observeAuthenticationStateUseCase()
+        observeIsConnectedUseCase()
             .mapLatest { isConnected ->
                 if (isConnected) AuthUiStateModel.IsConnected else AuthUiStateModel.NotConnected
             }
@@ -44,11 +46,10 @@ class AppViewModel @Inject constructor(
 
     fun logOut() {
         viewModelScope.launch(ioDispatcher) {
-            val connexionMode: ConnexionMode = fetchConnexionModeUseCase().first().let { mode ->
-                mode?.let { ConnexionMode.valueOf(mode) } ?: ConnexionMode.EMAIL
+            val connexionMode = getConnexionModeUseCase().first()
+            logOutUseCase(connexionMode ?: "EMAIL").mapSuccess {
+                setIsConnectedUseCase(false)
             }
-
-            logOutUseCase(connexionMode)
         }
     }
 }

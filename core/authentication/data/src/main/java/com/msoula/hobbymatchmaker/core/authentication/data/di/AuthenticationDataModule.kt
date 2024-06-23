@@ -3,11 +3,8 @@ package com.msoula.hobbymatchmaker.core.authentication.data.di
 import android.content.Context
 import androidx.credentials.CredentialManager
 import com.google.firebase.auth.FirebaseAuth
-import com.msoula.hobbymatchmaker.core.authentication.data.data_sources.local.AuthenticationLocalDataSourceImpl
 import com.msoula.hobbymatchmaker.core.authentication.data.data_sources.remote.AuthenticationRemoteDataSourceImpl
-import com.msoula.hobbymatchmaker.core.authentication.domain.data_sources.AuthenticationLocalDataSource
 import com.msoula.hobbymatchmaker.core.authentication.domain.data_sources.AuthenticationRemoteDataSource
-import com.msoula.hobbymatchmaker.core.common.AuthenticationDataStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,9 +28,4 @@ object AuthenticationDataModule {
         credentialManager: CredentialManager
     ): AuthenticationRemoteDataSource =
         AuthenticationRemoteDataSourceImpl(auth, credentialManager)
-
-    @Provides
-    @Singleton
-    fun provideAuthenticationLocalDataSource(authenticationDataStore: AuthenticationDataStore): AuthenticationLocalDataSource =
-        AuthenticationLocalDataSourceImpl(authenticationDataStore)
 }

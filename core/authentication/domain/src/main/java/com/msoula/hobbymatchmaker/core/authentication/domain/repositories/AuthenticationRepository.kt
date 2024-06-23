@@ -1,29 +1,21 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.repositories
 
 import com.google.firebase.auth.AuthCredential
-import com.msoula.hobbymatchmaker.core.authentication.domain.data_sources.AuthenticationLocalDataSource
 import com.msoula.hobbymatchmaker.core.authentication.domain.data_sources.AuthenticationRemoteDataSource
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutError
-import com.msoula.hobbymatchmaker.core.authentication.domain.models.ConnexionMode
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.mapError
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
-import kotlinx.coroutines.flow.Flow
 
 class AuthenticationRepository(
-    private val remoteDataSource: AuthenticationRemoteDataSource,
-    private val localDataSource: AuthenticationLocalDataSource
+    private val remoteDataSource: AuthenticationRemoteDataSource
 ) {
-
-    fun observeAuthenticationState(): Flow<Boolean> =
-        localDataSource.observeAuthenticationState()
-
-    suspend fun logOut(connexionMode: ConnexionMode): Result<Boolean> {
+    suspend fun logOut(connexionMode: String): Result<Boolean> {
         return try {
             when (connexionMode) {
-                ConnexionMode.FACEBOOK -> remoteDataSource.loginManagerSignOut()
-                ConnexionMode.EMAIL -> remoteDataSource.authenticationSignOut()
-                ConnexionMode.GOOGLE -> remoteDataSource.credentialManagerLogOut()
+                "FACEBOOK" -> remoteDataSource.loginManagerSignOut()
+                "GOOGLE" -> remoteDataSource.credentialManagerLogOut()
+                else -> remoteDataSource.authenticationSignOut()
             }
             Result.Success(true)
         } catch (exception: Exception) {

@@ -22,7 +22,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationE
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.models.SignInFormStateModel
 import com.msoula.hobbymatchmaker.core.navigation.contracts.SignInNavigation
-import com.msoula.hobbymatchmaker.core.session.domain.use_cases.SaveAuthenticationStateUseCase
+import com.msoula.hobbymatchmaker.core.session.domain.use_cases.SetIsConnectedUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -42,7 +42,7 @@ class SignInViewModel @Inject constructor(
     private val resetPasswordUseCase: ResetPasswordUseCase,
     private val ioDispatcher: CoroutineDispatcher,
     private val resourceProvider: StringResourcesProvider,
-    private val saveAuthenticationStateUseCase: SaveAuthenticationStateUseCase,
+    private val setIsConnectedUseCase: SetIsConnectedUseCase,
     private val loginWithSocialMediaUseCase: LoginWithSocialMediaUseCase,
     private val signInNavigation: SignInNavigation
 ) : ViewModel() {
@@ -89,8 +89,8 @@ class SignInViewModel @Inject constructor(
             AuthenticationUIEvent.OnResetPasswordConfirmed -> launchResetPassword()
 
             AuthenticationUIEvent.OnSignIn -> {
-                abortCircularProgress()
-                logIn()
+                launchCircularProgress()
+                signIn()
             }
 
             else -> Unit
@@ -147,7 +147,7 @@ class SignInViewModel @Inject constructor(
     }
 
     private suspend fun updateDataStoreAndRedirect() {
-        saveAuthenticationStateUseCase(true)
+        setIsConnectedUseCase(true)
         withContext(Dispatchers.Main) {
             redirectToAppScreen()
         }
@@ -165,7 +165,7 @@ class SignInViewModel @Inject constructor(
     private fun validateEmailReset(emailReset: String): Boolean =
         authFormValidationUseCases.validateEmailUseCase(emailReset).successful
 
-    private fun logIn() {
+    private fun signIn() {
         viewModelScope.launch(ioDispatcher) {
             signInUseCase(formDataFlow.value.email, formDataFlow.value.password)
                 .onEach {
@@ -174,6 +174,7 @@ class SignInViewModel @Inject constructor(
                     }
                 }
                 .mapSuccess {
+                    setIsConnectedUseCase(true)
                     clearFormState()
                     withContext(Dispatchers.Main) {
                         redirectToAppScreen()
@@ -243,7 +244,7 @@ class SignInViewModel @Inject constructor(
         launchCircularProgress()
 
         viewModelScope.launch(ioDispatcher) {
-            saveAuthenticationStateUseCase(true)
+            setIsConnectedUseCase(true)
             withContext(Dispatchers.Main) {
                 abortCircularProgress()
                 signInNavigation.redirectToAppScreen()

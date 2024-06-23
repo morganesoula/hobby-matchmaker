@@ -1,15 +1,12 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.di
 
-import com.msoula.hobbymatchmaker.core.authentication.domain.data_sources.AuthenticationLocalDataSource
 import com.msoula.hobbymatchmaker.core.authentication.domain.data_sources.AuthenticationRemoteDataSource
 import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepository
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.LogOutUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.LoginWithSocialMediaUseCase
-import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.ObserveAuthenticationStateUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.ResetPasswordUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.SignInUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.SignUpUseCase
-import com.msoula.hobbymatchmaker.core.session.domain.use_cases.SaveAuthenticationStateUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,16 +20,14 @@ object AuthenticationModule {
     @Provides
     @Singleton
     fun provideAuthenticationRepository(
-        remoteDataSource: AuthenticationRemoteDataSource,
-        localDataSource: AuthenticationLocalDataSource
-    ): AuthenticationRepository = AuthenticationRepository(remoteDataSource, localDataSource)
+        remoteDataSource: AuthenticationRemoteDataSource
+    ): AuthenticationRepository = AuthenticationRepository(remoteDataSource)
 
     @Provides
     fun provideLogOutUseCase(
-        authenticationRepository: AuthenticationRepository,
-        saveAuthenticationStateUseCase: SaveAuthenticationStateUseCase
+        authenticationRepository: AuthenticationRepository
     ): LogOutUseCase =
-        LogOutUseCase(authenticationRepository, saveAuthenticationStateUseCase)
+        LogOutUseCase(authenticationRepository)
 
     @Provides
     fun provideResetPasswordUseCase(authenticationRepository: AuthenticationRepository): ResetPasswordUseCase =
@@ -40,21 +35,15 @@ object AuthenticationModule {
 
     @Provides
     fun provideSignInUseCase(
-        authenticationRepository: AuthenticationRepository,
-        saveAuthenticationStateUseCase: SaveAuthenticationStateUseCase
+        authenticationRepository: AuthenticationRepository
     ): SignInUseCase =
-        SignInUseCase(authenticationRepository, saveAuthenticationStateUseCase)
+        SignInUseCase(authenticationRepository)
 
     @Provides
     fun provideSignUpUseCase(authenticationRepository: AuthenticationRepository): SignUpUseCase =
         SignUpUseCase(authenticationRepository)
 
     @Provides
-    fun provideObserveAuthenticationStateUseCase(authenticationRepository: AuthenticationRepository): ObserveAuthenticationStateUseCase =
-        ObserveAuthenticationStateUseCase(authenticationRepository)
-
-    @Provides
     fun provideLoginWithSocialMediaUsecase(authenticationRepository: AuthenticationRepository): LoginWithSocialMediaUseCase =
         LoginWithSocialMediaUseCase(authenticationRepository)
-
 }

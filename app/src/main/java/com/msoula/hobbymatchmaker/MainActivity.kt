@@ -12,9 +12,9 @@ import com.msoula.hobbymatchmaker.app.HobbyMatchMakerApp
 import com.msoula.hobbymatchmaker.core.design.theme.HobbyMatchmakerTheme
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.GoogleAuthClient
 import com.msoula.hobbymatchmaker.core.navigation.Navigator
-import com.msoula.hobbymatchmaker.core.session.domain.models.ConnexionMode
-import com.msoula.hobbymatchmaker.core.session.domain.models.UserDomainModel
-import com.msoula.hobbymatchmaker.core.session.domain.use_cases.ClearUserUseCase
+import com.msoula.hobbymatchmaker.core.session.domain.models.SessionConnexionModeDomainModel
+import com.msoula.hobbymatchmaker.core.session.domain.models.SessionUserDomainModel
+import com.msoula.hobbymatchmaker.core.session.domain.use_cases.ClearSessionDataUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.use_cases.SaveUserUseCase
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
     lateinit var saveUserUseCase: SaveUserUseCase
 
     @Inject
-    lateinit var clearUserUseCase: ClearUserUseCase
+    lateinit var clearDataUseCase: ClearSessionDataUseCase
 
     private lateinit var authStateListener: AuthStateListener
 
@@ -71,17 +71,17 @@ class MainActivity : ComponentActivity() {
                 val providers = firebaseUser.providerData.map { it.providerId }
 
                 val connexionMode = when {
-                    providers.contains("google.com") -> ConnexionMode.GOOGLE
-                    providers.contains("facebook.com") -> ConnexionMode.FACEBOOK
-                    else -> ConnexionMode.EMAIL
+                    providers.contains("google.com") -> SessionConnexionModeDomainModel.GOOGLE
+                    providers.contains("facebook.com") -> SessionConnexionModeDomainModel.FACEBOOK
+                    else -> SessionConnexionModeDomainModel.EMAIL
                 }
 
                 lifecycleScope.launch(Dispatchers.IO) {
-                    saveUserUseCase(UserDomainModel(email ?: "", connexionMode))
+                    saveUserUseCase(SessionUserDomainModel(email ?: "", connexionMode))
                 }
             } ?: run {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    clearUserUseCase()
+                    clearDataUseCase()
                 }
 
                 Log.d("HMM", "User is not connected")
