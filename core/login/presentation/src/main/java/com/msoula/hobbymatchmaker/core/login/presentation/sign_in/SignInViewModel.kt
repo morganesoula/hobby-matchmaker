@@ -130,7 +130,7 @@ class SignInViewModel @Inject constructor(
                     }
                 }
                 .mapSuccess {
-                    updateDataStoreAndRedirect()
+                    saveIsConnected()
                 }
                 .mapError { error ->
                     Log.e("HMM", errorMessage)
@@ -146,8 +146,8 @@ class SignInViewModel @Inject constructor(
         savedStateHandle.updateStateHandle(savedStateHandleKey, update)
     }
 
-    private suspend fun updateDataStoreAndRedirect() {
-        setIsConnectedUseCase(true)
+    private suspend fun saveIsConnected() {
+        setIsConnected(true)
         withContext(Dispatchers.Main) {
             redirectToAppScreen()
         }
@@ -174,7 +174,7 @@ class SignInViewModel @Inject constructor(
                     }
                 }
                 .mapSuccess {
-                    setIsConnectedUseCase(true)
+                    setIsConnected(true)
                     clearFormState()
                     withContext(Dispatchers.Main) {
                         redirectToAppScreen()
@@ -244,7 +244,7 @@ class SignInViewModel @Inject constructor(
         launchCircularProgress()
 
         viewModelScope.launch(ioDispatcher) {
-            setIsConnectedUseCase(true)
+            setIsConnected(true)
             withContext(Dispatchers.Main) {
                 abortCircularProgress()
                 signInNavigation.redirectToAppScreen()
@@ -270,5 +270,9 @@ class SignInViewModel @Inject constructor(
         viewModelScope.launch {
             oneTimeEventChannel.send(event)
         }
+    }
+
+    private suspend fun setIsConnected(isConnected: Boolean) {
+        setIsConnectedUseCase(isConnected)
     }
 }

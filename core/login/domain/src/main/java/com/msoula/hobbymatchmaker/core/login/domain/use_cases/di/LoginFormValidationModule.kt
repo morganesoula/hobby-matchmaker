@@ -1,6 +1,6 @@
 package com.msoula.hobbymatchmaker.core.login.domain.use_cases.di
 
-import com.msoula.hobbymatchmaker.core.login.domain.use_cases.LoginFormValidationUseCase
+import com.msoula.hobbymatchmaker.core.login.domain.use_cases.LoginValidateFormUseCase
 import com.msoula.hobbymatchmaker.core.login.domain.use_cases.ValidateEmailUseCase
 import com.msoula.hobbymatchmaker.core.login.domain.use_cases.ValidateNameUseCase
 import com.msoula.hobbymatchmaker.core.login.domain.use_cases.ValidatePasswordUseCase
@@ -14,8 +14,8 @@ import dagger.hilt.components.SingletonComponent
 object LoginFormValidationModule {
 
     @Provides
-    fun provideLoginFormValidationUseCase(): LoginFormValidationUseCase =
-        LoginFormValidationUseCase(
+    fun provideLoginFormValidationUseCase(): LoginValidateFormUseCase =
+        LoginValidateFormUseCase(
             ValidateEmailUseCase(),
             ValidatePasswordUseCase(),
             ValidateNameUseCase()

@@ -10,7 +10,7 @@ import com.msoula.hobbymatchmaker.core.common.mapError
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.common.onEach
 import com.msoula.hobbymatchmaker.core.di.domain.StringResourcesProvider
-import com.msoula.hobbymatchmaker.core.login.domain.use_cases.LoginFormValidationUseCase
+import com.msoula.hobbymatchmaker.core.login.domain.use_cases.LoginValidateFormUseCase
 import com.msoula.hobbymatchmaker.core.login.presentation.R
 import com.msoula.hobbymatchmaker.core.login.presentation.extensions.clearAll
 import com.msoula.hobbymatchmaker.core.login.presentation.extensions.updateStateHandle
@@ -32,7 +32,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @OptIn(FlowPreview::class)
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    private val loginFormValidationUseCase: LoginFormValidationUseCase,
+    private val loginValidateFormUseCase: LoginValidateFormUseCase,
     private val signUpUseCase: SignUpUseCase,
     private val ioDispatcher: CoroutineDispatcher,
     private val resourceProvider: StringResourcesProvider,
@@ -103,11 +103,11 @@ class SignUpViewModel @Inject constructor(
     private fun validateInput() {
         val formState = formDataFlow.value
 
-        val emailResult = loginFormValidationUseCase.validateEmail(formState.email)
+        val emailResult = loginValidateFormUseCase.validateEmail(formState.email)
         val passwordResult =
-            loginFormValidationUseCase.validatePassword.validatePassword(formState.password)
+            loginValidateFormUseCase.validatePassword.validatePassword(formState.password)
         val firstNameResult =
-            loginFormValidationUseCase.validateFirstName(formState.firstName.trimEnd())
+            loginValidateFormUseCase.validateFirstName(formState.firstName.trimEnd())
 
         val results = listOf(emailResult, passwordResult, firstNameResult)
         val hasError = results.any { !it.successful }
