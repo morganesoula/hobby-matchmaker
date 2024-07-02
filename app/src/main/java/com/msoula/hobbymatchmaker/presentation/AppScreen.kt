@@ -35,7 +35,7 @@ fun AppScreen(
                 canNavigateBack = false,
                 logOut = appViewModel::logOut
             )
-        }
+        },
     ) { paddingValues ->
         Surface(
             modifier =

@@ -27,10 +27,9 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -67,6 +66,7 @@ import com.msoula.hobbymatchmaker.core.design.component.HMMErrorText
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldPasswordComponent
 import com.msoula.hobbymatchmaker.core.design.component.HeaderTextComponent
+import com.msoula.hobbymatchmaker.core.design.component.LocalSnackBar
 import com.msoula.hobbymatchmaker.core.di.data.StringResourcesProviderImpl
 import com.msoula.hobbymatchmaker.core.login.presentation.components.SocialMediaRowCustom
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationEvent
@@ -95,10 +95,11 @@ fun SignInScreen(
     val openResetDialog by signInViewModel.openResetDialog.collectAsStateWithLifecycle()
     val emailResetSent by signInViewModel.resettingEmailSent.collectAsStateWithLifecycle()
 
-    val snackBarHostState = remember { SnackbarHostState() }
     val callBackManager = remember { CallbackManager.Factory.create() }
     val resourcesProvider = StringResourcesProviderImpl(context)
     val loginManager = LoginManager.getInstance()
+
+    val snackBarHostState = LocalSnackBar.current
 
     val facebookLauncher =
         rememberLauncherForActivityResult(
@@ -119,93 +120,98 @@ fun SignInScreen(
         coroutineScope.launch {
             when (event) {
                 is AuthenticationEvent.OnFacebookFailedConnection, is AuthenticationEvent.OnGoogleFailedConnection, is AuthenticationEvent.OnResetPasswordFailed -> {
-                    snackBarHostState.showSnackbar(message = event.message)
+                    snackBarHostState.showSnackbar(event.message)
                 }
             }
         }
     }
 
-    Scaffold(
-        modifier = modifier,
-        snackbarHost = { SnackbarHost(snackBarHostState) },
-    ) { paddingValues ->
-        LaunchedEffect(emailResetSent) {
-            if (emailResetSent) {
-                signInViewModel.onEvent(AuthenticationUIEvent.HideForgotPasswordDialog)
-                coroutineScope.launch {
-                    snackBarHostState.showSnackbar(message = resourcesProvider.getString(StringRes.email_sent))
+    CompositionLocalProvider(LocalSnackBar provides snackBarHostState) {
+        Scaffold(
+            modifier = modifier
+        ) { paddingValues ->
+            LaunchedEffect(emailResetSent) {
+                if (emailResetSent) {
+                    signInViewModel.onEvent(AuthenticationUIEvent.HideForgotPasswordDialog)
+                    coroutineScope.launch {
+                        snackBarHostState.showSnackbar(
+                            resourcesProvider.getString(
+                                StringRes.email_sent
+                            )
+                        )
+                    }
                 }
             }
-        }
 
-        Box(modifier = Modifier.fillMaxSize()) {
-            Column(
-                modifier =
-                Modifier
-                    .padding(paddingValues)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                if (openResetDialog) {
-                    ForgotPasswordAlertDialog(
-                        email = loginFormState.emailReset,
-                        paddingValues = paddingValues,
-                        enableSubmit = loginFormState.submitEmailReset,
-                        authUIEvent = signInViewModel::onEvent
+            Box(modifier = Modifier.fillMaxSize()) {
+                Column(
+                    modifier =
+                    Modifier
+                        .padding(paddingValues)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    if (openResetDialog) {
+                        ForgotPasswordAlertDialog(
+                            email = loginFormState.emailReset,
+                            paddingValues = paddingValues,
+                            enableSubmit = loginFormState.submitEmailReset,
+                            authUIEvent = signInViewModel::onEvent
+                        )
+                    }
+
+                    HeaderTextComponent(
+                        text = stringResource(id = StringRes.welcome_back_title),
+                    )
+
+                    if (loginFormState.logInError != null) {
+                        HMMErrorText(errorText = loginFormState.logInError!!)
+                    }
+
+                    SignInScreenMainContent(
+                        email = loginFormState.email.trimEnd(),
+                        onEmailChanged = {
+                            signInViewModel.onEvent(
+                                AuthenticationUIEvent.OnEmailChanged(
+                                    it
+                                )
+                            )
+                        },
+                        password = loginFormState.password,
+                        onPasswordChanged = {
+                            signInViewModel.onEvent(AuthenticationUIEvent.OnPasswordChanged(it))
+                        },
+                        onForgotPasswordClicked = {
+                            signInViewModel.onEvent(AuthenticationUIEvent.OnForgotPasswordClicked)
+                        },
+                        onSignInClicked = {
+                            signInViewModel.onEvent(AuthenticationUIEvent.OnSignIn)
+                        },
+                        canSubmit = loginFormState.submit,
+                        circularProgressLoading = circularProgressLoading,
+                        dividerConnectText = resourcesProvider.getString(StringRes.continue_with_rs),
+                        facebookLauncher = facebookLauncher,
+                        scope = coroutineScope,
+                        googleAuthClient = googleAuthClient,
+                        handleGoogleSignIn = handleGoogleSignIn
                     )
                 }
 
-                HeaderTextComponent(
-                    text = stringResource(id = StringRes.welcome_back_title),
-                )
-
-                if (loginFormState.logInError != null) {
-                    HMMErrorText(errorText = loginFormState.logInError!!)
-                }
-
-                SignInScreenMainContent(
-                    email = loginFormState.email.trimEnd(),
-                    onEmailChanged = {
-                        signInViewModel.onEvent(
-                            AuthenticationUIEvent.OnEmailChanged(
-                                it
-                            )
-                        )
-                    },
-                    password = loginFormState.password,
-                    onPasswordChanged = {
-                        signInViewModel.onEvent(AuthenticationUIEvent.OnPasswordChanged(it))
-                    },
-                    onForgotPasswordClicked = {
-                        signInViewModel.onEvent(AuthenticationUIEvent.OnForgotPasswordClicked)
-                    },
-                    onSignInClicked = {
-                        signInViewModel.onEvent(AuthenticationUIEvent.OnSignIn)
-                    },
-                    canSubmit = loginFormState.submit,
-                    circularProgressLoading = circularProgressLoading,
-                    dividerConnectText = resourcesProvider.getString(StringRes.continue_with_rs),
-                    facebookLauncher = facebookLauncher,
-                    scope = coroutineScope,
-                    googleAuthClient = googleAuthClient,
-                    handleGoogleSignIn = handleGoogleSignIn
-                )
-            }
-
-            Box(
-                modifier =
-                Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 8.dp)
-            ) {
-                ClickableText(
+                Box(
                     modifier =
-                    Modifier.wrapContentSize(),
-                    text = annotatedString,
-                    onClick = { redirectToSignUpScreen() },
-                    style = TextStyle(color = MaterialTheme.colorScheme.onBackground)
-                )
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 8.dp)
+                ) {
+                    ClickableText(
+                        modifier =
+                        Modifier.wrapContentSize(),
+                        text = annotatedString,
+                        onClick = { redirectToSignUpScreen() },
+                        style = TextStyle(color = MaterialTheme.colorScheme.onBackground)
+                    )
+                }
             }
         }
     }
