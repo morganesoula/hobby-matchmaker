@@ -37,14 +37,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.msoula.hobbymatchmaker.core.common.ObserveAsEvents
 import com.msoula.hobbymatchmaker.core.design.component.HMMButtonAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMErrorText
 import com.msoula.hobbymatchmaker.core.design.component.HMMFormHelperText
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldPasswordComponent
 import com.msoula.hobbymatchmaker.core.design.component.HeaderTextComponent
+import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_up.models.SignUpStateModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 import com.msoula.hobbymatchmaker.core.login.presentation.R.string as StringRes
 
@@ -52,6 +56,8 @@ import com.msoula.hobbymatchmaker.core.login.presentation.R.string as StringRes
 fun SignUpScreen(
     modifier: Modifier = Modifier,
     redirectToLogInScreen: () -> Unit,
+    redirectToAppScreen: () -> Unit,
+    oneTimeEventChannelFlow: Flow<AuthenticationEvent>,
     signUpViewModel: SignUpViewModel = hiltViewModel<SignUpViewModel>()
 ) {
     val registrationState by signUpViewModel.formDataFlow.collectAsStateWithLifecycle()
@@ -73,6 +79,13 @@ fun SignUpScreen(
                 append(stringResource(id = StringRes.already_a_member_connect))
             }
         }
+
+    ObserveAsEvents(oneTimeEventChannelFlow) { event ->
+        when (event) {
+            AuthenticationEvent.OnSignUpSuccess -> redirectToAppScreen()
+            else -> Unit
+        }
+    }
 
     Scaffold(modifier = modifier) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
@@ -228,6 +241,8 @@ fun BoxScope.SignUpScreenBottomContent(
 @Composable
 fun SignUpScreenPreview() {
     SignUpScreen(
-        redirectToLogInScreen = {}
+        redirectToLogInScreen = {},
+        redirectToAppScreen = {},
+        oneTimeEventChannelFlow = flowOf()
     )
 }

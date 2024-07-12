@@ -21,7 +21,6 @@ import com.msoula.hobbymatchmaker.core.login.presentation.extensions.updateState
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.models.SignInFormStateModel
-import com.msoula.hobbymatchmaker.core.navigation.contracts.SignInNavigation
 import com.msoula.hobbymatchmaker.core.session.domain.use_cases.SetIsConnectedUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -43,8 +42,7 @@ class SignInViewModel @Inject constructor(
     private val ioDispatcher: CoroutineDispatcher,
     private val resourceProvider: StringResourcesProvider,
     private val setIsConnectedUseCase: SetIsConnectedUseCase,
-    private val loginWithSocialMediaUseCase: LoginWithSocialMediaUseCase,
-    private val signInNavigation: SignInNavigation
+    private val loginWithSocialMediaUseCase: LoginWithSocialMediaUseCase
 ) : ViewModel() {
 
     private val savedStateHandleKey: String = "loginState"
@@ -149,7 +147,7 @@ class SignInViewModel @Inject constructor(
     private suspend fun saveIsConnected() {
         setIsConnected(true)
         withContext(Dispatchers.Main) {
-            redirectToAppScreen()
+            oneTimeEventChannel.send(AuthenticationEvent.OnSignInSuccess)
         }
     }
 
@@ -247,7 +245,7 @@ class SignInViewModel @Inject constructor(
             setIsConnected(true)
             withContext(Dispatchers.Main) {
                 abortCircularProgress()
-                signInNavigation.redirectToAppScreen()
+                oneTimeEventChannel.send(AuthenticationEvent.OnSignInSuccess)
             }
         }
     }
@@ -261,8 +259,6 @@ class SignInViewModel @Inject constructor(
     }
 
     private fun clearFormState() = savedStateHandle.clearAll<SignInFormStateModel>()
-
-    fun redirectToSignUpScreen() = signInNavigation.redirectToSignUpScreen()
     private fun launchCircularProgress() = circularProgressLoading.update { true }
     private fun abortCircularProgress() = circularProgressLoading.update { false }
 

@@ -14,16 +14,18 @@ import com.msoula.hobbymatchmaker.core.login.domain.use_cases.LoginValidateFormU
 import com.msoula.hobbymatchmaker.core.login.presentation.R
 import com.msoula.hobbymatchmaker.core.login.presentation.extensions.clearAll
 import com.msoula.hobbymatchmaker.core.login.presentation.extensions.updateStateHandle
+import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_up.models.SignUpStateModel
-import com.msoula.hobbymatchmaker.core.navigation.contracts.SignUpNavigation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -36,13 +38,15 @@ class SignUpViewModel @Inject constructor(
     private val signUpUseCase: SignUpUseCase,
     private val ioDispatcher: CoroutineDispatcher,
     private val resourceProvider: StringResourcesProvider,
-    private val savedStateHandle: SavedStateHandle,
-    private val signUpNavigation: SignUpNavigation
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val savedStateHandleKey: String = "signUpState"
     val formDataFlow = savedStateHandle.getStateFlow(savedStateHandleKey, SignUpStateModel())
     val signUpCircularProgress = MutableStateFlow(false)
+
+    private val oneTimeEventChannel = Channel<AuthenticationEvent>()
+    val oneTimeEventChannelFlow = oneTimeEventChannel.receiveAsFlow()
 
     private val _email = MutableStateFlow(savedStateHandle["email"] ?: "")
     private val _firstName = MutableStateFlow(savedStateHandle["firstName"] ?: "")
@@ -148,7 +152,7 @@ class SignUpViewModel @Inject constructor(
             }
             .mapSuccess {
                 savedStateHandle.clearAll<SignUpStateModel>()
-                signUpNavigation.redirectToAppScreen()
+                oneTimeEventChannel.send(AuthenticationEvent.OnSignUpSuccess)
             }
             .mapError { error ->
                 Log.e("HMM", "Could not create an account with error: $error")
@@ -174,6 +178,5 @@ class SignUpViewModel @Inject constructor(
             }
     }
 
-    fun redirectToSignInScreen() = signUpNavigation.redirectToSignInScreen()
     private fun abortCircularProgress() = signUpCircularProgress.update { false }
 }

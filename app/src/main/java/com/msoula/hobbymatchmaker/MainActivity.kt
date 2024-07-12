@@ -11,7 +11,6 @@ import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import com.msoula.hobbymatchmaker.app.HobbyMatchMakerApp
 import com.msoula.hobbymatchmaker.core.design.theme.HobbyMatchmakerTheme
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.GoogleAuthClient
-import com.msoula.hobbymatchmaker.core.navigation.Navigator
 import com.msoula.hobbymatchmaker.core.session.domain.models.SessionConnexionModeDomainModel
 import com.msoula.hobbymatchmaker.core.session.domain.models.SessionUserDomainModel
 import com.msoula.hobbymatchmaker.core.session.domain.use_cases.ClearSessionDataUseCase
@@ -23,9 +22,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @Inject
-    lateinit var navigator: Navigator
-
     @Inject
     lateinit var auth: FirebaseAuth
 
@@ -46,7 +42,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             HobbyMatchmakerTheme {
-                HobbyMatchMakerApp(navigator, googleAuthClient)
+                HobbyMatchMakerApp(googleAuthClient)
             }
         }
     }

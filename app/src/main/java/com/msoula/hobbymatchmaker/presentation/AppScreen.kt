@@ -18,11 +18,14 @@ import com.msoula.hobbymatchmaker.features.movies.presentation.ErrorMovieScreen
 import com.msoula.hobbymatchmaker.features.movies.presentation.MovieScreen
 import com.msoula.hobbymatchmaker.features.movies.presentation.MovieViewModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
+import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieNavigationModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiStateModel
+import kotlinx.coroutines.flow.Flow
 import com.msoula.hobbymatchmaker.R.string as StringRes
 
 @Composable
 fun AppScreen(
+    redirectToMovieDetail: (movieId: Long) -> Unit,
     appViewModel: AppViewModel,
     modifier: Modifier = Modifier,
     movieViewModel: MovieViewModel = hiltViewModel<MovieViewModel>()
@@ -47,7 +50,9 @@ fun AppScreen(
 
             AppContent(
                 viewState = viewState,
-                onCardEvent = movieViewModel::onCardEvent
+                onCardEvent = movieViewModel::onCardEvent,
+                redirectToMovieDetail = redirectToMovieDetail,
+                oneTimeEventChannelFlow = movieViewModel.oneTimeEventChannelFlow
             )
         }
     }
@@ -56,6 +61,8 @@ fun AppScreen(
 @Composable
 fun AppContent(
     viewState: MovieUiStateModel,
+    oneTimeEventChannelFlow: Flow<MovieNavigationModel>,
+    redirectToMovieDetail: (movieId: Long) -> Unit,
     modifier: Modifier = Modifier,
     onCardEvent: (CardEventModel) -> Unit
 ) {
@@ -66,7 +73,9 @@ fun AppContent(
             MovieScreen(
                 modifier = modifier,
                 movies = viewState.list,
-                onCardEvent = onCardEvent
+                onCardEvent = onCardEvent,
+                redirectToMovieDetail = redirectToMovieDetail,
+                oneTimeEventChannelFlow = oneTimeEventChannelFlow
             )
         }
 

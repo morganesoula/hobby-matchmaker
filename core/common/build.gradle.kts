@@ -3,7 +3,6 @@ plugins {
     `kotlin-android`
     id(Plugins.DAGGER_HILT)
     kotlin(Plugins.KAPT)
-    kotlin(Plugins.SERIALIZATION) version PluginVersion.SERIALIZATION
 }
 
 apply<MainGradlePlugin>()
@@ -20,6 +19,7 @@ androidComponents {
 
 dependencies {
     // Compose
+    implementation(libs.activity.compose)
     implementation(libs.runtime)
 
     // Hilt
@@ -31,7 +31,4 @@ dependencies {
 
     // Retrofit
     implementation(libs.retrofit)
-
-    // Serialization
-    implementation(libs.kotlinx.serialization)
 }

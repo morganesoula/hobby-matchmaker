@@ -27,6 +27,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -39,7 +40,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -51,9 +51,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.credentials.GetCredentialResponse
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
@@ -61,6 +59,7 @@ import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FacebookAuthProvider
+import com.msoula.hobbymatchmaker.core.common.ObserveAsEvents
 import com.msoula.hobbymatchmaker.core.design.component.HMMButtonAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMErrorText
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldAuthComponent
@@ -72,16 +71,16 @@ import com.msoula.hobbymatchmaker.core.login.presentation.components.SocialMedia
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import com.msoula.hobbymatchmaker.core.login.presentation.R.string as StringRes
 
 @Composable
 fun SignInScreen(
     modifier: Modifier = Modifier,
     signInViewModel: SignInViewModel,
+    oneTimeEventChannelFlow : Flow<AuthenticationEvent>,
+    redirectToAppScreen: () -> Unit,
     redirectToSignUpScreen: () -> Unit,
     handleFacebookAccessToken: (credential: AuthCredential) -> Unit,
     handleGoogleSignIn: (result: GetCredentialResponse?, googleAuthClient: GoogleAuthClient) -> Unit,
@@ -99,7 +98,7 @@ fun SignInScreen(
     val resourcesProvider = StringResourcesProviderImpl(context)
     val loginManager = LoginManager.getInstance()
 
-    val snackBarHostState = LocalSnackBar.current
+    val snackBarHostState = remember { SnackbarHostState() }
 
     val facebookLauncher =
         rememberLauncherForActivityResult(
@@ -116,12 +115,16 @@ fun SignInScreen(
         context = context
     )
 
-    ObserveAsEvents(signInViewModel.oneTimeEventChannelFlow) { event ->
+    ObserveAsEvents(oneTimeEventChannelFlow) { event ->
         coroutineScope.launch {
             when (event) {
                 is AuthenticationEvent.OnFacebookFailedConnection, is AuthenticationEvent.OnGoogleFailedConnection, is AuthenticationEvent.OnResetPasswordFailed -> {
                     snackBarHostState.showSnackbar(event.message)
                 }
+
+                AuthenticationEvent.OnSignInSuccess -> redirectToAppScreen()
+                AuthenticationEvent.OnSignUpClicked -> redirectToSignUpScreen()
+                else -> Unit
             }
         }
     }
@@ -263,19 +266,6 @@ fun createAnnotatedString(isDarkTheme: Boolean): AnnotatedString {
         )
         append(stringResource(id = StringRes.new_member_clickable_part))
         pop()
-    }
-}
-
-@Composable
-fun <T> ObserveAsEvents(flow: Flow<T>, onEvent: (T) -> Unit) {
-    val lifecycleOwner = LocalLifecycleOwner.current
-
-    LaunchedEffect(lifecycleOwner.lifecycle) {
-        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            withContext(Dispatchers.Main.immediate) {
-                flow.collect(onEvent)
-            }
-        }
     }
 }
 

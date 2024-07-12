@@ -6,4 +6,18 @@ sealed interface AuthenticationEvent {
     data class OnFacebookFailedConnection(override val message: String) : AuthenticationEvent
     data class OnGoogleFailedConnection(override val message: String) : AuthenticationEvent
     data class OnResetPasswordFailed(override val message: String) : AuthenticationEvent
+    data object OnSignInSuccess : AuthenticationEvent {
+        override val message: String
+            get() = "successful sign in"
+    }
+
+    data object OnSignUpClicked : AuthenticationEvent {
+        override val message: String
+            get() = "redirecting to sign up screen"
+    }
+
+    data object OnSignUpSuccess : AuthenticationEvent {
+        override val message: String
+            get() = "successful sign up"
+    }
 }

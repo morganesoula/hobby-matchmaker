@@ -35,8 +35,9 @@ dependencies {
     kapt(libs.hilt.compiler)
 
     // Modules
+    implementation(project(Modules.AUTHENTICATION_DOMAIN))
+    implementation(project(Modules.COMMON))
     implementation(project(Modules.DESIGN))
     implementation(project(Modules.MOVIE_DOMAIN))
-    implementation(project(Modules.COMMON))
-    implementation(project(Modules.AUTHENTICATION_DOMAIN))
+    implementation(project(Modules.NAVIGATION))
 }

@@ -1,6 +1,7 @@
 plugins {
     `android-library`
     `kotlin-android`
+    kotlin(Plugins.SERIALIZATION) version PluginVersion.SERIALIZATION
     kotlin(Plugins.KAPT)
 }
 
@@ -31,4 +32,7 @@ dependencies {
     // Navigation
     implementation(libs.navigation.ui.ktx)
     implementation(libs.compose.navigation)
+
+    // Serialization
+    implementation(libs.kotlinx.serialization)
 }

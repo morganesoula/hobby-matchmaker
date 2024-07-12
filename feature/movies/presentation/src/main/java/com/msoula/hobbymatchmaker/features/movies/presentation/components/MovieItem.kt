@@ -143,9 +143,14 @@ fun MovieItemContent(
                 modifier = Modifier
                     .fillMaxSize()
                     .pointerInput(movie) {
-                        detectTapGestures(onDoubleTap = {
-                            onCardEvent(CardEventModel.OnDoubleTap(movie))
-                        })
+                        detectTapGestures(
+                            onDoubleTap = {
+                                onCardEvent(CardEventModel.OnDoubleTap(movie))
+                            },
+                            onTap = {
+                                onCardEvent(CardEventModel.OnSingleTap(movie.id))
+                            }
+                        )
                     }
             ) {
                 Image(
