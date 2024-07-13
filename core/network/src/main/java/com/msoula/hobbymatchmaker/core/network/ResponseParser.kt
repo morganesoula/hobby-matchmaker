@@ -1,5 +1,6 @@
 package com.msoula.hobbymatchmaker.core.network
 
+import android.util.Log
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.ExternalServiceError
 import com.msoula.hobbymatchmaker.core.common.NetworkError
@@ -30,7 +31,7 @@ suspend fun <R> execute(
             }
         }
     } catch (exception: Exception) {
-        exception.printStackTrace()
+        Log.d("HMM", "Error message is: ${exception.message}")
         Result.Failure(NetworkError())
     }
 }

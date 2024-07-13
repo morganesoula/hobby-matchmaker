@@ -49,8 +49,8 @@ class SignInViewModel @Inject constructor(
     val formDataFlow = savedStateHandle.getStateFlow(savedStateHandleKey, SignInFormStateModel())
     val circularProgressLoading = MutableStateFlow(false)
 
-    private val oneTimeEventChannel = Channel<AuthenticationEvent>()
-    val oneTimeEventChannelFlow = oneTimeEventChannel.receiveAsFlow()
+    private val _oneTimeEventChannel = Channel<AuthenticationEvent>()
+    val oneTimeEventChannelFlow = _oneTimeEventChannel.receiveAsFlow()
 
     val openResetDialog = MutableStateFlow(false)
     val resettingEmailSent = MutableStateFlow(false)
@@ -147,7 +147,7 @@ class SignInViewModel @Inject constructor(
     private suspend fun saveIsConnected() {
         setIsConnected(true)
         withContext(Dispatchers.Main) {
-            oneTimeEventChannel.send(AuthenticationEvent.OnSignInSuccess)
+            _oneTimeEventChannel.send(AuthenticationEvent.OnSignInSuccess)
         }
     }
 
@@ -245,7 +245,7 @@ class SignInViewModel @Inject constructor(
             setIsConnected(true)
             withContext(Dispatchers.Main) {
                 abortCircularProgress()
-                oneTimeEventChannel.send(AuthenticationEvent.OnSignInSuccess)
+                _oneTimeEventChannel.send(AuthenticationEvent.OnSignInSuccess)
             }
         }
     }
@@ -264,7 +264,7 @@ class SignInViewModel @Inject constructor(
 
     private fun sendEvent(event: AuthenticationEvent) {
         viewModelScope.launch {
-            oneTimeEventChannel.send(event)
+            _oneTimeEventChannel.send(event)
         }
     }
 

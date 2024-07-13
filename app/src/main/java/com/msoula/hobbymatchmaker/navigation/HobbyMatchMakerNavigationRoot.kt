@@ -12,7 +12,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import androidx.navigation.toRoute
 import com.google.firebase.auth.AuthCredential
 import com.msoula.hobbymatchmaker.core.common.AuthUiStateModel
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.GoogleAuthClient
@@ -124,13 +123,12 @@ private fun NavGraphBuilder.mainGraph(
         }
 
         composable<Destinations.Main.MovieDetail> {
-            val movieDetailId = it.toRoute<Destinations.Main.MovieDetail>().movieId
             val movieDetailViewModel: MovieDetailViewModel = hiltViewModel<MovieDetailViewModel>()
             val movie = movieDetailViewModel.movie.collectAsStateWithLifecycle()
 
             MovieDetailScreen(
-                title = movie.value,
-                movieId = movieDetailId
+                movie = movie.value,
+                oneTimeEventFlow = movieDetailViewModel.oneTimeEvent
             )
         }
     }

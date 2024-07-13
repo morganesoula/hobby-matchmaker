@@ -17,7 +17,7 @@ class MovieDetailRemoteDataSourceImpl(
             movieDetailService.getMovieDetail(movieId)
         })
             .mapSuccess { response ->
-                response.result?.toMovieDetailDomainModel()
+                response.toMovieDetailDomainModel()
             }
     }
 }
