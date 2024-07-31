@@ -21,6 +21,7 @@ dependencies {
 
     // Modules
     implementation(project(Modules.COMMON))
+    implementation(project(Modules.DAO))
     implementation(project(Modules.MOVIE_DETAIL_DOMAIN))
     implementation(project(Modules.NETWORK))
 

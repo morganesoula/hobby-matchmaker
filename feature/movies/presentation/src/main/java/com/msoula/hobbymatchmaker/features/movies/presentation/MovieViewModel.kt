@@ -1,9 +1,9 @@
 package com.msoula.hobbymatchmaker.features.movies.presentation
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.core.common.getDeviceLocale
 import com.msoula.hobbymatchmaker.features.movies.domain.use_cases.FetchMoviesUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.use_cases.ObserveAllMoviesUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.use_cases.SetMovieFavoriteUseCase
@@ -60,6 +60,7 @@ class MovieViewModel @Inject constructor(
             )
     }
 
+
     fun onCardEvent(event: CardEventModel) {
         when (event) {
             is CardEventModel.OnDoubleTap -> {
@@ -69,7 +70,6 @@ class MovieViewModel @Inject constructor(
             }
 
             is CardEventModel.OnSingleTap -> {
-                Log.d("HMM", "Inside ViewModel with movieId: ${event.movieId}")
                 viewModelScope.launch {
                     oneTimeEventChannel.send(MovieNavigationModel.OnMovieDetailClicked(event.movieId))
                 }
@@ -78,8 +78,10 @@ class MovieViewModel @Inject constructor(
     }
 
     private suspend fun fetchMovies(): Result<Unit> {
+        val language = getDeviceLocale()
+
         val fetchResult = viewModelScope.async(ioDispatcher) {
-            fetchMoviesUseCase()
+            fetchMoviesUseCase(language)
         }
 
         return fetchResult.await()

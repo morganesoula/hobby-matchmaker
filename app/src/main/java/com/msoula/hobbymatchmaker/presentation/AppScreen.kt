@@ -2,8 +2,6 @@ package com.msoula.hobbymatchmaker.presentation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -13,6 +11,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.msoula.hobbymatchmaker.core.design.component.CenteredTopBarComponent
+import com.msoula.hobbymatchmaker.core.design.component.LoadingCircularProgress
 import com.msoula.hobbymatchmaker.features.movies.presentation.EmptyMovieScreen
 import com.msoula.hobbymatchmaker.features.movies.presentation.ErrorMovieScreen
 import com.msoula.hobbymatchmaker.features.movies.presentation.MovieScreen
@@ -67,7 +66,7 @@ fun AppContent(
     onCardEvent: (CardEventModel) -> Unit
 ) {
     when (viewState) {
-        is MovieUiStateModel.Loading -> CircularProgressIndicator(modifier.wrapContentSize())
+        is MovieUiStateModel.Loading -> LoadingCircularProgress()
         is MovieUiStateModel.Empty -> EmptyMovieScreen(modifier = modifier)
         is MovieUiStateModel.Fetched -> {
             MovieScreen(

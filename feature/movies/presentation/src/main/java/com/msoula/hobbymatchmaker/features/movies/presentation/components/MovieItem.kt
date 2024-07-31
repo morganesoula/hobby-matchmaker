@@ -148,7 +148,7 @@ fun MovieItemContent(
                                 onCardEvent(CardEventModel.OnDoubleTap(movie))
                             },
                             onTap = {
-                                onCardEvent(CardEventModel.OnSingleTap(movie.id))
+                                onCardEvent(CardEventModel.OnSingleTap(movie.id, movie.overview))
                             }
                         )
                     }

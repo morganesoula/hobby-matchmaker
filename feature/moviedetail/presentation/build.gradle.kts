@@ -16,6 +16,7 @@ android {
      implementation(libs.lifecycle.runtime.compose)
      implementation(libs.lifecycle.runtime.ktx)
      implementation(libs.kotlinx.collections.immutable)
+     implementation(libs.material.icons)
 
      // Coil
      implementation(libs.coil)

@@ -8,6 +8,7 @@ fun MovieDomainModel.toMovieUiModel(): MovieUiModel {
         id = this.id,
         coverFilePath = this.localCoverFilePath,
         isFavorite = this.isFavorite,
-        title = this.title
+        title = this.title,
+        overview = this.overview
     )
 }

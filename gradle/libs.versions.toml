@@ -17,6 +17,7 @@ firebaseUiAuth = "7.2.0"
 googleIdentity = "1.1.1"
 googleServices = "4.4.2"
 gradle = "8.5.1"
+gson = "2.11.0"
 hiltAndroid = "2.50"
 hiltAndroidGradlePlugin = "2.50"
 hiltAndroidTesting = "2.50"
@@ -71,6 +72,7 @@ firebase-ui-auth = { module = "com.firebaseui:firebase-ui-auth", version.ref = "
 google-identity = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleIdentity" }
 google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
 gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-gradle-plugin = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hiltAndroidGradlePlugin" }
 hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hiltAndroidTesting" }

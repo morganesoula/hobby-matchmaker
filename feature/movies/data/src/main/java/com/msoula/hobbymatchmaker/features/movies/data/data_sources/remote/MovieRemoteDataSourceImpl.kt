@@ -16,7 +16,7 @@ class MovieRemoteDataSourceImpl @Inject constructor(
     private val imageHelper: ImageHelper
 ) : MovieRemoteDataSource {
 
-    override suspend fun fetchMovies(): Result<List<MovieDomainModel>> {
+    override suspend fun fetchMovies(language: String): Result<List<MovieDomainModel>> {
         val list = buildList {
             fetchMoviesByPage("fr-FR", 1).mapSuccess { movies1 ->
                 addAll(movies1)

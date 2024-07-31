@@ -5,7 +5,7 @@ import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 
 fun MovieDomainModel.toMovieEntityModel(): MovieEntityModel {
     return MovieEntityModel(
-        id = this.id,
+        movieId = this.id,
         title = this.title,
         remotePosterPath = this.coverFileName,
         localPosterPath = this.localCoverFilePath,
@@ -16,12 +16,13 @@ fun MovieDomainModel.toMovieEntityModel(): MovieEntityModel {
 
 fun MovieEntityModel.toMovieDomainModel(): MovieDomainModel {
     return MovieDomainModel(
-        id = this.id,
+        id = this.movieId,
         title = this.title,
         coverFileName = this.remotePosterPath,
         localCoverFilePath = this.localPosterPath,
         isSeen = this.seen,
-        isFavorite = this.favourite
+        isFavorite = this.favourite,
+        overview = this.overview
     )
 }
 

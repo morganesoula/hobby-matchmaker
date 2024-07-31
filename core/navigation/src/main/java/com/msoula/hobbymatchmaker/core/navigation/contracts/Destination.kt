@@ -27,3 +27,4 @@ sealed class Destinations {
         object SplashScreen
     }
 }
+

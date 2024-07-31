@@ -38,8 +38,8 @@ class MovieRepository(
         movieLocalDataSource.updateMovieWithLocalCoverFilePath(coverFileName, localCoverFilePath)
     }
 
-    suspend fun fetchMovies(): Result<Unit> =
-        movieRemoteDataSource.fetchMovies()
+    suspend fun fetchMovies(language: String): Result<Unit> =
+        movieRemoteDataSource.fetchMovies(language)
             .mapSuccess { movies ->
                 movieLocalDataSource.upsertAll(movies)
                 Result.Success(Unit)

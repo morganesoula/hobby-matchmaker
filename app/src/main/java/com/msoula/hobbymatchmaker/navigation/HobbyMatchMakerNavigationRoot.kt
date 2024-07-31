@@ -21,7 +21,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.sign_up.SignUpScreen
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_up.SignUpViewModel
 import com.msoula.hobbymatchmaker.core.navigation.contracts.Destinations
 import com.msoula.hobbymatchmaker.core.splashscreen.presentation.SplashScreen
-import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.MovieDetailScreen
+import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.MovieDetailContent
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.MovieDetailViewModel
 import com.msoula.hobbymatchmaker.presentation.AppScreen
 import com.msoula.hobbymatchmaker.presentation.AppViewModel
@@ -124,11 +124,11 @@ private fun NavGraphBuilder.mainGraph(
 
         composable<Destinations.Main.MovieDetail> {
             val movieDetailViewModel: MovieDetailViewModel = hiltViewModel<MovieDetailViewModel>()
-            val movie = movieDetailViewModel.movie.collectAsStateWithLifecycle()
+            val viewState by movieDetailViewModel.viewState.collectAsStateWithLifecycle()
 
-            MovieDetailScreen(
-                movie = movie.value,
-                oneTimeEventFlow = movieDetailViewModel.oneTimeEvent
+            MovieDetailContent(
+                viewState = viewState,
+                oneTimeEventFlow = movieDetailViewModel.oneTimeEventChannelFlow
             )
         }
     }

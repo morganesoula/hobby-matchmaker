@@ -78,28 +78,32 @@ fun MovieScreenPreview() {
                 "",
                 isFavorite = false,
                 playFavoriteAnimation = false,
-                title = "Title 1"
+                title = "Title 1",
+                overview = ""
             ),
             MovieUiModel(
                 2,
                 "",
                 isFavorite = false,
                 playFavoriteAnimation = false,
-                title = "Title 2"
+                title = "Title 2",
+                overview = ""
             ),
             MovieUiModel(
                 3,
                 "",
                 isFavorite = false,
                 playFavoriteAnimation = false,
-                title = "Title 3"
+                title = "Title 3",
+                overview = ""
             ),
             MovieUiModel(
                 4,
                 "",
                 isFavorite = false,
                 playFavoriteAnimation = false,
-                title = "Title 4"
+                title = "Title 4",
+                overview = ""
             )
         ),
         onCardEvent = {},
