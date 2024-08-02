@@ -32,18 +32,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.msoula.hobbymatchmaker.core.common.ObserveAsEvents
+import com.msoula.hobbymatchmaker.core.design.component.ExpandableTextComponent
 import com.msoula.hobbymatchmaker.core.design.component.LoadingCircularProgress
 import com.msoula.hobbymatchmaker.core.design.component.LocalSnackBar
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieDetailUiEventModel
@@ -52,10 +53,10 @@ import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieD
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.io.File
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.R.string as StringRes
 
 @Composable
 fun MovieDetailContent(
-    modifier: Modifier = Modifier,
     viewState: MovieDetailViewStateModel,
     oneTimeEventFlow: Flow<MovieDetailUiEventModel>
 ) {
@@ -104,7 +105,7 @@ fun MovieDetailContentScreen(
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp.value
 
-    val castB = buildAnnotatedString {
+    val cast = buildAnnotatedString {
         movie.cast.asIterable().take(6).forEachIndexed { index, (name, role) ->
             append(name)
             append(" (")
@@ -116,12 +117,6 @@ fun MovieDetailContentScreen(
             if (index < 5) {
                 append(", ")
             }
-        }
-    }
-
-    val cast = buildList {
-        movie.cast.asIterable().take(6).forEach { (name, role) ->
-            add("$name ($role)")
         }
     }
 
@@ -199,33 +194,41 @@ fun MovieDetailContentScreen(
                     Row {
                         Icon(
                             imageVector = Icons.Default.PlayArrow,
-                            contentDescription = "play trailer icon"
+                            contentDescription = stringResource(id = StringRes.play_icon_accessibility)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "Play trailer",
+                            text = stringResource(id = StringRes.play_trailer),
                             textAlign = TextAlign.Center
                         )
                     }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(
+                ExpandableTextComponent(
                     text = movie.synopsis,
-                    minLines = 1,
-                    maxLines = 6,
-                    overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colorScheme.onBackground
+                    showLess = stringResource(id = StringRes.show_less),
+                    showMore = stringResource(
+                        id = StringRes.show_more
+                    )
                 )
+
+                /* ExpandableTextComponent(
+                    text = movie.synopsis,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    showLessText = stringResource(id = StringRes.show_less),
+                    showMoreText = stringResource(id = StringRes.show_more)
+                )*/
 
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Cast",
+                    text = stringResource(id = StringRes.cast),
                     color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(text = castB)
+                Text(text = cast)
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     }
@@ -238,5 +241,5 @@ fun ErrorMovieDetailScreen(modifier: Modifier = Modifier, error: String) {
 
 @Composable
 fun EmptyMovieDetailScreen(modifier: Modifier = Modifier) {
-    Text(modifier = modifier, text = "No data found")
+    Text(modifier = modifier, text = stringResource(id = StringRes.no_data))
 }

@@ -11,7 +11,7 @@ sealed interface MovieUiStateModel {
     data object Empty : MovieUiStateModel
 
     @Immutable
-    data class Fetched(val list: PersistentList<MovieUiModel>) : MovieUiStateModel
+    data class Success(val list: PersistentList<MovieUiModel>) : MovieUiStateModel
 
     @Immutable
     data class Error(val errorMessage: String) : MovieUiStateModel

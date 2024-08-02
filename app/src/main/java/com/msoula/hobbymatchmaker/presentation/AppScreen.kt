@@ -17,7 +17,7 @@ import com.msoula.hobbymatchmaker.features.movies.presentation.ErrorMovieScreen
 import com.msoula.hobbymatchmaker.features.movies.presentation.MovieScreen
 import com.msoula.hobbymatchmaker.features.movies.presentation.MovieViewModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
-import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieNavigationModel
+import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiStateModel
 import kotlinx.coroutines.flow.Flow
 import com.msoula.hobbymatchmaker.R.string as StringRes
@@ -45,7 +45,7 @@ fun AppScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            val viewState by movieViewModel.viewState.collectAsStateWithLifecycle()
+            val viewState by movieViewModel.movieState.collectAsStateWithLifecycle()
 
             AppContent(
                 viewState = viewState,
@@ -60,7 +60,7 @@ fun AppScreen(
 @Composable
 fun AppContent(
     viewState: MovieUiStateModel,
-    oneTimeEventChannelFlow: Flow<MovieNavigationModel>,
+    oneTimeEventChannelFlow: Flow<MovieUiEventModel>,
     redirectToMovieDetail: (movieId: Long) -> Unit,
     modifier: Modifier = Modifier,
     onCardEvent: (CardEventModel) -> Unit
@@ -68,7 +68,7 @@ fun AppContent(
     when (viewState) {
         is MovieUiStateModel.Loading -> LoadingCircularProgress()
         is MovieUiStateModel.Empty -> EmptyMovieScreen(modifier = modifier)
-        is MovieUiStateModel.Fetched -> {
+        is MovieUiStateModel.Success -> {
             MovieScreen(
                 modifier = modifier,
                 movies = viewState.list,
