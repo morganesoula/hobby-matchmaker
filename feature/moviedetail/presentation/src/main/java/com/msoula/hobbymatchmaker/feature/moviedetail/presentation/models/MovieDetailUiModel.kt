@@ -7,6 +7,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 data class MovieDetailUiModel(
+    val id: Long = -1,
     val title: String = "",
     val synopsis: String = "",
     val posterPath: String = "",
@@ -14,16 +15,24 @@ data class MovieDetailUiModel(
     val releaseDate: String = "",
     val status: String = "",
     val popularity: Double = 0.0,
-    val cast: Map<String, String> = emptyMap()
+    val cast: Map<String, String> = emptyMap(),
+    val videoKey: String = ""
 ) {
     companion object {
-        const val DEFAULT_TITLE = "Unknown title"
-        const val DEFAULT_SYNOPSIS = "No synopsis recorded"
+        const val DEFAULT_ID = -1
+        const val DEFAULT_TITLE = ""
+        const val DEFAULT_SYNOPSIS = ""
+        const val DEFAULT_POSTER_PATH = ""
+        const val DEFAULT_RELEASE_DATE = ""
+        const val DEFAULT_STATUS = ""
+        const val DEFAULT_POPULARITY = 0.0
+        const val DEFAULT_VIDEO_URI = ""
     }
 }
 
 fun MovieDetailDomainModel.toMovieDetailUiModel(): MovieDetailUiModel {
     return MovieDetailUiModel(
+        id = this.info.id ?: MovieInfoDomainModel.DEFAULT_ID,
         title = this.info.title ?: MovieInfoDomainModel.DEFAULT_TITLE,
         synopsis = this.info.synopsis ?: MovieInfoDomainModel.DEFAULT_SYNOPSIS,
         posterPath = this.info.posterPath ?: "",
@@ -35,12 +44,17 @@ fun MovieDetailDomainModel.toMovieDetailUiModel(): MovieDetailUiModel {
             val name = actor.name ?: MovieActorDomainModel.DEFAULT_NAME
             val role = actor.role ?: MovieActorDomainModel.DEFAULT_ROLE
             name to role
-        }?.toMap() ?: emptyMap()
+        }?.toMap() ?: emptyMap(),
+        videoKey = this.info.videoKey ?: ""
     )
 }
 
 fun String.extractYear(): String {
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-    val date = LocalDate.parse(this, formatter)
-    return date.year.toString()
+    return if (this.isNotEmpty()) {
+        val formatterBis = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val date = LocalDate.parse(this, formatterBis)
+        date.year.toString()
+    } else {
+        ""
+    }
 }

@@ -3,8 +3,10 @@ package com.msoula.hobbymatchmaker.feature.moviedetail.domain.di
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.data_sources.local.MovieDetailLocalDataSource
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.data_sources.remote.MovieDetailRemoteDataSource
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.repositories.MovieDetailRepository
+import com.msoula.hobbymatchmaker.feature.moviedetail.domain.use_cases.FetchMovieDetailTrailerUseCase
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.use_cases.FetchMovieDetailUseCase
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.use_cases.ObserveMovieDetailUseCase
+import com.msoula.hobbymatchmaker.feature.moviedetail.domain.use_cases.UpdateMovieVideoURIUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,5 +34,15 @@ object MovieDetailDomainModule {
     @Provides
     fun provideGetMovieDetailUseCase(movieDetailRepository: MovieDetailRepository): ObserveMovieDetailUseCase {
         return ObserveMovieDetailUseCase(movieDetailRepository)
+    }
+
+    @Provides
+    fun provideFetchMovieDetailVideoURIUseCase(movieDetailRepository: MovieDetailRepository): FetchMovieDetailTrailerUseCase {
+        return FetchMovieDetailTrailerUseCase(movieDetailRepository)
+    }
+
+    @Provides
+    fun provideUpdateMovieVideoURIUseCase(movieDetailRepository: MovieDetailRepository): UpdateMovieVideoURIUseCase {
+        return UpdateMovieVideoURIUseCase(movieDetailRepository)
     }
 }

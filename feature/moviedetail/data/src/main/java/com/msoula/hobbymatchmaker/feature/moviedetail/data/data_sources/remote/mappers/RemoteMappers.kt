@@ -2,10 +2,12 @@ package com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.
 
 import com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.models.CastResponseRemoteModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.models.MovieInfoResponseRemoteModel
+import com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.models.MovieVideosResponseRemoteModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.Genre
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieActorDomainModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieCastDomainModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieInfoDomainModel
+import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieVideoDomainModel
 
 fun MovieInfoResponseRemoteModel.toMovieInfoDomainModel(): MovieInfoDomainModel {
     return MovieInfoDomainModel(
@@ -27,4 +29,16 @@ fun CastResponseRemoteModel.toMovieActorDomainModel(): MovieCastDomainModel {
             role = it.character
         )
     }.orEmpty())
+}
+
+fun MovieVideosResponseRemoteModel.toMovieVideoDomainModel(): MovieVideoDomainModel? {
+    val trailer = results.find { it.type == "Trailer" }
+
+    return trailer?.let {
+        MovieVideoDomainModel(
+            key = it.key,
+            type = it.type,
+            site = it.site
+        )
+    }
 }

@@ -20,7 +20,6 @@ class ImageHelper @Inject constructor(
         coverFileName: String,
         updateMovie: suspend (localImagePath: String) -> Unit
     ) {
-        Log.d("HMM", "Into SaveRemoteImageAndUpdateMovie")
         val localImagePath = downloadImage(coverFileName)
 
         updateMovie(localImagePath)
@@ -37,7 +36,6 @@ class ImageHelper @Inject constructor(
                 savedImagePath
             }.await()
 
-        Log.d("HMM", "Response in downloadImage is $response")
         return response
     }
 
@@ -64,7 +62,6 @@ class ImageHelper @Inject constructor(
             Log.e("HMM", "Exception occurred while saving image: ${e.message}")
         }
 
-        Log.d("HMM", "Into saveImageToLocal with path: $absolutePath")
         return absolutePath
     }
 }

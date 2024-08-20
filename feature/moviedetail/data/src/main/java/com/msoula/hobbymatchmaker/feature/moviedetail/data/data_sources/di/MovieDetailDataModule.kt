@@ -4,6 +4,7 @@ import com.msoula.hobbymatchmaker.core.database.dao.MovieDAO
 import com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.local.MovieDetailLocalDataSourceImpl
 import com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.MovieDetailRemoteDataSourceImpl
 import com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.services.MovieDetailService
+import com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.services.MovieVideosService
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.data_sources.local.MovieDetailLocalDataSource
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.data_sources.remote.MovieDetailRemoteDataSource
 import dagger.Module
@@ -25,8 +26,17 @@ object MovieDetailDataModule {
 
     @Provides
     @Singleton
-    fun provideMovieRemoteDetailDataSource(movieDetailService: MovieDetailService): MovieDetailRemoteDataSource {
-        return MovieDetailRemoteDataSourceImpl(movieDetailService)
+    fun provideMovieVideosService(retrofit: Retrofit): MovieVideosService {
+        return retrofit.create(MovieVideosService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideMovieRemoteDetailDataSource(
+        movieDetailService: MovieDetailService,
+        movieVideosService: MovieVideosService
+    ): MovieDetailRemoteDataSource {
+        return MovieDetailRemoteDataSourceImpl(movieDetailService, movieVideosService)
     }
 
     @Provides

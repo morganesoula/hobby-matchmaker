@@ -128,7 +128,8 @@ private fun NavGraphBuilder.mainGraph(
 
             MovieDetailContent(
                 viewState = viewState,
-                oneTimeEventFlow = movieDetailViewModel.oneTimeEventChannelFlow
+                oneTimeEventFlow = movieDetailViewModel.oneTimeEventChannelFlow,
+                onPlayTrailerClicked = movieDetailViewModel::onEvent
             )
         }
     }

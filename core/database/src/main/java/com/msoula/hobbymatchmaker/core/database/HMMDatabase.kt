@@ -11,7 +11,7 @@ import com.msoula.hobbymatchmaker.core.database.dao.models.MovieEntityModel
 
 @Database(
     entities = [MovieEntityModel::class, ActorEntityModel::class, MovieActorCrossEntityModel::class],
-    version = 10
+    version = 13
 )
 @TypeConverters(GenreTypeConverter::class)
 abstract class HMMDatabase : RoomDatabase() {

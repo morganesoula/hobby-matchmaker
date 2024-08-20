@@ -14,8 +14,10 @@ data class MovieInfoDomainModel(
     val synopsis: String? = null,
     val status: String? = null,
     val posterPath: String? = null,
+    val videoKey: String? = ""
 ) {
     companion object {
+        const val DEFAULT_ID: Long = -1
         const val DEFAULT_TITLE: String = ""
         const val DEFAULT_POPULARITY: Double = -1.0
         const val DEFAULT_RELEASE_DATE: String = ""

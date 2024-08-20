@@ -83,27 +83,6 @@ class MovieViewModel @Inject constructor(
                 MovieUiStateModel.Loading
             )
 
-    /* val viewState: StateFlow<MovieUiStateModel> by lazy {
-        observeAllMoviesUseCase()
-            .mapLatest { movies ->
-                if (movies.isEmpty()) {
-                    when (val result = fetchMovies()) {
-                        is Result.Success -> MovieUiStateModel.Loading
-                        is Result.Failure -> MovieUiStateModel.Error(result.error.message)
-                    }
-                } else {
-                    MovieUiStateModel.Success(list = movies.map { it.toMovieUiModel() }
-                        .toPersistentList())
-                }
-            }
-            .flowOn(Dispatchers.Main)
-            .stateIn(
-                viewModelScope,
-                SharingStarted.WhileSubscribed(5000),
-                MovieUiStateModel.Loading
-            )
-    } */
-
 
     fun onCardEvent(event: CardEventModel) {
         when (event) {

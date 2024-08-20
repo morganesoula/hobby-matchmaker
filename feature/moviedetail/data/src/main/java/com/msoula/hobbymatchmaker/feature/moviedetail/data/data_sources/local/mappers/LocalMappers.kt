@@ -17,7 +17,8 @@ fun MovieEntityModel.toMovieInfoDomainModel(): MovieInfoDomainModel {
         genre = this.genre?.toListGenre(),
         releaseDate = this.releaseDate,
         popularity = this.popularity,
-        status = this.status
+        status = this.status,
+        videoKey = this.videoUri
     )
 }
 

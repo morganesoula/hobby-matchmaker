@@ -6,6 +6,7 @@ import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.data_sources.local.MovieDetailLocalDataSource
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.data_sources.remote.MovieDetailRemoteDataSource
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieDetailDomainModel
+import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieVideoDomainModel
 import kotlinx.coroutines.flow.Flow
 
 class MovieDetailRepository(
@@ -35,5 +36,13 @@ class MovieDetailRepository(
 
     fun getMovieDetail(movieId: Long): Flow<MovieDetailDomainModel?> {
         return movieDetailLocalDataSource.getMovieDetail(movieId)
+    }
+
+    suspend fun updateMovieVideoURI(movieId: Long, videoURI: String) {
+        movieDetailLocalDataSource.updateMovieVideoURI(movieId, videoURI)
+    }
+
+    suspend fun fetchMovieTrailer(movieId: Long, language: String): Result<MovieVideoDomainModel?> {
+        return movieDetailRemoteDataSource.fetchMovieTrailer(movieId, language)
     }
 }

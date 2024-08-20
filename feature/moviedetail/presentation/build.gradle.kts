@@ -31,6 +31,11 @@ android {
      implementation(libs.material3)
      implementation(libs.ui.tooling)
 
+     // Exoplayer
+     implementation(libs.media3.common)
+     implementation(libs.media3.ui)
+     implementation(libs.media3.exoplayer)
+
      // Hilt
      implementation(libs.hilt.android)
      kapt(libs.hilt.compiler)
@@ -39,4 +44,7 @@ android {
      implementation(project(Modules.COMMON))
      implementation(project(Modules.DESIGN))
      implementation(project(Modules.MOVIE_DETAIL_DOMAIN))
+
+     // Youtube
+     implementation(libs.youtube.player)
  }

@@ -1,13 +1,17 @@
 package com.msoula.hobbymatchmaker.feature.moviedetail.presentation
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.common.getDeviceLocale
 import com.msoula.hobbymatchmaker.core.common.mapError
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
+import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieVideoDomainModel
+import com.msoula.hobbymatchmaker.feature.moviedetail.domain.use_cases.FetchMovieDetailTrailerUseCase
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.use_cases.FetchMovieDetailUseCase
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.use_cases.ObserveMovieDetailUseCase
+import com.msoula.hobbymatchmaker.feature.moviedetail.domain.use_cases.UpdateMovieVideoURIUseCase
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.errors.FetchingMovieDetailError
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.FetchStatusModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieDetailUiEventModel
@@ -37,6 +41,8 @@ import javax.inject.Inject
 class MovieDetailViewModel @Inject constructor(
     private val fetchMovieDetailUseCase: FetchMovieDetailUseCase,
     private val observeMovieDetailUseCase: ObserveMovieDetailUseCase,
+    private val fetchMovieDetailTrailerUseCase: FetchMovieDetailTrailerUseCase,
+    private val updateMovieVideoURIUseCase: UpdateMovieVideoURIUseCase,
     private val ioDispatcher: CoroutineDispatcher,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -46,6 +52,8 @@ class MovieDetailViewModel @Inject constructor(
     private val movieId = requireNotNull(savedStateHandle.get<Long>("movieId"))
     private val fetchStatusFlow = MutableStateFlow<FetchStatusModel>(FetchStatusModel.NeverFetched)
     private val movieIdFlow = MutableStateFlow<Long?>(null)
+
+    private var currentMovie: MovieDetailUiModel? = MovieDetailUiModel()
 
     init {
         setMovieId(movieId)
@@ -57,6 +65,7 @@ class MovieDetailViewModel @Inject constructor(
                 .combine(fetchStatusFlow) { movie, fetchStatus ->
                     Pair(movie, fetchStatus)
                 }.mapLatest { (movie, fetchStatus) ->
+                    currentMovie = movie?.toMovieDetailUiModel()
                     when {
                         movie?.info?.synopsis.isNullOrBlank() -> {
                             when (fetchStatus) {
@@ -95,6 +104,58 @@ class MovieDetailViewModel @Inject constructor(
                 SharingStarted.WhileSubscribed(5000),
                 MovieDetailViewStateModel.Loading
             )
+
+    fun onEvent(event: MovieDetailUiEventModel) {
+        when (event) {
+            is MovieDetailUiEventModel.OnPlayMovieTrailerClicked -> {
+                viewModelScope.launch(ioDispatcher) {
+                    onPlayTrailerClicked(
+                        event.movieId,
+                        event.isVideoURIknown
+                    )
+                }
+            }
+
+            else -> Unit
+        }
+    }
+
+    private suspend fun onPlayTrailerClicked(movieId: Long, isVideoURIknown: Boolean) {
+        if (isVideoURIknown) {
+            Log.d("HMM", "Video URI is already known")
+            _oneTimeEventChannel.send(
+                MovieDetailUiEventModel.OnPlayMovieTrailerReady(
+                    currentMovie?.videoKey ?: ""
+                )
+            )
+        } else {
+            Log.d("HMM", "Video URI is not known")
+            val language = getDeviceLocale()
+
+            fetchMovieDetailTrailerUseCase(movieId, language)
+                .mapSuccess { videoResponse ->
+                    processVideoResponse(videoResponse, movieId)
+                }
+        }
+    }
+
+    private suspend fun processVideoResponse(videoResponse: MovieVideoDomainModel?, movieId: Long) {
+        val uri = videoResponse?.let { videoModel ->
+            Log.d("HMM", "Video site is: ${videoModel.site}")
+            when (videoModel.site.lowercase()) {
+                "youtube" -> videoModel.key
+                else -> "https://vimeo.com/${videoModel.key}"
+            }
+        } ?: ""
+
+        updateMovieVideoURI(uri, movieId)
+    }
+
+    private suspend fun updateMovieVideoURI(videoURI: String, movieId: Long) {
+        Log.d("HMM", "Updating movie URI with: $videoURI")
+        updateMovieVideoURIUseCase(movieId = movieId, videoURI = videoURI)
+        _oneTimeEventChannel.send(MovieDetailUiEventModel.OnPlayMovieTrailerReady(videoURI))
+    }
 
     private fun setMovieId(movieId: Long) {
         viewModelScope.launch(ioDispatcher) {

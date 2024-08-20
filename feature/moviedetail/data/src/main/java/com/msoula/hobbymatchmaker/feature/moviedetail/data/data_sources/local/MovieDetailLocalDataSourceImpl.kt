@@ -32,7 +32,7 @@ class MovieDetailLocalDataSourceImpl(
             overview = movie.info.synopsis,
             status = movie.info.status,
             popularity = movie.info.popularity,
-            actors = movie.cast?.cast?.map { actor -> actor.toActorEntityModel() } ?: emptyList(),
+            actors = movie.cast?.cast?.map { actor -> actor.toActorEntityModel() } ?: emptyList()
         )
     }
 
@@ -43,5 +43,9 @@ class MovieDetailLocalDataSourceImpl(
                 it.actors.toMovieCastDomainModel()
             )
         }
+    }
+
+    override suspend fun updateMovieVideoURI(movieId: Long, videoURI: String) {
+        movieDAO.updateMovieVideoURI(movieId, videoURI)
     }
 }
