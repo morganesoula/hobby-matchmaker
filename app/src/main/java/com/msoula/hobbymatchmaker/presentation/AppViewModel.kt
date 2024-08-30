@@ -8,7 +8,6 @@ import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.session.domain.use_cases.GetConnexionModeUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.use_cases.ObserveIsConnectedUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.use_cases.SetIsConnectedUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -19,11 +18,9 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@HiltViewModel
-class AppViewModel @Inject constructor(
+class AppViewModel(
     private val ioDispatcher: CoroutineDispatcher,
     private val logOutUseCase: LogOutUseCase,
     private val observeIsConnectedUseCase: ObserveIsConnectedUseCase,

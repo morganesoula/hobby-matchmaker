@@ -1,9 +1,8 @@
 plugins {
     `android-library`
     `kotlin-android`
-    id(Plugins.DAGGER_HILT)
+    id(Plugins.KSP)
     kotlin(Plugins.SERIALIZATION) version PluginVersion.SERIALIZATION
-    kotlin(Plugins.KAPT)
 }
 
 apply<MainGradlePlugin>()
@@ -20,9 +19,9 @@ dependencies {
     implementation(libs.core.ktx)
     implementation(libs.runtime)
 
-    // Hilt
-    implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
+    // Koin
+    implementation(libs.koin.android)
+    ksp(libs.koin.ksp)
 
     // Modules
     implementation(project(Modules.NETWORK))
@@ -38,6 +37,6 @@ dependencies {
 
     // Room
     api(libs.room.runtime)
-    kapt(libs.room.compiler)
+    ksp(libs.room.compiler)
     implementation(libs.room.ktx)
 }

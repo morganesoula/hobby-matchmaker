@@ -22,7 +22,6 @@ import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationE
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.models.SignInFormStateModel
 import com.msoula.hobbymatchmaker.core.session.domain.use_cases.SetIsConnectedUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -31,10 +30,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
-@HiltViewModel
-class SignInViewModel @Inject constructor(
+class SignInViewModel(
     private val authFormValidationUseCases: AuthFormValidationUseCase,
     private val savedStateHandle: SavedStateHandle,
     private val signInUseCase: SignInUseCase,

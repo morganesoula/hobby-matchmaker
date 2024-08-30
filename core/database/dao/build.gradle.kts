@@ -1,7 +1,7 @@
 plugins {
     `android-library`
     `kotlin-android`
-    kotlin(Plugins.KAPT)
+    id(Plugins.KSP)
 }
 
 apply<MainGradlePlugin>()
@@ -16,7 +16,7 @@ dependencies {
 
     // Room
     api(libs.room.runtime)
-    kapt(libs.room.compiler)
+    ksp(libs.room.compiler)
     implementation(libs.room.ktx)
     implementation(libs.gson)
 }

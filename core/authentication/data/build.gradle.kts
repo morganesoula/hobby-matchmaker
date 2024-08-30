@@ -1,9 +1,8 @@
 plugins {
     `android-library`
     `kotlin-android`
-    id(Plugins.DAGGER_HILT)
+    id(Plugins.KSP)
     kotlin(Plugins.SERIALIZATION) version PluginVersion.SERIALIZATION
-    kotlin(Plugins.KAPT)
 }
 
 apply<MainGradlePlugin>()
@@ -27,9 +26,9 @@ dependencies {
     // Google
     implementation(libs.play.services.auth)
 
-    // Hilt
-    implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
+    // Koin
+    implementation(libs.koin.android)
+    ksp(libs.koin.ksp)
 
     // Modules
     implementation(project(Modules.AUTHENTICATION_DOMAIN))

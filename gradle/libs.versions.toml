@@ -18,18 +18,16 @@ googleIdentity = "1.1.1"
 googleServices = "4.4.2"
 gradle = "8.5.2"
 gson = "2.11.0"
-hiltAndroid = "2.50"
-hiltAndroidGradlePlugin = "2.50"
-hiltAndroidTesting = "2.50"
-hiltCompiler = "2.50"
-hiltNavigationCompose = "1.2.0"
 javapoet = "1.13.0"
 junitJupiter = "5.10.2"
 junitKtx = "1.2.1"
+koin = "3.5.6"
+koinAnnotation = "1.4.0-RC3"
 kotlinGradlePlugin = "1.9.22"
 kotlinxCollectionsImmutable = "0.3.7"
 kotlinxCoroutinesTest = "1.8.0"
 kotlinxSerialization = "1.5.0"
+ksp = "1.9.22-1.0.17"
 lifecycleViewmodelCompose = "2.7.0"
 loggingInterceptor = "4.12.0"
 material = "1.6.8"
@@ -75,18 +73,18 @@ google-identity = { module = "com.google.android.libraries.identity.googleid:goo
 google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
 gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
-hilt-android-gradle-plugin = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hiltAndroidGradlePlugin" }
-hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hiltAndroidTesting" }
-hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltCompiler" }
-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 javapoet = { module = "com.squareup:javapoet", version.ref = "javapoet" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junitJupiter" }
 junit-ktx = { module = "androidx.test.ext:junit-ktx", version.ref = "junitKtx" }
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
+koin-ksp = { module = "io.insert-koin:koin-ksp-compiler", version.ref = "koinAnnotation" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinGradlePlugin" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+ksp = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleViewmodelCompose" }
 lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleViewmodelCompose" }
 lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }

@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.credentials.GetCredentialResponse
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -25,6 +24,7 @@ import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.MovieDetailCo
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.MovieDetailViewModel
 import com.msoula.hobbymatchmaker.presentation.AppScreen
 import com.msoula.hobbymatchmaker.presentation.AppViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @SuppressLint("ComposeModifierMissing", "ComposeViewModelInjection")
 @Stable
@@ -57,7 +57,7 @@ private fun NavGraphBuilder.authGraph(
         startDestination = Destinations.Auth.SignIn,
     ) {
         composable<Destinations.Auth.SignIn> {
-            val signInViewModel: SignInViewModel = hiltViewModel<SignInViewModel>()
+            val signInViewModel: SignInViewModel = koinViewModel<SignInViewModel>()
 
             SignInScreen(
                 redirectToSignUpScreen = { navController.navigate(Destinations.Auth.SignUp) },
@@ -81,7 +81,7 @@ private fun NavGraphBuilder.authGraph(
         }
 
         composable<Destinations.Auth.SignUp> {
-            val signUpViewModel: SignUpViewModel = hiltViewModel<SignUpViewModel>()
+            val signUpViewModel: SignUpViewModel = koinViewModel<SignUpViewModel>()
 
             SignUpScreen(
                 redirectToLogInScreen = {
@@ -123,7 +123,7 @@ private fun NavGraphBuilder.mainGraph(
         }
 
         composable<Destinations.Main.MovieDetail> {
-            val movieDetailViewModel: MovieDetailViewModel = hiltViewModel<MovieDetailViewModel>()
+            val movieDetailViewModel: MovieDetailViewModel = koinViewModel<MovieDetailViewModel>()
             val viewState by movieDetailViewModel.viewState.collectAsStateWithLifecycle()
 
             MovieDetailContent(

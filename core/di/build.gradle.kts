@@ -1,8 +1,7 @@
 plugins {
     `android-library`
     `kotlin-android`
-    id(Plugins.DAGGER_HILT)
-    kotlin(Plugins.KAPT)
+    id(Plugins.KSP)
 }
 
 apply<MainGradlePlugin>()
@@ -23,9 +22,9 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.runtime)
 
-    // Hilt
-    implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
+    // Koin
+    implementation(libs.koin.android)
+    ksp(libs.koin.ksp)
 
     // Firebase
     implementation(libs.firebase.firebase.auth.ktx)

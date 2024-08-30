@@ -3,9 +3,8 @@ package com.msoula.hobbymatchmaker.features.movies.domain.use_cases
 import android.util.Log
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.MovieRepository
 import com.msoula.hobbymatchmaker.features.movies.domain.utils.ImageHelper
-import javax.inject.Inject
 
-class SaveLocalCoverPathUseCase @Inject constructor(
+class SaveLocalCoverPathUseCase constructor(
     private val movieRepository: MovieRepository,
     private val imageHelper: ImageHelper
 ) {

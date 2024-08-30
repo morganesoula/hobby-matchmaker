@@ -15,7 +15,6 @@ class MainGradlePlugin : Plugin<Project> {
         project.apply {
             plugin(Plugins.ANDROID_LIBRARY)
             plugin(Plugins.KOTLIN_ANDROID)
-            plugin(Plugins.KOTLIN_KAPT)
             plugin("kotlin-parcelize")
         }
     }
