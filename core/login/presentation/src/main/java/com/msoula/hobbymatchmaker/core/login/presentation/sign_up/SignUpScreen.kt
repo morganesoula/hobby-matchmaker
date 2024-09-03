@@ -35,7 +35,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.msoula.hobbymatchmaker.core.common.ObserveAsEvents
 import com.msoula.hobbymatchmaker.core.design.component.HMMButtonAuthComponent
@@ -49,6 +48,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationU
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_up.models.SignUpStateModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import org.koin.androidx.compose.koinViewModel
 
 import com.msoula.hobbymatchmaker.core.login.presentation.R.string as StringRes
 
@@ -58,7 +58,7 @@ fun SignUpScreen(
     redirectToLogInScreen: () -> Unit,
     redirectToAppScreen: () -> Unit,
     oneTimeEventChannelFlow: Flow<AuthenticationEvent>,
-    signUpViewModel: SignUpViewModel = hiltViewModel<SignUpViewModel>()
+    signUpViewModel: SignUpViewModel = koinViewModel<SignUpViewModel>()
 ) {
     val registrationState by signUpViewModel.formDataFlow.collectAsStateWithLifecycle()
     val signUpProgressLoading by signUpViewModel.signUpCircularProgress.collectAsStateWithLifecycle()

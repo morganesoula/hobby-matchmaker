@@ -18,7 +18,6 @@ import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieD
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieDetailUiModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieDetailViewStateModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.toMovieDetailUiModel
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -34,11 +33,9 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@HiltViewModel
-class MovieDetailViewModel @Inject constructor(
+class MovieDetailViewModel constructor(
     private val fetchMovieDetailUseCase: FetchMovieDetailUseCase,
     private val observeMovieDetailUseCase: ObserveMovieDetailUseCase,
     private val fetchMovieDetailTrailerUseCase: FetchMovieDetailTrailerUseCase,

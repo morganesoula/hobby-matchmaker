@@ -1,22 +1,6 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.sign_in.utils
 
-import android.content.Context
-import android.content.Intent
-import android.content.IntentSender
-import android.util.Log
-import com.google.android.gms.auth.api.identity.BeginSignInRequest
-import com.google.android.gms.auth.api.identity.BeginSignInRequest.GoogleIdTokenRequestOptions
-import com.google.android.gms.auth.api.identity.SignInClient
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
-import com.msoula.hobbymatchmaker.core.login.presentation.R
-import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.models.SignInResultModel
-import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.models.UserData
-import kotlinx.coroutines.tasks.await
-import java.util.concurrent.CancellationException
-import javax.inject.Inject
-
-class GoogleAuthUIClient
+/* class GoogleAuthUIClient
 @Inject
 constructor(
     private val context: Context,
@@ -76,4 +60,4 @@ constructor(
             .setAutoSelectEnabled(true)
             .build()
     }
-}
+} */

@@ -1,9 +1,8 @@
 plugins {
     `android-library`
     `kotlin-android`
-    id(Plugins.DAGGER_HILT)
-    kotlin(Plugins.SERIALIZATION) version PluginVersion.SERIALIZATION
-    kotlin(Plugins.KAPT)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.serialization)
 }
 apply<MainGradlePlugin>()
 
@@ -41,10 +40,9 @@ dependencies {
     // Google
     implementation(libs.play.services.auth)
 
-    // Hilt
-    implementation(libs.hilt.android)
-    implementation(libs.hilt.navigation.compose)
-    kapt(libs.hilt.compiler)
+    // Koin
+    implementation(libs.koin.android)
+    implementation(libs.koin.compose)
 
     // Modules
     implementation(project(Modules.AUTHENTICATION_DATA))

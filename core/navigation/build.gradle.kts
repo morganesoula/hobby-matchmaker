@@ -1,8 +1,8 @@
 plugins {
     `android-library`
     `kotlin-android`
-    kotlin(Plugins.SERIALIZATION) version PluginVersion.SERIALIZATION
-    kotlin(Plugins.KAPT)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.serialization)
 }
 
 apply<MainGradlePlugin>()
@@ -22,9 +22,8 @@ dependencies {
     implementation(libs.activity.compose)
     implementation(libs.runtime)
 
-    // Hilt
-    implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
+    // Koin
+    implementation(libs.koin.android)
 
     // Modules
     implementation(project(Modules.DESIGN))

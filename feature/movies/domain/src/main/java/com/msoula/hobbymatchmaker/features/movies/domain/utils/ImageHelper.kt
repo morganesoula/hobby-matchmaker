@@ -8,11 +8,10 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import java.net.URL
-import javax.inject.Inject
 
 private const val IMG_PREFIX = "https://image.tmdb.org/t/p/w500"
 
-class ImageHelper @Inject constructor(
+class ImageHelper constructor(
     private val coroutineDispatcher: CoroutineDispatcher,
     private val context: Context,
 ) {

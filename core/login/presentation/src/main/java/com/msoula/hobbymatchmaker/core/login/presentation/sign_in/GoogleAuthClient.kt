@@ -50,5 +50,4 @@ class GoogleAuthClient(
             throw RuntimeException("Received an invalid credential type")
         }
     }
-
 }

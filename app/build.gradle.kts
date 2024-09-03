@@ -6,10 +6,10 @@ import java.util.Properties
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id(Plugins.DAGGER_HILT)
-    id(Plugins.GOOGLE_SERVICES)
-    kotlin(Plugins.KAPT)
     id("kotlin-parcelize")
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.ksp)
 }
 
 val secretsPropertiesFile = rootProject.file("secrets.properties")
@@ -65,6 +65,15 @@ android {
         }
     }
 
+    applicationVariants.all {
+        val variantName = name
+        sourceSets {
+            getByName("main") {
+                java.srcDir(File("build/generated/ksp/$variantName/kotlin"))
+            }
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -94,17 +103,12 @@ android {
     }
 }
 
-kapt {
-    arguments {
-        arg("dagger.hilt.shareTestComponents", "true")
-    }
-}
-
 dependencies {
     lintChecks(libs.compose.lint.checks)
 
     // Compose
     implementation(libs.ui.tooling)
+    implementation(libs.compose.navigation)
     implementation(libs.material)
     implementation(libs.material3)
     implementation(libs.activity.compose)
@@ -127,10 +131,9 @@ dependencies {
     implementation(libs.firebase.firebase.auth)
     implementation(libs.firebase.ui.auth)
 
-    // Hilt
-    implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
-    implementation(libs.hilt.navigation.compose)
+    // Koin
+    implementation(libs.koin.android)
+    implementation(libs.koin.compose)
 
     // Modules
     implementation(project(Modules.AUTHENTICATION_DATA))
@@ -140,6 +143,7 @@ dependencies {
     implementation(project(Modules.DAO))
     implementation(project(Modules.DESIGN))
     implementation(project(Modules.DI))
+    implementation(project(Modules.LOGIN_DOMAIN))
     implementation(project(Modules.LOGIN_PRESENTATION))
     implementation(project(Modules.MOVIE_DATA))
     implementation(project(Modules.MOVIE_DOMAIN))
@@ -158,7 +162,6 @@ dependencies {
 
     // Unit Test
     testImplementation(libs.assertk)
-    testImplementation(libs.hilt.android.testing)
     testImplementation(libs.test.core.ktx)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.junit.jupiter)

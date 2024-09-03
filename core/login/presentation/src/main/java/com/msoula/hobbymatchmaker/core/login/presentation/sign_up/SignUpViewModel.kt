@@ -17,7 +17,6 @@ import com.msoula.hobbymatchmaker.core.login.presentation.extensions.updateState
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_up.models.SignUpStateModel
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
@@ -28,12 +27,10 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(FlowPreview::class)
-@HiltViewModel
-class SignUpViewModel @Inject constructor(
+class SignUpViewModel(
     private val loginValidateFormUseCase: LoginValidateFormUseCase,
     private val signUpUseCase: SignUpUseCase,
     private val ioDispatcher: CoroutineDispatcher,

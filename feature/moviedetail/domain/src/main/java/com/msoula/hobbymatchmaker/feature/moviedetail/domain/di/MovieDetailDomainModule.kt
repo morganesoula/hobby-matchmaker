@@ -1,48 +1,16 @@
 package com.msoula.hobbymatchmaker.feature.moviedetail.domain.di
 
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.data_sources.local.MovieDetailLocalDataSource
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.data_sources.remote.MovieDetailRemoteDataSource
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.repositories.MovieDetailRepository
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.use_cases.FetchMovieDetailTrailerUseCase
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.use_cases.FetchMovieDetailUseCase
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.use_cases.ObserveMovieDetailUseCase
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.use_cases.UpdateMovieVideoURIUseCase
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import org.koin.dsl.module
 
-@Module
-@InstallIn(SingletonComponent::class)
-object MovieDetailDomainModule {
-
-    @Provides
-    @Singleton
-    fun provideMovieDetailRepository(
-        movieDetailRemoteDataSource: MovieDetailRemoteDataSource,
-        movieDetailLocalDataSource: MovieDetailLocalDataSource
-    ): MovieDetailRepository {
-        return MovieDetailRepository(movieDetailRemoteDataSource, movieDetailLocalDataSource)
-    }
-
-    @Provides
-    fun provideFetchMovieDetailUseCase(movieDetailRepository: MovieDetailRepository): FetchMovieDetailUseCase {
-        return FetchMovieDetailUseCase(movieDetailRepository)
-    }
-
-    @Provides
-    fun provideGetMovieDetailUseCase(movieDetailRepository: MovieDetailRepository): ObserveMovieDetailUseCase {
-        return ObserveMovieDetailUseCase(movieDetailRepository)
-    }
-
-    @Provides
-    fun provideFetchMovieDetailVideoURIUseCase(movieDetailRepository: MovieDetailRepository): FetchMovieDetailTrailerUseCase {
-        return FetchMovieDetailTrailerUseCase(movieDetailRepository)
-    }
-
-    @Provides
-    fun provideUpdateMovieVideoURIUseCase(movieDetailRepository: MovieDetailRepository): UpdateMovieVideoURIUseCase {
-        return UpdateMovieVideoURIUseCase(movieDetailRepository)
-    }
+val movieDetailDomainModule = module {
+    single<MovieDetailRepository> { MovieDetailRepository(get(), get()) }
+    factory<FetchMovieDetailUseCase> { FetchMovieDetailUseCase(get()) }
+    factory<ObserveMovieDetailUseCase> {  ObserveMovieDetailUseCase(get()) }
+    factory<FetchMovieDetailTrailerUseCase> { FetchMovieDetailTrailerUseCase(get()) }
+    factory<UpdateMovieVideoURIUseCase> { UpdateMovieVideoURIUseCase(get()) }
 }

@@ -1,7 +1,6 @@
 package com.msoula.hobbymatchmaker.features.movies.data.data_sources.remote
 
 import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.core.common.mapError
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.network.execute
 import com.msoula.hobbymatchmaker.features.movies.data.data_sources.remote.mappers.toMovieDomainModel
@@ -9,27 +8,24 @@ import com.msoula.hobbymatchmaker.features.movies.data.data_sources.remote.servi
 import com.msoula.hobbymatchmaker.features.movies.domain.data_sources.MovieRemoteDataSource
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.utils.ImageHelper
-import javax.inject.Inject
 
-class MovieRemoteDataSourceImpl @Inject constructor(
+class MovieRemoteDataSourceImpl constructor(
     private val tmdbService: TMDBService,
     private val imageHelper: ImageHelper
 ) : MovieRemoteDataSource {
 
     override suspend fun fetchMovies(language: String): Result<List<MovieDomainModel>> {
-        val list = buildList {
-            fetchMoviesByPage("fr-FR", 1).mapSuccess { movies1 ->
-                addAll(movies1)
-                fetchMoviesByPage("fr-FR", 2).mapSuccess { movies2 ->
-                    addAll(movies2)
-                    fetchMoviesByPage("fr-FR", 3).mapSuccess { movies3 ->
-                        addAll(movies3)
-                    }.mapError { error3 -> return@mapError error3 }
-                }.mapError { error2 -> return@mapError error2 }
-            }.mapError { error1 -> return@mapError error1 }
+        val pages = listOf(1, 2, 3)
+        val movies = mutableListOf<MovieDomainModel>()
+
+        pages.forEach { page ->
+            when (val result = fetchMoviesByPage(language, page)) {
+                is Result.Success -> movies.addAll(result.data)
+                is Result.Failure -> return result
+            }
         }
 
-        val updatedList = updateLocalPosterPath(list)
+        val updatedList = updateLocalPosterPath(movies)
         return Result.Success(updatedList)
     }
 

@@ -15,7 +15,6 @@ class MainGradlePlugin : Plugin<Project> {
         project.apply {
             plugin(Plugins.ANDROID_LIBRARY)
             plugin(Plugins.KOTLIN_ANDROID)
-            plugin(Plugins.KOTLIN_KAPT)
             plugin("kotlin-parcelize")
         }
     }
@@ -54,10 +53,6 @@ class MainGradlePlugin : Plugin<Project> {
             buildFeatures {
                 buildConfig = true
                 compose = true
-            }
-
-            composeOptions {
-                kotlinCompilerExtensionVersion = "1.5.8"
             }
         }
     }

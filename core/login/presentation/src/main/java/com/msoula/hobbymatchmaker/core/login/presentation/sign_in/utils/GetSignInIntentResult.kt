@@ -1,18 +1,9 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.sign_in.utils
 
-import android.app.Activity
 import android.content.IntentSender
-import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.models.SignInResultModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 class GetSignInIntentResult(
     private val launcher: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>,
@@ -21,12 +12,12 @@ class GetSignInIntentResult(
         launcher.launch(
             IntentSenderRequest.Builder(
                 signInIntentSender ?: return,
-            ).build(),
+            ).build()
         )
     }
 }
 
-@Composable
+/* @Composable
 fun rememberGetSignInIntentResult(
     googleAuthUiClient: GoogleAuthUIClient,
     onGoogleSignInEvent: (SignInResultModel) -> Unit,
@@ -53,4 +44,4 @@ fun rememberGetSignInIntentResult(
     return remember(launcher) {
         GetSignInIntentResult(launcher)
     }
-}
+} */

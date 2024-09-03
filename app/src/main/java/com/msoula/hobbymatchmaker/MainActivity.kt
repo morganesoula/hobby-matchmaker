@@ -15,21 +15,14 @@ import com.msoula.hobbymatchmaker.core.session.domain.models.SessionConnexionMod
 import com.msoula.hobbymatchmaker.core.session.domain.models.SessionUserDomainModel
 import com.msoula.hobbymatchmaker.core.session.domain.use_cases.ClearSessionDataUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.use_cases.SaveUserUseCase
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
 
-@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @Inject
-    lateinit var auth: FirebaseAuth
-
-    @Inject
-    lateinit var saveUserUseCase: SaveUserUseCase
-
-    @Inject
-    lateinit var clearDataUseCase: ClearSessionDataUseCase
+    val auth: FirebaseAuth by inject()
+    val saveUserUseCase: SaveUserUseCase by inject()
+    val clearDataUseCase: ClearSessionDataUseCase by inject()
 
     private lateinit var authStateListener: AuthStateListener
 
