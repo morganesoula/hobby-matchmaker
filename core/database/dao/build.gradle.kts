@@ -1,7 +1,8 @@
 plugins {
     `android-library`
     `kotlin-android`
-    id(Plugins.KSP)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.ksp)
 }
 
 apply<MainGradlePlugin>()

@@ -1,8 +1,8 @@
 plugins {
     `android-library`
     `kotlin-android`
-    id(Plugins.KSP)
-    kotlin(Plugins.SERIALIZATION) version PluginVersion.SERIALIZATION
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.serialization)
 }
 apply<MainGradlePlugin>()
 
@@ -43,7 +43,6 @@ dependencies {
     // Koin
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
-    ksp(libs.koin.ksp)
 
     // Modules
     implementation(project(Modules.AUTHENTICATION_DATA))

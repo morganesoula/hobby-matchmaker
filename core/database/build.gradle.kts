@@ -1,7 +1,8 @@
 plugins {
     `android-library`
     `kotlin-android`
-    id(Plugins.KSP)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.ksp)
 }
 
 apply<MainGradlePlugin>()
@@ -13,7 +14,6 @@ android {
 dependencies {
     // Koin
     implementation(libs.koin.android)
-    ksp(libs.koin.ksp)
 
     // Modules
     implementation(project(Modules.DAO))

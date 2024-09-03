@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     `kotlin-dsl`
 }
@@ -17,7 +15,7 @@ dependencies {
     implementation(libs.javapoet)
 }
 
-val compileKotlin: KotlinCompile by tasks
+/* val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions {
     jvmTarget = "17"
-}
+} */

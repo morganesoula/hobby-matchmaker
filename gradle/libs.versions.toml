@@ -1,5 +1,5 @@
 [versions]
-activityCompose = "1.9.0"
+activityCompose = "1.9.1"
 appcompat = "1.7.0"
 arrow = "1.2.1"
 assertk = "0.28.0"
@@ -11,34 +11,33 @@ coreTesting = "2.2.0"
 credentials = "1.2.2"
 datastore = "1.1.1"
 facebookAndroidSdk = "16.3.0"
-firebaseBom = "33.1.1"
+firebaseBom = "33.2.0"
 firebaseKtx = "23.0.0"
 firebaseUiAuth = "7.2.0"
 googleIdentity = "1.1.1"
 googleServices = "4.4.2"
-gradle = "8.5.2"
+gradle = "8.6.0"
 gson = "2.11.0"
 javapoet = "1.13.0"
 junitJupiter = "5.10.2"
 junitKtx = "1.2.1"
 koin = "3.5.6"
-koinAnnotation = "1.4.0-RC3"
-kotlinGradlePlugin = "1.9.22"
+kotlinGradlePlugin = "2.0.20"
 kotlinxCollectionsImmutable = "0.3.7"
 kotlinxCoroutinesTest = "1.8.0"
-kotlinxSerialization = "1.5.0"
-ksp = "1.9.22-1.0.17"
+kotlinxSerialization = "1.6.3"
+ksp = "2.0.20-1.0.24"
 lifecycleViewmodelCompose = "2.7.0"
 loggingInterceptor = "4.12.0"
 material = "1.6.8"
 material3 = "1.2.1"
-media3 = "1.4.0"
+media3 = "1.4.1"
 mockk = "1.13.9"
 mockkAndroid = "1.13.9"
 navigationTesting = "2.7.7"
-navigationUiKtx = "2.8.0-beta05"
+navigationUiKtx = "2.8.0-rc01"
 okhttp = "4.12.0"
-paging = "3.3.0"
+paging = "3.3.2"
 playServicesAuth = "21.2.0"
 retrofit = "2.9.0"
 room = "2.6.1"
@@ -79,7 +78,6 @@ junit-ktx = { module = "androidx.test.ext:junit-ktx", version.ref = "junitKtx" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
-koin-ksp = { module = "io.insert-koin:koin-ksp-compiler", version.ref = "koinAnnotation" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinGradlePlugin" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
@@ -114,3 +112,8 @@ ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "uiTooli
 youtube-player = { module = "com.pierfrancescosoffritti.androidyoutubeplayer:core", version.ref = "youtube" }
 
 [plugins]
+org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinGradlePlugin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlinGradlePlugin" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinGradlePlugin" }

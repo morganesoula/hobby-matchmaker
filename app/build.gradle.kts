@@ -6,9 +6,10 @@ import java.util.Properties
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id(Plugins.GOOGLE_SERVICES)
-    id(Plugins.KSP)
     id("kotlin-parcelize")
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.ksp)
 }
 
 val secretsPropertiesFile = rootProject.file("secrets.properties")
@@ -131,10 +132,8 @@ dependencies {
     implementation(libs.firebase.ui.auth)
 
     // Koin
-    implementation(libs.koin.core)
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
-    ksp(libs.koin.ksp)
 
     // Modules
     implementation(project(Modules.AUTHENTICATION_DATA))
