@@ -2,7 +2,7 @@ package com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.
 
 import com.google.gson.annotations.SerializedName
 
-data class MovieInfoResponseRemoteModel(
+data class MovieDetailResponseRemoteModel(
     @SerializedName("id") val id: Int = -1,
     @SerializedName("genres") val genres: List<GenreResponseRemoteModel> = emptyList(),
     @SerializedName("original_title") val originalTitle: String = "",

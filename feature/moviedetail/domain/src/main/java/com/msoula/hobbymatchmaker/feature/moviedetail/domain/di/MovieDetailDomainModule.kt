@@ -8,7 +8,7 @@ import com.msoula.hobbymatchmaker.feature.moviedetail.domain.use_cases.UpdateMov
 import org.koin.dsl.module
 
 val movieDetailDomainModule = module {
-    single<MovieDetailRepository> { MovieDetailRepository(get(), get()) }
+    single<MovieDetailRepository> { MovieDetailRepository(get()) }
     factory<FetchMovieDetailUseCase> { FetchMovieDetailUseCase(get()) }
     factory<ObserveMovieDetailUseCase> {  ObserveMovieDetailUseCase(get()) }
     factory<FetchMovieDetailTrailerUseCase> { FetchMovieDetailTrailerUseCase(get()) }

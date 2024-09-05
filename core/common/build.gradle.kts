@@ -21,6 +21,10 @@ dependencies {
     implementation(libs.activity.compose)
     implementation(libs.runtime)
 
+    // Firestore
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firebase.firestore.ktx)
+
     // Koin
     implementation(libs.koin.android)
 

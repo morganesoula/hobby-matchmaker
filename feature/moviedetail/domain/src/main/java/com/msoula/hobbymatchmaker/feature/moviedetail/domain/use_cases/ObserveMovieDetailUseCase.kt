@@ -5,6 +5,6 @@ import com.msoula.hobbymatchmaker.feature.moviedetail.domain.repositories.MovieD
 import kotlinx.coroutines.flow.Flow
 
 class ObserveMovieDetailUseCase(private val movieDetailRepository: MovieDetailRepository) {
-    operator fun invoke(movieId: Long): Flow<MovieDetailDomainModel?> =
-        movieDetailRepository.getMovieDetail(movieId)
+    suspend operator fun invoke(movieId: Long): Flow<MovieDetailDomainModel?> =
+        movieDetailRepository.observeMovieDetail(movieId)
 }

@@ -20,13 +20,17 @@ dependencies {
     implementation(libs.core.ktx)
     implementation(libs.runtime)
 
+    // Firestore
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firebase.firestore)
+    implementation(libs.firebase.firebase.firestore.ktx)
+
     // Koin
     implementation(libs.koin.android)
 
     // Modules
     implementation(project(Modules.NETWORK))
     implementation(project(Modules.MOVIE_DOMAIN))
-    implementation(project(Modules.DAO))
     implementation(project(Modules.COMMON))
 
     // Retrofit
@@ -34,9 +38,4 @@ dependencies {
     implementation(libs.retrofit.gson)
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
-
-    // Room
-    api(libs.room.runtime)
-    ksp(libs.room.compiler)
-    implementation(libs.room.ktx)
 }

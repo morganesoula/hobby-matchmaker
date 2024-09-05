@@ -35,7 +35,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class MovieDetailViewModel constructor(
+class MovieDetailViewModel(
     private val fetchMovieDetailUseCase: FetchMovieDetailUseCase,
     private val observeMovieDetailUseCase: ObserveMovieDetailUseCase,
     private val fetchMovieDetailTrailerUseCase: FetchMovieDetailTrailerUseCase,
@@ -64,7 +64,7 @@ class MovieDetailViewModel constructor(
                 }.mapLatest { (movie, fetchStatus) ->
                     currentMovie = movie?.toMovieDetailUiModel()
                     when {
-                        movie?.info?.synopsis.isNullOrBlank() -> {
+                        movie?.synopsis.isNullOrBlank() -> {
                             when (fetchStatus) {
                                 is FetchStatusModel.Error -> MovieDetailViewStateModel.Error(
                                     fetchStatus.error

@@ -33,7 +33,4 @@ dependencies {
 
     // Navigation
     implementation(libs.compose.navigation)
-
-    // Room
-    api(libs.room.runtime)
 }

@@ -1,5 +1,9 @@
 package com.msoula.hobbymatchmaker.features.movies.data.data_sources.remote
 
+import android.util.Log
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.WriteBatch
+import com.google.firebase.firestore.snapshots
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.network.execute
@@ -8,10 +12,14 @@ import com.msoula.hobbymatchmaker.features.movies.data.data_sources.remote.servi
 import com.msoula.hobbymatchmaker.features.movies.domain.data_sources.MovieRemoteDataSource
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.utils.ImageHelper
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.tasks.await
 
-class MovieRemoteDataSourceImpl constructor(
+class MovieRemoteDataSourceImpl(
     private val tmdbService: TMDBService,
-    private val imageHelper: ImageHelper
+    private val imageHelper: ImageHelper,
+    private val firestore: FirebaseFirestore
 ) : MovieRemoteDataSource {
 
     override suspend fun fetchMovies(language: String): Result<List<MovieDomainModel>> {
@@ -58,5 +66,84 @@ class MovieRemoteDataSourceImpl constructor(
         }
 
         return mutableMovieList.map { it }
+    }
+
+    override fun observeMovies(): Flow<List<MovieDomainModel>> {
+        return firestore.collection("movies")
+            .snapshots()
+            .map { query ->
+                query.documents.mapNotNull {
+                    it.toObject(MovieDomainModel::class.java)
+                }
+            }
+    }
+
+    override suspend fun upsertMovies(movies: List<MovieDomainModel>) {
+        val movieChunks = if (movies.size < 500) listOf(movies) else movies.chunked(500)
+
+        movieChunks.forEach { movieChunk ->
+            val batch: WriteBatch = firestore.batch()
+            movieChunk.forEach { movie ->
+                val movieRef = firestore.collection("movies").document(movie.id.toString())
+                val movieData = hashMapOf(
+                    "id" to movie.id,
+                    "title" to movie.title,
+                    "coverFileName" to movie.coverFileName,
+                    "localCoverFilePath" to movie.localCoverFilePath,
+                    "isFavorite" to movie.isFavorite,
+                    "isSeen" to movie.isSeen,
+                    "synopsis" to movie.overview
+                )
+                batch.set(movieRef, movieData)
+            }
+            batch.commit()
+                .addOnSuccessListener {
+                    Log.i("HMM", "Successfully saved movies online")
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("HMM", "Error saving movies online", exception)
+                }
+        }
+    }
+
+    override suspend fun setMovieFavoriteValue(movieId: Long, isFavorite: Boolean) {
+        try {
+            val movieSnapshot = firestore.collection("movies")
+                .whereEqualTo("id", movieId)
+                .get()
+                .await()
+
+            Log.d("HMM", "Movie snapshot: ${movieSnapshot.documents}")
+
+            if (movieSnapshot.documents.isNotEmpty()) {
+                val documentRef = movieSnapshot.documents.first().reference
+                documentRef.update(mapOf("isFavorite" to isFavorite)).await()
+            } else {
+                Log.e("HMM", "Movie not found")
+            }
+        } catch (e: Exception) {
+            Log.e("HMM", "Error setting movie favorite", e)
+        }
+    }
+
+    override suspend fun setMovieWithLocalCoverFilePath(
+        coverFileName: String,
+        localCoverFilePath: String
+    ) {
+        try {
+            val movieSnapshot = firestore.collection("movies")
+                .whereEqualTo("coverFileName", coverFileName)
+                .get()
+                .await()
+
+            if (movieSnapshot.documents.isNotEmpty()) {
+                val documentRef = movieSnapshot.documents.first().reference
+                documentRef.update(mapOf("localCoverFilePath" to localCoverFilePath)).await()
+            } else {
+                Log.e("HMM", "Movie not found")
+            }
+        } catch (e: Exception) {
+            Log.e("HMM", "Error updating movie", e)
+        }
     }
 }
