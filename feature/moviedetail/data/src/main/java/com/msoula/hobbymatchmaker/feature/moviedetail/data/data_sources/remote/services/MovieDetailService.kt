@@ -1,7 +1,7 @@
 package com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.services
 
 import com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.models.CastResponseRemoteModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.models.MovieInfoResponseRemoteModel
+import com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.models.MovieDetailResponseRemoteModel
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -15,7 +15,7 @@ interface MovieDetailService {
     suspend fun fetchMovieDetail(
         @Path(PARAMS_MOVIE_ID) movieId: Long,
         @Query(PARAMS_LANGUAGE) language: String
-    ): Response<MovieInfoResponseRemoteModel>
+    ): Response<MovieDetailResponseRemoteModel>
 
     @GET("movie/{$PARAMS_MOVIE_ID}/credits")
     suspend fun fetchMovieCredits(

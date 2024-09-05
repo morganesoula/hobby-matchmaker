@@ -139,8 +139,6 @@ dependencies {
     implementation(project(Modules.AUTHENTICATION_DATA))
     implementation(project(Modules.AUTHENTICATION_DOMAIN))
     implementation(project(Modules.COMMON))
-    implementation(project(Modules.DATABASE))
-    implementation(project(Modules.DAO))
     implementation(project(Modules.DESIGN))
     implementation(project(Modules.DI))
     implementation(project(Modules.LOGIN_DOMAIN))

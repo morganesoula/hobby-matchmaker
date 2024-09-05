@@ -11,7 +11,7 @@ import java.net.URL
 
 private const val IMG_PREFIX = "https://image.tmdb.org/t/p/w500"
 
-class ImageHelper constructor(
+class ImageHelper(
     private val coroutineDispatcher: CoroutineDispatcher,
     private val context: Context,
 ) {
@@ -31,6 +31,10 @@ class ImageHelper constructor(
             CoroutineScope(coroutineDispatcher).async {
                 val bitmap =
                     BitmapFactory.decodeStream(URL(IMG_PREFIX + remotePosterPath).openStream())
+                if (bitmap == null) {
+                    Log.e("HMM", "Bitmap is null into method downloadImage")
+                    return@async ""
+                }
                 val savedImagePath = saveImageToLocal(bitmap, remotePosterPath)
                 savedImagePath
             }.await()

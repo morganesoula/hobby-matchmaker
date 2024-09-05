@@ -1,16 +1,16 @@
 package com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.mappers
 
 import com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.models.CastResponseRemoteModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.models.MovieInfoResponseRemoteModel
+import com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.models.MovieDetailResponseRemoteModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.models.MovieVideosResponseRemoteModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.Genre
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieActorDomainModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieCastDomainModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieInfoDomainModel
+import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieDetailDomainModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieVideoDomainModel
 
-fun MovieInfoResponseRemoteModel.toMovieInfoDomainModel(): MovieInfoDomainModel {
-    return MovieInfoDomainModel(
+fun MovieDetailResponseRemoteModel.toMovieDetailDomainModel(): MovieDetailDomainModel {
+    return MovieDetailDomainModel(
         id = this.id.toLong(),
         title = this.title,
         genre = this.genres.map { genre -> Genre(genre.id ?: -1, genre.name ?: "") },

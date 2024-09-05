@@ -2,7 +2,6 @@ package com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models
 
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieActorDomainModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieDetailDomainModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieInfoDomainModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -32,20 +31,20 @@ data class MovieDetailUiModel(
 
 fun MovieDetailDomainModel.toMovieDetailUiModel(): MovieDetailUiModel {
     return MovieDetailUiModel(
-        id = this.info.id ?: MovieInfoDomainModel.DEFAULT_ID,
-        title = this.info.title ?: MovieInfoDomainModel.DEFAULT_TITLE,
-        synopsis = this.info.synopsis ?: MovieInfoDomainModel.DEFAULT_SYNOPSIS,
-        posterPath = this.info.posterPath ?: "",
-        genre = this.info.genre?.map { it.name ?: "" } ?: emptyList(),
-        releaseDate = this.info.releaseDate?.extractYear() ?: "",
-        status = this.info.status ?: "",
-        popularity = this.info.popularity ?: 0.0,
-        cast = this.cast?.cast?.associate { actor ->
+        id = this.id ?: MovieDetailDomainModel.DEFAULT_ID,
+        title = this.title ?: MovieDetailDomainModel.DEFAULT_TITLE,
+        synopsis = this.synopsis ?: MovieDetailDomainModel.DEFAULT_SYNOPSIS,
+        posterPath = this.localCoverFilePath ?: "",
+        genre = this.genre?.map { it.name ?: "" } ?: emptyList(),
+        releaseDate = this.releaseDate?.extractYear() ?: "",
+        status = this.status ?: "",
+        popularity = this.popularity ?: 0.0,
+        cast = this.cast?.associate { actor ->
             val name = actor.name ?: MovieActorDomainModel.DEFAULT_NAME
             val role = actor.role ?: MovieActorDomainModel.DEFAULT_ROLE
             name to role
         }?.toMap() ?: emptyMap(),
-        videoKey = this.info.videoKey ?: ""
+        videoKey = this.videoKey ?: ""
     )
 }
 

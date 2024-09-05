@@ -1,11 +1,6 @@
 package com.msoula.hobbymatchmaker.feature.moviedetail.domain.models
 
 data class MovieDetailDomainModel(
-    val info: MovieInfoDomainModel,
-    val cast: MovieCastDomainModel?
-)
-
-data class MovieInfoDomainModel(
     val id: Long? = null,
     val title: String? = null,
     val genre: List<Genre>? = null,
@@ -13,8 +8,9 @@ data class MovieInfoDomainModel(
     val releaseDate: String? = null,
     val synopsis: String? = null,
     val status: String? = null,
-    val posterPath: String? = null,
-    val videoKey: String? = ""
+    val localCoverFilePath: String? = null,
+    val videoKey: String? = "",
+    val cast: List<MovieActorDomainModel>? = null
 ) {
     companion object {
         const val DEFAULT_ID: Long = -1
@@ -28,8 +24,8 @@ data class MovieInfoDomainModel(
 }
 
 data class Genre(
-    val id: Int?,
-    val name: String?
+    val id: Int? = null,
+    val name: String? = null
 ) {
     companion object {
         const val DEFAULT_ID: Int = -1
@@ -38,13 +34,13 @@ data class Genre(
 }
 
 data class MovieCastDomainModel(
-    val cast: List<MovieActorDomainModel>
+    val cast: List<MovieActorDomainModel> = emptyList()
 )
 
 data class MovieActorDomainModel(
-    val id: Long,
-    val name: String?,
-    val role: String?
+    val id: Long = 0L,
+    val name: String? = null,
+    val role: String? = null
 ) {
     companion object {
         const val DEFAULT_NAME: String = ""
