@@ -24,4 +24,8 @@ dependencies {
 
     // Modules
     implementation(project(Modules.COMMON))
+
+    // Unit test
+    testImplementation(libs.junit.ktx)
+    testImplementation(libs.kotlinx.coroutines.test)
 }

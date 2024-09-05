@@ -4,7 +4,7 @@ import android.util.Log
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.MovieRepository
 import com.msoula.hobbymatchmaker.features.movies.domain.utils.ImageHelper
 
-class SaveLocalCoverPathUseCase constructor(
+class SaveLocalCoverPathUseCase(
     private val movieRepository: MovieRepository,
     private val imageHelper: ImageHelper
 ) {
