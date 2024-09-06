@@ -38,4 +38,8 @@ dependencies {
     implementation(libs.retrofit.gson)
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
+
+    // Test
+    testImplementation(libs.junit.ktx)
+    testImplementation(libs.kotlinx.coroutines.test)
 }

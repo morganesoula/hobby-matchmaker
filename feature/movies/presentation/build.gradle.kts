@@ -38,4 +38,10 @@ dependencies {
     implementation(project(Modules.DESIGN))
     implementation(project(Modules.MOVIE_DOMAIN))
     implementation(project(Modules.NAVIGATION))
+
+    // Test
+    testImplementation(libs.junit.ktx)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
+    testImplementation(libs.mockk)
 }
