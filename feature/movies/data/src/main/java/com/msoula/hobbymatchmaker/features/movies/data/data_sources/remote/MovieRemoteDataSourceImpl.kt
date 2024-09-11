@@ -8,6 +8,8 @@ import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.network.execute
 import com.msoula.hobbymatchmaker.features.movies.data.data_sources.remote.mappers.toMovieDomainModel
+import com.msoula.hobbymatchmaker.features.movies.data.data_sources.remote.mappers.toMovieEntityModel
+import com.msoula.hobbymatchmaker.features.movies.data.data_sources.remote.models.MovieEntityModel
 import com.msoula.hobbymatchmaker.features.movies.data.data_sources.remote.services.TMDBService
 import com.msoula.hobbymatchmaker.features.movies.domain.data_sources.MovieRemoteDataSource
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
@@ -73,7 +75,7 @@ class MovieRemoteDataSourceImpl(
             .snapshots()
             .map { query ->
                 query.documents.mapNotNull {
-                    it.toObject(MovieDomainModel::class.java)
+                    it.toObject(MovieEntityModel::class.java)?.toMovieDomainModel()
                 }
             }
     }
@@ -84,17 +86,20 @@ class MovieRemoteDataSourceImpl(
         movieChunks.forEach { movieChunk ->
             val batch: WriteBatch = firestore.batch()
             movieChunk.forEach { movie ->
-                val movieRef = firestore.collection("movies").document(movie.id.toString())
-                val movieData = hashMapOf(
-                    "id" to movie.id,
-                    "title" to movie.title,
-                    "coverFileName" to movie.coverFileName,
-                    "localCoverFilePath" to movie.localCoverFilePath,
-                    "isFavorite" to movie.isFavorite,
-                    "isSeen" to movie.isSeen,
-                    "synopsis" to movie.overview
+                val movieEntity = movie.toMovieEntityModel()
+
+                val movieRef = firestore.collection("movies").document(movieEntity.id.toString())
+                batch.set(
+                    movieRef, hashMapOf(
+                        "id" to movieEntity.id,
+                        "title" to movieEntity.title,
+                        "coverFileName" to movieEntity.posterFileName,
+                        "localCoverFilePath" to movieEntity.localCoverFilePath,
+                        "isFavorite" to movieEntity.isFavorite,
+                        "isSeen" to movieEntity.isSeen,
+                        "synopsis" to movieEntity.synopsis
+                    )
                 )
-                batch.set(movieRef, movieData)
             }
             batch.commit()
                 .addOnSuccessListener {
@@ -112,8 +117,6 @@ class MovieRemoteDataSourceImpl(
                 .whereEqualTo("id", movieId)
                 .get()
                 .await()
-
-            Log.d("HMM", "Movie snapshot: ${movieSnapshot.documents}")
 
             if (movieSnapshot.documents.isNotEmpty()) {
                 val documentRef = movieSnapshot.documents.first().reference

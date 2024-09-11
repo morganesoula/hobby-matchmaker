@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -59,8 +60,11 @@ import com.msoula.hobbymatchmaker.core.design.component.LocalSnackBar
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieDetailUiEventModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieDetailUiModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieDetailViewStateModel
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.R
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.R.string as StringRes
 
@@ -110,6 +114,8 @@ fun MovieDetailContentScreen(
     val coroutineScope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
 
+    val errorFetchingMovieMessage = stringResource(R.string.no_trailer_available)
+
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp.value
     val videoPlayerVisibility = remember { mutableStateOf(false) }
@@ -141,6 +147,13 @@ fun MovieDetailContentScreen(
                 is MovieDetailUiEventModel.OnPlayMovieTrailerReady -> {
                     movieVideoUri.value = event.movieUri
                     videoPlayerVisibility.value = true
+                }
+
+                is MovieDetailUiEventModel.ErrorFetchingTrailer -> {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, errorFetchingMovieMessage, Toast.LENGTH_SHORT)
+                            .show()
+                    }
                 }
 
                 else -> Unit
@@ -315,6 +328,7 @@ private fun Context.enterFullScreen() {
     }
 
 }
+
 private fun Context.exitFullScreen() {
     val activity = this.findActivity()
     activity?.let {

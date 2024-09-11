@@ -5,18 +5,20 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.snapshots
 import com.google.firebase.firestore.toObject
 import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.core.common.mapError
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.network.execute
 import com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.mappers.toMovieActorDomainModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.mappers.toMovieDetailDomainModel
+import com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.mappers.toMovieEntityModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.mappers.toMovieVideoDomainModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.services.MovieDetailService
 import com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.services.MovieVideosService
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.data_sources.remote.MovieDetailRemoteDataSource
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.Genre
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieCastDomainModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieDetailDomainModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieVideoDomainModel
+import com.msoula.hobbymatchmaker.features.movies.data.data_sources.remote.models.MovieEntityModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
@@ -55,11 +57,17 @@ class MovieDetailRemoteDataSourceImpl(
         movieId: Long,
         language: String
     ): Result<MovieVideoDomainModel?> {
+        Log.d("HMM", "Fetching movie trailer online")
         return execute({
             movieVideosService.fetchMovieVideos(movieId, language)
         })
             .mapSuccess {
+                Log.i("HMM", "Successfully fetched movie trailer: $it")
                 it.toMovieVideoDomainModel()
+            }
+            .mapError { error ->
+                Log.e("HMM", "Error fetching movie trailer: $error")
+                error
             }
     }
 
@@ -72,32 +80,19 @@ class MovieDetailRemoteDataSourceImpl(
 
             if (movieQuery.documents.isNotEmpty()) {
                 val movieReference = movieQuery.documents.first().reference
-                val existingMovie = movieReference.get().await().toObject<MovieDetailDomainModel>()
+                val movieEntityToSave = movieDetail.toMovieEntityModel()
 
-                Log.d("HMM", "Existing movie is: $existingMovie")
-
-                val movieData = hashMapOf(
-                    "title" to movieDetail.title,
-                    "genre" to movieDetail.genre?.map { genre ->
-                        mapOf(
-                            "id" to (genre.id ?: Genre.DEFAULT_ID),
-                            "name" to (genre.name ?: Genre.DEFAULT_NAME)
-                        )
-                    },
-                    "popularity" to movieDetail.popularity,
-                    "releaseDate" to movieDetail.releaseDate,
-                    "synopsis" to movieDetail.synopsis,
-                    "status" to movieDetail.status,
-                    "cast" to movieDetail.cast?.map { actor ->
-                        mapOf(
-                            "id" to actor.id,
-                            "name" to actor.name,
-                            "role" to actor.role
-                        )
-                    }
-                )
-
-                movieReference.update(movieData).await()
+                movieReference.update(
+                    hashMapOf(
+                        "title" to movieEntityToSave.title,
+                        "genre" to movieEntityToSave.genres,
+                        "popularity" to movieEntityToSave.popularity,
+                        "releaseDate" to movieEntityToSave.releaseDate,
+                        "synopsis" to movieEntityToSave.synopsis,
+                        "status" to movieEntityToSave.status,
+                        "cast" to movieEntityToSave.cast
+                    )
+                ).await()
             } else {
                 Log.e("HMM", "Movie not found")
             }
@@ -109,13 +104,9 @@ class MovieDetailRemoteDataSourceImpl(
     override suspend fun observeMovieDetail(movieId: Long): Flow<MovieDetailDomainModel?> {
         val movieReference = firestore.collection("movies").document(movieId.toString())
 
-        Log.d("HMM", "Into ObserveMovieDetail with movieReference: ${movieReference.get().await()}")
-
         return movieReference.snapshots().map { snapshot ->
             if (snapshot.exists()) {
-                val movieDetail = snapshot.toObject<MovieDetailDomainModel>()
-                Log.d("HMM", "Movie detail observed is: $movieDetail")
-                movieDetail
+                snapshot.toObject<MovieEntityModel>()?.toMovieDetailDomainModel()
             } else {
                 Log.d("HMM", "No movie detail found for ID: $movieId")
                 null
@@ -132,6 +123,9 @@ class MovieDetailRemoteDataSourceImpl(
 
             if (movieQuery.documents.isNotEmpty()) {
                 val movieReference = movieQuery.documents.first().reference
+
+                Log.d("HMM", "Updating movie video path for $movieReference")
+
                 movieReference.update(
                     mapOf(
                         "videoKey" to videoPath
@@ -145,4 +139,3 @@ class MovieDetailRemoteDataSourceImpl(
         }
     }
 }
-

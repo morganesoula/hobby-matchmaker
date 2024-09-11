@@ -51,6 +51,8 @@ class MovieDetailViewModel(
     private val movieIdFlow = MutableStateFlow<Long?>(null)
 
     private var currentMovie: MovieDetailUiModel? = MovieDetailUiModel()
+    private val maxTrailerAttempt = 2
+    private var currentAttempt = 0
 
     init {
         setMovieId(movieId)
@@ -137,6 +139,7 @@ class MovieDetailViewModel(
     }
 
     private suspend fun processVideoResponse(videoResponse: MovieVideoDomainModel?, movieId: Long) {
+        Log.d("HMM", "Processing video trailer response")
         val uri = videoResponse?.let { videoModel ->
             Log.d("HMM", "Video site is: ${videoModel.site}")
             when (videoModel.site.lowercase()) {
@@ -145,7 +148,26 @@ class MovieDetailViewModel(
             }
         } ?: ""
 
-        updateMovieVideoURI(uri, movieId)
+        currentAttempt++
+
+        if (uri.isNotEmpty()) {
+            currentAttempt = 0
+            updateMovieVideoURI(uri, movieId)
+        } else if (currentAttempt < maxTrailerAttempt) {
+            reloadVideoResponse(movieId)
+        } else {
+            Log.e("HMM", "Error while loading URI with native and US language")
+            _oneTimeEventChannel.send(
+                MovieDetailUiEventModel.ErrorFetchingTrailer
+            )
+        }
+    }
+
+    private suspend fun reloadVideoResponse(movieId: Long) {
+        fetchMovieDetailTrailerUseCase(movieId, "en-US")
+            .mapSuccess { videoResponse ->
+                processVideoResponse(videoResponse, movieId)
+            }
     }
 
     private suspend fun updateMovieVideoURI(videoURI: String, movieId: Long) {
