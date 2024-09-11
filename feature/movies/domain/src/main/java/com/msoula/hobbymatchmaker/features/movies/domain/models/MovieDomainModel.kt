@@ -5,9 +5,7 @@ data class MovieDomainModel(
     var title: String = "",
     var coverFileName: String = "",
     var localCoverFilePath: String = "",
-    @field:JvmField
     var isFavorite: Boolean = false,
-    @field:JvmField
     var isSeen: Boolean = false,
     var overview: String? = null
 ) {

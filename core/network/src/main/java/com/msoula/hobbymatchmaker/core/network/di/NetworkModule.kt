@@ -40,10 +40,12 @@ val networkModule = module {
         }
     }
 
-    single<OkHttpClient> { OkHttpClient().newBuilder()
-        .addInterceptor(get<Interceptor>())
-        //.addInterceptor(get<LoggingInterceptor>()))
-        .build()}
+    single<OkHttpClient> {
+        OkHttpClient().newBuilder()
+            .addInterceptor(get<Interceptor>())
+            //.addInterceptor(get<HttpLoggingInterceptor>())
+            .build()
+    }
 
     single<FirebaseAuth> { FirebaseAuth.getInstance() }
 
