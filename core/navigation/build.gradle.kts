@@ -11,12 +11,6 @@ android {
     namespace = "com.msoula.hobbymatchmaker.core.navigation"
 }
 
-androidComponents {
-    onVariants(selector().withBuildType("release")) {
-        it.packaging.resources.excludes.add(("META-INF/**"))
-    }
-}
-
 dependencies {
     // Compose
     implementation(libs.activity.compose)

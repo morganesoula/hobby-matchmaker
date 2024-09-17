@@ -1,6 +1,5 @@
 package com.msoula.hobbymatchmaker.feature.moviedetail.presentation
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.msoula.hobbymatchmaker.core.common.Result
@@ -15,7 +14,6 @@ import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieD
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieDetailViewStateModel
 import io.mockk.coEvery
 import io.mockk.mockk
-import io.mockk.mockkClass
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -26,8 +24,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert.*
-
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
@@ -43,10 +40,6 @@ class MovieDetailViewModelTest {
     private var updateMovieVideoURIUseCase = mockk<UpdateMovieVideoURIUseCase>(relaxed = true)
     private var fetchMovieDetailUseCase = mockk<FetchMovieDetailUseCase>(relaxed = true)
     private var observeMovieDetailUseCase = mockk<ObserveMovieDetailUseCase>(relaxed = true)
-
-    private var fetchStatusFlow = mutableStateOf<FetchStatusModel>(FetchStatusModel.NeverFetched)
-
-    private var movieIdFlow = mutableStateOf<Long?>(null)
 
     @Before
     fun setUp() {
@@ -86,36 +79,71 @@ class MovieDetailViewModelTest {
     }
 
     @Test
-    fun `when data exists and fetchStatus is an error, should return an Error`() =
+    fun `when synopsis is empty and fetchStatus is an error, should return an Error`() =
         testScope.runTest {
-            val errorMessage = "An error occurred"
-            coEvery { observeMovieDetailUseCase(1) } returns flowOf(
-                MovieDetailDomainModel(
-                    synopsis = "Some synopsis"
-                )
-            )
-            fetchStatusFlow.value = FetchStatusModel.Error(errorMessage)
+            coEvery { observeMovieDetailUseCase(1) } returns flowOf(MovieDetailDomainModel(title = "Testing title"))
 
-            movieDetailViewModel.viewState.test {
-                val result = awaitItem()
-                println("Result: $result")
-                assertTrue(result is MovieDetailViewStateModel.Error)
-                assertEquals(errorMessage, (result as MovieDetailViewStateModel.Error).error)
-            }
-
-        }
-
-    @Test
-    fun `when data exists and fetchStatus is success, should return a Success`() =
-        testScope.runTest {
-            fetchStatusFlow.value = FetchStatusModel.Success
+            movieDetailViewModel.fetchStatusFlow.value = FetchStatusModel.Error("Error happened")
 
             movieDetailViewModel.viewState.test {
                 val result = awaitItem()
 
-                if (result is MovieDetailViewStateModel.Success) {
-                    assertEquals(result, MovieDetailViewStateModel.Success(MovieDetailUiModel()))
+                if (result is MovieDetailViewStateModel.Error) {
+                    assertEquals("Error happened", result.error)
                 }
             }
         }
+
+    @Test
+    fun `when synopsis is empty and fetchStatus is Loading, should return a Loading`() =
+        testScope.runTest {
+            coEvery { observeMovieDetailUseCase(1) } returns flowOf(MovieDetailDomainModel(title = "Testing title"))
+            movieDetailViewModel.fetchStatusFlow.value = FetchStatusModel.Loading
+
+            movieDetailViewModel.viewState.test {
+                val result = awaitItem()
+
+                assertEquals(result, MovieDetailViewStateModel.Loading)
+            }
+        }
+
+    @Test
+    fun `when synopsis is empty and fetchStatus is Success, should return an Empty`() =
+        testScope.runTest {
+            coEvery { observeMovieDetailUseCase(1) } returns flowOf(MovieDetailDomainModel(title = "Testing title"))
+            movieDetailViewModel.fetchStatusFlow.value = FetchStatusModel.Success
+
+            movieDetailViewModel.viewState.test {
+                val result = awaitItem()
+                assertEquals(result, MovieDetailViewStateModel.Empty)
+            }
+        }
+
+    @Test
+    fun `when synopsis is filled and fetchStatus is not Error, should return data`() =
+        testScope.runTest {
+            coEvery { observeMovieDetailUseCase(1) } returns flowOf(
+                MovieDetailDomainModel(
+                    title = "Testing title",
+                    synopsis = "Some synopsis"
+                )
+            )
+
+            movieDetailViewModel.viewState.test {
+                val result = awaitItem()
+                assertEquals(
+                    result,
+                    MovieDetailViewStateModel.Success(
+                        MovieDetailUiModel(
+                            title = "Testing title",
+                            synopsis = "Some synopsis"
+                        )
+                    )
+                )
+            }
+        }
 }
+
+
+
+

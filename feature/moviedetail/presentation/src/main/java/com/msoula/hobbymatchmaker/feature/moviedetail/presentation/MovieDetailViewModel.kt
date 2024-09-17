@@ -43,14 +43,15 @@ class MovieDetailViewModel(
     private val ioDispatcher: CoroutineDispatcher,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val _oneTimeEventChannel = Channel<MovieDetailUiEventModel>()
+    internal val _oneTimeEventChannel = Channel<MovieDetailUiEventModel>()
     val oneTimeEventChannelFlow = _oneTimeEventChannel.receiveAsFlow()
 
     private val movieId = requireNotNull(savedStateHandle.get<Long>("movieId"))
-    private val fetchStatusFlow = MutableStateFlow<FetchStatusModel>(FetchStatusModel.NeverFetched)
+
+    internal val fetchStatusFlow = MutableStateFlow<FetchStatusModel>(FetchStatusModel.NeverFetched)
     private val movieIdFlow = MutableStateFlow<Long?>(null)
 
-    private var currentMovie: MovieDetailUiModel? = MovieDetailUiModel()
+    internal var currentMovie: MovieDetailUiModel? = MovieDetailUiModel()
 
     init {
         setMovieId(movieId)
@@ -63,12 +64,15 @@ class MovieDetailViewModel(
                     Pair(movie, fetchStatus)
                 }.mapLatest { (movie, fetchStatus) ->
                     currentMovie = movie?.toMovieDetailUiModel()
+
                     when {
                         movie?.synopsis.isNullOrBlank() -> {
                             when (fetchStatus) {
-                                is FetchStatusModel.Error -> MovieDetailViewStateModel.Error(
-                                    fetchStatus.error
-                                )
+                                is FetchStatusModel.Error -> {
+                                    MovieDetailViewStateModel.Error(
+                                        fetchStatus.error
+                                    )
+                                }
 
                                 FetchStatusModel.Loading -> MovieDetailViewStateModel.Loading
                                 FetchStatusModel.NeverFetched -> {
@@ -88,6 +92,7 @@ class MovieDetailViewModel(
                                     )
                                 )
                             }
+
                             MovieDetailViewStateModel.Success(
                                 movie?.toMovieDetailUiModel() ?: MovieDetailUiModel()
                             )
@@ -119,14 +124,12 @@ class MovieDetailViewModel(
 
     private suspend fun onPlayTrailerClicked(movieId: Long, isVideoURIknown: Boolean) {
         if (isVideoURIknown) {
-            Log.d("HMM", "Video URI is already known")
             _oneTimeEventChannel.send(
                 MovieDetailUiEventModel.OnPlayMovieTrailerReady(
                     currentMovie?.videoKey ?: ""
                 )
             )
         } else {
-            Log.d("HMM", "Video URI is not known")
             val language = getDeviceLocale()
 
             fetchMovieDetailTrailerUseCase(movieId, language)
@@ -138,7 +141,6 @@ class MovieDetailViewModel(
 
     private suspend fun processVideoResponse(videoResponse: MovieVideoDomainModel?, movieId: Long) {
         val uri = videoResponse?.let { videoModel ->
-            Log.d("HMM", "Video site is: ${videoModel.site}")
             when (videoModel.site.lowercase()) {
                 "youtube" -> videoModel.key
                 else -> "https://vimeo.com/${videoModel.key}"

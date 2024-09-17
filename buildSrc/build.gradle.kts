@@ -14,8 +14,3 @@ dependencies {
     implementation(libs.kotlin.gradle.plugin)
     implementation(libs.javapoet)
 }
-
-/* val compileKotlin: KotlinCompile by tasks
-compileKotlin.kotlinOptions {
-    jvmTarget = "17"
-} */
