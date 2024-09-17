@@ -10,12 +10,6 @@ android {
     namespace = "com.msoula.hobbymatchmaker.core.di"
 }
 
-androidComponents {
-    onVariants(selector().withBuildType("release")) {
-        it.packaging.resources.excludes.add(("META-INF/**"))
-    }
-}
-
 dependencies {
     // Core
     implementation(libs.core.ktx)

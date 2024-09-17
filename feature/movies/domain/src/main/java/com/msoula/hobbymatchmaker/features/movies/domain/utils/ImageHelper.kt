@@ -24,7 +24,8 @@ class ImageHelper(
         updateMovie(localImagePath)
     }
 
-    suspend fun getRemoteImage(coverFileName: String): String = downloadImage(coverFileName)
+    suspend fun getRemoteImage(coverFileName: String): String =
+        downloadImage(coverFileName)
 
     private suspend fun downloadImage(remotePosterPath: String): String {
         val response =
