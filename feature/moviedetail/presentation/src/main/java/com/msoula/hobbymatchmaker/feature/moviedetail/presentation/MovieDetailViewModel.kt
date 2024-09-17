@@ -47,7 +47,7 @@ class MovieDetailViewModel(
     val oneTimeEventChannelFlow = _oneTimeEventChannel.receiveAsFlow()
 
     private val movieId = requireNotNull(savedStateHandle.get<Long>("movieId"))
-    private val fetchStatusFlow = MutableStateFlow<FetchStatusModel>(FetchStatusModel.NeverFetched)
+    internal val fetchStatusFlow = MutableStateFlow<FetchStatusModel>(FetchStatusModel.NeverFetched)
     private val movieIdFlow = MutableStateFlow<Long?>(null)
 
     private var currentMovie: MovieDetailUiModel? = MovieDetailUiModel()
