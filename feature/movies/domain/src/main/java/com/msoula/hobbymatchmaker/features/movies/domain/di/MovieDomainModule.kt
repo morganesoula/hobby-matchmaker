@@ -10,7 +10,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 val movieDomainModule = module {
-    single<MovieRepository> { MovieRepositoryImpl(get()) }
+    single<MovieRepository> { MovieRepositoryImpl(get(), get()) }
     factory<ImageHelper> { ImageHelper(get(), androidContext()) }
     factory<ObserveAllMoviesUseCase> { ObserveAllMoviesUseCase(get()) }
     factory<SetMovieFavoriteUseCase> { SetMovieFavoriteUseCase(get()) }

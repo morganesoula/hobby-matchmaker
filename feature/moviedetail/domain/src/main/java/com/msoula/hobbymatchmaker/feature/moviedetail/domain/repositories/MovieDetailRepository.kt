@@ -1,15 +1,16 @@
 package com.msoula.hobbymatchmaker.feature.moviedetail.domain.repositories
 
-import android.util.Log
 import com.msoula.hobbymatchmaker.core.common.ExternalServiceError
 import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.feature.moviedetail.domain.data_sources.local.MovieDetailLocalDataSource
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.data_sources.remote.MovieDetailRemoteDataSource
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieDetailDomainModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieVideoDomainModel
 import kotlinx.coroutines.flow.Flow
 
 class MovieDetailRepository(
-    private val movieDetailRemoteDataSource: MovieDetailRemoteDataSource
+    private val movieDetailRemoteDataSource: MovieDetailRemoteDataSource,
+    private val movieDetailLocalDataSource: MovieDetailLocalDataSource
 ) {
     suspend fun fetchMovieDetail(
         movieId: Long,
@@ -19,7 +20,6 @@ class MovieDetailRepository(
             when (val infoResult =
                 movieDetailRemoteDataSource.fetchMovieDetail(movieId, language)) {
                 is Result.Success -> {
-                    Log.d("HMM", "Fetched details are: ${infoResult.data}")
                     val actorsResult =
                         movieDetailRemoteDataSource.fetchMovieCredit(movieId, language)
                     when (actorsResult) {
@@ -35,7 +35,7 @@ class MovieDetailRepository(
                                     status = infoResult.data!!.status,
                                     cast = actorsResult.data?.cast
                                 )
-                            movieDetailRemoteDataSource.saveMovieDetail(movieDetail)
+                            movieDetailLocalDataSource.saveMovieDetail(movieDetail)
                             Result.Success(true)
                         }
 
@@ -51,11 +51,11 @@ class MovieDetailRepository(
     }
 
     suspend fun observeMovieDetail(movieId: Long): Flow<MovieDetailDomainModel?> {
-        return movieDetailRemoteDataSource.observeMovieDetail(movieId)
+        return movieDetailLocalDataSource.observeMovieDetail(movieId)
     }
 
     suspend fun updateMovieVideoURI(movieId: Long, videoURI: String) {
-        movieDetailRemoteDataSource.updateMovieVideoUri(movieId, videoURI)
+        movieDetailLocalDataSource.updateMovieVideoUri(movieId, videoURI)
     }
 
     suspend fun fetchMovieTrailer(movieId: Long, language: String): Result<MovieVideoDomainModel?> {

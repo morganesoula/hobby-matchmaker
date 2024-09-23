@@ -2,6 +2,8 @@ object Modules {
     const val AUTHENTICATION_DATA = ":core:authentication:data"
     const val AUTHENTICATION_DOMAIN = ":core:authentication:domain"
     const val COMMON = ":core:common"
+    const val DATABASE = ":core:database"
+    const val DAO = ":core:database:dao"
     const val DESIGN = ":core:design"
     const val DI = ":core:di"
     const val LOGIN_DOMAIN = ":core:login:domain"

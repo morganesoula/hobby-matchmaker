@@ -1,18 +1,18 @@
 package com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.mappers
 
+import com.msoula.hobbymatchmaker.core.database.dao.models.Actor
+import com.msoula.hobbymatchmaker.core.database.dao.models.Genre
+import com.msoula.hobbymatchmaker.core.database.dao.models.MovieEntityModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieActorDomainModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieDetailDomainModel
-import com.msoula.hobbymatchmaker.features.movies.data.data_sources.remote.models.Actor
-import com.msoula.hobbymatchmaker.features.movies.data.data_sources.remote.models.Genre
-import com.msoula.hobbymatchmaker.features.movies.data.data_sources.remote.models.MovieEntityModel
 
 fun MovieDetailDomainModel.toMovieEntityModel(): MovieEntityModel {
     return MovieEntityModel(
-        id = this.id,
+        movieId = this.id ?: 0L,
         title = this.title,
         genres = this.genre?.map { genre ->
             Genre(
-                id = genre.id,
+                genreId = genre.id?.toLong() ?: 0L,
                 name = genre.name
             )
 
@@ -25,7 +25,7 @@ fun MovieDetailDomainModel.toMovieEntityModel(): MovieEntityModel {
         videoKey = this.videoKey,
         cast = this.cast?.map { actor ->
             Actor(
-                id = actor.id,
+                actorId = actor.id,
                 name = actor.name,
                 role = actor.role
             )
@@ -36,11 +36,11 @@ fun MovieDetailDomainModel.toMovieEntityModel(): MovieEntityModel {
 
 fun MovieEntityModel.toMovieDetailDomainModel(): MovieDetailDomainModel {
     return MovieDetailDomainModel(
-        id = this.id,
+        id = this.movieId,
         title = this.title,
         genre = this.genres?.map { genre ->
-            com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.Genre(
-                id = genre.id,
+            com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.GenreDomainModel(
+                id = genre.genreId.toInt(),
                 name = genre.name
             )
         },
@@ -52,7 +52,7 @@ fun MovieEntityModel.toMovieDetailDomainModel(): MovieDetailDomainModel {
         videoKey = this.videoKey,
         cast = this.cast?.map { actor ->
             MovieActorDomainModel(
-                id = actor.id,
+                id = actor.actorId,
                 name = actor.name
             )
         }

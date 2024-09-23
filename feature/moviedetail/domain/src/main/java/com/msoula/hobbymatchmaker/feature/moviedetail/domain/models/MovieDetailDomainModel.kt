@@ -3,7 +3,7 @@ package com.msoula.hobbymatchmaker.feature.moviedetail.domain.models
 data class MovieDetailDomainModel(
     val id: Long? = null,
     val title: String? = null,
-    val genre: List<Genre>? = null,
+    val genre: List<GenreDomainModel>? = null,
     val popularity: Double? = null,
     val releaseDate: String? = null,
     val synopsis: String? = null,
@@ -23,7 +23,7 @@ data class MovieDetailDomainModel(
     }
 }
 
-data class Genre(
+data class GenreDomainModel(
     val id: Int? = null,
     val name: String? = null
 ) {

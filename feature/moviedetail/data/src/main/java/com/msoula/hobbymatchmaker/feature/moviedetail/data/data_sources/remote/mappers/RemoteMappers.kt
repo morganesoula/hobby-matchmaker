@@ -3,7 +3,7 @@ package com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.
 import com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.models.CastResponseRemoteModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.models.MovieDetailResponseRemoteModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.remote.models.MovieVideosResponseRemoteModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.Genre
+import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.GenreDomainModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieActorDomainModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieCastDomainModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieDetailDomainModel
@@ -13,7 +13,7 @@ fun MovieDetailResponseRemoteModel.toMovieDetailDomainModel(): MovieDetailDomain
     return MovieDetailDomainModel(
         id = this.id.toLong(),
         title = this.title,
-        genre = this.genres.map { genre -> Genre(genre.id ?: -1, genre.name ?: "") },
+        genre = this.genres.map { genre -> GenreDomainModel(genre.id ?: -1, genre.name ?: "") },
         popularity = this.popularity,
         releaseDate = this.releaseDate,
         synopsis = this.overview,

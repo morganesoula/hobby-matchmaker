@@ -1,14 +1,13 @@
-package com.msoula.hobbymatchmaker.features.movies.data.data_sources.remote.mappers
+package com.msoula.hobbymatchmaker.features.movies.data.data_sources.mappers
 
-import com.msoula.hobbymatchmaker.features.movies.data.data_sources.remote.models.MovieEntityModel
+import com.msoula.hobbymatchmaker.core.database.dao.models.MovieEntityModel
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 
 fun MovieDomainModel.toMovieEntityModel(): MovieEntityModel {
     return MovieEntityModel(
-        id = this.id,
+        movieId = this.id,
         title = this.title,
         posterFileName = this.coverFileName,
-        synopsis = this.overview,
         localCoverFilePath = this.localCoverFilePath,
         isFavorite = this.isFavorite,
         isSeen = this.isSeen
@@ -17,7 +16,7 @@ fun MovieDomainModel.toMovieEntityModel(): MovieEntityModel {
 
 fun MovieEntityModel.toMovieDomainModel(): MovieDomainModel {
     return MovieDomainModel(
-        id = this.id ?: 0L,
+        id = this.movieId,
         title = this.title ?: "",
         coverFileName = this.posterFileName ?: "",
         localCoverFilePath = this.localCoverFilePath ?: "",
