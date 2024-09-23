@@ -1,5 +1,6 @@
 package com.msoula.hobbymatchmaker.features.movies.domain.use_cases
 
+import com.msoula.hobbymatchmaker.features.movies.domain.use_cases.fakes.FakeMovieLocalDataSource
 import com.msoula.hobbymatchmaker.features.movies.domain.use_cases.fakes.FakeMovieRemoteDataSource
 import com.msoula.hobbymatchmaker.features.movies.domain.use_cases.fakes.FakeMovieRepository
 import kotlinx.coroutines.runBlocking
@@ -17,7 +18,8 @@ class SetMovieFavoriteUseCaseTest {
     @Before
     fun setUp() {
         val fakeRemoteDataSource = FakeMovieRemoteDataSource()
-        fakeMovieRepository = FakeMovieRepository(fakeRemoteDataSource)
+        val fakeMovieLocalDataSource = FakeMovieLocalDataSource()
+        fakeMovieRepository = FakeMovieRepository(fakeRemoteDataSource, fakeMovieLocalDataSource)
         setMovieFavoriteUseCase = SetMovieFavoriteUseCase(fakeMovieRepository)
         fetchMoviesUseCase = FetchMoviesUseCase(fakeMovieRepository)
     }

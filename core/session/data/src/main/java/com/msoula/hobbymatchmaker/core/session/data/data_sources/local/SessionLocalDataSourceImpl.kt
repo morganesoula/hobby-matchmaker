@@ -16,7 +16,7 @@ import java.io.IOException
 
 private val Context.dataStore by preferencesDataStore("settings")
 
-class SessionLocalDataSourceImpl constructor(
+class SessionLocalDataSourceImpl(
     context: Context
 ) : SessionLocalDataSource {
 

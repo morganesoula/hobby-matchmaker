@@ -6,23 +6,26 @@ import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.MovieRepository
 import kotlinx.coroutines.flow.Flow
 
-class FakeMovieRepository(private val remoteDataSource: FakeMovieRemoteDataSource) :
+class FakeMovieRepository(
+    private val remoteDataSource: FakeMovieRemoteDataSource,
+    private val localDataSource: FakeMovieLocalDataSource
+) :
     MovieRepository {
 
     override suspend fun fetchMovies(language: String): Result<Unit> {
         return remoteDataSource.fetchMovies(language)
             .mapSuccess { movies ->
-                remoteDataSource.upsertMovies(movies)
+                localDataSource.upsertAll(movies)
                 Result.Success(Unit)
             }
     }
 
     override fun observeMovies(): Flow<List<MovieDomainModel>> {
-        return remoteDataSource.observeMovies()
+        return localDataSource.observeMovies()
     }
 
     override suspend fun updateMovieWithFavoriteValue(id: Long, isFavorite: Boolean) {
-        return remoteDataSource.setMovieFavoriteValue(movieId = id, isFavorite = isFavorite)
+        return localDataSource.updateMovieWithFavoriteValue(id, isFavorite)
     }
 
     override suspend fun updateMovieWithLocalCoverFilePath(
@@ -33,10 +36,11 @@ class FakeMovieRepository(private val remoteDataSource: FakeMovieRemoteDataSourc
     }
 
     fun getFirstElement(): MovieDomainModel {
-        return remoteDataSource.getFirstElement()
+        return localDataSource.getFirstElement()
     }
 
     fun clearData() {
         remoteDataSource.clearData()
+        localDataSource.clearData()
     }
 }

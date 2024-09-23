@@ -121,14 +121,12 @@ class MovieDetailViewModel(
 
     private suspend fun onPlayTrailerClicked(movieId: Long, isVideoURIknown: Boolean) {
         if (isVideoURIknown) {
-            Log.d("HMM", "Video URI is already known")
             _oneTimeEventChannel.send(
                 MovieDetailUiEventModel.OnPlayMovieTrailerReady(
                     currentMovie?.videoKey ?: ""
                 )
             )
         } else {
-            Log.d("HMM", "Video URI is not known")
             val language = getDeviceLocale()
 
             fetchMovieDetailTrailerUseCase(movieId, language)
@@ -139,9 +137,7 @@ class MovieDetailViewModel(
     }
 
     private suspend fun processVideoResponse(videoResponse: MovieVideoDomainModel?, movieId: Long) {
-        Log.d("HMM", "Processing video trailer response")
         val uri = videoResponse?.let { videoModel ->
-            Log.d("HMM", "Video site is: ${videoModel.site}")
             when (videoModel.site.lowercase()) {
                 "youtube" -> videoModel.key
                 else -> "https://vimeo.com/${videoModel.key}"
@@ -171,7 +167,6 @@ class MovieDetailViewModel(
     }
 
     private suspend fun updateMovieVideoURI(videoURI: String, movieId: Long) {
-        Log.d("HMM", "Updating movie URI with: $videoURI")
         updateMovieVideoURIUseCase(movieId = movieId, videoURI = videoURI)
         _oneTimeEventChannel.send(MovieDetailUiEventModel.OnPlayMovieTrailerReady(videoURI))
     }

@@ -30,6 +30,7 @@ dependencies {
 
     // Modules
     implementation(project(Modules.NETWORK))
+    implementation(project(Modules.DAO))
     implementation(project(Modules.MOVIE_DOMAIN))
     implementation(project(Modules.COMMON))
 
@@ -38,6 +39,11 @@ dependencies {
     implementation(libs.retrofit.gson)
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
+
+    //Room
+    api(libs.room.runtime)
+    ksp(libs.room.compiler)
+    implementation(libs.room.ktx)
 
     // Test
     testImplementation(libs.junit.ktx)

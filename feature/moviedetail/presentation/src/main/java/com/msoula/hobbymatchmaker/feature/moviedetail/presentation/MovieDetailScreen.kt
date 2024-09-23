@@ -3,7 +3,6 @@ package com.msoula.hobbymatchmaker.feature.moviedetail.presentation
 import android.content.Context
 import android.content.pm.ActivityInfo
 import android.os.Build
-import android.util.Log
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
@@ -225,7 +224,6 @@ fun MovieDetailContentScreen(
 
                     Button(
                         onClick = {
-                            Log.d("HMM", "Clicked on Trailer button with uri: ${movie.videoKey}")
                             onPlayTrailerClicked(
                                 MovieDetailUiEventModel.OnPlayMovieTrailerClicked(
                                     movieId = movie.id,
