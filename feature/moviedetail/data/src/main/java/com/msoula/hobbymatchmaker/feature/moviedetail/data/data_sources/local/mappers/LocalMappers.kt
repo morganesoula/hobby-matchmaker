@@ -1,6 +1,5 @@
 package com.msoula.hobbymatchmaker.feature.moviedetail.data.data_sources.local.mappers
 
-import android.util.Log
 import com.msoula.hobbymatchmaker.core.database.dao.models.Actor
 import com.msoula.hobbymatchmaker.core.database.dao.models.Genre
 import com.msoula.hobbymatchmaker.core.database.dao.models.MovieEntityModel
@@ -10,7 +9,6 @@ import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieActorDo
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieDetailDomainModel
 
 fun MovieWithActors.toMovieDetailDomainModel(): MovieDetailDomainModel {
-    Log.d("HMM", "MovieID is (should not be 4011) ${this.movie.movieId}")
     return MovieDetailDomainModel(
         id = this.movie.movieId,
         title = this.movie.title,
