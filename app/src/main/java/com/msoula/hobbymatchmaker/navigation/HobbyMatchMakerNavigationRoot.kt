@@ -62,9 +62,9 @@ private fun NavGraphBuilder.authGraph(
             SignInScreen(
                 redirectToSignUpScreen = { navController.navigate(Destinations.Auth.SignUp) },
                 signInViewModel = signInViewModel,
-                handleFacebookAccessToken = { credential: AuthCredential ->
+                handleFacebookAccessToken = { credential: AuthCredential, email ->
                     signInViewModel.handleFacebookLogin(
-                        credential
+                        credential, email
                     )
                 },
                 handleGoogleSignIn = { result: GetCredentialResponse?, googleAuthClient: GoogleAuthClient ->

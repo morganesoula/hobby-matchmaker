@@ -1,6 +1,7 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.sign_in
 
 import android.content.Context
+import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.ManagedActivityResultLauncher
@@ -52,9 +53,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.credentials.GetCredentialResponse
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.facebook.AccessToken
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
+import com.facebook.GraphRequest
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import com.google.firebase.auth.AuthCredential
@@ -73,16 +76,18 @@ import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationU
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 import com.msoula.hobbymatchmaker.core.login.presentation.R.string as StringRes
 
 @Composable
 fun SignInScreen(
     modifier: Modifier = Modifier,
     signInViewModel: SignInViewModel,
-    oneTimeEventChannelFlow : Flow<AuthenticationEvent>,
+    oneTimeEventChannelFlow: Flow<AuthenticationEvent>,
     redirectToAppScreen: () -> Unit,
     redirectToSignUpScreen: () -> Unit,
-    handleFacebookAccessToken: (credential: AuthCredential) -> Unit,
+    handleFacebookAccessToken: (credential: AuthCredential, email: String) -> Unit,
     handleGoogleSignIn: (result: GetCredentialResponse?, googleAuthClient: GoogleAuthClient) -> Unit,
     googleAuthClient: GoogleAuthClient
 ) {
@@ -225,7 +230,7 @@ fun RegisterFacebookCallback(
     loginManager: LoginManager,
     callBackManager: CallbackManager,
     coroutineScope: CoroutineScope,
-    handleFacebookAccessToken: (credential: AuthCredential) -> Unit,
+    handleFacebookAccessToken: (credential: AuthCredential, email: String) -> Unit,
     context: Context
 ) {
     DisposableEffect(Unit) {
@@ -240,8 +245,16 @@ fun RegisterFacebookCallback(
 
             override fun onSuccess(result: LoginResult) {
                 coroutineScope.launch {
-                    val credential = FacebookAuthProvider.getCredential(result.accessToken.token)
-                    handleFacebookAccessToken(credential)
+                    val accessToken = result.accessToken
+
+                    val email = fetchFacebookUserProfile(accessToken)
+
+                    if (email != null) {
+                        val credential = FacebookAuthProvider.getCredential(accessToken.token)
+                        handleFacebookAccessToken(credential, email)
+                    } else {
+                        Log.e("HMM", "Failed to fetch Facebook user email")
+                    }
                 }
             }
         })
@@ -434,4 +447,28 @@ fun ForgotPasswordAlertDialog(
             }
         }
     )
+}
+
+private suspend fun fetchFacebookUserProfile(
+    accessToken: AccessToken
+): String? {
+    return suspendCancellableCoroutine { continuation ->
+        val request = GraphRequest.newMeRequest(accessToken) { jsonObject, _ ->
+            try {
+                val email = jsonObject?.getString("email")
+                continuation.resume(email)
+            } catch (e: Exception) {
+                Log.e("HMM", "Error fetching Facebook profile: ${e.message}")
+                continuation.resume(null)
+            }
+        }
+
+        val parameters = Bundle().apply { putString("fields", "email, name") }
+        request.parameters = parameters
+        request.executeAsync()
+
+        continuation.invokeOnCancellation {
+            request.callback = null
+        }
+    }
 }

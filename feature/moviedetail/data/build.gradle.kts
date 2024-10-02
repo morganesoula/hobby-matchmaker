@@ -14,9 +14,6 @@ dependencies {
     // Core
     implementation(libs.runtime)
 
-    // Firestore
-    implementation(libs.firebase.firebase.firestore.ktx)
-
     // Koin
     implementation(libs.koin.android)
 

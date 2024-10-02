@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.LogOutUseCase
 import com.msoula.hobbymatchmaker.core.common.AuthUiStateModel
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
-import com.msoula.hobbymatchmaker.core.session.domain.use_cases.GetConnexionModeUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.use_cases.ObserveIsConnectedUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.use_cases.SetIsConnectedUseCase
 import kotlinx.coroutines.CoroutineDispatcher
@@ -13,7 +12,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
@@ -24,7 +22,6 @@ class AppViewModel(
     private val ioDispatcher: CoroutineDispatcher,
     private val logOutUseCase: LogOutUseCase,
     private val observeIsConnectedUseCase: ObserveIsConnectedUseCase,
-    private val getConnexionModeUseCase: GetConnexionModeUseCase,
     private val setIsConnectedUseCase: SetIsConnectedUseCase
 ) : ViewModel() {
 
@@ -43,8 +40,7 @@ class AppViewModel(
 
     fun logOut() {
         viewModelScope.launch(ioDispatcher) {
-            val connexionMode = getConnexionModeUseCase().first()
-            logOutUseCase(connexionMode ?: "EMAIL").mapSuccess {
+            logOutUseCase().mapSuccess {
                 setIsConnectedUseCase(false)
             }
         }

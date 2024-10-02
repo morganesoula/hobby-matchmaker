@@ -26,3 +26,4 @@ sealed class SignInError : AppError {
 
 class ResetPasswordError(override val message: String) : AppError
 class SocialMediaError(override val message: String) : AppError
+class LinkWithCredentialsError(override val message: String) : AppError

@@ -6,7 +6,7 @@ import com.msoula.hobbymatchmaker.core.common.Result
 class LogOutUseCase(
     private val authenticationRepository: AuthenticationRepository
 ) {
-    suspend operator fun invoke(connexionMode: String): Result<Boolean> {
-        return authenticationRepository.logOut(connexionMode)
+    suspend operator fun invoke(): Result<Boolean> {
+        return authenticationRepository.logOut()
     }
 }

@@ -1,6 +1,7 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.repositories
 
 import com.google.firebase.auth.AuthCredential
+import com.google.firebase.auth.AuthResult
 import com.msoula.hobbymatchmaker.core.authentication.domain.data_sources.AuthenticationRemoteDataSource
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutError
 import com.msoula.hobbymatchmaker.core.common.Result
@@ -10,13 +11,9 @@ import com.msoula.hobbymatchmaker.core.common.mapSuccess
 class AuthenticationRepository(
     private val remoteDataSource: AuthenticationRemoteDataSource
 ) {
-    suspend fun logOut(connexionMode: String): Result<Boolean> {
+    suspend fun logOut(): Result<Boolean> {
         return try {
-            when (connexionMode) {
-                "FACEBOOK" -> remoteDataSource.loginManagerSignOut()
-                "GOOGLE" -> remoteDataSource.credentialManagerLogOut()
-                else -> remoteDataSource.authenticationSignOut()
-            }
+            remoteDataSource.authenticationSignOut()
             Result.Success(true)
         } catch (exception: Exception) {
             Result.Failure(LogOutError(message = exception.message ?: "Error while logging out"))
@@ -26,7 +23,7 @@ class AuthenticationRepository(
     suspend fun signUp(
         email: String,
         password: String,
-    ): Result<Boolean> {
+    ): Result<String> {
         return remoteDataSource.createUserWithEmailAndPassword(email, password)
             .mapSuccess { it }
             .mapError { error ->
@@ -37,7 +34,7 @@ class AuthenticationRepository(
     suspend fun signInWithEmailAndPassword(
         email: String,
         password: String,
-    ): Result<Boolean> {
+    ): Result<String> {
         return remoteDataSource.signInWithEmailAndPassword(email, password)
             .mapSuccess { it }
             .mapError { error ->
@@ -54,7 +51,20 @@ class AuthenticationRepository(
 
     suspend fun signInWithCredential(
         authCredential: AuthCredential
-    ): Result<Boolean> {
+    ): Result<AuthResult?> {
         return remoteDataSource.signInWithCredentials(authCredential)
     }
+
+    suspend fun linkInWithCredential(
+        authCredential: AuthCredential
+    ): Result<AuthResult?> {
+        return remoteDataSource.linkWithCredential(credential = authCredential)
+    }
+
+    suspend fun isFirstSignIn(uid: String): Boolean {
+        return remoteDataSource.isFirstSignIn(uid)
+    }
+
+    suspend fun fetchFirebaseUserInfo() =
+        remoteDataSource.fetchFirebaseUserInfo()
 }

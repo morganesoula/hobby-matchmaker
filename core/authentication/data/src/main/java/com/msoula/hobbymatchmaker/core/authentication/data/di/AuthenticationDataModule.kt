@@ -9,6 +9,6 @@ import org.koin.dsl.module
 val authenticationDataModule = module {
     single { CredentialManager.create(androidContext()) }
     factory<AuthenticationRemoteDataSource> {
-        AuthenticationRemoteDataSourceImpl(get(), get())
+        AuthenticationRemoteDataSourceImpl(get(), get(), get())
     }
 }

@@ -10,7 +10,6 @@ val appViewModelModule = module {
             ioDispatcher = get(),
             logOutUseCase = get(),
             observeIsConnectedUseCase = get(),
-            getConnexionModeUseCase = get(),
             setIsConnectedUseCase = get()
         )
     }

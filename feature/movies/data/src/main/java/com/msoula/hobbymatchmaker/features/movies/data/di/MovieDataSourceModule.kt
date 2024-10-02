@@ -9,7 +9,7 @@ import org.koin.dsl.module
 import retrofit2.Retrofit
 
 val movieDataModule = module {
-    single<MovieRemoteDataSource> { MovieRemoteDataSourceImpl(get(), get()) }
+    single<MovieRemoteDataSource> { MovieRemoteDataSourceImpl(get(), get(), get()) }
     single<MovieLocalDataSource> { MovieLocalDataSourceImpl(get()) }
     single<TMDBService> { get<Retrofit>().create(TMDBService::class.java) }
 }

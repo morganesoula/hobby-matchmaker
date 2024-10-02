@@ -5,4 +5,5 @@ import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 
 interface MovieRemoteDataSource {
     suspend fun fetchMovies(language: String): Result<List<MovieDomainModel>>
+    suspend fun updateUserFavoriteMovieList(uuidUser: String, movieId: Long, isFavorite: Boolean)
 }

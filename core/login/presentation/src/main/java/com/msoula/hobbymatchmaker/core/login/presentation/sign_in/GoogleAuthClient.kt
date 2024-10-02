@@ -40,12 +40,16 @@ class GoogleAuthClient(
         }
     }
 
-    fun handleSignIn(result: GetCredentialResponse): AuthCredential {
+    fun handleSignIn(result: GetCredentialResponse): Pair<AuthCredential, String?> {
         val credential = result.credential
         return if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
             val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+            val email = googleIdTokenCredential.id
 
-            GoogleAuthProvider.getCredential(googleIdTokenCredential.idToken, null)
+            val authCredential =
+                GoogleAuthProvider.getCredential(googleIdTokenCredential.idToken, null)
+
+            Pair(authCredential, email)
         } else {
             throw RuntimeException("Received an invalid credential type")
         }

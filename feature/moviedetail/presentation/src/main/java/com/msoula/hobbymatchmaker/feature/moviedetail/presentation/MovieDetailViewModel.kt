@@ -19,6 +19,7 @@ import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieD
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieDetailViewStateModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.toMovieDetailUiModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -33,6 +34,7 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class MovieDetailViewModel(
@@ -43,6 +45,7 @@ class MovieDetailViewModel(
     private val ioDispatcher: CoroutineDispatcher,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
     private val _oneTimeEventChannel = Channel<MovieDetailUiEventModel>()
     val oneTimeEventChannelFlow = _oneTimeEventChannel.receiveAsFlow()
 
@@ -52,7 +55,8 @@ class MovieDetailViewModel(
 
     private var currentMovie: MovieDetailUiModel? = MovieDetailUiModel()
     private val maxTrailerAttempt = 2
-    private var currentAttempt = 0
+
+    private val fallBackLanguages = listOf("en-US", "fr-FR")
 
     init {
         setMovieId(movieId)
@@ -74,7 +78,9 @@ class MovieDetailViewModel(
 
                                 FetchStatusModel.Loading -> MovieDetailViewStateModel.Loading
                                 FetchStatusModel.NeverFetched -> {
-                                    fetchMovieDetail(movieId)
+                                    withContext(ioDispatcher) {
+                                        fetchMovieDetail(movieId)
+                                    }
                                     MovieDetailViewStateModel.Loading
                                 }
 
@@ -84,7 +90,7 @@ class MovieDetailViewModel(
 
                         else -> {
                             if (fetchStatus is FetchStatusModel.Error) {
-                                _oneTimeEventChannel.send(
+                                sendOnce(
                                     MovieDetailUiEventModel.OnMovieDetailUiFetchedError(
                                         fetchStatus.error
                                     )
@@ -121,7 +127,7 @@ class MovieDetailViewModel(
 
     private suspend fun onPlayTrailerClicked(movieId: Long, isVideoURIknown: Boolean) {
         if (isVideoURIknown) {
-            _oneTimeEventChannel.send(
+            sendOnce(
                 MovieDetailUiEventModel.OnPlayMovieTrailerReady(
                     currentMovie?.videoKey ?: ""
                 )
@@ -136,7 +142,11 @@ class MovieDetailViewModel(
         }
     }
 
-    private suspend fun processVideoResponse(videoResponse: MovieVideoDomainModel?, movieId: Long) {
+    private suspend fun processVideoResponse(
+        videoResponse: MovieVideoDomainModel?,
+        movieId: Long,
+        attempt: Int = 0
+    ) {
         val uri = videoResponse?.let { videoModel ->
             when (videoModel.site.lowercase()) {
                 "youtube" -> videoModel.key
@@ -144,31 +154,27 @@ class MovieDetailViewModel(
             }
         } ?: ""
 
-        currentAttempt++
-
         if (uri.isNotEmpty()) {
-            currentAttempt = 0
             updateMovieVideoURI(uri, movieId)
-        } else if (currentAttempt < maxTrailerAttempt) {
-            reloadVideoResponse(movieId)
+        } else if (attempt < maxTrailerAttempt) {
+            reloadVideoResponse(movieId, attempt + 1)
         } else {
             Log.e("HMM", "Error while loading URI with native and US language")
-            _oneTimeEventChannel.send(
-                MovieDetailUiEventModel.ErrorFetchingTrailer
-            )
+            sendOnce(MovieDetailUiEventModel.ErrorFetchingTrailer)
         }
     }
 
-    private suspend fun reloadVideoResponse(movieId: Long) {
-        fetchMovieDetailTrailerUseCase(movieId, "en-US")
+    private suspend fun reloadVideoResponse(movieId: Long, attempt: Int) {
+        val language = fallBackLanguages.getOrNull(attempt) ?: "en-US"
+        fetchMovieDetailTrailerUseCase(movieId, language)
             .mapSuccess { videoResponse ->
-                processVideoResponse(videoResponse, movieId)
+                processVideoResponse(videoResponse, movieId, attempt)
             }
     }
 
     private suspend fun updateMovieVideoURI(videoURI: String, movieId: Long) {
         updateMovieVideoURIUseCase(movieId = movieId, videoURI = videoURI)
-        _oneTimeEventChannel.send(MovieDetailUiEventModel.OnPlayMovieTrailerReady(videoURI))
+        sendOnce(MovieDetailUiEventModel.OnPlayMovieTrailerReady(videoURI))
     }
 
     private fun setMovieId(movieId: Long) {
@@ -178,22 +184,28 @@ class MovieDetailViewModel(
     }
 
     private suspend fun fetchMovieDetail(movieId: Long) {
+        fetchStatusFlow.emit(FetchStatusModel.Loading)
+
         val language = getDeviceLocale()
+        val movieDetail = fetchMovieDetailUseCase(movieId, language)
 
-        viewModelScope.launch(ioDispatcher) {
-            fetchStatusFlow.emit(FetchStatusModel.Loading)
-
-            fetchMovieDetailUseCase(movieId, language)
-                .mapSuccess {
-                    fetchStatusFlow.emit(FetchStatusModel.Success)
+        movieDetail
+            .mapSuccess {
+                fetchStatusFlow.emit(FetchStatusModel.Success)
+            }
+            .mapError { error ->
+                viewModelScope.launch(ioDispatcher) {
+                    fetchStatusFlow.emit(FetchStatusModel.Error(error.message))
                 }
-                .mapError { error ->
-                    viewModelScope.launch(ioDispatcher) {
-                        fetchStatusFlow.emit(FetchStatusModel.Error(error.message))
-                    }
 
-                    FetchingMovieDetailError(error.message)
-                }
+                FetchingMovieDetailError(error.message)
+            }
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    private suspend fun sendOnce(event: MovieDetailUiEventModel) {
+        if (!_oneTimeEventChannel.isClosedForSend) {
+            _oneTimeEventChannel.send(event)
         }
     }
 }

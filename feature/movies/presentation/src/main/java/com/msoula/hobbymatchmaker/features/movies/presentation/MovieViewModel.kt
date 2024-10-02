@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.features.movies.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.FetchFirebaseUserInfo
 import com.msoula.hobbymatchmaker.core.common.getDeviceLocale
 import com.msoula.hobbymatchmaker.core.common.mapError
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
@@ -16,6 +17,7 @@ import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiEve
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiStateModel
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -34,6 +36,7 @@ class MovieViewModel(
     private val observeAllMoviesUseCase: ObserveAllMoviesUseCase,
     private val setMovieFavoriteUseCase: SetMovieFavoriteUseCase,
     private val fetchMoviesUseCase: FetchMoviesUseCase,
+    private val getUserInfo: FetchFirebaseUserInfo,
     private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
@@ -45,7 +48,7 @@ class MovieViewModel(
     val movieState: StateFlow<MovieUiStateModel> =
         observeAllMoviesUseCase()
             .combine(fetchStatusFlow) { movies, fetchStatus ->
-                Pair(movies, fetchStatus)
+                movies to fetchStatus
             }.mapLatest { (movies, fetchStatus) ->
                 when {
                     movies.isEmpty() -> {
@@ -62,9 +65,7 @@ class MovieViewModel(
 
                     else -> {
                         if (fetchStatus is FetchStatusModel.Error) {
-                            _oneTimeEventChannel.send(
-                                MovieUiEventModel.OnMovieUiFetchedError(fetchStatus.error)
-                            )
+                            sendOnce(MovieUiEventModel.OnMovieUiFetchedError(fetchStatus.error))
                         }
 
                         MovieUiStateModel.Success(
@@ -84,16 +85,21 @@ class MovieViewModel(
     fun onCardEvent(event: CardEventModel) {
         when (event) {
             is CardEventModel.OnDoubleTap -> {
-                viewModelScope.launch(ioDispatcher) {
-                    setMovieFavoriteUseCase(event.movie.id, !event.movie.isFavorite)
-                }
+                toggleFavorite(event.movie.id, !event.movie.isFavorite)
             }
 
             is CardEventModel.OnSingleTap -> {
                 viewModelScope.launch {
-                    _oneTimeEventChannel.send(MovieUiEventModel.OnMovieDetailClicked(event.movieId))
+                    sendOnce(MovieUiEventModel.OnMovieDetailClicked(event.movieId))
                 }
             }
+        }
+    }
+
+    private fun toggleFavorite(movieId: Long, isFavorite: Boolean) {
+        viewModelScope.launch(ioDispatcher) {
+            val uuid = getUserInfo()?.uid
+            setMovieFavoriteUseCase(uuid ?: "", movieId, isFavorite)
         }
     }
 
@@ -103,7 +109,9 @@ class MovieViewModel(
         viewModelScope.launch(ioDispatcher) {
             fetchStatusFlow.emit(FetchStatusModel.Loading)
 
-            fetchMoviesUseCase(language)
+            val result = fetchMoviesUseCase(language)
+
+            result
                 .mapSuccess {
                     fetchStatusFlow.emit(FetchStatusModel.Success)
                 }
@@ -114,6 +122,13 @@ class MovieViewModel(
 
                     FetchingMovieError(error.message)
                 }
+        }
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    private suspend fun sendOnce(event: MovieUiEventModel) {
+        if (!_oneTimeEventChannel.isClosedForSend) {
+            _oneTimeEventChannel.send(event)
         }
     }
 }

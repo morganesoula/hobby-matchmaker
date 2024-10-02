@@ -8,6 +8,7 @@ interface MovieRepository {
     fun observeMovies(): Flow<List<MovieDomainModel>>
 
     suspend fun updateMovieWithFavoriteValue(
+        uuidUser: String,
         id: Long,
         isFavorite: Boolean
     )

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.data.data_sources.remote.errors.CreateUserError
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.SignUpUseCase
+import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.mapError
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.common.onEach
@@ -17,6 +18,8 @@ import com.msoula.hobbymatchmaker.core.login.presentation.extensions.updateState
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_up.models.SignUpStateModel
+import com.msoula.hobbymatchmaker.core.session.domain.models.SessionUserDomainModel
+import com.msoula.hobbymatchmaker.core.session.domain.use_cases.CreateUserUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
@@ -35,7 +38,8 @@ class SignUpViewModel(
     private val signUpUseCase: SignUpUseCase,
     private val ioDispatcher: CoroutineDispatcher,
     private val resourceProvider: StringResourcesProvider,
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
+    private val createUserUseCase: CreateUserUseCase
 ) : ViewModel() {
 
     private val savedStateHandleKey: String = "signUpState"
@@ -69,35 +73,31 @@ class SignUpViewModel(
 
     fun onEvent(event: AuthenticationUIEvent) {
         when (event) {
-            is AuthenticationUIEvent.OnEmailChanged -> {
-                _email.value = event.email
-                updateFormState {
-                    it.copy(
-                        email = event.email.trimEnd()
-                    )
-                }
-            }
+            is AuthenticationUIEvent.OnEmailChanged -> handleInputChange(event.email, "email")
+            is AuthenticationUIEvent.OnFirstNameChanged -> handleInputChange(
+                event.firstName,
+                "firstName"
+            )
 
-            is AuthenticationUIEvent.OnFirstNameChanged -> {
-                _firstName.value = event.firstName
-                updateFormState {
-                    it.copy(
-                        firstName = event.firstName
-                    )
-                }
-            }
-
-            is AuthenticationUIEvent.OnPasswordChanged -> {
-                _password.value = event.password
-                updateFormState {
-                    it.copy(
-                        password = event.password
-                    )
-                }
-            }
+            is AuthenticationUIEvent.OnPasswordChanged -> handleInputChange(
+                event.password,
+                "password"
+            )
 
             AuthenticationUIEvent.OnSignUp -> launchSignUp()
             else -> Unit
+        }
+    }
+
+    private fun handleInputChange(input: String, field: String) {
+        when (field) {
+            "email" -> _email.value = input.trimEnd()
+            "firstName" -> _firstName.value = input
+            "password" -> _password.value = input
+        }
+
+        updateFormState {
+            it.copy(email = _email.value, firstName = _firstName.value, password = _password.value)
         }
     }
 
@@ -110,12 +110,11 @@ class SignUpViewModel(
         val firstNameResult =
             loginValidateFormUseCase.validateFirstName(formState.firstName.trimEnd())
 
-        val results = listOf(emailResult, passwordResult, firstNameResult)
-        val hasError = results.any { !it.successful }
+        val results = listOf(emailResult, passwordResult, firstNameResult).any { !it.successful }
 
         updateFormState {
             it.copy(
-                submit = !hasError,
+                submit = !results,
                 signUpError = if (formState.firstName.isNotEmpty()) firstNameResult.errorMessage?.let { error ->
                     resourceProvider.getString(
                         error
@@ -147,33 +146,55 @@ class SignUpViewModel(
                     abortCircularProgress()
                 }
             }
-            .mapSuccess {
+            .mapSuccess { uid ->
                 savedStateHandle.clearAll<SignUpStateModel>()
-                oneTimeEventChannel.send(AuthenticationEvent.OnSignUpSuccess)
+                createUserOnline(uid)
             }
             .mapError { error ->
                 Log.e("HMM", "Could not create an account with error: $error")
-                val errorMessageToDisplay: String = when (error) {
-                    is CreateUserError.EmailAlreadyExists -> resourceProvider.getString(
-                        R.string.email_already_exists_error
-                    )
-                    is CreateUserError.UserDisabled -> resourceProvider.getString(
-                        R.string.user_disabled_error
-                    )
-                    is CreateUserError.TooManyRequests -> resourceProvider.getString(
-                        R.string.too_many_requests_error
-                    )
-                    is CreateUserError.InternalError -> resourceProvider.getString(
-                        R.string.internal_error
-                    )
-
-                    else -> error.message
-                }
-
+                val errorMessageToDisplay: String = handleSignUpError(error)
                 updateFormState { it.copy(signUpError = errorMessageToDisplay) }
                 error
             }
     }
 
     private fun abortCircularProgress() = signUpCircularProgress.update { false }
+
+    private suspend fun createUserOnline(uid: String) {
+        createUserUseCase(
+            SessionUserDomainModel(
+                uid = uid,
+                email = formDataFlow.value.email
+            )
+        )
+            .mapSuccess {
+                oneTimeEventChannel.send(AuthenticationEvent.OnSignUpSuccess)
+            }
+            .mapError {
+                Log.e("HMM", "VM - Could not create user online with error: $it")
+                it
+            }
+    }
+
+    private fun handleSignUpError(error: AppError): String {
+        return when (error) {
+            is CreateUserError.EmailAlreadyExists -> resourceProvider.getString(
+                R.string.email_already_exists_error
+            )
+
+            is CreateUserError.UserDisabled -> resourceProvider.getString(
+                R.string.user_disabled_error
+            )
+
+            is CreateUserError.TooManyRequests -> resourceProvider.getString(
+                R.string.too_many_requests_error
+            )
+
+            is CreateUserError.InternalError -> resourceProvider.getString(
+                R.string.internal_error
+            )
+
+            else -> error.message
+        }
+    }
 }

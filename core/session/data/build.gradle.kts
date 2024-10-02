@@ -18,6 +18,15 @@ dependencies {
     implementation(libs.datastore.core)
     implementation(libs.datastore.preferences)
 
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firebase.auth)
+
+    // Firestore
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firebase.firestore)
+    implementation(libs.firebase.firebase.firestore.ktx)
+
     // Koin
     implementation(libs.koin.android)
 

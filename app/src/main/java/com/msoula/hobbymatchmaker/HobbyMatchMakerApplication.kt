@@ -11,6 +11,7 @@ import com.msoula.hobbymatchmaker.core.di.module.resourceModule
 import com.msoula.hobbymatchmaker.core.di.module.stringResourcesProviderModule
 import com.msoula.hobbymatchmaker.core.login.domain.use_cases.di.loginFormValidationModule
 import com.msoula.hobbymatchmaker.core.login.presentation.di.signInViewModelModule
+import com.msoula.hobbymatchmaker.core.login.presentation.di.signUpViewModelModule
 import com.msoula.hobbymatchmaker.core.network.di.networkModule
 import com.msoula.hobbymatchmaker.core.session.data.di.sessionDataModule
 import com.msoula.hobbymatchmaker.core.session.domain.di.sessionDomainModule
@@ -51,6 +52,7 @@ class HobbyMatchMakerApplication : Application() {
                     sessionDomainModule,
                     appViewModelModule,
                     signInViewModelModule,
+                    signUpViewModelModule,
                     movieViewModelModule,
                     movieDetailViewModelModule,
                     localDatabaseModule

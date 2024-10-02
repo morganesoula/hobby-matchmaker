@@ -7,9 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.AuthCredential
 import com.msoula.hobbymatchmaker.core.authentication.data.data_sources.remote.errors.SignInError
-import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.LoginWithSocialMediaUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.ResetPasswordUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.SignInUseCase
+import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.SocialMediaSignInUseCase
+import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.mapError
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.common.onEach
@@ -21,6 +22,8 @@ import com.msoula.hobbymatchmaker.core.login.presentation.extensions.updateState
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.models.SignInFormStateModel
+import com.msoula.hobbymatchmaker.core.session.domain.models.SessionUserDomainModel
+import com.msoula.hobbymatchmaker.core.session.domain.use_cases.CreateUserUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.use_cases.SetIsConnectedUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -39,7 +42,8 @@ class SignInViewModel(
     private val ioDispatcher: CoroutineDispatcher,
     private val resourceProvider: StringResourcesProvider,
     private val setIsConnectedUseCase: SetIsConnectedUseCase,
-    private val loginWithSocialMediaUseCase: LoginWithSocialMediaUseCase
+    private val socialMediaSignInUseCase: SocialMediaSignInUseCase,
+    private val createUserUseCase: CreateUserUseCase
 ) : ViewModel() {
 
     private val savedStateHandleKey: String = "loginState"
@@ -92,47 +96,59 @@ class SignInViewModel(
         }
     }
 
-    fun handleFacebookLogin(credential: AuthCredential) {
+    fun handleFacebookLogin(credential: AuthCredential, email: String) {
         launchCircularProgress()
+
         handleSocialMediaLogin(
-            credential,
+            Pair(credential, email),
             AuthenticationEvent::OnFacebookFailedConnection,
-            "Facebook login failed"
+            "Facebook login failed",
+            "Facebook"
         )
     }
 
     fun handleGoogleLogin(result: GetCredentialResponse?, googleAuthClient: GoogleAuthClient) {
         result?.let {
             val authCredential = googleAuthClient.handleSignIn(it)
+
             handleSocialMediaLogin(
                 authCredential,
                 AuthenticationEvent::OnGoogleFailedConnection,
-                "Google login failed"
+                "Google login failed",
+                "Google"
             )
         } ?: Log.e("HMM", "Could not get credentials response from UI")
     }
 
     private fun handleSocialMediaLogin(
-        credential: AuthCredential,
+        credential: Pair<AuthCredential, String?>,
         onFailureEvent: (String) -> AuthenticationEvent,
-        errorMessage: String
+        errorMessage: String,
+        type: String
     ) {
         viewModelScope.launch(ioDispatcher) {
-            loginWithSocialMediaUseCase(credential)
-                .onEach {
-                    viewModelScope.launch {
-                        abortCircularProgress()
-                    }
+            val result = socialMediaSignInUseCase(credential.first, type)
+            abortCircularProgress()
+
+            result.mapSuccess { authResult ->
+                authResult?.user?.let { firebaseUser ->
+                    createUserUseCase(
+                        SessionUserDomainModel(
+                            firebaseUser.uid,
+                            credential.second ?: ""
+                        )
+                    )
                 }
-                .mapSuccess {
-                    saveIsConnected()
-                }
+
+                saveIsConnected()
+            }
                 .mapError { error ->
-                    Log.e("HMM", errorMessage)
+                    Log.e("HMM", errorMessage + " - ${error.message}")
                     viewModelScope.launch {
                         sendEvent(onFailureEvent(error.message))
                     }
                     error
+
                 }
         }
     }
@@ -142,7 +158,7 @@ class SignInViewModel(
     }
 
     private suspend fun saveIsConnected() {
-        setIsConnected(true)
+        setIsConnectedUseCase(true)
         withContext(Dispatchers.Main) {
             _oneTimeEventChannel.send(AuthenticationEvent.OnSignInSuccess)
         }
@@ -169,34 +185,15 @@ class SignInViewModel(
                     }
                 }
                 .mapSuccess {
-                    setIsConnected(true)
+                    setIsConnectedUseCase(true)
                     clearFormState()
                     withContext(Dispatchers.Main) {
                         redirectToAppScreen()
                     }
                 }
                 .mapError { error ->
-                    Log.d("HMM", "SignInViewModel - Error while signing in: ${error.message}")
-                    val errorMessage: String = when (error) {
-                        is SignInError.WrongPassword -> resourceProvider.getString(
-                            R.string.login_error
-                        )
-
-                        is SignInError.UserNotFound -> resourceProvider.getString(
-                            R.string.user_not_found_error
-                        )
-
-                        is SignInError.UserDisabled -> resourceProvider.getString(
-                            R.string.user_disabled_error
-                        )
-
-                        is SignInError.TooManyRequests -> resourceProvider.getString(
-                            R.string.too_many_requests_error
-                        )
-
-                        else -> error.message
-                    }
-
+                    Log.e("HMM", "SignInViewModel - Error while signing in: ${error.message}")
+                    val errorMessage = handleError(error)
                     updateFormState { it.copy(logInError = errorMessage) }
                     error
                 }
@@ -239,7 +236,7 @@ class SignInViewModel(
         launchCircularProgress()
 
         viewModelScope.launch(ioDispatcher) {
-            setIsConnected(true)
+            setIsConnectedUseCase(true)
             withContext(Dispatchers.Main) {
                 abortCircularProgress()
                 _oneTimeEventChannel.send(AuthenticationEvent.OnSignInSuccess)
@@ -265,7 +262,25 @@ class SignInViewModel(
         }
     }
 
-    private suspend fun setIsConnected(isConnected: Boolean) {
-        setIsConnectedUseCase(isConnected)
+    private fun handleError(error: AppError): String {
+        return when (error) {
+            is SignInError.WrongPassword -> resourceProvider.getString(
+                R.string.login_error
+            )
+
+            is SignInError.UserNotFound -> resourceProvider.getString(
+                R.string.user_not_found_error
+            )
+
+            is SignInError.UserDisabled -> resourceProvider.getString(
+                R.string.user_disabled_error
+            )
+
+            is SignInError.TooManyRequests -> resourceProvider.getString(
+                R.string.too_many_requests_error
+            )
+
+            else -> error.message
+        }
     }
 }

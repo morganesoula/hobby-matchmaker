@@ -18,11 +18,13 @@ class MovieRepositoryImpl(
     }
 
     override suspend fun updateMovieWithFavoriteValue(
+        uuidUser: String,
         id: Long,
         isFavorite: Boolean
     ) {
         Log.d("HMM", "repository favorite value: $id, $isFavorite")
         movieLocalDataSource.updateMovieWithFavoriteValue(id, isFavorite)
+        movieRemoteDataSource.updateUserFavoriteMovieList(uuidUser, id, isFavorite)
     }
 
     override suspend fun updateMovieWithLocalCoverFilePath(
