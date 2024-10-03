@@ -6,6 +6,7 @@ import com.msoula.hobbymatchmaker.core.common.ExternalServiceError
 import com.msoula.hobbymatchmaker.core.common.NetworkError
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.ServerError
+import kotlinx.coroutines.CancellationException
 import retrofit2.Response
 
 suspend fun <R> execute(
@@ -30,6 +31,12 @@ suspend fun <R> execute(
                 Result.Failure(errorCallBack?.invoke(error) ?: parseCommonError(error))
             }
         }
+    } catch (exception: CancellationException) {
+        Log.e(
+            "HMM",
+            "Error parsing data ${exception.message}"
+        )
+        throw exception
     } catch (exception: Exception) {
         Log.d("HMM", "Error message is: ${exception.message}")
         Result.Failure(NetworkError())

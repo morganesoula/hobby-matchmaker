@@ -8,6 +8,7 @@ import com.msoula.hobbymatchmaker.features.movies.domain.data_sources.MovieLocal
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlin.coroutines.cancellation.CancellationException
 
 class MovieLocalDataSourceImpl
     (private val movieDAO: MovieDAO) : MovieLocalDataSource {
@@ -25,6 +26,8 @@ class MovieLocalDataSourceImpl
     ) {
         try {
             movieDAO.updateMovieFavorite(id, isFavorite)
+        } catch (exception: CancellationException) {
+            throw exception
         } catch (exception: Exception) {
             exception.printStackTrace()
             Log.e("HMM", "Error updating movie: $exception")
@@ -34,6 +37,8 @@ class MovieLocalDataSourceImpl
     override suspend fun insertMovie(movie: MovieDomainModel) {
         try {
             movieDAO.upsertMovie(movie.toMovieEntityModel())
+        } catch (exception: CancellationException) {
+            throw exception
         } catch (exception: Exception) {
             exception.printStackTrace()
             Log.e("HMM", "Error on inserting movie: $exception")
@@ -44,10 +49,24 @@ class MovieLocalDataSourceImpl
         coverFileName: String,
         localCoverFilePath: String
     ) {
-        movieDAO.updateMovieCover(coverFileName, localCoverFilePath)
+        try {
+            movieDAO.updateMovieCover(coverFileName, localCoverFilePath)
+        } catch (exception: CancellationException) {
+            throw exception
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.e("HMM", "Error updating movie with local cover: $e")
+        }
     }
 
     override suspend fun upsertAll(movies: List<MovieDomainModel>) {
-        movieDAO.upsertMovies(movies.map { it.toMovieEntityModel() })
+        try {
+            movieDAO.upsertMovies(movies.map { it.toMovieEntityModel() })
+        } catch (exception: CancellationException) {
+            throw exception
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.e("HMM", "Error upserting movies: $e")
+        }
     }
 }

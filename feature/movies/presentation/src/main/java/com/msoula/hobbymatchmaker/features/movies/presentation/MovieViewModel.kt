@@ -103,7 +103,7 @@ class MovieViewModel(
         }
     }
 
-    private suspend fun fetchMovies() {
+    private fun fetchMovies() {
         val language = getDeviceLocale()
 
         viewModelScope.launch(ioDispatcher) {

@@ -18,8 +18,9 @@ import com.msoula.hobbymatchmaker.core.authentication.data.data_sources.remote.m
 import com.msoula.hobbymatchmaker.core.authentication.domain.data_sources.AuthenticationRemoteDataSource
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.core.common.safeFirebaseCall
+import com.msoula.hobbymatchmaker.core.common.safeCall
 import kotlinx.coroutines.tasks.await
+import kotlin.coroutines.cancellation.CancellationException
 
 class AuthenticationRemoteDataSourceImpl(
     private val auth: FirebaseAuth,
@@ -30,9 +31,16 @@ class AuthenticationRemoteDataSourceImpl(
     private val facebookManager = LoginManager.getInstance()
 
     override suspend fun authenticationSignOut() {
-        credentialManager.clearCredentialState(ClearCredentialStateRequest())
-        facebookManager.logOut()
-        auth.signOut()
+        try {
+            credentialManager.clearCredentialState(ClearCredentialStateRequest())
+            facebookManager.logOut()
+            auth.signOut()
+        } catch (exception: CancellationException) {
+            throw exception
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.e("HMM", "Exception caught while logging out: ${e.message}")
+        }
         Log.d("HMM", "Logged out")
     }
 
@@ -43,6 +51,8 @@ class AuthenticationRemoteDataSourceImpl(
         return try {
             auth.createUserWithEmailAndPassword(email, password).await()
             Result.Success(auth.currentUser?.uid ?: "")
+        } catch (exception: CancellationException) {
+            throw exception
         } catch (e: Exception) {
             Log.e("HMM", "Exception caught while creating user: ${e.message}")
             if (e is FirebaseAuthException) {
@@ -75,6 +85,8 @@ class AuthenticationRemoteDataSourceImpl(
                 "User not found"
             )
             Result.Success(uid)
+        } catch (exception: CancellationException) {
+            throw exception
         } catch (e: Exception) {
             Log.e("HMM", "Exception caught while logging user: ${e.message}")
             if (e is FirebaseAuthException) {
@@ -92,7 +104,7 @@ class AuthenticationRemoteDataSourceImpl(
     }
 
     override suspend fun resetPassword(email: String): Result<Boolean> {
-        return safeFirebaseCall(
+        return safeCall(
             appError = { errorMessage -> ResetPasswordError("Could not reset password: $errorMessage") }
         ) {
             auth.sendPasswordResetEmail(email).await()
@@ -103,7 +115,7 @@ class AuthenticationRemoteDataSourceImpl(
     override suspend fun signInWithCredentials(
         credential: AuthCredential
     ): Result<AuthResult> {
-        return safeFirebaseCall(
+        return safeCall(
             appError = { errorMessage -> SocialMediaError("Could not sign in with credentials: $credential - $errorMessage") }
         ) {
             auth.signInWithCredential(credential).await()
@@ -111,7 +123,7 @@ class AuthenticationRemoteDataSourceImpl(
     }
 
     override suspend fun linkWithCredential(credential: AuthCredential): Result<AuthResult?> {
-        return safeFirebaseCall(
+        return safeCall(
             appError = { errorMessage ->
                 LinkWithCredentialsError(
                     "Exception while linking with credentials - $errorMessage"

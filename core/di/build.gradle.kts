@@ -20,7 +20,8 @@ dependencies {
     implementation(libs.koin.android)
 
     // Firebase
-    implementation(libs.firebase.firebase.auth.ktx)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firebase.auth)
 
     // Modules
     implementation(project(Modules.DESIGN))

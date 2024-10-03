@@ -3,7 +3,7 @@ package com.msoula.hobbymatchmaker.core.session.data.data_sources.remote
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.core.common.safeFirebaseCall
+import com.msoula.hobbymatchmaker.core.common.safeCall
 import com.msoula.hobbymatchmaker.core.session.data.data_sources.remote.errors.SaveFirestoreUserError
 import com.msoula.hobbymatchmaker.core.session.data.data_sources.remote.mappers.toUserFireStoreModel
 import com.msoula.hobbymatchmaker.core.session.domain.data_sources.SessionRemoteDataSource
@@ -36,7 +36,7 @@ class SessionRemoteDataSourceImpl(
         uid: String,
         userFireStoreModel: HashMap<String, String>
     ): Result<Boolean> {
-        return safeFirebaseCall(appError = { errorMessage ->
+        return safeCall(appError = { errorMessage ->
             Log.e("HMM", "Error while saving firestore user online")
             SaveFirestoreUserError(errorMessage)
         }) {

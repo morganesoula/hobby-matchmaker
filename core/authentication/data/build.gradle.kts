@@ -26,7 +26,6 @@ dependencies {
     // Firestore
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firebase.firestore)
-    implementation(libs.firebase.firebase.firestore.ktx)
 
     // Google
     implementation(libs.play.services.auth)

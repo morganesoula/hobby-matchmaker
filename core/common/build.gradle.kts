@@ -17,7 +17,7 @@ dependencies {
 
     // Firestore
     implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.firebase.firestore.ktx)
+    implementation(libs.firebase.firebase.firestore)
 
     // Koin
     implementation(libs.koin.android)
