@@ -29,7 +29,7 @@ class SetMovieFavoriteUseCaseTest {
         var query = fakeMovieRepository.getFirstElement()
         assertFalse(query.isFavorite)
 
-        setMovieFavoriteUseCase(1, true)
+        setMovieFavoriteUseCase("uuid1", 1, true)
         query = fakeMovieRepository.getFirstElement()
 
         assertTrue(query.isFavorite)

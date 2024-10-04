@@ -40,6 +40,14 @@ class FakeMovieRemoteDataSource : MovieRemoteDataSource {
         }
     }
 
+    override suspend fun updateUserFavoriteMovieList(
+        uuidUser: String,
+        movieId: Long,
+        isFavorite: Boolean
+    ) {
+        TODO("Not yet implemented")
+    }
+
     fun clearData() {
         fakeMovies.clear()
     }

@@ -1,6 +1,8 @@
 package com.msoula.hobbymatchmaker.features.movies.presentation
 
 import app.cash.turbine.test
+import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
+import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.FetchFirebaseUserInfo
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.use_cases.FetchMoviesUseCase
@@ -41,6 +43,7 @@ class MovieViewModelTest {
     private val fetchMoviesUseCase = mockk<FetchMoviesUseCase>(relaxed = true)
     private val observeAllMoviesUseCase = mockk<ObserveAllMoviesUseCase>(relaxed = true)
     private val fetchStatusFlow = MutableStateFlow<FetchStatusModel>(FetchStatusModel.NeverFetched)
+    private val getUserInfo = mockk<FetchFirebaseUserInfo>(relaxed = true)
 
     @Before
     fun setUp() {
@@ -54,6 +57,7 @@ class MovieViewModelTest {
             setMovieFavoriteUseCase = setMovieFavoriteUseCase,
             observeAllMoviesUseCase = observeAllMoviesUseCase,
             fetchMoviesUseCase = fetchMoviesUseCase,
+            getUserInfo = getUserInfo,
             ioDispatcher = testDispatcher
         )
     }
@@ -155,11 +159,12 @@ class MovieViewModelTest {
             )
         )
 
-        coEvery { setMovieFavoriteUseCase(movie.id, true) } returns Unit
+        coEvery { setMovieFavoriteUseCase("uuidUser1", movie.id, true) } returns Unit
+        coEvery { getUserInfo() } returns FirebaseUserInfoDomainModel("uuidUser1", "test@test.fr", null)
 
         val event = CardEventModel.OnDoubleTap(movie)
         viewModel.onCardEvent(event)
 
-        coVerify { setMovieFavoriteUseCase(movie.id, true) }
+        coVerify { setMovieFavoriteUseCase("uuidUser1", movie.id, true) }
     }
 }

@@ -24,7 +24,7 @@ class FakeMovieRepository(
         return localDataSource.observeMovies()
     }
 
-    override suspend fun updateMovieWithFavoriteValue(id: Long, isFavorite: Boolean) {
+    override suspend fun updateMovieWithFavoriteValue(uuidUser: String, id: Long, isFavorite: Boolean) {
         return localDataSource.updateMovieWithFavoriteValue(id, isFavorite)
     }
 
