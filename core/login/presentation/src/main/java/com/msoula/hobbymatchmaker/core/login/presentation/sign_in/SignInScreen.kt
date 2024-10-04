@@ -44,11 +44,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.credentials.GetCredentialResponse
@@ -110,7 +113,7 @@ fun SignInScreen(
             loginManager.createLogInActivityResultContract(callBackManager, null)
         ) {}
 
-    val annotatedString = createAnnotatedString(isDarkTheme = isSystemInDarkTheme())
+    val annotatedString = AnnotatedStringWithLinkAnnotation(isSystemInDarkTheme()) { redirectToSignUpScreen()  }
 
     RegisterFacebookCallback(
         loginManager = loginManager,
@@ -212,11 +215,9 @@ fun SignInScreen(
                         .align(Alignment.BottomCenter)
                         .padding(bottom = 8.dp)
                 ) {
-                    ClickableText(
-                        modifier =
-                        Modifier.wrapContentSize(),
+                    Text(
+                        modifier = Modifier.wrapContentSize(),
                         text = annotatedString,
-                        onClick = { redirectToSignUpScreen() },
                         style = TextStyle(color = MaterialTheme.colorScheme.onBackground)
                     )
                 }
@@ -279,6 +280,28 @@ fun createAnnotatedString(isDarkTheme: Boolean): AnnotatedString {
         )
         append(stringResource(id = StringRes.new_member_clickable_part))
         pop()
+    }
+}
+
+@Composable
+fun AnnotatedStringWithLinkAnnotation(isDarkTheme: Boolean, onClick: () -> Unit): AnnotatedString {
+    val color = if (isDarkTheme) Color(0, 191, 255) else Color.Blue
+
+    return buildAnnotatedString {
+        append(stringResource(id = StringRes.new_member) + "  ")
+        withLink(
+            LinkAnnotation.Clickable(
+                tag = stringResource(id = StringRes.new_member_clickable_part),
+                styles = TextLinkStyles(
+                    style = SpanStyle(
+                        color = color,
+                        textDecoration = TextDecoration.Underline,
+                    )
+                ),
+                linkInteractionListener = { onClick() }
+            ),
+            block = { pop() }
+        )
     }
 }
 

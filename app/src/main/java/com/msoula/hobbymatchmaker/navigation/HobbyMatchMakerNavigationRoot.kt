@@ -26,7 +26,7 @@ import com.msoula.hobbymatchmaker.presentation.AppScreen
 import com.msoula.hobbymatchmaker.presentation.AppViewModel
 import org.koin.androidx.compose.koinViewModel
 
-@SuppressLint("ComposeModifierMissing", "ComposeViewModelInjection")
+@SuppressLint("ComposeModifierMissing", "ComposeViewModelInjection", "RestrictedApi")
 @Stable
 @Composable
 fun HobbyMatchMakerNavigationRoot(
@@ -49,6 +49,7 @@ fun HobbyMatchMakerNavigationRoot(
     }
 }
 
+@SuppressLint("RestrictedApi")
 private fun NavGraphBuilder.authGraph(
     navController: NavHostController,
     googleAuthClient: GoogleAuthClient

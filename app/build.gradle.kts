@@ -37,6 +37,10 @@ android {
 
         testInstrumentationRunner = AndroidConfig.TEST_INSTRUMENTATION_RUNNER
         vectorDrawables.useSupportLibrary = true
+
+        ksp {
+            arg("room.schemaLocation", "$projectDir/schemas")
+        }
     }
 
     bundle {
@@ -74,14 +78,20 @@ android {
         }
     }
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(21))
+        }
+    }
+
+    /* compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     kotlinOptions {
-        jvmTarget = "17"
-    }
+        jvmTarget = "21"
+    } */
 
     buildFeatures {
         buildConfig = true

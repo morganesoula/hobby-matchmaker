@@ -9,6 +9,7 @@ import com.msoula.hobbymatchmaker.core.common.ServerError
 import kotlinx.coroutines.CancellationException
 import retrofit2.Response
 
+@Suppress("UNCHECKED_CAST")
 suspend fun <R> execute(
     call: suspend () -> Response<R>,
     errorCallBack: ((Int) -> AppError)? = null

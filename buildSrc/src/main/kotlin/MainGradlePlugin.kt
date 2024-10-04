@@ -1,4 +1,4 @@
-import com.android.build.gradle.LibraryExtension
+import com.android.build.api.dsl.LibraryExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -42,7 +42,11 @@ class MainGradlePlugin : Plugin<Project> {
                 testInstrumentationRunner = AndroidConfig.TEST_INSTRUMENTATION_RUNNER
 
                 buildConfigField("String", "TMDB_KEY", "\"${tmdbProperties["tmdb_key"]}\"")
-                buildConfigField("String", "WEB_CLIENT_ID", "\"${secretProperties["web_client_id"]}\"")
+                buildConfigField(
+                    "String",
+                    "WEB_CLIENT_ID",
+                    "\"${secretProperties["web_client_id"]}\""
+                )
             }
 
             compileOptions {
