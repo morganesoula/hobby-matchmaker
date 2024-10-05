@@ -12,7 +12,6 @@ android {
 
 dependencies {
     // Compose
-    implementation(libs.material)
     implementation(libs.material3)
     implementation(libs.runtime)
     implementation(libs.material.icons)

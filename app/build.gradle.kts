@@ -84,15 +84,6 @@ android {
         }
     }
 
-    /* compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
-
-    kotlinOptions {
-        jvmTarget = "21"
-    } */
-
     buildFeatures {
         buildConfig = true
         compose = true
@@ -118,8 +109,6 @@ dependencies {
 
     // Compose
     implementation(libs.ui.tooling)
-    implementation(libs.compose.navigation)
-    implementation(libs.material)
     implementation(libs.material3)
     implementation(libs.activity.compose)
     implementation(libs.runtime)
@@ -132,9 +121,6 @@ dependencies {
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.kotlinx.collections.immutable)
-
-    // Facebook
-    implementation(libs.facebook.android.sdk)
 
     // Firebase
     implementation(platform(libs.firebase.bom))
@@ -168,7 +154,7 @@ dependencies {
     implementation(project(Modules.SPLASHSCREEN_PRESENTATION))
 
     // Navigation
-    implementation(libs.navigation.ui.ktx)
+    implementation(libs.compose.navigation)
 
     // Unit Test
     testImplementation(libs.assertk)

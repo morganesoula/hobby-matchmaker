@@ -17,7 +17,6 @@ dependencies {
     implementation(libs.kotlinx.collections.immutable)
 
     // Coil
-    implementation(libs.coil)
     implementation(libs.coil.compose)
 
     // Core

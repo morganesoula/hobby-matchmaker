@@ -51,7 +51,6 @@ activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activ
 appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
 assertk = { module = "com.willowtreeapps.assertk:assertk", version.ref = "assertk" }
-coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 compose-lint-checks = { module = "com.slack.lint.compose:compose-lint-checks", version.ref = "composeLintChecks" }
 compose-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "navigationUiKtx" }
@@ -59,7 +58,6 @@ core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 core-testing = { module = "androidx.arch.core:core-testing", version.ref = "coreTesting" }
 credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
 credentials-play-services = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
-datastore-core = { module = "androidx.datastore:datastore-core", version.ref = "datastore" }
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 facebook-android-sdk = { module = "com.facebook.android:facebook-android-sdk", version.ref = "facebookAndroidSdk" }
 facebook-login = { module = "com.facebook.android:facebook-login", version.ref = "facebookAndroidSdk" }
@@ -85,7 +83,6 @@ lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-com
 lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleViewmodelCompose" }
 lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
 logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "loggingInterceptor" }
-material = { module = "androidx.compose.material:material", version.ref = "material" }
 material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 material-icons = { module = "androidx.compose.material:material-icons-extended", version.ref = "material" }
 media3-common = { module = "androidx.media3:media3-common", version.ref = "media3" }
@@ -94,7 +91,6 @@ media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockkAndroid" }
 navigation-testing = { module = "androidx.navigation:navigation-testing", version.ref = "navigationTesting" }
-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigationUiKtx" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }

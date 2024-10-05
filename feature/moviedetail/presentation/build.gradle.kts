@@ -18,7 +18,6 @@ dependencies {
     implementation(libs.material.icons)
 
     // Coil
-    implementation(libs.coil)
     implementation(libs.coil.compose)
 
     // Core

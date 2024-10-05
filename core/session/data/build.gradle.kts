@@ -15,7 +15,6 @@ dependencies {
     implementation(libs.runtime)
 
     // Datastore
-    implementation(libs.datastore.core)
     implementation(libs.datastore.preferences)
 
     // Firebase

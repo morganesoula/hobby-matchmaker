@@ -45,7 +45,7 @@ class FakeMovieRemoteDataSource : MovieRemoteDataSource {
         movieId: Long,
         isFavorite: Boolean
     ) {
-        TODO("Not yet implemented")
+        println("HMM - Updating user favorite movie list")
     }
 
     fun clearData() {

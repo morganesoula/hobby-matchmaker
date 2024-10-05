@@ -23,7 +23,6 @@ dependencies {
     implementation(project(Modules.DESIGN))
 
     // Navigation
-    implementation(libs.navigation.ui.ktx)
     implementation(libs.compose.navigation)
 
     // Serialization
