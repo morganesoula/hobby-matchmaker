@@ -1,12 +1,12 @@
 package com.msoula.hobbymatchmaker.core.network
 
-import android.util.Log
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.ExternalServiceError
 import com.msoula.hobbymatchmaker.core.common.NetworkError
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.ServerError
-import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import retrofit2.Response
 
 @Suppress("UNCHECKED_CAST")
@@ -32,14 +32,8 @@ suspend fun <R> execute(
                 Result.Failure(errorCallBack?.invoke(error) ?: parseCommonError(error))
             }
         }
-    } catch (exception: CancellationException) {
-        Log.e(
-            "HMM",
-            "Error parsing data ${exception.message}"
-        )
-        throw exception
     } catch (exception: Exception) {
-        Log.d("HMM", "Error message is: ${exception.message}")
+        currentCoroutineContext().ensureActive()
         Result.Failure(NetworkError())
     }
 }

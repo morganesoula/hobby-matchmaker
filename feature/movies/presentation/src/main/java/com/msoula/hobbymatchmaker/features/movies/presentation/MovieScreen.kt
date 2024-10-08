@@ -46,7 +46,6 @@ fun MovieScreen(
                 }
             }
         }
-
     }
 
     LazyRow(

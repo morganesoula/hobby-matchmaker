@@ -16,6 +16,7 @@ class NetworkError(override val message: String = "No internet connection") : Ap
 class ServerError(override val message: String = "Server error occurred") : AppError
 class ExternalServiceError(override val message: String = "External service error occurred") :
     AppError
+class ChildCancellationError(override val message: String = "Child of the scope cancelled") : AppError
 
 suspend fun <R, S> Result<R>.mapSuccess(transform: suspend (value: R) -> S): Result<S> =
     when (this) {

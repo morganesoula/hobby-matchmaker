@@ -22,6 +22,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -78,9 +79,7 @@ class MovieDetailViewModel(
 
                                 FetchStatusModel.Loading -> MovieDetailViewStateModel.Loading
                                 FetchStatusModel.NeverFetched -> {
-                                    withContext(ioDispatcher) {
-                                        fetchMovieDetail(movieId)
-                                    }
+                                    fetchMovieDetail(movieId)
                                     MovieDetailViewStateModel.Loading
                                 }
 
@@ -178,28 +177,30 @@ class MovieDetailViewModel(
     }
 
     private fun setMovieId(movieId: Long) {
-        viewModelScope.launch(ioDispatcher) {
-            movieIdFlow.emit(movieId)
+        if (movieIdFlow.value != movieId) {
+            movieIdFlow.value = movieId
         }
     }
 
     private suspend fun fetchMovieDetail(movieId: Long) {
-        fetchStatusFlow.emit(FetchStatusModel.Loading)
+        withContext(NonCancellable) {
+            fetchStatusFlow.emit(FetchStatusModel.Loading)
 
-        val language = getDeviceLocale()
-        val movieDetail = fetchMovieDetailUseCase(movieId, language)
+            val language = getDeviceLocale()
+            val movieDetail = fetchMovieDetailUseCase(movieId, language)
 
-        movieDetail
-            .mapSuccess {
-                fetchStatusFlow.emit(FetchStatusModel.Success)
-            }
-            .mapError { error ->
-                viewModelScope.launch(ioDispatcher) {
-                    fetchStatusFlow.emit(FetchStatusModel.Error(error.message))
+            movieDetail
+                .mapSuccess {
+                    fetchStatusFlow.emit(FetchStatusModel.Success)
                 }
+                .mapError { error ->
+                    viewModelScope.launch(ioDispatcher) {
+                        fetchStatusFlow.emit(FetchStatusModel.Error(error.message))
+                    }
 
-                FetchingMovieDetailError(error.message)
-            }
+                    FetchingMovieDetailError(error.message)
+                }
+        }
     }
 
     @OptIn(DelicateCoroutinesApi::class)
