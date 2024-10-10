@@ -59,9 +59,7 @@ fun MovieScreen(
                 movie = currentMovie,
                 index = index,
                 onCardEvent = onCardEvent,
-                state = listState,
-                playAnimation = false,
-                shouldPlayHeartAnimation = {}
+                state = listState
             )
         }
     }

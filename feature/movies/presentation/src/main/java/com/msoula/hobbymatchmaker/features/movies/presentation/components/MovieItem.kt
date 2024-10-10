@@ -1,8 +1,7 @@
 package com.msoula.hobbymatchmaker.features.movies.presentation.components
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -13,12 +12,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -28,7 +27,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,17 +57,8 @@ fun MovieItem(
     movie: MovieUiModel,
     index: Int,
     state: LazyListState,
-    onCardEvent: (CardEventModel) -> Unit,
-    playAnimation: Boolean,
-    shouldPlayHeartAnimation: (Boolean) -> Unit
+    onCardEvent: (CardEventModel) -> Unit
 ) {
-    LaunchedEffect(playAnimation) {
-        if (playAnimation) {
-            delay(2000)
-            shouldPlayHeartAnimation(false)
-        }
-    }
-
     val painter = rememberAsyncImagePainter(
         model = if (movie.coverFilePath.isEmpty()) ImageRequest.Builder(LocalContext.current).data(
             R.drawable.ic_movie_clapper_board
@@ -115,17 +107,25 @@ fun MovieItemContent(
         }
     }
 
-    // Like animation
-    val heartColor by animateColorAsState(
-        targetValue = Color.Red,
-        animationSpec = tween(durationMillis = 2000, easing = FastOutLinearInEasing),
-        label = "define heart color",
-    )
+    // Like Animation Bis
+    var showBigHeart by remember { mutableStateOf(false) }
+    var pulse by remember { mutableStateOf(false) }
 
-    val heartSize by animateDpAsState(
-        targetValue = if (movie.playFavoriteAnimation) 60.dp else 0.dp,
-        animationSpec = tween(2000),
-        label = "define heart size"
+    LaunchedEffect(showBigHeart, pulse) {
+        if (showBigHeart) {
+            delay(600)
+            showBigHeart = false
+        }
+
+        if (pulse) {
+            delay(600)
+            pulse = false
+        }
+    }
+
+    val heartScaleAnimation by animateFloatAsState(
+        targetValue = if (showBigHeart || pulse) 2f else 1f,
+        animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing), label = ""
     )
 
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -145,6 +145,8 @@ fun MovieItemContent(
                     .pointerInput(movie) {
                         detectTapGestures(
                             onDoubleTap = {
+                                showBigHeart = true
+                                pulse = true
                                 onCardEvent(CardEventModel.OnDoubleTap(movie))
                             },
                             onTap = {
@@ -161,17 +163,26 @@ fun MovieItemContent(
                         .fillMaxSize()
                 )
 
-                if (movie.isFavorite) {
+                if (showBigHeart) {
                     Icon(
                         imageVector = Icons.Default.Favorite,
                         modifier = Modifier
                             .align(Alignment.TopEnd)
-                            .size(heartSize)
-                            .padding(top = 5.dp, end = 5.dp),
+                            .scale(heartScaleAnimation)
+                            .padding(top = 10.dp, end = 10.dp),
                         contentDescription = "heart icon",
-                        tint = heartColor
+                        tint = Color.Red
                     )
                 }
+                Icon(
+                    imageVector = if (movie.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                    contentDescription = "Like",
+                    tint = if (movie.isFavorite) Color.Red else Color.White,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .scale(heartScaleAnimation)
+                        .padding(top = 10.dp, end = 10.dp)
+                )
             }
         }
         Spacer(modifier = Modifier.height(20.dp))
