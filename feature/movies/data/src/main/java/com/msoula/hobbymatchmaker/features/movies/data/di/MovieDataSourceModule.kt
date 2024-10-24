@@ -1,10 +1,10 @@
 package com.msoula.hobbymatchmaker.features.movies.data.di
 
-import com.msoula.hobbymatchmaker.features.movies.data.data_sources.local.MovieLocalDataSourceImpl
-import com.msoula.hobbymatchmaker.features.movies.data.data_sources.remote.MovieRemoteDataSourceImpl
-import com.msoula.hobbymatchmaker.features.movies.data.data_sources.remote.services.TMDBService
-import com.msoula.hobbymatchmaker.features.movies.domain.data_sources.MovieLocalDataSource
-import com.msoula.hobbymatchmaker.features.movies.domain.data_sources.MovieRemoteDataSource
+import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.MovieLocalDataSourceImpl
+import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.MovieRemoteDataSourceImpl
+import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.services.TMDBService
+import com.msoula.hobbymatchmaker.features.movies.domain.dataSources.MovieLocalDataSource
+import com.msoula.hobbymatchmaker.features.movies.domain.dataSources.MovieRemoteDataSource
 import org.koin.dsl.module
 import retrofit2.Retrofit
 

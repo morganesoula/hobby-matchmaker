@@ -1,15 +1,15 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.di
 
 import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepository
-import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.FetchFirebaseUserInfo
-import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.IsFirstSignInUseCase
-import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.LinkInWithCredentialUseCase
-import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.LogOutUseCase
-import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.ResetPasswordUseCase
-import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.SignInUseCase
-import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.SignInWithCredentialUseCase
-import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.SignUpUseCase
-import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.SocialMediaSignInUseCase
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfo
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.IsFirstSignInUseCase
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LinkInWithCredentialUseCase
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutUseCase
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ResetPasswordUseCase
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInUseCase
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInWithCredentialUseCase
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignUpUseCase
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SocialMediaSignInUseCase
 import org.koin.dsl.module
 
 val authenticationDomainModule = module {

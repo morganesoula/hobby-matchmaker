@@ -1,6 +1,7 @@
 package com.msoula.hobbymatchmaker.features.movies.domain.repositories
 
 import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.features.movies.domain.errors.MovieErrors
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 import kotlinx.coroutines.flow.Flow
 
@@ -18,5 +19,5 @@ interface MovieRepository {
         localCoverFilePath: String
     )
 
-    suspend fun fetchMovies(language: String): Result<Unit>
+    suspend fun fetchMovies(language: String): Result<Unit, MovieErrors>
 }

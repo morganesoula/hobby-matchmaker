@@ -1,11 +1,15 @@
 package com.msoula.hobbymatchmaker.core.common
 
-sealed interface Result<out R> {
-    data class Success<out R>(val data: R) :
-        Result<R>
+sealed class Result<out D, out E> {
+    data class Success<out D>(val data: D) :
+        Result<D, Nothing>()
 
     data class Failure(val error: AppError) :
-        Result<Nothing>
+        Result<Nothing, Nothing>()
+
+    data object Loading : Result<Nothing, Nothing>()
+
+    data class BusinessRuleError<out E>(val error: E) : Result<Nothing, E>()
 }
 
 interface AppError {
@@ -16,22 +20,30 @@ class NetworkError(override val message: String = "No internet connection") : Ap
 class ServerError(override val message: String = "Server error occurred") : AppError
 class ExternalServiceError(override val message: String = "External service error occurred") :
     AppError
-class ChildCancellationError(override val message: String = "Child of the scope cancelled") : AppError
 
-suspend fun <R, S> Result<R>.mapSuccess(transform: suspend (value: R) -> S): Result<S> =
+suspend fun <Data, Out, Error> Result<Data, Error>.mapSuccess(
+    transform: suspend (value: Data) -> Out
+): Result<Out, Error> =
     when (this) {
         is Result.Success -> Result.Success(transform(this.data))
         is Result.Failure -> Result.Failure(this.error)
+        is Result.Loading -> Result.Loading
+        is Result.BusinessRuleError -> Result.BusinessRuleError(this.error)
     }
 
-fun <R> Result<R>.mapError(transform: (value: AppError) -> AppError): Result<R> =
+fun <Data, Error> Result<Data, Error>.mapError(
+    transform: (value: AppError) -> AppError
+): Result<Data, Error> =
     when (this) {
-        is Result.Failure -> Result.Failure(transform(this.error))
         is Result.Success -> Result.Success(this.data)
+        is Result.Failure -> Result.Failure(transform(this.error))
+        is Result.Loading -> Result.Loading
+        is Result.BusinessRuleError -> Result.BusinessRuleError(this.error)
     }
 
-fun <T> Result<T>.onEach(action: (Result<T>) -> Unit): Result<T> {
+fun <Data, Error> Result<Data, Error>.onEach(
+    action: (Result<Data, Error>) -> Unit
+): Result<Data, Error> {
     action(this@onEach)
     return this
 }
-

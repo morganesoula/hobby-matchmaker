@@ -1,5 +1,6 @@
 package com.msoula.hobbymatchmaker.core.network
 
+import android.util.Log
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.ExternalServiceError
 import com.msoula.hobbymatchmaker.core.common.NetworkError
@@ -9,11 +10,10 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import retrofit2.Response
 
-@Suppress("UNCHECKED_CAST")
-suspend fun <R> execute(
-    call: suspend () -> Response<R>,
+suspend fun <Data> execute(
+    call: suspend () -> Response<Data>,
     errorCallBack: ((Int) -> AppError)? = null
-): Result<R> {
+): Result<Data, Nothing> {
     return try {
         val response = call()
         val body = response.body()
@@ -23,10 +23,6 @@ suspend fun <R> execute(
                 Result.Success(body)
             }
 
-            response.isSuccessful && (Unit as? R).toString() == Unit.toString() -> {
-                Result.Success(Unit as R)
-            }
-
             else -> {
                 val error = response.code()
                 Result.Failure(errorCallBack?.invoke(error) ?: parseCommonError(error))
@@ -34,6 +30,7 @@ suspend fun <R> execute(
         }
     } catch (exception: Exception) {
         currentCoroutineContext().ensureActive()
+        Log.e("HMM", "Error while executing call: ${exception.message}", exception)
         Result.Failure(NetworkError())
     }
 }

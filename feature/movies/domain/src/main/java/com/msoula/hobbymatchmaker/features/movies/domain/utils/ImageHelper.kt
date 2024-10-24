@@ -62,7 +62,6 @@ class ImageHelper(
                     context.getFileStreamPath(cleanImageName).absolutePath
                 }
         } catch (e: Exception) {
-            e.printStackTrace()
             Log.e("HMM", "Exception occurred while saving image: ${e.message}")
         }
 

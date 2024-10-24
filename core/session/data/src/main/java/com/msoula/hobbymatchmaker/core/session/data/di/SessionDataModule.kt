@@ -1,10 +1,10 @@
 package com.msoula.hobbymatchmaker.core.session.data.di
 
 import com.google.firebase.firestore.FirebaseFirestore
-import com.msoula.hobbymatchmaker.core.session.data.data_sources.local.SessionLocalDataSourceImpl
-import com.msoula.hobbymatchmaker.core.session.data.data_sources.remote.SessionRemoteDataSourceImpl
-import com.msoula.hobbymatchmaker.core.session.domain.data_sources.SessionLocalDataSource
-import com.msoula.hobbymatchmaker.core.session.domain.data_sources.SessionRemoteDataSource
+import com.msoula.hobbymatchmaker.core.session.data.dataSources.local.SessionLocalDataSourceImpl
+import com.msoula.hobbymatchmaker.core.session.data.dataSources.remote.SessionRemoteDataSourceImpl
+import com.msoula.hobbymatchmaker.core.session.domain.dataSources.SessionLocalDataSource
+import com.msoula.hobbymatchmaker.core.session.domain.dataSources.SessionRemoteDataSource
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 

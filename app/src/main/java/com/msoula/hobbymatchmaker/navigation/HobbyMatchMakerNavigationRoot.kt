@@ -1,6 +1,8 @@
 package com.msoula.hobbymatchmaker.navigation
 
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresExtension
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -13,11 +15,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.google.firebase.auth.AuthCredential
 import com.msoula.hobbymatchmaker.core.common.AuthUiStateModel
-import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.GoogleAuthClient
-import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.SignInScreen
-import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.SignInViewModel
-import com.msoula.hobbymatchmaker.core.login.presentation.sign_up.SignUpScreen
-import com.msoula.hobbymatchmaker.core.login.presentation.sign_up.SignUpViewModel
+import com.msoula.hobbymatchmaker.core.login.presentation.signIn.GoogleAuthClient
+import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SignInScreen
+import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SignInViewModel
+import com.msoula.hobbymatchmaker.core.login.presentation.signUp.SignUpScreen
+import com.msoula.hobbymatchmaker.core.login.presentation.signUp.SignUpViewModel
 import com.msoula.hobbymatchmaker.core.navigation.contracts.Destinations
 import com.msoula.hobbymatchmaker.core.splashscreen.presentation.SplashScreen
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.MovieDetailContent
@@ -26,6 +28,7 @@ import com.msoula.hobbymatchmaker.presentation.AppScreen
 import com.msoula.hobbymatchmaker.presentation.AppViewModel
 import org.koin.androidx.compose.koinViewModel
 
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @SuppressLint("ComposeModifierMissing", "ComposeViewModelInjection", "RestrictedApi")
 @Stable
 @Composable
@@ -104,6 +107,7 @@ private fun NavGraphBuilder.authGraph(
     }
 }
 
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 private fun NavGraphBuilder.mainGraph(
     navController: NavHostController,
     appViewModel: AppViewModel
@@ -125,10 +129,11 @@ private fun NavGraphBuilder.mainGraph(
 
         composable<Destinations.Main.MovieDetail> {
             val movieDetailViewModel: MovieDetailViewModel = koinViewModel<MovieDetailViewModel>()
-            val viewState by movieDetailViewModel.viewState.collectAsStateWithLifecycle()
+            //val viewState by movieDetailViewModel.viewState.collectAsStateWithLifecycle()
+            val viewStateBis by movieDetailViewModel.viewState.collectAsStateWithLifecycle()
 
             MovieDetailContent(
-                viewState = viewState,
+                viewState = viewStateBis,
                 oneTimeEventFlow = movieDetailViewModel.oneTimeEventChannelFlow,
                 onPlayTrailerClicked = movieDetailViewModel::onEvent
             )

@@ -107,27 +107,6 @@ fun MovieItemContent(
         }
     }
 
-    // Like Animation Bis
-    var showBigHeart by remember { mutableStateOf(false) }
-    var pulse by remember { mutableStateOf(false) }
-
-    LaunchedEffect(showBigHeart, pulse) {
-        if (showBigHeart) {
-            delay(600)
-            showBigHeart = false
-        }
-
-        if (pulse) {
-            delay(600)
-            pulse = false
-        }
-    }
-
-    val heartScaleAnimation by animateFloatAsState(
-        targetValue = if (showBigHeart || pulse) 2f else 1f,
-        animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing), label = ""
-    )
-
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Card(
             modifier = modifier
@@ -139,51 +118,7 @@ fun MovieItemContent(
             shape = RoundedCornerShape(5),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .pointerInput(movie) {
-                        detectTapGestures(
-                            onDoubleTap = {
-                                showBigHeart = true
-                                pulse = true
-                                onCardEvent(CardEventModel.OnDoubleTap(movie))
-                            },
-                            onTap = {
-                                onCardEvent(CardEventModel.OnSingleTap(movie.id, movie.overview))
-                            }
-                        )
-                    }
-            ) {
-                Image(
-                    painter = painter,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(5))
-                        .fillMaxSize()
-                )
-
-                if (showBigHeart) {
-                    Icon(
-                        imageVector = Icons.Default.Favorite,
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .scale(heartScaleAnimation)
-                            .padding(top = 10.dp, end = 10.dp),
-                        contentDescription = "heart icon",
-                        tint = Color.Red
-                    )
-                }
-                Icon(
-                    imageVector = if (movie.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                    contentDescription = "Like",
-                    tint = if (movie.isFavorite) Color.Red else Color.White,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .scale(heartScaleAnimation)
-                        .padding(top = 10.dp, end = 10.dp)
-                )
-            }
+            MovieItemContentCard(modifier, movie, onCardEvent, painter)
         }
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -192,6 +127,81 @@ fun MovieItemContent(
             fontSize = 20.sp,
             color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.bodyMedium
+        )
+    }
+}
+
+@Composable
+fun MovieItemContentCard(
+    modifier: Modifier = Modifier,
+    movie: MovieUiModel,
+    onCardEvent: (CardEventModel) -> Unit,
+    painter: AsyncImagePainter
+) {
+    var showBigHeart by remember { mutableStateOf(false) }
+    var pulse by remember { mutableStateOf(false) }
+    val animationDelay = 600L
+
+    val heartScaleAnimation by animateFloatAsState(
+        targetValue = if (showBigHeart || pulse) 2f else 1f,
+        animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing), label = ""
+    )
+
+    LaunchedEffect(showBigHeart, pulse) {
+        if (showBigHeart) {
+            delay(animationDelay)
+            showBigHeart = false
+        }
+
+        if (pulse) {
+            delay(animationDelay)
+            pulse = false
+        }
+    }
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .pointerInput(movie) {
+                detectTapGestures(
+                    onDoubleTap = {
+                        showBigHeart = true
+                        pulse = true
+                        onCardEvent(CardEventModel.OnDoubleTap(movie))
+                    },
+                    onTap = {
+                        onCardEvent(CardEventModel.OnSingleTap(movie.id, movie.overview))
+                    }
+                )
+            }
+    ) {
+        Image(
+            painter = painter,
+            contentDescription = null,
+            modifier = Modifier
+                .clip(RoundedCornerShape(5))
+                .fillMaxSize()
+        )
+
+        if (showBigHeart) {
+            Icon(
+                imageVector = Icons.Default.Favorite,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .scale(heartScaleAnimation)
+                    .padding(top = 10.dp, end = 10.dp),
+                contentDescription = "heart icon",
+                tint = Color.Red
+            )
+        }
+        Icon(
+            imageVector = if (movie.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+            contentDescription = "Like",
+            tint = if (movie.isFavorite) Color.Red else Color.White,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .scale(heartScaleAnimation)
+                .padding(top = 10.dp, end = 10.dp)
         )
     }
 }

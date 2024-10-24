@@ -77,11 +77,12 @@ fun MovieDetailContent(
         is MovieDetailViewStateModel.Error -> ErrorMovieDetailScreen(error = viewState.error)
         is MovieDetailViewStateModel.Loading -> LoadingCircularProgress()
         is MovieDetailViewStateModel.Empty -> EmptyMovieDetailScreen()
-        is MovieDetailViewStateModel.Success -> MovieDetailScreen(
-            oneTimeEventFlow = oneTimeEventFlow,
-            movie = viewState.movie,
-            onPlayTrailerClicked = onPlayTrailerClicked
-        )
+        is MovieDetailViewStateModel.Success ->
+            MovieDetailScreen(
+                oneTimeEventFlow = oneTimeEventFlow,
+                movie = viewState.movie,
+                onPlayTrailerClicked = onPlayTrailerClicked
+            )
     }
 }
 
@@ -120,6 +121,10 @@ fun MovieDetailContentScreen(
     val videoPlayerVisibility = remember { mutableStateOf(false) }
 
     val movieVideoUri = remember { mutableStateOf(movie.videoKey) }
+    val isLoading = remember { mutableStateOf(false) }
+
+    val castMaxIndex = 5
+    val verticalGradientHeight = 0.8f
 
     val cast = buildAnnotatedString {
         movie.cast.asIterable().take(6).forEachIndexed { index, (name, role) ->
@@ -130,7 +135,7 @@ fun MovieDetailContentScreen(
             }
             append(")")
 
-            if (index < 5) {
+            if (index < castMaxIndex) {
                 append(", ")
             }
         }
@@ -144,20 +149,40 @@ fun MovieDetailContentScreen(
                 }
 
                 is MovieDetailUiEventModel.OnPlayMovieTrailerReady -> {
+                    if (isLoading.value) {
+                        isLoading.value = false
+                    }
+
                     movieVideoUri.value = event.movieUri
                     videoPlayerVisibility.value = true
                 }
 
                 is MovieDetailUiEventModel.ErrorFetchingTrailer -> {
+                    if (isLoading.value) {
+                        isLoading.value = false
+                    }
+
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(context, errorFetchingMovieMessage, Toast.LENGTH_SHORT)
+                        Toast.makeText(
+                            context,
+                            errorFetchingMovieMessage + { event.message },
+                            Toast.LENGTH_SHORT
+                        )
                             .show()
                     }
+                }
+
+                is MovieDetailUiEventModel.LoadingTrailer -> {
+                    isLoading.value = true
                 }
 
                 else -> Unit
             }
         }
+    }
+
+    if (isLoading.value) {
+        LoadingCircularProgress()
     }
 
     CompositionLocalProvider(value = LocalSnackBar provides snackBarHostState) {
@@ -181,7 +206,7 @@ fun MovieDetailContentScreen(
                     .background(
                         brush = Brush.verticalGradient(
                             colors = listOf(Color.Transparent, Color.Black),
-                            endY = screenHeight.div(0.8f)
+                            endY = screenHeight.div(verticalGradientHeight)
                         )
                     )
             )

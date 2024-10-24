@@ -8,10 +8,10 @@ fun getDeviceLocale(): String {
     return "${locale.language}-${locale.country}"
 }
 
-suspend fun <T> safeCall(
+suspend fun <Data> safeCall(
     appError: (String) -> AppError,
-    action: suspend () -> T
-): Result<T> {
+    action: suspend () -> Data
+): Result<Data, Nothing> {
     return try {
         Result.Success(action())
     } catch (exception: CancellationException) {
@@ -20,5 +20,3 @@ suspend fun <T> safeCall(
         Result.Failure(appError(e.message ?: "Unknown error"))
     }
 }
-
-

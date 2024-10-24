@@ -63,7 +63,11 @@ interface MovieDAO {
     @Query("UPDATE movie SET videoKey = :videoKey WHERE movieId = :movieId")
     fun updateMovieVideoKey(movieId: Long, videoKey: String)
 
-    @Query("UPDATE movie SET releaseDate = :releaseDate, synopsis = :overview, status = :status, popularity = :popularity, genres = :genres WHERE movieId = :movieId")
+    @Query(
+        "UPDATE movie " +
+            "SET releaseDate = :releaseDate, synopsis = :overview, status = :status, " +
+            "popularity = :popularity, genres = :genres WHERE movieId = :movieId"
+    )
     suspend fun updateMovie(
         movieId: Long,
         releaseDate: String?,

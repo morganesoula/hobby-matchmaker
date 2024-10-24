@@ -1,107 +1,82 @@
 package com.msoula.hobbymatchmaker.feature.moviedetail.presentation
 
-import android.util.Log
+import android.annotation.SuppressLint
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.msoula.hobbymatchmaker.core.common.Parameters
+import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.getDeviceLocale
-import com.msoula.hobbymatchmaker.core.common.mapError
-import com.msoula.hobbymatchmaker.core.common.mapSuccess
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieVideoDomainModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.use_cases.FetchMovieDetailTrailerUseCase
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.use_cases.FetchMovieDetailUseCase
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.use_cases.ObserveMovieDetailUseCase
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.use_cases.UpdateMovieVideoURIUseCase
-import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.errors.FetchingMovieDetailError
-import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.FetchStatusModel
+import com.msoula.hobbymatchmaker.feature.moviedetail.domain.useCases.ManageMovieTrailerUseCase
+import com.msoula.hobbymatchmaker.feature.moviedetail.domain.useCases.ObserveMovieDetailUseCase
+import com.msoula.hobbymatchmaker.feature.moviedetail.domain.useCases.ObserveMovieErrors
+import com.msoula.hobbymatchmaker.feature.moviedetail.domain.useCases.ObserveMovieSuccess
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieDetailUiEventModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieDetailUiModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieDetailViewStateModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.toMovieDetailUiModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class MovieDetailViewModel(
-    private val fetchMovieDetailUseCase: FetchMovieDetailUseCase,
-    private val observeMovieDetailUseCase: ObserveMovieDetailUseCase,
-    private val fetchMovieDetailTrailerUseCase: FetchMovieDetailTrailerUseCase,
-    private val updateMovieVideoURIUseCase: UpdateMovieVideoURIUseCase,
     private val ioDispatcher: CoroutineDispatcher,
-    private val savedStateHandle: SavedStateHandle
+    private val observeMovieDetailUseCase: ObserveMovieDetailUseCase,
+    private val manageMovieTrailerUseCase: ManageMovieTrailerUseCase,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _oneTimeEventChannel = Channel<MovieDetailUiEventModel>()
     val oneTimeEventChannelFlow = _oneTimeEventChannel.receiveAsFlow()
 
     private val movieId = requireNotNull(savedStateHandle.get<Long>("movieId"))
-    internal val fetchStatusFlow = MutableStateFlow<FetchStatusModel>(FetchStatusModel.NeverFetched)
     private val movieIdFlow = MutableStateFlow<Long?>(null)
 
     private var currentMovie: MovieDetailUiModel? = MovieDetailUiModel()
-    private val maxTrailerAttempt = 2
-
-    private val fallBackLanguages = listOf("en-US", "fr-FR")
+    private val language = getDeviceLocale()
 
     init {
         setMovieId(movieId)
     }
 
+    @SuppressLint("NewApi")
     val viewState: StateFlow<MovieDetailViewStateModel> =
-        movieIdFlow.filterNotNull().flatMapLatest {
-            observeMovieDetailUseCase(movieId)
-                .combine(fetchStatusFlow) { movie, fetchStatus ->
-                    Pair(movie, fetchStatus)
-                }.mapLatest { (movie, fetchStatus) ->
-                    currentMovie = movie?.toMovieDetailUiModel()
-                    when {
-                        movie?.synopsis.isNullOrBlank() -> {
-                            when (fetchStatus) {
-                                is FetchStatusModel.Error -> MovieDetailViewStateModel.Error(
-                                    fetchStatus.error
-                                )
-
-                                FetchStatusModel.Loading -> MovieDetailViewStateModel.Loading
-                                FetchStatusModel.NeverFetched -> {
-                                    fetchMovieDetail(movieId)
-                                    MovieDetailViewStateModel.Loading
+        movieIdFlow.filterNotNull().flatMapLatest { movieId ->
+            observeMovieDetailUseCase(Parameters.LongStringParam(movieId, language))
+                .map { result ->
+                    when (result) {
+                        is Result.Loading -> MovieDetailViewStateModel.Loading
+                        is Result.Success -> {
+                            when (val data = result.data) {
+                                is ObserveMovieSuccess.Success -> {
+                                    currentMovie = data.data.toMovieDetailUiModel()
+                                    MovieDetailViewStateModel.Success(data.data.toMovieDetailUiModel())
                                 }
 
-                                FetchStatusModel.Success -> MovieDetailViewStateModel.Empty
+                                else -> MovieDetailViewStateModel.Empty
                             }
                         }
 
-                        else -> {
-                            if (fetchStatus is FetchStatusModel.Error) {
-                                sendOnce(
-                                    MovieDetailUiEventModel.OnMovieDetailUiFetchedError(
-                                        fetchStatus.error
-                                    )
-                                )
+                        is Result.BusinessRuleError ->
+                            when (result.error) {
+                                ObserveMovieErrors.Empty -> MovieDetailViewStateModel.Empty
+                                else -> MovieDetailViewStateModel.Error(result.error.toString())
                             }
-                            MovieDetailViewStateModel.Success(
-                                movie?.toMovieDetailUiModel() ?: MovieDetailUiModel()
-                            )
-                        }
+
+                        is Result.Failure -> MovieDetailViewStateModel.Error(result.error.message)
                     }
                 }
-                .flowOn(Dispatchers.Main)
         }
             .stateIn(
                 viewModelScope,
@@ -124,6 +99,7 @@ class MovieDetailViewModel(
         }
     }
 
+    @SuppressLint("NewApi")
     private suspend fun onPlayTrailerClicked(movieId: Long, isVideoURIknown: Boolean) {
         if (isVideoURIknown) {
             sendOnce(
@@ -132,74 +108,36 @@ class MovieDetailViewModel(
                 )
             )
         } else {
-            val language = getDeviceLocale()
+            manageMovieTrailerUseCase(
+                Parameters.LongStringParam(
+                    movieId,
+                    language
+                )
+            ).collect { result ->
+                when (result) {
+                    is Result.Success -> sendOnce(
+                        MovieDetailUiEventModel.OnPlayMovieTrailerReady(
+                            result.data.videoURI
+                        )
+                    )
 
-            fetchMovieDetailTrailerUseCase(movieId, language)
-                .mapSuccess { videoResponse ->
-                    processVideoResponse(videoResponse, movieId)
+                    is Result.Loading -> sendOnce(MovieDetailUiEventModel.LoadingTrailer)
+                    is Result.Failure -> sendOnce(
+                        MovieDetailUiEventModel.ErrorFetchingTrailer(
+                            result.error.message
+                        )
+                    )
+
+                    is Result.BusinessRuleError ->
+                        MovieDetailUiEventModel.ErrorFetchingTrailer(result.error.errorMessage)
                 }
-        }
-    }
-
-    private suspend fun processVideoResponse(
-        videoResponse: MovieVideoDomainModel?,
-        movieId: Long,
-        attempt: Int = 0
-    ) {
-        val uri = videoResponse?.let { videoModel ->
-            when (videoModel.site.lowercase()) {
-                "youtube" -> videoModel.key
-                else -> "https://vimeo.com/${videoModel.key}"
             }
-        } ?: ""
-
-        if (uri.isNotEmpty()) {
-            updateMovieVideoURI(uri, movieId)
-        } else if (attempt < maxTrailerAttempt) {
-            reloadVideoResponse(movieId, attempt + 1)
-        } else {
-            Log.e("HMM", "Error while loading URI with native and US language")
-            sendOnce(MovieDetailUiEventModel.ErrorFetchingTrailer)
         }
-    }
-
-    private suspend fun reloadVideoResponse(movieId: Long, attempt: Int) {
-        val language = fallBackLanguages.getOrNull(attempt) ?: "en-US"
-        fetchMovieDetailTrailerUseCase(movieId, language)
-            .mapSuccess { videoResponse ->
-                processVideoResponse(videoResponse, movieId, attempt)
-            }
-    }
-
-    private suspend fun updateMovieVideoURI(videoURI: String, movieId: Long) {
-        updateMovieVideoURIUseCase(movieId = movieId, videoURI = videoURI)
-        sendOnce(MovieDetailUiEventModel.OnPlayMovieTrailerReady(videoURI))
     }
 
     private fun setMovieId(movieId: Long) {
         if (movieIdFlow.value != movieId) {
             movieIdFlow.value = movieId
-        }
-    }
-
-    private suspend fun fetchMovieDetail(movieId: Long) {
-        withContext(NonCancellable) {
-            fetchStatusFlow.emit(FetchStatusModel.Loading)
-
-            val language = getDeviceLocale()
-            val movieDetail = fetchMovieDetailUseCase(movieId, language)
-
-            movieDetail
-                .mapSuccess {
-                    fetchStatusFlow.emit(FetchStatusModel.Success)
-                }
-                .mapError { error ->
-                    viewModelScope.launch(ioDispatcher) {
-                        fetchStatusFlow.emit(FetchStatusModel.Error(error.message))
-                    }
-
-                    FetchingMovieDetailError(error.message)
-                }
         }
     }
 

@@ -2,13 +2,15 @@ package com.msoula.hobbymatchmaker.feature.moviedetail.presentation
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
+import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieDetailDomainModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieVideoDomainModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.use_cases.FetchMovieDetailTrailerUseCase
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.use_cases.FetchMovieDetailUseCase
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.use_cases.ObserveMovieDetailUseCase
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.use_cases.UpdateMovieVideoURIUseCase
+import com.msoula.hobbymatchmaker.feature.moviedetail.domain.useCases.FetchMovieDetailTrailerUseCase
+import com.msoula.hobbymatchmaker.feature.moviedetail.domain.useCases.FetchMovieDetailUseCase
+import com.msoula.hobbymatchmaker.feature.moviedetail.domain.useCases.ObserveMovieDetailUseCase
+import com.msoula.hobbymatchmaker.feature.moviedetail.domain.useCases.ObserveMovieSuccess
+import com.msoula.hobbymatchmaker.feature.moviedetail.domain.useCases.UpdateMovieVideoURIUseCase
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.FetchStatusModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieDetailUiModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieDetailViewStateModel
@@ -47,7 +49,13 @@ class MovieDetailViewModelTest {
         Dispatchers.setMain(testDispatcher)
         testScope = TestScope(testDispatcher)
 
-        coEvery { observeMovieDetailUseCase(1) } returns flowOf(MovieDetailDomainModel(synopsis = "Some synopsis"))
+        coEvery { observeMovieDetailUseCase(Parameters.LongStringParam(1L, "fr-FR")) } returns flowOf(
+            Result.Success(
+                ObserveMovieSuccess.Success(
+                    MovieDetailDomainModel(synopsis = "Some synopsis")
+                )
+            )
+        )
 
         coEvery { updateMovieVideoURIUseCase(1, "video_uri_test") }
         coEvery {
@@ -55,7 +63,7 @@ class MovieDetailViewModelTest {
                 1,
                 "fr-Fr"
             )
-        } returns Result.Success(true)
+        } returns Result.Success(MovieDetailDomainModel(id = 1))
 
         coEvery { fetchMovieDetailTrailerUseCase(1, "fr-Fr") } returns Result.Success(
             MovieVideoDomainModel("test_video_key", "Trailer", "Youtube")
@@ -63,7 +71,6 @@ class MovieDetailViewModelTest {
 
         movieDetailViewModel = MovieDetailViewModel(
             fetchMovieDetailTrailerUseCase = fetchMovieDetailTrailerUseCase,
-            fetchMovieDetailUseCase = fetchMovieDetailUseCase,
             updateMovieVideoURIUseCase = updateMovieVideoURIUseCase,
             observeMovieDetailUseCase = observeMovieDetailUseCase,
             ioDispatcher = testDispatcher,
@@ -81,7 +88,11 @@ class MovieDetailViewModelTest {
     @Test
     fun `when synopsis is empty and fetchStatus is an error, should return an Error`() =
         testScope.runTest {
-            coEvery { observeMovieDetailUseCase(1) } returns flowOf(MovieDetailDomainModel(title = "Testing title"))
+            coEvery { observeMovieDetailUseCase(Parameters.LongStringParam(1L, "fr-FR")) } returns flowOf(
+                Result.Success(
+                    ObserveMovieSuccess.Success(MovieDetailDomainModel(title = "Testing title"))
+                )
+            )
 
             movieDetailViewModel.fetchStatusFlow.value = FetchStatusModel.Error("Error happened")
 
@@ -97,7 +108,11 @@ class MovieDetailViewModelTest {
     @Test
     fun `when synopsis is empty and fetchStatus is Loading, should return a Loading`() =
         testScope.runTest {
-            coEvery { observeMovieDetailUseCase(1) } returns flowOf(MovieDetailDomainModel(title = "Testing title"))
+            coEvery { observeMovieDetailUseCase(Parameters.LongStringParam(1L, "fr-FR")) } returns flowOf(
+                Result.Success(
+                    ObserveMovieSuccess.Success(MovieDetailDomainModel(title = "Testing title"))
+                )
+            )
             movieDetailViewModel.fetchStatusFlow.value = FetchStatusModel.Loading
 
             movieDetailViewModel.viewState.test {
@@ -110,7 +125,11 @@ class MovieDetailViewModelTest {
     @Test
     fun `when synopsis is empty and fetchStatus is Success, should return an Empty`() =
         testScope.runTest {
-            coEvery { observeMovieDetailUseCase(1) } returns flowOf(MovieDetailDomainModel(title = "Testing title"))
+            coEvery { observeMovieDetailUseCase(Parameters.LongStringParam(1L, "fr-FR")) } returns flowOf(
+                Result.Success(
+                    ObserveMovieSuccess.Success(MovieDetailDomainModel(title = "Testing title"))
+                )
+            )
             movieDetailViewModel.fetchStatusFlow.value = FetchStatusModel.Success
 
             movieDetailViewModel.viewState.test {
@@ -122,10 +141,14 @@ class MovieDetailViewModelTest {
     @Test
     fun `when synopsis is filled and fetchStatus is not Error, should return data`() =
         testScope.runTest {
-            coEvery { observeMovieDetailUseCase(1) } returns flowOf(
-                MovieDetailDomainModel(
-                    title = "Testing title",
-                    synopsis = "Some synopsis"
+            coEvery { observeMovieDetailUseCase(Parameters.LongStringParam(1L, "fr-FR")) } returns flowOf(
+                Result.Success(
+                    ObserveMovieSuccess.Success(
+                        MovieDetailDomainModel(
+                            title = "Testing title",
+                            synopsis = "Some synopsis"
+                        )
+                    )
                 )
             )
 

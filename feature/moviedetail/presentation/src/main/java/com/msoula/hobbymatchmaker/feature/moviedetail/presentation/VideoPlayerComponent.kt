@@ -33,7 +33,8 @@ fun YoutubePlayerComponent(videoId: String) {
                         activity?.window?.let { window ->
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                                 window.insetsController?.let { controller ->
-                                    controller.hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
+                                    controller.hide(WindowInsets.Type.statusBars()
+                                        or WindowInsets.Type.navigationBars())
                                     controller.systemBarsBehavior =
                                         WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
                                 }
@@ -51,7 +52,8 @@ fun YoutubePlayerComponent(videoId: String) {
                     override fun onExitFullscreen() {
                         activity?.window?.let { window ->
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                                window.insetsController?.show(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
+                                window.insetsController?.show(WindowInsets.Type.statusBars()
+                                    or WindowInsets.Type.navigationBars())
                             } else {
                                 @Suppress("DEPRECATION")
                                 window.decorView.systemUiVisibility = (

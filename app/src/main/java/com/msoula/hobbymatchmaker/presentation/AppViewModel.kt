@@ -2,11 +2,11 @@ package com.msoula.hobbymatchmaker.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.LogOutUseCase
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutUseCase
 import com.msoula.hobbymatchmaker.core.common.AuthUiStateModel
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
-import com.msoula.hobbymatchmaker.core.session.domain.use_cases.ObserveIsConnectedUseCase
-import com.msoula.hobbymatchmaker.core.session.domain.use_cases.SetIsConnectedUseCase
+import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveIsConnectedUseCase
+import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetIsConnectedUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

@@ -6,5 +6,6 @@ sealed interface MovieDetailUiEventModel {
         MovieDetailUiEventModel
 
     data class OnPlayMovieTrailerReady(val movieUri: String) : MovieDetailUiEventModel
-    data object ErrorFetchingTrailer : MovieDetailUiEventModel
+    data class ErrorFetchingTrailer(val message: String) : MovieDetailUiEventModel
+    data object LoadingTrailer : MovieDetailUiEventModel
 }

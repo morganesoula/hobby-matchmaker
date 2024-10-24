@@ -1,7 +1,7 @@
 package com.msoula.hobbymatchmaker.core.session.domain.repositories
 
-import com.msoula.hobbymatchmaker.core.session.domain.data_sources.SessionLocalDataSource
-import com.msoula.hobbymatchmaker.core.session.domain.data_sources.SessionRemoteDataSource
+import com.msoula.hobbymatchmaker.core.session.domain.dataSources.SessionLocalDataSource
+import com.msoula.hobbymatchmaker.core.session.domain.dataSources.SessionRemoteDataSource
 import com.msoula.hobbymatchmaker.core.session.domain.models.SessionUserDomainModel
 import kotlinx.coroutines.flow.Flow
 

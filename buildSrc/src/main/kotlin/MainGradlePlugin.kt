@@ -16,6 +16,7 @@ class MainGradlePlugin : Plugin<Project> {
             plugin(Plugins.ANDROID_LIBRARY)
             plugin(Plugins.KOTLIN_ANDROID)
             plugin("kotlin-parcelize")
+            plugin("io.gitlab.arturbosch.detekt")
         }
     }
 

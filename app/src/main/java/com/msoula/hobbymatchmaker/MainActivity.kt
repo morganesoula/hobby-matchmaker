@@ -8,7 +8,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import com.msoula.hobbymatchmaker.app.HobbyMatchMakerApp
 import com.msoula.hobbymatchmaker.core.design.theme.HobbyMatchmakerTheme
-import com.msoula.hobbymatchmaker.core.login.presentation.sign_in.GoogleAuthClient
+import com.msoula.hobbymatchmaker.core.login.presentation.signIn.GoogleAuthClient
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {

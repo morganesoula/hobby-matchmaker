@@ -1,6 +1,6 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.di
 
-import com.msoula.hobbymatchmaker.core.login.presentation.sign_up.SignUpViewModel
+import com.msoula.hobbymatchmaker.core.login.presentation.signUp.SignUpViewModel
 import org.koin.dsl.module
 
 val signUpViewModelModule = module {

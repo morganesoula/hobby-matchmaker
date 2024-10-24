@@ -2,12 +2,12 @@ package com.msoula.hobbymatchmaker.features.movies.presentation
 
 import app.cash.turbine.test
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
-import com.msoula.hobbymatchmaker.core.authentication.domain.use_cases.FetchFirebaseUserInfo
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfo
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
-import com.msoula.hobbymatchmaker.features.movies.domain.use_cases.FetchMoviesUseCase
-import com.msoula.hobbymatchmaker.features.movies.domain.use_cases.ObserveAllMoviesUseCase
-import com.msoula.hobbymatchmaker.features.movies.domain.use_cases.SetMovieFavoriteUseCase
+import com.msoula.hobbymatchmaker.features.movies.domain.useCases.FetchMoviesUseCase
+import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesUseCase
+import com.msoula.hobbymatchmaker.features.movies.domain.useCases.SetMovieFavoriteUseCase
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.FetchStatusModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiModel

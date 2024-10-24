@@ -3,8 +3,9 @@ package com.msoula.hobbymatchmaker.features.movies.domain.repositories
 import android.util.Log
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
-import com.msoula.hobbymatchmaker.features.movies.domain.data_sources.MovieLocalDataSource
-import com.msoula.hobbymatchmaker.features.movies.domain.data_sources.MovieRemoteDataSource
+import com.msoula.hobbymatchmaker.features.movies.domain.dataSources.MovieLocalDataSource
+import com.msoula.hobbymatchmaker.features.movies.domain.dataSources.MovieRemoteDataSource
+import com.msoula.hobbymatchmaker.features.movies.domain.errors.MovieErrors
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 import kotlinx.coroutines.flow.Flow
 
@@ -34,7 +35,7 @@ class MovieRepositoryImpl(
         movieLocalDataSource.updateMovieWithLocalCoverFilePath(coverFileName, localCoverFilePath)
     }
 
-    override suspend fun fetchMovies(language: String): Result<Unit> =
+    override suspend fun fetchMovies(language: String): Result<Unit, MovieErrors> =
         movieRemoteDataSource.fetchMovies(language)
             .mapSuccess { movies ->
                 movieLocalDataSource.upsertAll(movies)
