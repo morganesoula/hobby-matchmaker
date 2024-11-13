@@ -2,12 +2,12 @@ package com.msoula.hobbymatchmaker
 
 import android.app.Application
 import com.google.firebase.FirebaseApp
+import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.GoogleClient
 import com.msoula.hobbymatchmaker.core.authentication.data.di.authenticationDataModule
 import com.msoula.hobbymatchmaker.core.authentication.domain.di.authenticationDomainModule
 import com.msoula.hobbymatchmaker.core.common.databaseModule
 import com.msoula.hobbymatchmaker.core.di.module.authValidationDataUseCaseModule
 import com.msoula.hobbymatchmaker.core.di.module.dispatcherModule
-import com.msoula.hobbymatchmaker.core.di.module.resourceModule
 import com.msoula.hobbymatchmaker.core.di.module.stringResourcesProviderModule
 import com.msoula.hobbymatchmaker.core.login.domain.useCases.di.loginFormValidationModule
 import com.msoula.hobbymatchmaker.core.login.presentation.di.signInViewModelModule
@@ -25,6 +25,7 @@ import com.msoula.hobbymatchmaker.features.movies.presentation.di.movieViewModel
 import com.msoula.hobbymatchmaker.presentation.di.appViewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
+import org.koin.dsl.module
 
 class HobbyMatchMakerApplication : Application() {
     override fun onCreate() {
@@ -38,7 +39,6 @@ class HobbyMatchMakerApplication : Application() {
                     dispatcherModule,
                     networkModule,
                     loginFormValidationModule,
-                    resourceModule,
                     stringResourcesProviderModule,
                     authValidationDataUseCaseModule,
                     databaseModule,

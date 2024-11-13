@@ -7,16 +7,17 @@ import androidx.credentials.CredentialManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import com.msoula.hobbymatchmaker.app.HobbyMatchMakerApp
+import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.GoogleClient
+import com.msoula.hobbymatchmaker.core.authentication.domain.dataSources.AuthenticationRemoteDataSource
 import com.msoula.hobbymatchmaker.core.design.theme.HobbyMatchmakerTheme
-import com.msoula.hobbymatchmaker.core.login.presentation.signIn.GoogleAuthClient
 import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 
 class MainActivity : ComponentActivity() {
     val auth: FirebaseAuth by inject()
-
     private lateinit var authStateListener: AuthStateListener
 
-    private val googleAuthClient = GoogleAuthClient(CredentialManager.create(this), this)
+    val googleClient by inject<GoogleClient> { parametersOf(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,7 +26,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             HobbyMatchmakerTheme {
-                HobbyMatchMakerApp(googleAuthClient)
+                HobbyMatchMakerApp()
             }
         }
     }

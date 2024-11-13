@@ -1,5 +1,7 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.repositories
 
+import android.content.Context
+import com.facebook.AccessToken
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.AuthResult
 import com.msoula.hobbymatchmaker.core.authentication.domain.dataSources.AuthenticationRemoteDataSource
@@ -51,10 +53,6 @@ class AuthenticationRepository(
 
     suspend fun resetPassword(email: String): Result<Boolean, ResetPasswordError> =
         remoteDataSource.resetPassword(email)
-            .mapSuccess { it }
-            .mapError { error ->
-                return@mapError error
-            }
 
     suspend fun signInWithCredential(
         authCredential: AuthCredential
@@ -74,4 +72,12 @@ class AuthenticationRepository(
 
     suspend fun fetchFirebaseUserInfo() =
         remoteDataSource.fetchFirebaseUserInfo()
+
+    suspend fun connectWithGoogle(context: Context) = remoteDataSource.connectWithGoogle(context)
+
+    suspend fun fetchFacebookCredentials(token: String) =
+        remoteDataSource.fetchFacebookCredentials(token)
+
+    suspend fun fetchFacebookClient(accessToken: AccessToken) =
+        remoteDataSource.fetchFacebookClient(accessToken)
 }

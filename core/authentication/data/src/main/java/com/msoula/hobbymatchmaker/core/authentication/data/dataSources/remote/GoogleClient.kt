@@ -1,4 +1,4 @@
-package com.msoula.hobbymatchmaker.core.login.presentation.signIn
+package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote
 
 import android.content.Context
 import android.util.Log
@@ -11,11 +11,11 @@ import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.GoogleAuthProvider
-import com.msoula.hobbymatchmaker.core.login.presentation.BuildConfig
+import com.msoula.hobbymatchmaker.core.authentication.data.BuildConfig
 
-class GoogleAuthClient(
+class GoogleClient(
     private val credentialManager: CredentialManager,
-    private val context: Context
+    private val testContext: Context
 ) {
 
     private val googleIdOption = GetGoogleIdOption.Builder()
@@ -29,11 +29,11 @@ class GoogleAuthClient(
         .addCredentialOption(googleIdOption)
         .build()
 
-    suspend fun launchGetCredential(): GetCredentialResponse? {
+    suspend fun launchGetCredential(context: Context): GetCredentialResponse? {
         return try {
             credentialManager.getCredential(
                 request = request,
-                context = context
+                context = testContext
             )
         } catch (e: GetCredentialException) {
             Log.e("HMM", "Error getting credential: $e")

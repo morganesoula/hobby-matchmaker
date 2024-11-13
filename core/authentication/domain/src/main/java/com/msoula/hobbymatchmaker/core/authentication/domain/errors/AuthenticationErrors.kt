@@ -32,5 +32,8 @@ sealed class SignInWithEmailAndPasswordError : AppError {
         get() = ""
 }
 
-class ResetPasswordError(override val message: String) : AppError
-class LogOutError(override val message: String) : AppError
+data class ResetPasswordError(override val message: String) : AppError
+data class LogOutError(override val message: String) : AppError
+data class GetGoogleCredentialError(override val message: String) : AppError
+data class GetFacebookCredentialError(override val message: String) : AppError
+data class GetFacebookClientError(override val message: String) : AppError

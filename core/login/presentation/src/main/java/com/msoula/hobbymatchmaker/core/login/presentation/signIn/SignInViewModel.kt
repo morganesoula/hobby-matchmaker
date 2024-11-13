@@ -1,19 +1,17 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.signIn
 
-import android.util.Log
-import androidx.credentials.GetCredentialResponse
+import android.annotation.SuppressLint
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.AuthCredential
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SignInWithEmailAndPasswordError
+import com.facebook.AccessToken
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ResetPasswordUseCase
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInError
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInUseCase
-import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SocialMediaSignInUseCase
-import com.msoula.hobbymatchmaker.core.common.AppError
-import com.msoula.hobbymatchmaker.core.common.mapError
-import com.msoula.hobbymatchmaker.core.common.mapSuccess
-import com.msoula.hobbymatchmaker.core.common.onEach
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SocialMediaSignInBisUseCase
+import com.msoula.hobbymatchmaker.core.common.Parameters
+import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.di.domain.StringResourcesProvider
 import com.msoula.hobbymatchmaker.core.di.domain.useCase.AuthFormValidationUseCase
 import com.msoula.hobbymatchmaker.core.login.presentation.R
@@ -21,29 +19,26 @@ import com.msoula.hobbymatchmaker.core.login.presentation.extensions.clearAll
 import com.msoula.hobbymatchmaker.core.login.presentation.extensions.updateStateHandle
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
+import com.msoula.hobbymatchmaker.core.login.presentation.models.ResetPasswordEvent
+import com.msoula.hobbymatchmaker.core.login.presentation.models.SignInEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.models.SignInFormStateModel
-import com.msoula.hobbymatchmaker.core.session.domain.models.SessionUserDomainModel
-import com.msoula.hobbymatchmaker.core.session.domain.useCases.CreateUserUseCase
-import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetIsConnectedUseCase
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
+@SuppressLint("NewApi")
 class SignInViewModel(
     private val authFormValidationUseCases: AuthFormValidationUseCase,
     private val savedStateHandle: SavedStateHandle,
     private val signInUseCase: SignInUseCase,
     private val resetPasswordUseCase: ResetPasswordUseCase,
-    private val ioDispatcher: CoroutineDispatcher,
     private val resourceProvider: StringResourcesProvider,
-    private val setIsConnectedUseCase: SetIsConnectedUseCase,
-    private val socialMediaSignInUseCase: SocialMediaSignInUseCase,
-    private val createUserUseCase: CreateUserUseCase
+    private val socialMediaSignInBisUseCase: SocialMediaSignInBisUseCase
 ) : ViewModel() {
 
     private val savedStateHandleKey: String = "loginState"
@@ -54,7 +49,14 @@ class SignInViewModel(
     val oneTimeEventChannelFlow = _oneTimeEventChannel.receiveAsFlow()
 
     val openResetDialog = MutableStateFlow(false)
-    val resettingEmailSent = MutableStateFlow(false)
+
+    private val _resetPasswordState: MutableStateFlow<ResetPasswordEvent> =
+        MutableStateFlow(ResetPasswordEvent.Idle)
+    val resetPasswordState: StateFlow<ResetPasswordEvent> = _resetPasswordState.asStateFlow()
+
+    private val _signInState: MutableStateFlow<SignInEvent> =
+        MutableStateFlow(SignInEvent.Idle)
+    val signInState: StateFlow<SignInEvent> = _signInState.asStateFlow()
 
     fun onEvent(event: AuthenticationUIEvent) {
         when (event) {
@@ -78,90 +80,53 @@ class SignInViewModel(
             }
 
             AuthenticationUIEvent.OnForgotPasswordClicked -> {
-                toggleResetDialog(true)
+                openResetDialog.update { true }
             }
 
             AuthenticationUIEvent.HideForgotPasswordDialog -> {
-                toggleResetDialog(false)
+                openResetDialog.update { false }
             }
 
-            AuthenticationUIEvent.OnResetPasswordConfirmed -> launchResetPassword()
+            AuthenticationUIEvent.OnResetPasswordConfirmed -> viewModelScope.launch { resetPassword() }
 
             AuthenticationUIEvent.OnSignIn -> {
-                launchCircularProgress()
-                signIn()
+                viewModelScope.launch { signIn() }
             }
 
             else -> Unit
         }
     }
 
-    fun handleFacebookLogin(credential: AuthCredential, email: String) {
-        launchCircularProgress()
-
-        handleSocialMediaLogin(
-            Pair(credential, email),
-            AuthenticationEvent::OnFacebookFailedConnection,
-            "Facebook login failed",
-            "Facebook"
-        )
-    }
-
-    fun handleGoogleLogin(result: GetCredentialResponse?, googleAuthClient: GoogleAuthClient) {
-        result?.let {
-            val authCredential = googleAuthClient.handleSignIn(it)
-
-            handleSocialMediaLogin(
-                authCredential,
-                AuthenticationEvent::OnGoogleFailedConnection,
-                "Google login failed",
-                "Google"
-            )
-        } ?: Log.e("HMM", "Could not get credentials response from UI")
-    }
-
-    private fun handleSocialMediaLogin(
-        credential: Pair<AuthCredential, String?>,
-        onFailureEvent: (String) -> AuthenticationEvent,
-        errorMessage: String,
-        type: String
+    fun connectWithSocialMedia(
+        facebookAccessToken: AccessToken? = null,
+        context: Context
     ) {
-        viewModelScope.launch(ioDispatcher) {
-            val result = socialMediaSignInUseCase(credential.first, type)
-            abortCircularProgress()
-
-            result.mapSuccess { authResult ->
-                authResult?.user?.let { firebaseUser ->
-                    createUserUseCase(
-                        SessionUserDomainModel(
-                            firebaseUser.uid,
-                            credential.second ?: ""
-                        )
+        (
+            viewModelScope.launch {
+                socialMediaSignInBisUseCase(
+                    Parameters.GetCredentialResponseParam(
+                        facebookAccessToken, context
                     )
-                }
+                ).collectLatest { socialMediaResult ->
+                    _signInState.value = when (socialMediaResult) {
+                        is Result.Loading -> {
+                            circularProgressLoading.value = true
+                            SignInEvent.Loading
+                        }
 
-                saveIsConnected()
-            }
-                .mapError { error ->
-                    Log.e("HMM", errorMessage + " - ${error.message}")
-                    viewModelScope.launch {
-                        sendEvent(onFailureEvent(error.message))
+                        is Result.Success -> SignInEvent.Success
+                        is Result.Failure -> {
+                            circularProgressLoading.value = false
+                            SignInEvent.Error(socialMediaResult.error.message)
+                        }
+
+                        is Result.BusinessRuleError -> {
+                            circularProgressLoading.value = false
+                            SignInEvent.Error(socialMediaResult.error.message)
+                        }
                     }
-                    error
-
                 }
-        }
-    }
-
-    private fun updateFormState(update: (SignInFormStateModel) -> SignInFormStateModel) {
-        savedStateHandle.updateStateHandle(savedStateHandleKey, update)
-    }
-
-    private suspend fun saveIsConnected() {
-        setIsConnectedUseCase(true)
-        withContext(Dispatchers.Main) {
-            _oneTimeEventChannel.send(AuthenticationEvent.OnSignInSuccess)
-        }
+            })
     }
 
     private fun validateInput() {
@@ -176,115 +141,78 @@ class SignInViewModel(
     private fun validateEmailReset(emailReset: String): Boolean =
         authFormValidationUseCases.validateEmailUseCase(emailReset).successful
 
-    private fun signIn() {
-        viewModelScope.launch(ioDispatcher) {
-            signInUseCase(formDataFlow.value.email, formDataFlow.value.password)
-                .onEach {
-                    viewModelScope.launch {
-                        abortCircularProgress()
+    private suspend fun signIn() {
+        signInUseCase(
+            Parameters.DoubleStringParam(
+                formDataFlow.value.email,
+                formDataFlow.value.password
+            )
+        ).collectLatest { result ->
+            _signInState.update {
+                when (result) {
+                    is Result.Loading -> {
+                        circularProgressLoading.value = true
+                        SignInEvent.Loading
                     }
-                }
-                .mapSuccess {
-                    setIsConnectedUseCase(true)
-                    clearFormState()
-                    withContext(Dispatchers.Main) {
-                        redirectToAppScreen()
-                    }
-                }
-                .mapError { error ->
-                    Log.e("HMM", "SignInViewModel - Error while signing in: ${error.message}")
-                    val errorMessage = handleError(error)
-                    updateFormState { it.copy(logInError = errorMessage) }
-                    error
-                }
-        }
-    }
 
-    private fun launchResetPassword() {
-        viewModelScope.launch(ioDispatcher) {
-            resetPassword()
+                    is Result.Failure -> {
+                        circularProgressLoading.value = false
+                        SignInEvent.Error(result.error.message)
+                    }
+
+                    is Result.BusinessRuleError -> {
+                        val error = handleError(result.error)
+                        circularProgressLoading.value = false
+                        SignInEvent.Error(error)
+                    }
+
+                    is Result.Success -> {
+                        clearFormState()
+                        SignInEvent.Success
+                    }
+                }
+            }
         }
     }
 
     private suspend fun resetPassword() {
-        launchCircularProgress()
+        resetPasswordUseCase(Parameters.StringParam(formDataFlow.value.emailReset)).collectLatest { result ->
+            _resetPasswordState.update {
+                when (result) {
+                    is Result.Loading -> ResetPasswordEvent.Loading
+                    is Result.Success -> {
+                        updateFormState { it.copy(emailReset = "") }
+                        ResetPasswordEvent.Success
+                    }
 
-        resetPasswordUseCase(formDataFlow.value.emailReset)
-            .onEach {
-                viewModelScope.launch {
-                    abortCircularProgress()
+                    is Result.Failure -> ResetPasswordEvent.Error(result.error.message)
+                    is Result.BusinessRuleError -> ResetPasswordEvent.Error(result.error.message)
                 }
-            }
-            .mapSuccess {
-                if (openResetDialog.value) {
-                    toggleResetDialog(false)
-                    resetEmailSentValue(true)
-                }
-            }
-            .mapError { error ->
-                Log.e(
-                    "HMM",
-                    "Could not reset password with ${formDataFlow.value.emailReset} - $error"
-                )
-                sendEvent(
-                    AuthenticationEvent.OnResetPasswordFailed(
-                        resourceProvider.getString(R.string.reset_password_error)
-                    )
-                )
-                resetEmailSentValue(false)
-                error
-            }
-    }
-
-    private fun redirectToAppScreen() {
-        launchCircularProgress()
-
-        viewModelScope.launch(ioDispatcher) {
-            setIsConnectedUseCase(true)
-            withContext(Dispatchers.Main) {
-                abortCircularProgress()
-                _oneTimeEventChannel.send(AuthenticationEvent.OnSignInSuccess)
             }
         }
     }
 
-    private fun toggleResetDialog(show: Boolean) {
-        openResetDialog.value = show
-    }
-
-    private fun resetEmailSentValue(reset: Boolean) {
-        resettingEmailSent.value = reset
-    }
-
-    private fun clearFormState() = savedStateHandle.clearAll<SignInFormStateModel>()
-    private fun launchCircularProgress() = circularProgressLoading.update { true }
-    private fun abortCircularProgress() = circularProgressLoading.update { false }
-
-    private fun sendEvent(event: AuthenticationEvent) {
-        viewModelScope.launch {
-            _oneTimeEventChannel.send(event)
-        }
-    }
-
-    private fun handleError(error: AppError): String {
+    private fun handleError(error: SignInError): String {
         return when (error) {
-            is SignInWithEmailAndPasswordError.WrongPassword -> resourceProvider.getString(
-                R.string.login_error
-            )
-
-            is SignInWithEmailAndPasswordError.UserNotFound -> resourceProvider.getString(
+            is SignInError.WrongPassword -> resourceProvider.getString(R.string.login_error)
+            is SignInError.UserNotFound -> resourceProvider.getString(
                 R.string.user_not_found_error
             )
 
-            is SignInWithEmailAndPasswordError.UserDisabled -> resourceProvider.getString(
+            is SignInError.UserDisabled -> resourceProvider.getString(
                 R.string.user_disabled_error
             )
 
-            is SignInWithEmailAndPasswordError.TooManyRequests -> resourceProvider.getString(
+            is SignInError.TooManyRequests -> resourceProvider.getString(
                 R.string.too_many_requests_error
             )
 
             else -> error.message
         }
     }
+
+    private fun updateFormState(update: (SignInFormStateModel) -> SignInFormStateModel) =
+        savedStateHandle.updateStateHandle(savedStateHandleKey, update)
+
+    private fun clearFormState() = savedStateHandle.clearAll<SignInFormStateModel>()
 }

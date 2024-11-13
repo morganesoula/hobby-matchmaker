@@ -122,6 +122,9 @@ dependencies {
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.kotlinx.collections.immutable)
 
+    // Facebook
+    implementation(libs.facebook.android.sdk)
+
     // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firebase.auth)

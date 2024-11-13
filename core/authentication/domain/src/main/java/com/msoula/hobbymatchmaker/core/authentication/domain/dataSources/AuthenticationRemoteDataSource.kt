@@ -1,8 +1,12 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.dataSources
 
+import android.content.Context
+import com.facebook.AccessToken
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.AuthResult
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.CreateUserWithEmailAndPasswordError
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.GetFacebookClientError
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.GetGoogleCredentialError
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ResetPasswordError
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SignInWithEmailAndPasswordError
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SocialMediaError
@@ -27,4 +31,7 @@ interface AuthenticationRemoteDataSource {
     suspend fun getUserUid(): String?
     suspend fun isFirstSignIn(uid: String): Boolean
     suspend fun fetchFirebaseUserInfo(): FirebaseUserInfoDomainModel?
+    suspend fun connectWithGoogle(context: Context): Result<Pair<AuthCredential, String?>, GetGoogleCredentialError>
+    suspend fun fetchFacebookCredentials(token: String): Result<AuthCredential, GetGoogleCredentialError>
+    suspend fun fetchFacebookClient(accessToken: AccessToken): Result<String?, GetFacebookClientError>
 }

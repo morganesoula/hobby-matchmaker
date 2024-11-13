@@ -15,6 +15,13 @@ dependencies {
     implementation(libs.activity.compose)
     implementation(libs.runtime)
 
+    // Facebook
+    implementation(libs.facebook.android.sdk)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firebase.auth)
+
     // Firestore
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firebase.firestore)

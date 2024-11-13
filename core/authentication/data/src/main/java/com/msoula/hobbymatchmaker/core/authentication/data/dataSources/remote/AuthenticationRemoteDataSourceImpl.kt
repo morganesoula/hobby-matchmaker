@@ -1,17 +1,23 @@
 package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote
 
+import android.content.Context
 import android.util.Log
 import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
+import com.facebook.AccessToken
 import com.facebook.login.LoginManager
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.mappers.toFirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.dataSources.AuthenticationRemoteDataSource
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.CreateUserWithEmailAndPasswordError
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.GetFacebookClientError
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.GetFacebookCredentialError
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.GetGoogleCredentialError
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ResetPasswordError
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SignInWithEmailAndPasswordError
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SocialMediaError
@@ -24,7 +30,9 @@ import kotlin.coroutines.cancellation.CancellationException
 class AuthenticationRemoteDataSourceImpl(
     private val auth: FirebaseAuth,
     private val credentialManager: CredentialManager,
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val googleClient: GoogleClient,
+    private val facebookAuthClient: FacebookClient
 ) : AuthenticationRemoteDataSource {
 
     private val facebookManager = LoginManager.getInstance()
@@ -157,5 +165,33 @@ class AuthenticationRemoteDataSourceImpl(
 
     override suspend fun fetchFirebaseUserInfo(): FirebaseUserInfoDomainModel? {
         return auth.currentUser?.toFirebaseUserInfoDomainModel()
+    }
+
+    override suspend fun connectWithGoogle(context: Context): Result<Pair<AuthCredential, String?>, GetGoogleCredentialError> {
+        return safeCall(
+            appError = { errorMessage -> GetGoogleCredentialError(errorMessage) }
+        ) {
+            val result = googleClient.launchGetCredential(context)
+            result?.let { googleClient.handleSignIn(it) }
+                ?: throw Exception("Google credential is null")
+        }
+    }
+
+    override suspend fun fetchFacebookCredentials(token: String): Result<AuthCredential, GetGoogleCredentialError> {
+        return safeCall(
+            appError = { errorMessage -> GetFacebookCredentialError(errorMessage) }
+        ) {
+            FacebookAuthProvider.getCredential(token)
+        }
+    }
+
+    override suspend fun fetchFacebookClient(accessToken: AccessToken): Result<String?, GetFacebookClientError> {
+        return try {
+            facebookAuthClient.fetchFacebookUserProfile(accessToken)
+        } catch (exception: CancellationException) {
+            throw exception
+        } catch (exception: Exception) {
+            Result.Failure(GetFacebookClientError(exception.message ?: ""))
+        }
     }
 }

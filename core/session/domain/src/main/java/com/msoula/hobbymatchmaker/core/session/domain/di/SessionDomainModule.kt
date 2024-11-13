@@ -4,11 +4,12 @@ import com.msoula.hobbymatchmaker.core.session.domain.repositories.SessionReposi
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.CreateUserUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveIsConnectedUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetIsConnectedUseCase
+import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 
 val sessionDomainModule = module {
-    factory<SessionRepository> { SessionRepository(get(), get()) }
-    factory<ObserveIsConnectedUseCase> { ObserveIsConnectedUseCase(get()) }
-    factory<SetIsConnectedUseCase> { SetIsConnectedUseCase(get()) }
-    factory<CreateUserUseCase> { CreateUserUseCase(get()) }
+    factoryOf(::SessionRepository)
+    factoryOf(::ObserveIsConnectedUseCase)
+    factoryOf(::SetIsConnectedUseCase)
+    factoryOf(::CreateUserUseCase)
 }

@@ -26,6 +26,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -53,7 +54,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.credentials.GetCredentialResponse
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.facebook.AccessToken
 import com.facebook.CallbackManager
@@ -62,11 +62,8 @@ import com.facebook.FacebookException
 import com.facebook.GraphRequest
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
-import com.google.firebase.auth.AuthCredential
-import com.google.firebase.auth.FacebookAuthProvider
 import com.msoula.hobbymatchmaker.core.common.ObserveAsEvents
 import com.msoula.hobbymatchmaker.core.design.component.HMMButtonAuthComponent
-import com.msoula.hobbymatchmaker.core.design.component.HMMErrorText
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldPasswordComponent
 import com.msoula.hobbymatchmaker.core.design.component.HeaderTextComponent
@@ -75,6 +72,8 @@ import com.msoula.hobbymatchmaker.core.di.data.StringResourcesProviderImpl
 import com.msoula.hobbymatchmaker.core.login.presentation.components.SocialMediaRowCustom
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
+import com.msoula.hobbymatchmaker.core.login.presentation.models.ResetPasswordEvent
+import com.msoula.hobbymatchmaker.core.login.presentation.models.SignInEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -89,17 +88,17 @@ fun SignInScreen(
     oneTimeEventChannelFlow: Flow<AuthenticationEvent>,
     redirectToAppScreen: () -> Unit,
     redirectToSignUpScreen: () -> Unit,
-    handleFacebookAccessToken: (credential: AuthCredential, email: String) -> Unit,
-    handleGoogleSignIn: (result: GetCredentialResponse?, googleAuthClient: GoogleAuthClient) -> Unit,
-    googleAuthClient: GoogleAuthClient
+    connectWithSocialMedia: (facebookAccessToken: AccessToken?, context: Context) -> Unit
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
     val loginFormState by signInViewModel.formDataFlow.collectAsStateWithLifecycle()
-    val circularProgressLoading by signInViewModel.circularProgressLoading.collectAsStateWithLifecycle()
+    val circularProgressLoading by
+    signInViewModel.circularProgressLoading.collectAsStateWithLifecycle()
     val openResetDialog by signInViewModel.openResetDialog.collectAsStateWithLifecycle()
-    val emailResetSent by signInViewModel.resettingEmailSent.collectAsStateWithLifecycle()
+    val resetPasswordState by signInViewModel.resetPasswordState.collectAsStateWithLifecycle()
+    val signInState by signInViewModel.signInState.collectAsStateWithLifecycle()
 
     val callBackManager = remember { CallbackManager.Factory.create() }
     val resourcesProvider = StringResourcesProviderImpl(context)
@@ -116,16 +115,44 @@ fun SignInScreen(
         loginManager = loginManager,
         callBackManager = callBackManager,
         coroutineScope = coroutineScope,
-        handleFacebookAccessToken = handleFacebookAccessToken,
-        context = context
+        context = context,
+        connectWithSocialMedia = connectWithSocialMedia
     )
+
+    LaunchedEffect(resetPasswordState) {
+        when (resetPasswordState) {
+            is ResetPasswordEvent.Error -> coroutineScope.launch {
+                snackBarHostState.showSnackbar(
+                    (resetPasswordState as ResetPasswordEvent.Error).message
+                )
+            }
+
+            is ResetPasswordEvent.Success -> signInViewModel.onEvent(
+                AuthenticationUIEvent.HideForgotPasswordDialog
+            )
+
+            else -> Unit
+        }
+    }
+
+    LaunchedEffect(signInState) {
+        when (signInState) {
+            is SignInEvent.Error -> coroutineScope.launch {
+                snackBarHostState.showSnackbar(
+                    (signInState as SignInEvent.Error).message
+                )
+            }
+
+            is SignInEvent.Success -> redirectToAppScreen()
+            else -> Unit
+        }
+    }
 
     ObserveAsEvents(oneTimeEventChannelFlow) { event ->
         coroutineScope.launch {
             when (event) {
                 is AuthenticationEvent.OnFacebookFailedConnection,
-                is AuthenticationEvent.OnGoogleFailedConnection,
-                is AuthenticationEvent.OnResetPasswordFailed -> {
+                is AuthenticationEvent.OnGoogleFailedConnection -> {
                     snackBarHostState.showSnackbar(event.message)
                 }
 
@@ -140,19 +167,6 @@ fun SignInScreen(
         Scaffold(
             modifier = modifier
         ) { paddingValues ->
-            LaunchedEffect(emailResetSent) {
-                if (emailResetSent) {
-                    signInViewModel.onEvent(AuthenticationUIEvent.HideForgotPasswordDialog)
-                    coroutineScope.launch {
-                        snackBarHostState.showSnackbar(
-                            resourcesProvider.getString(
-                                StringRes.email_sent
-                            )
-                        )
-                    }
-                }
-            }
-
             Box(modifier = Modifier.fillMaxSize()) {
                 Column(
                     modifier =
@@ -167,17 +181,14 @@ fun SignInScreen(
                             email = loginFormState.emailReset,
                             paddingValues = paddingValues,
                             enableSubmit = loginFormState.submitEmailReset,
-                            authUIEvent = signInViewModel::onEvent
+                            authUIEvent = signInViewModel::onEvent,
+                            isLoading = resetPasswordState == ResetPasswordEvent.Loading
                         )
                     }
 
                     HeaderTextComponent(
                         text = stringResource(id = StringRes.welcome_back_title),
                     )
-
-                    if (loginFormState.logInError != null) {
-                        HMMErrorText(errorText = loginFormState.logInError!!)
-                    }
 
                     SignInScreenMainContent(
                         email = loginFormState.email.trimEnd(),
@@ -203,8 +214,7 @@ fun SignInScreen(
                         dividerConnectText = resourcesProvider.getString(StringRes.continue_with_rs),
                         facebookLauncher = facebookLauncher,
                         scope = coroutineScope,
-                        googleAuthClient = googleAuthClient,
-                        handleGoogleSignIn = handleGoogleSignIn
+                        connectWithSocialMedia = connectWithSocialMedia
                     )
                 }
 
@@ -228,9 +238,11 @@ fun RegisterFacebookCallback(
     loginManager: LoginManager,
     callBackManager: CallbackManager,
     coroutineScope: CoroutineScope,
-    handleFacebookAccessToken: (credential: AuthCredential, email: String) -> Unit,
+    connectWithSocialMedia: (facebookAccessToken: AccessToken?, context: Context) -> Unit,
     context: Context
 ) {
+    val localContext = LocalContext.current
+
     DisposableEffect(Unit) {
         loginManager.registerCallback(callBackManager, object : FacebookCallback<LoginResult> {
             override fun onCancel() {
@@ -244,15 +256,16 @@ fun RegisterFacebookCallback(
             override fun onSuccess(result: LoginResult) {
                 coroutineScope.launch {
                     val accessToken = result.accessToken
+                    connectWithSocialMedia(accessToken, localContext)
 
-                    val email = fetchFacebookUserProfile(accessToken)
+                    /* val email = fetchFacebookUserProfile(accessToken)
 
                     if (email != null) {
                         val credential = FacebookAuthProvider.getCredential(accessToken.token)
                         handleFacebookAccessToken(credential, email)
                     } else {
                         Log.e("HMM", "Failed to fetch Facebook user email")
-                    }
+                    }*/
                 }
             }
         })
@@ -314,11 +327,15 @@ fun ColumnScope.SignInScreenMainContent(
     canSubmit: Boolean = false,
     circularProgressLoading: Boolean = false,
     dividerConnectText: String = "",
-    facebookLauncher: ManagedActivityResultLauncher<Collection<String>, CallbackManager.ActivityResultParameters>,
+    facebookLauncher: ManagedActivityResultLauncher<Collection<String>,
+        CallbackManager.ActivityResultParameters>,
     scope: CoroutineScope,
-    googleAuthClient: GoogleAuthClient,
-    handleGoogleSignIn: (result: GetCredentialResponse?, googleAuthClient: GoogleAuthClient) -> Unit
+    //googleAuthClient: GoogleAuthClient,
+    //handleGoogleSignIn: (result: GetCredentialResponse?, googleAuthClient: GoogleAuthClient) -> Unit,
+    connectWithSocialMedia: (facebookAccessToken: AccessToken?, context: Context) -> Unit
 ) {
+    val localContext = LocalContext.current
+
     HMMTextFieldAuthComponent(
         value = email,
         placeHolderText = stringResource(StringRes.email),
@@ -378,10 +395,7 @@ fun ColumnScope.SignInScreenMainContent(
             facebookLauncher.launch(listOf("email", "public_profile"))
         },
         onGoogleButtonClicked = {
-            scope.launch {
-                val credential = googleAuthClient.launchGetCredential()
-                handleGoogleSignIn(credential, googleAuthClient)
-            }
+            connectWithSocialMedia(null, localContext)
         }
     )
 }
@@ -423,7 +437,8 @@ fun ForgotPasswordAlertDialog(
     email: String,
     authUIEvent: (AuthenticationUIEvent) -> Unit,
     paddingValues: PaddingValues,
-    enableSubmit: Boolean
+    enableSubmit: Boolean,
+    isLoading: Boolean
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -449,15 +464,20 @@ fun ForgotPasswordAlertDialog(
         },
         onDismissRequest = { authUIEvent(AuthenticationUIEvent.HideForgotPasswordDialog) },
         confirmButton = {
-            Button(
-                onClick = {
-                    keyboardController?.hide()
-                    authUIEvent(AuthenticationUIEvent.OnResetPasswordConfirmed)
-                },
-                enabled = enableSubmit
-            ) {
-                Text(text = stringResource(id = StringRes.reset_password))
+            if (isLoading) {
+                CircularProgressIndicator()
+            } else {
+                Button(
+                    onClick = {
+                        keyboardController?.hide()
+                        authUIEvent(AuthenticationUIEvent.OnResetPasswordConfirmed)
+                    },
+                    enabled = enableSubmit
+                ) {
+                    Text(text = stringResource(id = StringRes.reset_password))
+                }
             }
+
         },
         dismissButton = {
             Button(

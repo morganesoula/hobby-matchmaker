@@ -9,18 +9,21 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ResetPassw
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInWithCredentialUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignUpUseCase
-import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SocialMediaSignInUseCase
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SocialMediaSignInBisUseCase
+import org.koin.core.module.dsl.factoryOf
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 val authenticationDomainModule = module {
-    single<AuthenticationRepository> { AuthenticationRepository(get()) }
-    factory<LogOutUseCase> { LogOutUseCase(get()) }
-    factory<ResetPasswordUseCase> { ResetPasswordUseCase(get()) }
-    factory<SignInUseCase> { SignInUseCase(get()) }
-    factory<SignUpUseCase> { SignUpUseCase(get()) }
-    factory<LinkInWithCredentialUseCase> { LinkInWithCredentialUseCase(get()) }
-    factory<SignInWithCredentialUseCase> { SignInWithCredentialUseCase(get()) }
-    factory<IsFirstSignInUseCase> { IsFirstSignInUseCase(get()) }
-    factory<FetchFirebaseUserInfo> { FetchFirebaseUserInfo(get()) }
-    factory<SocialMediaSignInUseCase> { SocialMediaSignInUseCase(get(), get(), get(), get()) }
+    singleOf(::AuthenticationRepository)
+    singleOf(::AuthenticationRepository)
+    factoryOf(::LogOutUseCase)
+    singleOf(::ResetPasswordUseCase)
+    factoryOf(::SignInUseCase)
+    factoryOf(::SignUpUseCase)
+    factoryOf(::LinkInWithCredentialUseCase)
+    factoryOf(::SignInWithCredentialUseCase)
+    factoryOf(::IsFirstSignInUseCase)
+    factoryOf(::FetchFirebaseUserInfo)
+    factoryOf(::SocialMediaSignInBisUseCase)
 }

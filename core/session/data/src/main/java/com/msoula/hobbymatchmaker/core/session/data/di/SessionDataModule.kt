@@ -6,10 +6,12 @@ import com.msoula.hobbymatchmaker.core.session.data.dataSources.remote.SessionRe
 import com.msoula.hobbymatchmaker.core.session.domain.dataSources.SessionLocalDataSource
 import com.msoula.hobbymatchmaker.core.session.domain.dataSources.SessionRemoteDataSource
 import org.koin.android.ext.koin.androidContext
+import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val sessionDataModule = module {
     single<FirebaseFirestore> { FirebaseFirestore.getInstance() }
-    single<SessionLocalDataSource> { SessionLocalDataSourceImpl(androidContext()) }
-    single<SessionRemoteDataSource> { SessionRemoteDataSourceImpl(get()) }
+    singleOf(::SessionLocalDataSourceImpl) bind SessionLocalDataSource::class
+    singleOf(::SessionRemoteDataSourceImpl) bind SessionRemoteDataSource::class
 }

@@ -15,6 +15,11 @@ dependencies {
     // Core
     implementation(libs.runtime)
 
+    // Credentials Manager
+    implementation(libs.credentials)
+    implementation(libs.credentials.play.services)
+    implementation(libs.google.identity)
+
     // Facebook
     implementation(libs.facebook.android.sdk)
     implementation(libs.facebook.login)

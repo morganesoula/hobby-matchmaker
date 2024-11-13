@@ -9,6 +9,5 @@ data class SignInFormStateModel(
     val emailReset: String = "",
     val password: String = "",
     val submit: Boolean = false,
-    val submitEmailReset: Boolean = false,
-    val logInError: String? = null
+    val submitEmailReset: Boolean = false
 ) : Parcelable

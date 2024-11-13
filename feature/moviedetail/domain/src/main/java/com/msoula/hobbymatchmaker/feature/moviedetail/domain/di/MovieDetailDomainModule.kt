@@ -6,13 +6,15 @@ import com.msoula.hobbymatchmaker.feature.moviedetail.domain.useCases.FetchMovie
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.useCases.ManageMovieTrailerUseCase
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.useCases.ObserveMovieDetailUseCase
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.useCases.UpdateMovieVideoURIUseCase
+import org.koin.core.module.dsl.factoryOf
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 val movieDetailDomainModule = module {
-    single<MovieDetailRepository> { MovieDetailRepository(get(), get()) }
-    factory<FetchMovieDetailUseCase> { FetchMovieDetailUseCase(get()) }
-    factory<FetchMovieDetailTrailerUseCase> { FetchMovieDetailTrailerUseCase(get()) }
-    factory<UpdateMovieVideoURIUseCase> { UpdateMovieVideoURIUseCase(get()) }
-    factory<ObserveMovieDetailUseCase> { ObserveMovieDetailUseCase(get(), get(), get()) }
-    factory<ManageMovieTrailerUseCase> { ManageMovieTrailerUseCase(get(), get(), get()) }
+    singleOf(::MovieDetailRepository)
+    factoryOf(::FetchMovieDetailUseCase)
+    factoryOf(::FetchMovieDetailTrailerUseCase)
+    factoryOf(::UpdateMovieVideoURIUseCase)
+    factoryOf(::ObserveMovieDetailUseCase)
+    factoryOf(::ManageMovieTrailerUseCase)
 }

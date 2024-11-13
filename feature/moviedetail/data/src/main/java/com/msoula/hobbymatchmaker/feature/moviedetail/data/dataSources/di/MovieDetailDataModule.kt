@@ -6,12 +6,14 @@ import com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote.se
 import com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote.services.MovieVideosService
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.dataSources.local.MovieDetailLocalDataSource
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.dataSources.remote.MovieDetailRemoteDataSource
+import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.bind
 import org.koin.dsl.module
 import retrofit2.Retrofit
 
 val movieDetailDataModule = module {
     single<MovieDetailService> { get<Retrofit>().create(MovieDetailService::class.java) }
     single<MovieVideosService> { get<Retrofit>().create(MovieVideosService::class.java) }
-    single<MovieDetailRemoteDataSource> { MovieDetailRemoteDataSourceImpl(get(), get()) }
-    single<MovieDetailLocalDataSource> { MovieDetailLocalDataSourceImpl(get()) }
+    singleOf(::MovieDetailLocalDataSourceImpl) bind MovieDetailLocalDataSource::class
+    singleOf(::MovieDetailRemoteDataSourceImpl) bind MovieDetailRemoteDataSource::class
 }

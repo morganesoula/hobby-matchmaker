@@ -6,16 +6,13 @@ import androidx.annotation.RequiresExtension
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
-import androidx.credentials.GetCredentialResponse
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.google.firebase.auth.AuthCredential
 import com.msoula.hobbymatchmaker.core.common.AuthUiStateModel
-import com.msoula.hobbymatchmaker.core.login.presentation.signIn.GoogleAuthClient
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SignInScreen
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SignInViewModel
 import com.msoula.hobbymatchmaker.core.login.presentation.signUp.SignUpScreen
@@ -34,8 +31,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun HobbyMatchMakerNavigationRoot(
     navController: NavHostController,
-    appViewModel: AppViewModel,
-    googleAuthClient: GoogleAuthClient
+    appViewModel: AppViewModel
 ) {
     val authenticationState by appViewModel.authenticationState.collectAsStateWithLifecycle()
 
@@ -47,15 +43,14 @@ fun HobbyMatchMakerNavigationRoot(
 
     NavHost(navController, startDestination = startDestination) {
         splashGraph()
-        authGraph(navController, googleAuthClient)
+        authGraph(navController)
         mainGraph(navController, appViewModel)
     }
 }
 
 @SuppressLint("RestrictedApi")
 private fun NavGraphBuilder.authGraph(
-    navController: NavHostController,
-    googleAuthClient: GoogleAuthClient
+    navController: NavHostController
 ) {
     navigation<Destinations.Auth>(
         startDestination = Destinations.Auth.SignIn,
@@ -66,7 +61,7 @@ private fun NavGraphBuilder.authGraph(
             SignInScreen(
                 redirectToSignUpScreen = { navController.navigate(Destinations.Auth.SignUp) },
                 signInViewModel = signInViewModel,
-                handleFacebookAccessToken = { credential: AuthCredential, email ->
+                /* handleFacebookAccessToken = { credential: AuthCredential, email ->
                     signInViewModel.handleFacebookLogin(
                         credential, email
                     )
@@ -74,13 +69,16 @@ private fun NavGraphBuilder.authGraph(
                 handleGoogleSignIn = { result: GetCredentialResponse?, googleAuthClient: GoogleAuthClient ->
                     signInViewModel.handleGoogleLogin(result, googleAuthClient)
                 },
-                googleAuthClient = googleAuthClient,
+                googleAuthClient = googleAuthClient */
                 redirectToAppScreen = {
                     navController.navigate(Destinations.Main.App) {
                         popUpTo(Destinations.Main.App)
                     }
                 },
-                oneTimeEventChannelFlow = signInViewModel.oneTimeEventChannelFlow
+                oneTimeEventChannelFlow = signInViewModel.oneTimeEventChannelFlow,
+                connectWithSocialMedia = { facebookAccessToken, context ->
+                    signInViewModel.connectWithSocialMedia(facebookAccessToken, context)
+                }
             )
         }
 

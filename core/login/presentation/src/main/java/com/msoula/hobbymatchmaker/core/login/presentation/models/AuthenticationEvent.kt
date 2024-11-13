@@ -5,7 +5,13 @@ sealed interface AuthenticationEvent {
 
     data class OnFacebookFailedConnection(override val message: String) : AuthenticationEvent
     data class OnGoogleFailedConnection(override val message: String) : AuthenticationEvent
+    data class OnSocialMediaFailedConnection(override val message: String) : AuthenticationEvent
     data class OnResetPasswordFailed(override val message: String) : AuthenticationEvent
+    data object OnResetPasswordSuccess : AuthenticationEvent {
+        override val message: String
+            get() = "Successful password reset"
+    }
+
     data object OnSignInSuccess : AuthenticationEvent {
         override val message: String
             get() = "successful sign in"
@@ -19,5 +25,10 @@ sealed interface AuthenticationEvent {
     data object OnSignUpSuccess : AuthenticationEvent {
         override val message: String
             get() = "successful sign up"
+    }
+
+    data object Loading : AuthenticationEvent {
+        override val message: String
+            get() = "loading"
     }
 }

@@ -5,11 +5,13 @@ import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.MovieR
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.services.TMDBService
 import com.msoula.hobbymatchmaker.features.movies.domain.dataSources.MovieLocalDataSource
 import com.msoula.hobbymatchmaker.features.movies.domain.dataSources.MovieRemoteDataSource
+import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.bind
 import org.koin.dsl.module
 import retrofit2.Retrofit
 
 val movieDataModule = module {
-    single<MovieRemoteDataSource> { MovieRemoteDataSourceImpl(get(), get(), get()) }
-    single<MovieLocalDataSource> { MovieLocalDataSourceImpl(get()) }
+    singleOf(::MovieRemoteDataSourceImpl) bind MovieRemoteDataSource::class
+    singleOf(::MovieLocalDataSourceImpl) bind MovieLocalDataSource::class
     single<TMDBService> { get<Retrofit>().create(TMDBService::class.java) }
 }
