@@ -7,6 +7,7 @@ import com.google.firebase.auth.AuthResult
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.CreateUserWithEmailAndPasswordError
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.GetFacebookClientError
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.GetGoogleCredentialError
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutError
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ResetPasswordError
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SignInWithEmailAndPasswordError
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SocialMediaError
@@ -14,7 +15,7 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUser
 import com.msoula.hobbymatchmaker.core.common.Result
 
 interface AuthenticationRemoteDataSource {
-    suspend fun authenticationSignOut()
+    suspend fun authenticationSignOut(): Result<Boolean, LogOutError>
     suspend fun signInWithCredentials(credential: AuthCredential): Result<AuthResult, SocialMediaError>
     suspend fun linkWithCredential(credential: AuthCredential): Result<AuthResult?, SocialMediaError>
     suspend fun createUserWithEmailAndPassword(

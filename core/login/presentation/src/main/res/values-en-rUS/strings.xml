@@ -7,11 +7,11 @@
     // FORM
     <string name="firstname">First name</string>
     <string name="lastname">Last name</string>
-    <string name="example">Example: </string>
+    <string name="example">Example:&#160;</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
-    <string name="at_least">At least: </string>
-    <string name="password_hint">• 8 characters • 1 number • 1 uppercase \n• 1 lowercase • 1 special character</string>
+    <string name="at_least">At least:&#160;</string>
+    <string name="password_hint"> 8 characters • 1 number • 1 uppercase \n• 1 lowercase • 1 special character</string>
     <string name="sign_up">Sign Up</string>
     <string name="already_a_member">Already using HobbyMatchMaker? </string>
     <string name="already_a_member_connect">Log in</string>

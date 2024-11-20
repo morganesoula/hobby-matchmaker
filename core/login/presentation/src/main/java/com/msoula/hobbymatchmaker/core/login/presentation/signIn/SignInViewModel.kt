@@ -9,7 +9,8 @@ import com.facebook.AccessToken
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ResetPasswordUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInError
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInUseCase
-import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SocialMediaSignInBisUseCase
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SocialMediaSignInUseCase
+import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.di.domain.StringResourcesProvider
@@ -38,7 +39,7 @@ class SignInViewModel(
     private val signInUseCase: SignInUseCase,
     private val resetPasswordUseCase: ResetPasswordUseCase,
     private val resourceProvider: StringResourcesProvider,
-    private val socialMediaSignInBisUseCase: SocialMediaSignInBisUseCase
+    private val socialMediaSignInUseCase: SocialMediaSignInUseCase
 ) : ViewModel() {
 
     private val savedStateHandleKey: String = "loginState"
@@ -103,7 +104,7 @@ class SignInViewModel(
     ) {
         (
             viewModelScope.launch {
-                socialMediaSignInBisUseCase(
+                socialMediaSignInUseCase(
                     Parameters.GetCredentialResponseParam(
                         facebookAccessToken, context
                     )
@@ -116,11 +117,6 @@ class SignInViewModel(
 
                         is Result.Success -> SignInEvent.Success
                         is Result.Failure -> {
-                            circularProgressLoading.value = false
-                            SignInEvent.Error(socialMediaResult.error.message)
-                        }
-
-                        is Result.BusinessRuleError -> {
                             circularProgressLoading.value = false
                             SignInEvent.Error(socialMediaResult.error.message)
                         }
@@ -157,13 +153,8 @@ class SignInViewModel(
 
                     is Result.Failure -> {
                         circularProgressLoading.value = false
-                        SignInEvent.Error(result.error.message)
-                    }
-
-                    is Result.BusinessRuleError -> {
-                        val error = handleError(result.error)
-                        circularProgressLoading.value = false
-                        SignInEvent.Error(error)
+                        val errorMessage = handleError(result.error)
+                        SignInEvent.Error(errorMessage)
                     }
 
                     is Result.Success -> {
@@ -186,13 +177,12 @@ class SignInViewModel(
                     }
 
                     is Result.Failure -> ResetPasswordEvent.Error(result.error.message)
-                    is Result.BusinessRuleError -> ResetPasswordEvent.Error(result.error.message)
                 }
             }
         }
     }
 
-    private fun handleError(error: SignInError): String {
+    private fun handleError(error: AppError): String {
         return when (error) {
             is SignInError.WrongPassword -> resourceProvider.getString(R.string.login_error)
             is SignInError.UserNotFound -> resourceProvider.getString(

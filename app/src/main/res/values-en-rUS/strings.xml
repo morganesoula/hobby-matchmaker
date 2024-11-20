@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Errors -->
+    <string name="facebook_log_out_error">Facebook log out error</string>
+    <string name="google_log_out_error">Google log out error</string>
+    <string name="firebase_log_out_error">Firebase lot oug error</string>
+    <string name="unknown_log_out_error">Error while logging out</string>
+</resources>

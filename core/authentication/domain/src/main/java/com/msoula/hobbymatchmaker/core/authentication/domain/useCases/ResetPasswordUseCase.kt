@@ -24,12 +24,6 @@ class ResetPasswordUseCase(
             when (val result = authenticationRepository.resetPassword(parameters.value)) {
                 is Result.Success -> emit(Result.Success(ResetPasswordSuccess))
                 is Result.Failure -> emit(Result.Failure(result.error))
-                is Result.BusinessRuleError -> {
-                    emit(
-                        Result.BusinessRuleError(ResetPasswordErrors(result.error.message))
-                    )
-                }
-
                 else -> Unit
             }
         }.flowOn(dispatcher)

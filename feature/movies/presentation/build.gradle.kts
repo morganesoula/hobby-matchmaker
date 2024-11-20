@@ -35,6 +35,7 @@ dependencies {
     implementation(project(Modules.AUTHENTICATION_DOMAIN))
     implementation(project(Modules.COMMON))
     implementation(project(Modules.DESIGN))
+    implementation(project(Modules.DI))
     implementation(project(Modules.MOVIE_DOMAIN))
     implementation(project(Modules.NAVIGATION))
 

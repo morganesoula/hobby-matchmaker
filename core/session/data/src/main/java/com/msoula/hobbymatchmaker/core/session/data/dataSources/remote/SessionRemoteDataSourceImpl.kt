@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.core.session.data.dataSources.remote
 
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.safeCall
 import com.msoula.hobbymatchmaker.core.session.data.dataSources.remote.mappers.toUserFireStoreModel
@@ -28,7 +29,11 @@ class SessionRemoteDataSourceImpl(
                 "email" to firestoreUser.email
             )
 
-            return saveFireStoreUser(firestoreUser.uid, firestoreUserMap)
+            return try {
+                saveFireStoreUser(firestoreUser.uid, firestoreUserMap)
+            } catch (e: FirebaseFirestoreException) {
+                Result.Failure(SessionErrors.CreateUserError.SaveError(e.message ?: ""))
+            }
         }
     }
 
@@ -38,7 +43,7 @@ class SessionRemoteDataSourceImpl(
     ): Result<Boolean, SessionErrors.CreateUserError> {
         return safeCall(appError = { errorMessage ->
             Log.e("HMM", "Error while saving firestore user online")
-            SessionErrors.CreateUserError(errorMessage)
+            SessionErrors.CreateUserError.SaveError(errorMessage)
         }) {
             firestore.collection("users").document(uid).set(userFireStoreModel).await()
             true

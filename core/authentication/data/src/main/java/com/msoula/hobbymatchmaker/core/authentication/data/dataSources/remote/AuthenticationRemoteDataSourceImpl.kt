@@ -4,7 +4,9 @@ import android.content.Context
 import android.util.Log
 import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
+import androidx.credentials.exceptions.ClearCredentialException
 import com.facebook.AccessToken
+import com.facebook.FacebookException
 import com.facebook.login.LoginManager
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.AuthResult
@@ -18,6 +20,8 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.errors.CreateUserWi
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.GetFacebookClientError
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.GetFacebookCredentialError
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.GetGoogleCredentialError
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.GoogleCredentialNullError
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutError
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ResetPasswordError
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SignInWithEmailAndPasswordError
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SocialMediaError
@@ -37,17 +41,24 @@ class AuthenticationRemoteDataSourceImpl(
 
     private val facebookManager = LoginManager.getInstance()
 
-    override suspend fun authenticationSignOut() {
-        try {
+    override suspend fun authenticationSignOut(): Result<Boolean, LogOutError> {
+        return try {
             credentialManager.clearCredentialState(ClearCredentialStateRequest())
             facebookManager.logOut()
             auth.signOut()
+            Result.Success(true)
         } catch (exception: CancellationException) {
             throw exception
+        } catch (e: FirebaseAuthException) {
+            Result.Failure(LogOutError.FirebaseException(e.message ?: ""))
+        } catch (e: ClearCredentialException) {
+            Result.Failure(LogOutError.CredentialException(e.message ?: ""))
+        } catch (e: FacebookException) {
+            Result.Failure(LogOutError.FacebookLogOutException(e.message ?: ""))
         } catch (e: Exception) {
             Log.e("HMM", "Exception caught while logging out: ${e.message}")
+            Result.Failure(LogOutError.UnknownError(e.message ?: ""))
         }
-        Log.d("HMM", "Logged out")
     }
 
     override suspend fun createUserWithEmailAndPassword(
@@ -59,31 +70,29 @@ class AuthenticationRemoteDataSourceImpl(
             Result.Success(auth.currentUser?.uid ?: "")
         } catch (exception: CancellationException) {
             throw exception
-        } catch (e: Exception) {
-            Log.e("HMM", "Exception caught while creating user: ${e.message}")
-            if (e is FirebaseAuthException) {
-                when (e.errorCode) {
-                    "ERROR_EMAIL_ALREADY_IN_USE" -> Result.Failure(
-                        CreateUserWithEmailAndPasswordError.EmailAlreadyExists
-                    )
+        } catch (e: FirebaseAuthException) {
+            when (e.errorCode) {
+                "ERROR_EMAIL_ALREADY_IN_USE" -> Result.Failure(
+                    CreateUserWithEmailAndPasswordError.EmailAlreadyExists
+                )
 
-                    "ERROR_USER_DISABLED" -> Result.Failure(CreateUserWithEmailAndPasswordError.UserDisabled)
-                    "ERROR_TOO_MANY_REQUESTS" -> Result.Failure(CreateUserWithEmailAndPasswordError.TooManyRequests)
-                    "ERROR_INTERNAL_ERROR" -> Result.Failure(CreateUserWithEmailAndPasswordError.InternalError)
+                "ERROR_USER_DISABLED" -> Result.Failure(CreateUserWithEmailAndPasswordError.UserDisabled)
+                "ERROR_TOO_MANY_REQUESTS" -> Result.Failure(CreateUserWithEmailAndPasswordError.TooManyRequests)
+                "ERROR_INTERNAL_ERROR" -> Result.Failure(CreateUserWithEmailAndPasswordError.InternalError)
 
-                    else -> Result.Failure(
-                        CreateUserWithEmailAndPasswordError.Other(
-                            message = e.message ?: "Could not create user"
-                        )
-                    )
-                }
-            } else {
-                Result.Failure(
+                else -> Result.Failure(
                     CreateUserWithEmailAndPasswordError.Other(
-                        message = "Unexpected error with error message: ${e.message}"
+                        message = e.message ?: "Could not create user"
                     )
                 )
             }
+        } catch (e: Exception) {
+            Log.e("HMM", "Exception caught while creating user: ${e.message}")
+            Result.Failure(
+                CreateUserWithEmailAndPasswordError.Other(
+                    e.message ?: "Unexpected error"
+                )
+            )
         }
     }
 
@@ -122,7 +131,11 @@ class AuthenticationRemoteDataSourceImpl(
 
     override suspend fun resetPassword(email: String): Result<Boolean, ResetPasswordError> {
         return safeCall(
-            appError = { errorMessage -> ResetPasswordError("Could not reset password: $errorMessage") }
+            appError = { errorMessage ->
+                ResetPasswordError(
+                    "Could not reset password: $errorMessage"
+                )
+            }
         ) {
             auth.sendPasswordResetEmail(email).await()
             true
@@ -139,7 +152,8 @@ class AuthenticationRemoteDataSourceImpl(
         }
     }
 
-    override suspend fun linkWithCredential(credential: AuthCredential): Result<AuthResult?, SocialMediaError> {
+    override suspend fun linkWithCredential(credential: AuthCredential)
+        : Result<AuthResult?, SocialMediaError> {
         return safeCall(
             appError = {
                 SocialMediaError.LinkWithCredentialsError
@@ -167,17 +181,19 @@ class AuthenticationRemoteDataSourceImpl(
         return auth.currentUser?.toFirebaseUserInfoDomainModel()
     }
 
-    override suspend fun connectWithGoogle(context: Context): Result<Pair<AuthCredential, String?>, GetGoogleCredentialError> {
+    override suspend fun connectWithGoogle(context: Context)
+        : Result<Pair<AuthCredential, String?>, GetGoogleCredentialError> {
         return safeCall(
             appError = { errorMessage -> GetGoogleCredentialError(errorMessage) }
         ) {
             val result = googleClient.launchGetCredential(context)
             result?.let { googleClient.handleSignIn(it) }
-                ?: throw Exception("Google credential is null")
+                ?: throw GoogleCredentialNullError("Google credential is null")
         }
     }
 
-    override suspend fun fetchFacebookCredentials(token: String): Result<AuthCredential, GetGoogleCredentialError> {
+    override suspend fun fetchFacebookCredentials(token: String)
+        : Result<AuthCredential, GetGoogleCredentialError> {
         return safeCall(
             appError = { errorMessage -> GetFacebookCredentialError(errorMessage) }
         ) {
@@ -185,7 +201,8 @@ class AuthenticationRemoteDataSourceImpl(
         }
     }
 
-    override suspend fun fetchFacebookClient(accessToken: AccessToken): Result<String?, GetFacebookClientError> {
+    override suspend fun fetchFacebookClient(accessToken: AccessToken)
+        : Result<String?, GetFacebookClientError> {
         return try {
             facebookAuthClient.fetchFacebookUserProfile(accessToken)
         } catch (exception: CancellationException) {

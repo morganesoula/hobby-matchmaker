@@ -1,10 +1,9 @@
 package com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote
 
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.core.common.mapSuccess
-import com.msoula.hobbymatchmaker.core.network.execute
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.mappers.toMovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.services.TMDBService
 import com.msoula.hobbymatchmaker.features.movies.domain.dataSources.MovieRemoteDataSource
@@ -12,6 +11,7 @@ import com.msoula.hobbymatchmaker.features.movies.domain.errors.MovieErrors
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.utils.ImageHelper
 import kotlinx.coroutines.tasks.await
+import okio.IOException
 
 class MovieRemoteDataSourceImpl(
     private val tmdbService: TMDBService,
@@ -27,7 +27,7 @@ class MovieRemoteDataSourceImpl(
         pages.forEach { page ->
             when (val result = fetchMoviesByPage(language, page)) {
                 is Result.Success -> movies.addAll(result.data)
-                is Result.Failure, is Result.BusinessRuleError -> return result
+                is Result.Failure -> return result
                 else -> Unit
             }
         }
@@ -56,15 +56,16 @@ class MovieRemoteDataSourceImpl(
         language: String,
         page: Int
     ): Result<List<MovieDomainModel>, MovieErrors.FetchMovieByPageError> {
-        return execute({
-            tmdbService.getMoviesByPopularityDesc(
-                language,
-                page
-            )
-        }).mapSuccess { response ->
-            response.results?.map {
-                it.toMovieDomainModel()
-            } ?: emptyList()
+        return try {
+            val response = tmdbService.getMoviesByPopularityDesc(language, page)
+            val data = response.body()?.results?.map { it.toMovieDomainModel() } ?: emptyList()
+            Result.Success(data)
+        } catch (e: IOException) {
+            Result.Failure(MovieErrors.NetworkError(e.message ?: ""))
+        } catch (e: ApiException) {
+            Result.Failure(MovieErrors.ApiError(e.message ?: ""))
+        } catch (e: Exception) {
+            Result.Failure(MovieErrors.UnknownError(e.message ?: ""))
         }
     }
 

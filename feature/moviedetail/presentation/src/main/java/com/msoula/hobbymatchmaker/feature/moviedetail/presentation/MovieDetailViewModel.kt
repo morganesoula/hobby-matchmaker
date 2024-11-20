@@ -9,7 +9,6 @@ import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.getDeviceLocale
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.useCases.ManageMovieTrailerUseCase
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.useCases.ObserveMovieDetailUseCase
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.useCases.ObserveMovieErrors
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.useCases.ObserveMovieSuccess
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieDetailUiEventModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieDetailUiModel
@@ -68,12 +67,6 @@ class MovieDetailViewModel(
                             }
                         }
 
-                        is Result.BusinessRuleError ->
-                            when (result.error) {
-                                ObserveMovieErrors.Empty -> MovieDetailViewStateModel.Empty
-                                else -> MovieDetailViewStateModel.Error(result.error.toString())
-                            }
-
                         is Result.Failure -> MovieDetailViewStateModel.Error(result.error.message)
                     }
                 }
@@ -127,9 +120,6 @@ class MovieDetailViewModel(
                             result.error.message
                         )
                     )
-
-                    is Result.BusinessRuleError ->
-                        MovieDetailUiEventModel.ErrorFetchingTrailer(result.error.errorMessage)
                 }
             }
         }

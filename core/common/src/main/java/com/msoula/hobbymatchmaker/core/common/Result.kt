@@ -8,8 +8,6 @@ sealed class Result<out D, out E> {
         Result<Nothing, Nothing>()
 
     data object Loading : Result<Nothing, Nothing>()
-
-    data class BusinessRuleError<out E>(val error: E) : Result<Nothing, E>()
 }
 
 interface AppError {
@@ -28,7 +26,6 @@ suspend fun <Data, Out, Error> Result<Data, Error>.mapSuccess(
         is Result.Success -> Result.Success(transform(this.data))
         is Result.Failure -> Result.Failure(this.error)
         is Result.Loading -> Result.Loading
-        is Result.BusinessRuleError -> Result.BusinessRuleError(this.error)
     }
 
 fun <Data, Error> Result<Data, Error>.mapError(
@@ -38,7 +35,6 @@ fun <Data, Error> Result<Data, Error>.mapError(
         is Result.Success -> Result.Success(this.data)
         is Result.Failure -> Result.Failure(transform(this.error))
         is Result.Loading -> Result.Loading
-        is Result.BusinessRuleError -> Result.BusinessRuleError(this.error)
     }
 
 fun <Data, Error> Result<Data, Error>.onEach(

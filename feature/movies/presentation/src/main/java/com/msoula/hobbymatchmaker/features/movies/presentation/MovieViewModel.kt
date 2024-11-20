@@ -4,9 +4,11 @@ import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfo
+import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.getDeviceLocale
+import com.msoula.hobbymatchmaker.core.di.domain.StringResourcesProvider
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesErrors
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesSuccess
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesUseCase
@@ -32,7 +34,8 @@ class MovieViewModel(
     private val setMovieFavoriteUseCase: SetMovieFavoriteUseCase,
     observeAllMoviesUseCase: ObserveAllMoviesUseCase,
     private val getUserInfo: FetchFirebaseUserInfo,
-    private val ioDispatcher: CoroutineDispatcher
+    private val ioDispatcher: CoroutineDispatcher,
+    private val resourceProvider: StringResourcesProvider
 ) : ViewModel() {
 
     private val _oneTimeEventChannel = Channel<MovieUiEventModel>()
@@ -55,12 +58,9 @@ class MovieViewModel(
                     }
                 }
 
-                is Result.Failure -> MovieUiStateModel.Error(result.error.message)
-                is Result.BusinessRuleError -> {
-                    when (val error = result.error) {
-                        is ObserveAllMoviesErrors.Empty -> MovieUiStateModel.Empty
-                        is ObserveAllMoviesErrors.Error -> MovieUiStateModel.Error(error.error.message)
-                    }
+                 is Result.Failure -> {
+                    val errorMessage = handleError(result.error)
+                    MovieUiStateModel.Error(errorMessage)
                 }
 
                 else -> MovieUiStateModel.Loading
@@ -71,6 +71,15 @@ class MovieViewModel(
                 SharingStarted.WhileSubscribed(5000),
                 MovieUiStateModel.Loading
             )
+
+    private fun handleError(error: AppError): String {
+        return when (error) {
+            is ObserveAllMoviesErrors.NetworkError -> resourceProvider.getString(R.string.movies_network_error)
+            is ObserveAllMoviesErrors.ApiError -> resourceProvider.getString(R.string.movies_api_error)
+            is ObserveAllMoviesErrors.UnknownError -> resourceProvider.getString(R.string.movies_unknown_error)
+            else -> error.message
+        }
+    }
 
     fun onCardEvent(event: CardEventModel) {
         when (event) {

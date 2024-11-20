@@ -130,6 +130,10 @@ dependencies {
     implementation(libs.firebase.firebase.auth)
     implementation(libs.firebase.ui.auth)
 
+    // Firestore
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firebase.firestore)
+
     // Koin
     implementation(libs.koin.android)
     implementation(libs.koin.compose)

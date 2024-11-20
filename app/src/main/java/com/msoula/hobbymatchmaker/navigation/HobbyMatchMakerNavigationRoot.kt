@@ -16,7 +16,6 @@ import com.msoula.hobbymatchmaker.core.common.AuthUiStateModel
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SignInScreen
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SignInViewModel
 import com.msoula.hobbymatchmaker.core.login.presentation.signUp.SignUpScreen
-import com.msoula.hobbymatchmaker.core.login.presentation.signUp.SignUpViewModel
 import com.msoula.hobbymatchmaker.core.navigation.contracts.Destinations
 import com.msoula.hobbymatchmaker.core.splashscreen.presentation.SplashScreen
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.MovieDetailContent
@@ -61,15 +60,6 @@ private fun NavGraphBuilder.authGraph(
             SignInScreen(
                 redirectToSignUpScreen = { navController.navigate(Destinations.Auth.SignUp) },
                 signInViewModel = signInViewModel,
-                /* handleFacebookAccessToken = { credential: AuthCredential, email ->
-                    signInViewModel.handleFacebookLogin(
-                        credential, email
-                    )
-                },
-                handleGoogleSignIn = { result: GetCredentialResponse?, googleAuthClient: GoogleAuthClient ->
-                    signInViewModel.handleGoogleLogin(result, googleAuthClient)
-                },
-                googleAuthClient = googleAuthClient */
                 redirectToAppScreen = {
                     navController.navigate(Destinations.Main.App) {
                         popUpTo(Destinations.Main.App)
@@ -83,8 +73,6 @@ private fun NavGraphBuilder.authGraph(
         }
 
         composable<Destinations.Auth.SignUp> {
-            val signUpViewModel: SignUpViewModel = koinViewModel<SignUpViewModel>()
-
             SignUpScreen(
                 redirectToLogInScreen = {
                     navController.navigate(Destinations.Auth.SignIn) {
@@ -98,8 +86,7 @@ private fun NavGraphBuilder.authGraph(
                 },
                 redirectToAppScreen = {
                     navController.navigate(Destinations.Main.App)
-                },
-                oneTimeEventChannelFlow = signUpViewModel.oneTimeEventChannelFlow
+                }
             )
         }
     }
@@ -116,6 +103,11 @@ private fun NavGraphBuilder.mainGraph(
         composable<Destinations.Main.App> {
             AppScreen(
                 appViewModel = appViewModel,
+                redirectToLoginScreen = {
+                    navController.navigate(
+                        Destinations.Auth.SignIn
+                    )
+                },
                 redirectToMovieDetail = { movieId: Long ->
                     navController.navigate(
                         Destinations.Main.MovieDetail(
@@ -127,7 +119,6 @@ private fun NavGraphBuilder.mainGraph(
 
         composable<Destinations.Main.MovieDetail> {
             val movieDetailViewModel: MovieDetailViewModel = koinViewModel<MovieDetailViewModel>()
-            //val viewState by movieDetailViewModel.viewState.collectAsStateWithLifecycle()
             val viewStateBis by movieDetailViewModel.viewState.collectAsStateWithLifecycle()
 
             MovieDetailContent(

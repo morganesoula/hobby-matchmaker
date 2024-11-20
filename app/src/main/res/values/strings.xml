@@ -2,4 +2,10 @@
     <string name="app_name" translatable="false">Hobby Matchmaker</string>
     // Route
     <string name="home_route_name" translatable="false">Home</string>
+
+    <!-- Errors -->
+    <string name="facebook_log_out_error">Erreur lors de la deconnexion avec Facebook</string>
+    <string name="google_log_out_error">Erreur lors de la deconnexion avec Google</string>
+    <string name="firebase_log_out_error">Erreur lors de la deconnexion avec Firebase</string>
+    <string name="unknown_log_out_error">Erreur inconnue lors de la deconnexion</string>
 </resources>

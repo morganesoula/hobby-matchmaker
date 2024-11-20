@@ -16,11 +16,15 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -36,20 +40,16 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.msoula.hobbymatchmaker.core.common.ObserveAsEvents
 import com.msoula.hobbymatchmaker.core.design.component.HMMButtonAuthComponent
-import com.msoula.hobbymatchmaker.core.design.component.HMMErrorText
 import com.msoula.hobbymatchmaker.core.design.component.HMMFormHelperText
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldPasswordComponent
 import com.msoula.hobbymatchmaker.core.design.component.HeaderTextComponent
-import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
+import com.msoula.hobbymatchmaker.core.login.presentation.models.SignUpEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.signUp.models.SignUpStateModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-
 import com.msoula.hobbymatchmaker.core.login.presentation.R.string as StringRes
 
 @Composable
@@ -57,11 +57,14 @@ fun SignUpScreen(
     modifier: Modifier = Modifier,
     redirectToLogInScreen: () -> Unit,
     redirectToAppScreen: () -> Unit,
-    oneTimeEventChannelFlow: Flow<AuthenticationEvent>,
     signUpViewModel: SignUpViewModel = koinViewModel<SignUpViewModel>()
 ) {
+    val coroutineScope = rememberCoroutineScope()
+    val snackBarHostState = remember { SnackbarHostState() }
+
     val registrationState by signUpViewModel.formDataFlow.collectAsStateWithLifecycle()
-    val signUpProgressLoading by signUpViewModel.signUpCircularProgress.collectAsStateWithLifecycle()
+    val isLoading by signUpViewModel.isLoading.collectAsStateWithLifecycle()
+    val signUpState by signUpViewModel.signUpState.collectAsStateWithLifecycle()
 
     val emailTipVisibility = remember { mutableStateOf(false) }
     val passwordTipVisibility = remember { mutableStateOf(false) }
@@ -72,7 +75,8 @@ fun SignUpScreen(
             withStyle(
                 style =
                 SpanStyle(
-                    color = if (isSystemInDarkTheme()) Color(0, 191, 255) else Color.Blue,
+                    color = if (isSystemInDarkTheme()) Color(0, 191, 255)
+                    else Color.Blue,
                     textDecoration = TextDecoration.Underline
                 )
             ) {
@@ -80,14 +84,22 @@ fun SignUpScreen(
             }
         }
 
-    ObserveAsEvents(oneTimeEventChannelFlow) { event ->
-        when (event) {
-            AuthenticationEvent.OnSignUpSuccess -> redirectToAppScreen()
+    LaunchedEffect(signUpState) {
+        when (signUpState) {
+            is SignUpEvent.Success -> redirectToAppScreen()
+            is SignUpEvent.Error -> {
+                coroutineScope.launch {
+                    snackBarHostState.showSnackbar((signUpState as SignUpEvent.Error).message)
+                }
+            }
+
             else -> Unit
         }
     }
 
-    Scaffold(modifier = modifier) { paddingValues ->
+    Scaffold(
+        modifier = modifier,
+        snackbarHost = { SnackbarHost(snackBarHostState) }) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
             Column {
                 HeaderTextComponent(text = stringResource(id = StringRes.welcome_title))
@@ -116,7 +128,7 @@ fun SignUpScreen(
                         )
                     },
                     onSignUpClicked = { signUpViewModel.onEvent(AuthenticationUIEvent.OnSignUp) },
-                    signUpProgressLoading = signUpProgressLoading,
+                    isLoading = isLoading,
                     emailTipVisibility = emailTipVisibility,
                     passwordTipVisibility = passwordTipVisibility
                 )
@@ -138,7 +150,7 @@ fun SignUpScreenMainContent(
     onEmailChanged: (email: String) -> Unit,
     onPasswordChanged: (password: String) -> Unit,
     onSignUpClicked: () -> Unit,
-    signUpProgressLoading: Boolean = false,
+    isLoading: Boolean = false,
     emailTipVisibility: MutableState<Boolean> = mutableStateOf(false),
     passwordTipVisibility: MutableState<Boolean> = mutableStateOf(false)
 ) {
@@ -150,13 +162,6 @@ fun SignUpScreenMainContent(
         contentAlignment = Alignment.Center
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-            if (!registrationState.signUpError.isNullOrEmpty()) {
-                HMMErrorText(
-                    modifier = Modifier,
-                    errorText = registrationState.signUpError
-                )
-            }
-
             HMMTextFieldAuthComponent(
                 placeHolderText = stringResource(id = StringRes.firstname),
                 value = registrationState.firstName.trimEnd(),
@@ -211,7 +216,7 @@ fun SignUpScreenMainContent(
                 onClick = { onSignUpClicked() },
                 enabled = registrationState.submit,
                 text = stringResource(id = StringRes.sign_up),
-                loading = signUpProgressLoading
+                loading = isLoading
             )
         }
     }
@@ -242,7 +247,6 @@ fun BoxScope.SignUpScreenBottomContent(
 fun SignUpScreenPreview() {
     SignUpScreen(
         redirectToLogInScreen = {},
-        redirectToAppScreen = {},
-        oneTimeEventChannelFlow = flowOf()
+        redirectToAppScreen = {}
     )
 }

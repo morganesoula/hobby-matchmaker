@@ -1,7 +1,6 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.signIn
 
 import android.content.Context
-import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.ManagedActivityResultLauncher
@@ -30,10 +29,10 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -59,7 +58,6 @@ import com.facebook.AccessToken
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
-import com.facebook.GraphRequest
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import com.msoula.hobbymatchmaker.core.common.ObserveAsEvents
@@ -67,7 +65,6 @@ import com.msoula.hobbymatchmaker.core.design.component.HMMButtonAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldPasswordComponent
 import com.msoula.hobbymatchmaker.core.design.component.HeaderTextComponent
-import com.msoula.hobbymatchmaker.core.design.component.LocalSnackBar
 import com.msoula.hobbymatchmaker.core.di.data.StringResourcesProviderImpl
 import com.msoula.hobbymatchmaker.core.login.presentation.components.SocialMediaRowCustom
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationEvent
@@ -77,8 +74,6 @@ import com.msoula.hobbymatchmaker.core.login.presentation.models.SignInEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.resume
 import com.msoula.hobbymatchmaker.core.login.presentation.R.string as StringRes
 
 @Composable
@@ -163,70 +158,68 @@ fun SignInScreen(
         }
     }
 
-    CompositionLocalProvider(LocalSnackBar provides snackBarHostState) {
-        Scaffold(
-            modifier = modifier
-        ) { paddingValues ->
-            Box(modifier = Modifier.fillMaxSize()) {
-                Column(
-                    modifier =
-                    Modifier
-                        .padding(paddingValues)
-                        .verticalScroll(rememberScrollState()),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    if (openResetDialog) {
-                        ForgotPasswordAlertDialog(
-                            email = loginFormState.emailReset,
-                            paddingValues = paddingValues,
-                            enableSubmit = loginFormState.submitEmailReset,
-                            authUIEvent = signInViewModel::onEvent,
-                            isLoading = resetPasswordState == ResetPasswordEvent.Loading
-                        )
-                    }
-
-                    HeaderTextComponent(
-                        text = stringResource(id = StringRes.welcome_back_title),
-                    )
-
-                    SignInScreenMainContent(
-                        email = loginFormState.email.trimEnd(),
-                        onEmailChanged = {
-                            signInViewModel.onEvent(
-                                AuthenticationUIEvent.OnEmailChanged(
-                                    it
-                                )
-                            )
-                        },
-                        password = loginFormState.password,
-                        onPasswordChanged = {
-                            signInViewModel.onEvent(AuthenticationUIEvent.OnPasswordChanged(it))
-                        },
-                        onForgotPasswordClicked = {
-                            signInViewModel.onEvent(AuthenticationUIEvent.OnForgotPasswordClicked)
-                        },
-                        onSignInClicked = {
-                            signInViewModel.onEvent(AuthenticationUIEvent.OnSignIn)
-                        },
-                        canSubmit = loginFormState.submit,
-                        circularProgressLoading = circularProgressLoading,
-                        dividerConnectText = resourcesProvider.getString(StringRes.continue_with_rs),
-                        facebookLauncher = facebookLauncher,
-                        scope = coroutineScope,
-                        connectWithSocialMedia = connectWithSocialMedia
+    Scaffold(
+        modifier = modifier,
+        snackbarHost = { SnackbarHost(snackBarHostState) }
+    ) { paddingValues ->
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier =
+                Modifier
+                    .padding(paddingValues)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                if (openResetDialog) {
+                    ForgotPasswordAlertDialog(
+                        email = loginFormState.emailReset,
+                        paddingValues = paddingValues,
+                        enableSubmit = loginFormState.submitEmailReset,
+                        authUIEvent = signInViewModel::onEvent,
+                        isLoading = resetPasswordState == ResetPasswordEvent.Loading
                     )
                 }
 
-                Box(
-                    modifier =
-                    Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 8.dp)
-                ) {
-                    AnnotatedStringWithLinkAnnotation(isSystemInDarkTheme()) {
-                        redirectToSignUpScreen()
-                    }
+                HeaderTextComponent(
+                    text = stringResource(id = StringRes.welcome_back_title),
+                )
+
+                SignInScreenMainContent(
+                    email = loginFormState.email.trimEnd(),
+                    onEmailChanged = {
+                        signInViewModel.onEvent(
+                            AuthenticationUIEvent.OnEmailChanged(
+                                it
+                            )
+                        )
+                    },
+                    password = loginFormState.password,
+                    onPasswordChanged = {
+                        signInViewModel.onEvent(AuthenticationUIEvent.OnPasswordChanged(it))
+                    },
+                    onForgotPasswordClicked = {
+                        signInViewModel.onEvent(AuthenticationUIEvent.OnForgotPasswordClicked)
+                    },
+                    onSignInClicked = {
+                        signInViewModel.onEvent(AuthenticationUIEvent.OnSignIn)
+                    },
+                    canSubmit = loginFormState.submit,
+                    circularProgressLoading = circularProgressLoading,
+                    dividerConnectText = resourcesProvider.getString(StringRes.continue_with_rs),
+                    facebookLauncher = facebookLauncher,
+                    connectWithSocialMedia = connectWithSocialMedia
+                )
+            }
+
+            Box(
+                modifier =
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 8.dp)
+            ) {
+                AnnotatedStringWithLinkAnnotation(isSystemInDarkTheme()) {
+                    redirectToSignUpScreen()
                 }
             }
         }
@@ -257,15 +250,6 @@ fun RegisterFacebookCallback(
                 coroutineScope.launch {
                     val accessToken = result.accessToken
                     connectWithSocialMedia(accessToken, localContext)
-
-                    /* val email = fetchFacebookUserProfile(accessToken)
-
-                    if (email != null) {
-                        val credential = FacebookAuthProvider.getCredential(accessToken.token)
-                        handleFacebookAccessToken(credential, email)
-                    } else {
-                        Log.e("HMM", "Failed to fetch Facebook user email")
-                    }*/
                 }
             }
         })
@@ -329,9 +313,6 @@ fun ColumnScope.SignInScreenMainContent(
     dividerConnectText: String = "",
     facebookLauncher: ManagedActivityResultLauncher<Collection<String>,
         CallbackManager.ActivityResultParameters>,
-    scope: CoroutineScope,
-    //googleAuthClient: GoogleAuthClient,
-    //handleGoogleSignIn: (result: GetCredentialResponse?, googleAuthClient: GoogleAuthClient) -> Unit,
     connectWithSocialMedia: (facebookAccessToken: AccessToken?, context: Context) -> Unit
 ) {
     val localContext = LocalContext.current
@@ -446,7 +427,10 @@ fun ForgotPasswordAlertDialog(
         modifier = modifier.padding(paddingValues),
         title = {
             Text(
-                text = stringResource(id = StringRes.forgot_password_title),
+                text = stringResource(
+                    id =
+                    StringRes.forgot_password_title
+                ),
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center
             )
@@ -492,28 +476,4 @@ fun ForgotPasswordAlertDialog(
             }
         }
     )
-}
-
-private suspend fun fetchFacebookUserProfile(
-    accessToken: AccessToken
-): String? {
-    return suspendCancellableCoroutine { continuation ->
-        val request = GraphRequest.newMeRequest(accessToken) { jsonObject, _ ->
-            try {
-                val email = jsonObject?.getString("email")
-                continuation.resume(email)
-            } catch (e: Exception) {
-                Log.e("HMM", "Error fetching Facebook profile: ${e.message}")
-                continuation.resume(null)
-            }
-        }
-
-        val parameters = Bundle().apply { putString("fields", "email, name") }
-        request.parameters = parameters
-        request.executeAsync()
-
-        continuation.invokeOnCancellation {
-            request.callback = null
-        }
-    }
 }

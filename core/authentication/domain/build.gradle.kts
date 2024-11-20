@@ -27,6 +27,7 @@ dependencies {
     implementation(libs.koin.android)
 
     // Modules
+    implementation(project(Modules.DI))
     implementation(project(Modules.COMMON))
     implementation(project(Modules.SESSION_DOMAIN))
 }

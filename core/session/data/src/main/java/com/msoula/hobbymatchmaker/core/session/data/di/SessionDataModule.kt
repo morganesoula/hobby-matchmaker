@@ -5,7 +5,6 @@ import com.msoula.hobbymatchmaker.core.session.data.dataSources.local.SessionLoc
 import com.msoula.hobbymatchmaker.core.session.data.dataSources.remote.SessionRemoteDataSourceImpl
 import com.msoula.hobbymatchmaker.core.session.domain.dataSources.SessionLocalDataSource
 import com.msoula.hobbymatchmaker.core.session.domain.dataSources.SessionRemoteDataSource
-import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module

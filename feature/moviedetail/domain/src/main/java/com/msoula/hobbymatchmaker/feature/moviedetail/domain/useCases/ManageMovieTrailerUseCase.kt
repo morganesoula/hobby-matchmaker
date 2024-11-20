@@ -1,5 +1,6 @@
 package com.msoula.hobbymatchmaker.feature.moviedetail.domain.useCases
 
+import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.FlowUseCase
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
@@ -14,7 +15,7 @@ class ManageMovieTrailerUseCase(
     private val updateMovieVideoURIUseCase: UpdateMovieVideoURIUseCase,
     dispatcher: CoroutineDispatcher
 ) :
-    FlowUseCase<Parameters.LongStringParam, MovieTrailerReady, ErrorFetchingTrailer>(
+    FlowUseCase<Parameters.LongStringParam, MovieTrailerReady, FetchingTrailerError>(
         dispatcher
     ) {
 
@@ -22,12 +23,12 @@ class ManageMovieTrailerUseCase(
     private val fallBackLanguages = listOf("en-US", "fr-FR")
 
     override fun execute(parameters: Parameters.LongStringParam):
-        Flow<Result<MovieTrailerReady, ErrorFetchingTrailer>> {
+        Flow<Result<MovieTrailerReady, FetchingTrailerError>> {
         return channelFlow {
             val movieId = parameters.longValue
 
             var attempt = 0
-            var result: Result<MovieTrailerReady, ErrorFetchingTrailer>
+            var result: Result<MovieTrailerReady, FetchingTrailerError>
 
             send(Result.Loading)
 
@@ -43,7 +44,7 @@ class ManageMovieTrailerUseCase(
     private suspend fun processVideoResponse(
         movieId: Long,
         language: String
-    ): Result<MovieTrailerReady, ErrorFetchingTrailer> {
+    ): Result<MovieTrailerReady, FetchingTrailerError> {
         return when (val fetchResult = movieDetailRepository.fetchMovieTrailer(movieId, language)) {
             is Result.Success -> {
                 val uri = formatVideoResponse(fetchResult.data)
@@ -57,24 +58,14 @@ class ManageMovieTrailerUseCase(
                         )
 
                         is Result.Failure -> Result.Failure(updateResult.error)
-                        is Result.BusinessRuleError -> Result.BusinessRuleError(
-                            ErrorFetchingTrailer(updateResult.error.message)
-                        )
-
                         is Result.Loading -> Result.Loading
                     }
                 } else {
-                    Result.BusinessRuleError(ErrorFetchingTrailer(""))
+                    Result.Failure(FetchingTrailerError(""))
                 }
             }
 
             is Result.Failure -> Result.Failure(fetchResult.error)
-            is Result.BusinessRuleError -> Result.BusinessRuleError(
-                ErrorFetchingTrailer(
-                    fetchResult.error.message
-                )
-            )
-
             is Result.Loading -> Result.Loading
         }
     }
@@ -92,4 +83,4 @@ class ManageMovieTrailerUseCase(
 }
 
 data class MovieTrailerReady(val videoURI: String)
-data class ErrorFetchingTrailer(val errorMessage: String)
+data class FetchingTrailerError(override val message: String) : AppError

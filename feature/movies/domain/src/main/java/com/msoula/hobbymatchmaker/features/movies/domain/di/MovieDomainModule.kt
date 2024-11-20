@@ -6,7 +6,6 @@ import com.msoula.hobbymatchmaker.features.movies.domain.useCases.FetchMoviesUse
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.SetMovieFavoriteUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.utils.ImageHelper
-import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind

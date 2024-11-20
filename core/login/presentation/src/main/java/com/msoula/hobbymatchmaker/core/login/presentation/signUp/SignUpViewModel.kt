@@ -1,33 +1,29 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.signUp
 
-import android.util.Log
+import android.annotation.SuppressLint
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.CreateUserWithEmailAndPasswordError
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignUpErrors
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignUpUseCase
 import com.msoula.hobbymatchmaker.core.common.AppError
-import com.msoula.hobbymatchmaker.core.common.mapError
-import com.msoula.hobbymatchmaker.core.common.mapSuccess
-import com.msoula.hobbymatchmaker.core.common.onEach
+import com.msoula.hobbymatchmaker.core.common.Parameters
+import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.di.domain.StringResourcesProvider
 import com.msoula.hobbymatchmaker.core.login.domain.useCases.LoginValidateFormUseCase
 import com.msoula.hobbymatchmaker.core.login.presentation.R
 import com.msoula.hobbymatchmaker.core.login.presentation.extensions.clearAll
 import com.msoula.hobbymatchmaker.core.login.presentation.extensions.updateStateHandle
-import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
+import com.msoula.hobbymatchmaker.core.login.presentation.models.SignUpEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.signUp.models.SignUpStateModel
-import com.msoula.hobbymatchmaker.core.session.domain.models.SessionUserDomainModel
-import com.msoula.hobbymatchmaker.core.session.domain.useCases.CreateUserUseCase
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
@@ -35,19 +31,19 @@ import kotlin.time.Duration.Companion.milliseconds
 @OptIn(FlowPreview::class)
 class SignUpViewModel(
     private val loginValidateFormUseCase: LoginValidateFormUseCase,
-    private val signUpUseCase: SignUpUseCase,
-    private val ioDispatcher: CoroutineDispatcher,
     private val resourceProvider: StringResourcesProvider,
     private val savedStateHandle: SavedStateHandle,
-    private val createUserUseCase: CreateUserUseCase
+    private val signUpUseCase: SignUpUseCase
 ) : ViewModel() {
 
     private val savedStateHandleKey: String = "signUpState"
     val formDataFlow = savedStateHandle.getStateFlow(savedStateHandleKey, SignUpStateModel())
-    val signUpCircularProgress = MutableStateFlow(false)
 
-    private val oneTimeEventChannel = Channel<AuthenticationEvent>()
-    val oneTimeEventChannelFlow = oneTimeEventChannel.receiveAsFlow()
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
+
+    private val _signUpState: MutableStateFlow<SignUpEvent> = MutableStateFlow(SignUpEvent.Idle)
+    val signUpState: StateFlow<SignUpEvent> = _signUpState.asStateFlow()
 
     private val _email = MutableStateFlow(savedStateHandle["email"] ?: "")
     private val _firstName = MutableStateFlow(savedStateHandle["firstName"] ?: "")
@@ -84,7 +80,7 @@ class SignUpViewModel(
                 "password"
             )
 
-            AuthenticationUIEvent.OnSignUp -> launchSignUp()
+            AuthenticationUIEvent.OnSignUp -> createFirebaseAccount()
             else -> Unit
         }
     }
@@ -128,69 +124,53 @@ class SignUpViewModel(
         savedStateHandle.updateStateHandle(savedStateHandleKey, update)
     }
 
-    private fun launchSignUp() {
-        viewModelScope.launch(ioDispatcher) {
-            createFirebaseAccount()
-        }
-    }
+    @SuppressLint("NewApi")
+    private fun createFirebaseAccount() {
+        viewModelScope.launch {
+            signUpUseCase(
+                Parameters.DoubleStringParam(
+                    formDataFlow.value.email,
+                    formDataFlow.value.password
+                )
+            ).collectLatest { result ->
+                _signUpState.update {
+                    when (result) {
+                        is Result.Success -> {
+                            savedStateHandle.clearAll<SignUpStateModel>()
+                            SignUpEvent.Success
+                        }
 
-    private suspend fun createFirebaseAccount() {
-        signUpCircularProgress.value = true
+                        is Result.Loading -> {
+                            _isLoading.update { true }
+                            SignUpEvent.Loading
+                        }
 
-        signUpUseCase(
-            formDataFlow.value.email,
-            formDataFlow.value.password
-        )
-            .onEach {
-                viewModelScope.launch {
-                    abortCircularProgress()
+                        is Result.Failure -> {
+                            _isLoading.update { false }
+                            val errorMessage = handleSignUpError(result.error)
+                            SignUpEvent.Error(errorMessage)
+                        }
+                    }
                 }
             }
-            .mapSuccess { uid ->
-                savedStateHandle.clearAll<SignUpStateModel>()
-                createUserOnline(uid)
-            }
-            .mapError { error ->
-                Log.e("HMM", "Could not create an account with error: $error")
-                val errorMessageToDisplay: String = handleSignUpError(error)
-                updateFormState { it.copy(signUpError = errorMessageToDisplay) }
-                error
-            }
-    }
-
-    private fun abortCircularProgress() = signUpCircularProgress.update { false }
-
-    private suspend fun createUserOnline(uid: String) {
-        createUserUseCase(
-            SessionUserDomainModel(
-                uid = uid,
-                email = formDataFlow.value.email
-            )
-        )
-            .mapSuccess {
-                oneTimeEventChannel.send(AuthenticationEvent.OnSignUpSuccess)
-            }
-            .mapError {
-                Log.e("HMM", "VM - Could not create user online with error: $it")
-                it
-            }
+        }
     }
 
     private fun handleSignUpError(error: AppError): String {
         return when (error) {
-            is CreateUserWithEmailAndPasswordError.EmailAlreadyExists -> resourceProvider.getString(
+            is SignUpErrors.EmailAlreadyExists -> resourceProvider.getString(
                 R.string.email_already_exists_error
             )
 
-            is CreateUserWithEmailAndPasswordError.UserDisabled -> resourceProvider.getString(
+            is SignUpErrors.UserDisabled -> resourceProvider.getString(
                 R.string.user_disabled_error
             )
 
-            is CreateUserWithEmailAndPasswordError.TooManyRequests -> resourceProvider.getString(
+            is SignUpErrors.TooManyRequests -> resourceProvider.getString(
                 R.string.too_many_requests_error
             )
 
-            is CreateUserWithEmailAndPasswordError.InternalError -> resourceProvider.getString(
+            is SignUpErrors.InternalError -> resourceProvider.getString(
                 R.string.internal_error
             )
 

@@ -4,16 +4,14 @@ import com.msoula.hobbymatchmaker.core.login.domain.useCases.LoginValidateFormUs
 import com.msoula.hobbymatchmaker.core.login.domain.useCases.ValidateEmailUseCase
 import com.msoula.hobbymatchmaker.core.login.domain.useCases.ValidateNameUseCase
 import com.msoula.hobbymatchmaker.core.login.domain.useCases.ValidatePasswordUseCase
-import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 
 val loginFormValidationModule = module {
-    factoryOf(::LoginValidateFormUseCase)
-    /* factory {
+    factory {
         LoginValidateFormUseCase(
             ValidateEmailUseCase(),
             ValidatePasswordUseCase(),
             ValidateNameUseCase()
         )
-    } */
+    }
 }

@@ -27,11 +27,6 @@ class ObserveAllMoviesUseCase(
                         is Result.Success -> send(Result.Success(ObserveAllMoviesSuccess.DataLoadedInDB))
                         is Result.Failure -> send(Result.Failure(fetchStatus.error))
                         is Result.Loading -> send(Result.Success(ObserveAllMoviesSuccess.Loading))
-                        is Result.BusinessRuleError -> send(
-                            Result.BusinessRuleError(
-                                ObserveAllMoviesErrors.Error(fetchStatus.error)
-                            )
-                        )
                     }
                 } else {
                     send(Result.Success(ObserveAllMoviesSuccess.Success(list)))
@@ -47,7 +42,12 @@ sealed class ObserveAllMoviesSuccess {
     data object DataLoadedInDB : ObserveAllMoviesSuccess()
 }
 
-sealed class ObserveAllMoviesErrors {
-    data object Empty : ObserveAllMoviesErrors()
-    data class Error(val error: AppError) : ObserveAllMoviesErrors()
+sealed class ObserveAllMoviesErrors(override val message: String) : AppError {
+    data object Empty : ObserveAllMoviesErrors("")
+    data class NetworkError(val networkErrorMessage: String) :
+        ObserveAllMoviesErrors(networkErrorMessage)
+
+    data class ApiError(val apiErrorMessage: String) : ObserveAllMoviesErrors(apiErrorMessage)
+    data class UnknownError(val unknownErrorMessage: String) :
+        ObserveAllMoviesErrors(unknownErrorMessage)
 }

@@ -20,12 +20,14 @@ class AuthenticationRepository(
 ) {
     suspend fun logOut(): Result<Boolean, LogOutError> {
         return try {
-            remoteDataSource.authenticationSignOut()
-            Result.Success(true)
-        } catch (exception: CancellationException) {
-            throw exception
+            when (val result = remoteDataSource.authenticationSignOut()) {
+                is Result.Success, Result.Loading -> Result.Success(true)
+                is Result.Failure -> {
+                    Result.Failure(result.error)
+                }
+            }
         } catch (exception: Exception) {
-            Result.Failure(LogOutError(message = exception.message ?: "Error while logging out"))
+            Result.Failure(LogOutError.UnknownError(exception.message ?: ""))
         }
     }
 
@@ -33,11 +35,17 @@ class AuthenticationRepository(
         email: String,
         password: String,
     ): Result<String, CreateUserWithEmailAndPasswordError> {
-        return remoteDataSource.createUserWithEmailAndPassword(email, password)
-            .mapSuccess { it }
-            .mapError { error ->
-                return@mapError error
-            }
+        return try {
+            remoteDataSource.createUserWithEmailAndPassword(email, password)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Result.Failure(
+                CreateUserWithEmailAndPasswordError.Other(
+                    message = e.message ?: "Error while creating user"
+                )
+            )
+        }
     }
 
     suspend fun signInWithEmailAndPassword(

@@ -31,31 +31,15 @@ class SignInUseCase(
                     emit(Result.Success(SignInSuccess))
                 }
 
-                is Result.Failure -> emit(Result.Failure(result.error))
-                is Result.BusinessRuleError -> {
-                    emit(
-                        when (result.error) {
-                            is SignInWithEmailAndPasswordError.UserNotFound -> Result.BusinessRuleError(
-                                SignInError.UserNotFound
-                            )
-
-                            is SignInWithEmailAndPasswordError.WrongPassword -> Result.BusinessRuleError(
-                                SignInError.WrongPassword
-                            )
-
-                            is SignInWithEmailAndPasswordError.UserDisabled -> Result.BusinessRuleError(
-                                SignInError.UserDisabled
-                            )
-
-                            is SignInWithEmailAndPasswordError.TooManyRequests -> Result.BusinessRuleError(
-                                SignInError.TooManyRequests
-                            )
-
-                            is SignInWithEmailAndPasswordError.Other -> Result.BusinessRuleError(
-                                SignInError.Other
-                            )
-                        }
-                    )
+                is Result.Failure -> {
+                    val error: SignInError = when (result.error) {
+                        is SignInWithEmailAndPasswordError.UserNotFound -> SignInError.UserNotFound
+                        is SignInWithEmailAndPasswordError.WrongPassword -> SignInError.WrongPassword
+                        is SignInWithEmailAndPasswordError.UserDisabled -> SignInError.UserDisabled
+                        is SignInWithEmailAndPasswordError.TooManyRequests -> SignInError.TooManyRequests
+                        else -> SignInError.Other
+                    }
+                    emit(Result.Failure(error))
                 }
 
                 else -> Unit
@@ -66,9 +50,9 @@ class SignInUseCase(
 
 data object SignInSuccess
 sealed class SignInError(override val message: String) : AppError {
-    data object WrongPassword : SignInError("Wrong password")
-    data object UserNotFound : SignInError("User not found")
-    data object UserDisabled : SignInError("User disabled")
-    data object TooManyRequests : SignInError("Too many requests")
-    data object Other : SignInError("Other error")
+    data object WrongPassword : SignInError("")
+    data object UserNotFound : SignInError("")
+    data object UserDisabled : SignInError("")
+    data object TooManyRequests : SignInError("")
+    data object Other : SignInError("")
 }

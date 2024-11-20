@@ -12,10 +12,10 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.GoogleAuthProvider
 import com.msoula.hobbymatchmaker.core.authentication.data.BuildConfig
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.InvalidCredentialError
 
 class GoogleClient(
-    private val credentialManager: CredentialManager,
-    private val testContext: Context
+    private val credentialManager: CredentialManager
 ) {
 
     private val googleIdOption = GetGoogleIdOption.Builder()
@@ -33,7 +33,7 @@ class GoogleClient(
         return try {
             credentialManager.getCredential(
                 request = request,
-                context = testContext
+                context = context
             )
         } catch (e: GetCredentialException) {
             Log.e("HMM", "Error getting credential: $e")
@@ -54,7 +54,7 @@ class GoogleClient(
 
             Pair(authCredential, email)
         } else {
-            throw RuntimeException("Received an invalid credential type")
+            throw InvalidCredentialError("Received an invalid credential type")
         }
     }
 }

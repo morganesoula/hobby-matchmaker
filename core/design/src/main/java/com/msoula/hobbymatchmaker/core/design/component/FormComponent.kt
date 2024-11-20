@@ -1,5 +1,6 @@
 package com.msoula.hobbymatchmaker.core.design.component
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -123,7 +124,8 @@ fun HMMButtonAuthComponent(
         modifier =
         modifier
             .fillMaxWidth()
-            .padding(start = 24.dp, end = 24.dp),
+            .padding(start = 24.dp, end = 24.dp)
+            .clickable { !loading },
         enabled = enabled,
         shape = RoundedCornerShape(8.dp),
     ) {
@@ -166,19 +168,4 @@ fun HMMFormHelperText(
         }
         Spacer(modifier = modifier.height(4.dp))
     }
-}
-
-@Composable
-fun HMMErrorText(
-    modifier: Modifier = Modifier,
-    errorText: String,
-) {
-    Text(
-        modifier = modifier.fillMaxWidth(),
-        text = errorText,
-        color = MaterialTheme.colorScheme.error,
-        textAlign = TextAlign.Center,
-    )
-
-    Spacer(modifier = modifier.height(8.dp))
 }

@@ -1,5 +1,6 @@
 package com.msoula.hobbymatchmaker.feature.moviedetail.domain.useCases
 
+import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.FlowUseCase
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
@@ -32,13 +33,11 @@ class ObserveMovieDetailUseCase(
                         is Result.Success -> send(Result.Success(ObserveMovieSuccess.DataLoadedInDB))
                         is Result.Failure -> send(Result.Failure(fetchStatus.error))
                         is Result.Loading -> send(Result.Loading)
-                        is Result.BusinessRuleError ->
-                            send(Result.BusinessRuleError(ObserveMovieErrors.Error(fetchStatus.error.message)))
                     }
                 } else if (movieDetail != null) {
                     send(Result.Success(ObserveMovieSuccess.Success(movieDetail)))
                 } else {
-                    send(Result.BusinessRuleError(ObserveMovieErrors.Empty))
+                    send(Result.Failure(ObserveMovieErrors.Empty))
                 }
             }
         }.flowOn(dispatcher)
@@ -50,9 +49,9 @@ sealed class ObserveMovieSuccess {
     data object DataLoadedInDB : ObserveMovieSuccess()
 }
 
-sealed class ObserveMovieErrors {
-    data object Empty : ObserveMovieErrors()
-    data class Error(val error: String) : ObserveMovieErrors()
+sealed class ObserveMovieErrors(override val message: String): AppError {
+    data object Empty : ObserveMovieErrors("")
+    data class Error(val error: String) : ObserveMovieErrors("")
 }
 
 

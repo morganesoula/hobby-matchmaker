@@ -45,13 +45,11 @@ class MovieDetailRepository(
                         }
 
                         is Result.Failure -> Result.Failure(actorsResult.error)
-                        is Result.BusinessRuleError -> Result.BusinessRuleError(actorsResult.error)
                         Result.Loading -> Result.Loading
                     }
                 }
 
                 is Result.Failure -> Result.Failure(infoResult.error)
-                is Result.BusinessRuleError -> Result.BusinessRuleError(infoResult.error)
                 Result.Loading -> Result.Loading
             }
         } catch (e: Exception) {
