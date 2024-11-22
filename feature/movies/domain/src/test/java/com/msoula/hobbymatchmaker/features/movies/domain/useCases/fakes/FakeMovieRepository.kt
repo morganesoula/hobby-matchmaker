@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.features.movies.domain.useCases.fakes
 
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
+import com.msoula.hobbymatchmaker.features.movies.domain.errors.MovieErrors
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.MovieRepository
 import kotlinx.coroutines.flow.Flow
@@ -12,7 +13,7 @@ class FakeMovieRepository(
 ) :
     MovieRepository {
 
-    override suspend fun fetchMovies(language: String): Result<Unit> {
+    override suspend fun fetchMovies(language: String): Result<Unit, MovieErrors> {
         return remoteDataSource.fetchMovies(language)
             .mapSuccess { movies ->
                 localDataSource.upsertAll(movies)

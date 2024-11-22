@@ -30,4 +30,8 @@ dependencies {
     implementation(project(Modules.DI))
     implementation(project(Modules.COMMON))
     implementation(project(Modules.SESSION_DOMAIN))
+
+    // Unit test
+    testImplementation(libs.junit.ktx)
+    testImplementation(libs.kotlinx.coroutines.test)
 }

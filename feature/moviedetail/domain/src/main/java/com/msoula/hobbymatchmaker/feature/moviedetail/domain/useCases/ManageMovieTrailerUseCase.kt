@@ -51,11 +51,13 @@ class ManageMovieTrailerUseCase(
 
                 if (uri.isNotEmpty()) {
                     when (val updateResult = updateMovieVideoURIUseCase(movieId, uri)) {
-                        is Result.Success -> Result.Success(
-                            MovieTrailerReady(
-                                uri
+                        is Result.Success -> {
+                            Result.Success(
+                                MovieTrailerReady(
+                                    uri
+                                )
                             )
-                        )
+                        }
 
                         is Result.Failure -> Result.Failure(updateResult.error)
                         is Result.Loading -> Result.Loading
@@ -65,7 +67,7 @@ class ManageMovieTrailerUseCase(
                 }
             }
 
-            is Result.Failure -> Result.Failure(fetchResult.error)
+            is Result.Failure -> Result.Failure(FetchingTrailerError(fetchResult.error.message))
             is Result.Loading -> Result.Loading
         }
     }

@@ -23,7 +23,6 @@ class ObserveMovieDetailUseCase(
         Flow<Result<ObserveMovieSuccess, ObserveMovieErrors>> {
         return channelFlow {
             send(Result.Loading)
-
             movieDetailRepository.observeMovieDetail(parameters.longValue).collect { movieDetail ->
                 if (movieDetail != null && movieDetail.synopsis.isNullOrBlank()) {
                     when (val fetchStatus = fetchMovieDetailUseCase(
@@ -49,7 +48,7 @@ sealed class ObserveMovieSuccess {
     data object DataLoadedInDB : ObserveMovieSuccess()
 }
 
-sealed class ObserveMovieErrors(override val message: String): AppError {
+sealed class ObserveMovieErrors(override val message: String) : AppError {
     data object Empty : ObserveMovieErrors("")
     data class Error(val error: String) : ObserveMovieErrors("")
 }

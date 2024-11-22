@@ -59,6 +59,10 @@ class MainGradlePlugin : Plugin<Project> {
                 buildConfig = true
                 compose = true
             }
+
+            testOptions {
+                unitTests.isReturnDefaultValues = true
+            }
         }
     }
 

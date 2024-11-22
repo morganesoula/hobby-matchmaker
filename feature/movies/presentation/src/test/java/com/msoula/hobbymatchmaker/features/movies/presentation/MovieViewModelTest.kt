@@ -3,11 +3,13 @@ package com.msoula.hobbymatchmaker.features.movies.presentation
 import app.cash.turbine.test
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfo
+import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.FetchMoviesUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.SetMovieFavoriteUseCase
+import com.msoula.hobbymatchmaker.features.movies.presentation.fakes.FakeResourcesProvider
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.FetchStatusModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiModel
@@ -44,6 +46,7 @@ class MovieViewModelTest {
     private val observeAllMoviesUseCase = mockk<ObserveAllMoviesUseCase>(relaxed = true)
     private val fetchStatusFlow = MutableStateFlow<FetchStatusModel>(FetchStatusModel.NeverFetched)
     private val getUserInfo = mockk<FetchFirebaseUserInfo>(relaxed = true)
+    private val fakeResourcesProvider = FakeResourcesProvider()
 
     @Before
     fun setUp() {
@@ -56,9 +59,9 @@ class MovieViewModelTest {
         viewModel = MovieViewModel(
             setMovieFavoriteUseCase = setMovieFavoriteUseCase,
             observeAllMoviesUseCase = observeAllMoviesUseCase,
-            fetchMoviesUseCase = fetchMoviesUseCase,
             getUserInfo = getUserInfo,
-            ioDispatcher = testDispatcher
+            ioDispatcher = testDispatcher,
+            resourceProvider = fakeResourcesProvider
         )
     }
 
@@ -72,7 +75,7 @@ class MovieViewModelTest {
         testScope.runTest {
             fetchStatusFlow.value = FetchStatusModel.Loading
 
-            coEvery { observeAllMoviesUseCase() } returns flowOf(emptyList())
+            coEvery { observeAllMoviesUseCase(Parameters.StringParam("")) } returns flowOf(emptyList())
 
             viewModel.movieState.test {
                 assertEquals(MovieUiStateModel.Loading, awaitItem())
@@ -85,7 +88,7 @@ class MovieViewModelTest {
             val errorMessage = "Error while fetching movies"
 
             fetchStatusFlow.value = FetchStatusModel.Error(errorMessage)
-            coEvery { observeAllMoviesUseCase() } returns flowOf(emptyList())
+            coEvery { observeAllMoviesUseCase(Parameters.StringParam("")) } returns flowOf(emptyList())
 
             viewModel.movieState.test {
                 val result = awaitItem()
@@ -160,7 +163,11 @@ class MovieViewModelTest {
         )
 
         coEvery { setMovieFavoriteUseCase("uuidUser1", movie.id, true) } returns Unit
-        coEvery { getUserInfo() } returns FirebaseUserInfoDomainModel("uuidUser1", "test@test.fr", null)
+        coEvery { getUserInfo() } returns FirebaseUserInfoDomainModel(
+            "uuidUser1",
+            "test@test.fr",
+            null
+        )
 
         val event = CardEventModel.OnDoubleTap(movie)
         viewModel.onCardEvent(event)

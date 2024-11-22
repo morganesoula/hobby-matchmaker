@@ -19,4 +19,10 @@ dependencies {
 
     // Modules
     implementation(project(Modules.COMMON))
+
+    // Test
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.junit.ktx)
+    testImplementation(libs.turbine)
+    testImplementation(libs.mockk)
 }

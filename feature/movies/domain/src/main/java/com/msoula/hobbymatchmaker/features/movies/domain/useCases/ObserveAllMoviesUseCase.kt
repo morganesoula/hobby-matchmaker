@@ -4,6 +4,7 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.FlowUseCase
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.features.movies.domain.errors.MovieErrors
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.MovieRepository
 import kotlinx.coroutines.CoroutineDispatcher
@@ -19,14 +20,28 @@ class ObserveAllMoviesUseCase(
     override fun execute(parameters: Parameters.StringParam):
         Flow<Result<ObserveAllMoviesSuccess, ObserveAllMoviesErrors>> {
         return channelFlow {
-            send(Result.Loading)
-
             movieRepository.observeMovies().collect { list ->
                 if (list.isEmpty()) {
+                    send(Result.Success(ObserveAllMoviesSuccess.Loading))
+
                     when (val fetchStatus = fetchMoviesUseCase(parameters.value)) {
                         is Result.Success -> send(Result.Success(ObserveAllMoviesSuccess.DataLoadedInDB))
-                        is Result.Failure -> send(Result.Failure(fetchStatus.error))
-                        is Result.Loading -> send(Result.Success(ObserveAllMoviesSuccess.Loading))
+                        is Result.Failure -> {
+                            val error = when (fetchStatus.error) {
+                                is MovieErrors.NetworkError -> ObserveAllMoviesErrors.NetworkError(
+                                    fetchStatus.error.message
+                                )
+
+                                is MovieErrors.ApiError -> ObserveAllMoviesErrors.ApiError(
+                                    fetchStatus.error.message
+                                )
+
+                                else -> ObserveAllMoviesErrors.UnknownError(fetchStatus.error.message)
+                            }
+                            send(Result.Failure(error))
+                        }
+
+                        else -> send(Result.Success(ObserveAllMoviesSuccess.Loading))
                     }
                 } else {
                     send(Result.Success(ObserveAllMoviesSuccess.Success(list)))

@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 
 sealed class Parameters {
-    data class LongParam(val value: Long) : Parameters()
     data class StringParam(val value: String) : Parameters()
     data class DoubleStringParam(val firstValue: String, val secondValue: String) : Parameters()
     data class LongStringParam(val longValue: Long, val stringValue: String) : Parameters()

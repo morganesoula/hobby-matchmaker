@@ -1,5 +1,6 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.useCases
 
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutError
 import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepository
 import com.msoula.hobbymatchmaker.core.common.FlowUseCase
 import com.msoula.hobbymatchmaker.core.common.Parameters
@@ -23,11 +24,10 @@ class LogOutUseCase(
             when (val result = authenticationRepository.logOut()) {
                 is Result.Success -> setIsConnectedUseCase(false)
                 is Result.Failure -> emit(Result.Failure(result.error))
-                is Result.Loading -> Unit
+                else -> Unit
             }
         }.flowOn(dispatcher)
     }
 }
 
-data object LogOutError
 data object LogOutSuccess

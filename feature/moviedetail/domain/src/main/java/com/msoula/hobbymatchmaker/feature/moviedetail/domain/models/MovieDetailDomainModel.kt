@@ -9,7 +9,7 @@ data class MovieDetailDomainModel(
     val synopsis: String? = null,
     val status: String? = null,
     val localCoverFilePath: String? = null,
-    val videoKey: String? = "",
+    var videoKey: String? = "",
     val cast: List<MovieActorDomainModel>? = null
 ) {
     companion object {

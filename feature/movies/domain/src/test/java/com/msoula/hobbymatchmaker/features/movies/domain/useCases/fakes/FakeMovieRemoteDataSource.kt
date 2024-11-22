@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.features.movies.domain.useCases.fakes
 
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.features.movies.domain.dataSources.MovieRemoteDataSource
+import com.msoula.hobbymatchmaker.features.movies.domain.errors.MovieErrors
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.errors.LanguageNotSupportedError
 
@@ -32,7 +33,7 @@ class FakeMovieRemoteDataSource : MovieRemoteDataSource {
         )
     }
 
-    override suspend fun fetchMovies(language: String): Result<List<MovieDomainModel>> {
+    override suspend fun fetchMovies(language: String): Result<List<MovieDomainModel>, MovieErrors> {
         return if (language == "fr-FR") {
             Result.Success(fakeMovies)
         } else {

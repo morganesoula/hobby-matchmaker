@@ -1,38 +1,83 @@
 package com.msoula.hobbymatchmaker.features.movies.domain.useCases
 
-import com.msoula.hobbymatchmaker.features.movies.domain.useCases.fakes.FakeMovieLocalDataSource
-import com.msoula.hobbymatchmaker.features.movies.domain.useCases.fakes.FakeMovieRemoteDataSource
-import com.msoula.hobbymatchmaker.features.movies.domain.useCases.fakes.FakeMovieRepository
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import com.msoula.hobbymatchmaker.core.common.Parameters
+import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
+import com.msoula.hobbymatchmaker.features.movies.domain.useCases.fakes.FakeMovieRepositoryBis
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Before
 import org.junit.Test
 
 class ObserveAllMoviesUseCaseTest {
+    private val testDispatcher = StandardTestDispatcher()
 
-    private lateinit var fakeMovieRepository: FakeMovieRepository
-    private lateinit var observeMoviesUseCase: ObserveAllMoviesUseCase
+    @Test
+    fun `should return success when movies are already in DB`() = runTest(testDispatcher) {
+        val fakeMovieRepository = FakeMovieRepositoryBis()
+        val observeAllMoviesUseCase = ObserveAllMoviesUseCase(
+            fakeMovieRepository,
+            FetchMoviesUseCase(fakeMovieRepository),
+            testDispatcher
+        )
 
-    @Before
-    fun setUp() {
-        val fakeMovieRemoteDataSource = FakeMovieRemoteDataSource()
-        val fakeMovieLocalDataSource = FakeMovieLocalDataSource()
-        fakeMovieRepository =
-            FakeMovieRepository(fakeMovieRemoteDataSource, fakeMovieLocalDataSource)
-        observeMoviesUseCase = ObserveAllMoviesUseCase(fakeMovieRepository)
+        fakeMovieRepository.setMovies(listOf(MovieDomainModel(1, "Test movie")))
+
+        val results = mutableListOf<Result<ObserveAllMoviesSuccess, ObserveAllMoviesErrors>>()
+        observeAllMoviesUseCase(Parameters.StringParam("en")).collect {
+            results.add(it)
+        }
+
+        assertEquals(1, results.size)
+        assert(results[0] is Result.Success)
+        assert((results[0] as Result.Success).data is ObserveAllMoviesSuccess.Success)
     }
 
     @Test
-    fun `observeAllMoviesUseCase returns list of movies when list is not empty`() = runBlocking {
-        val result = observeMoviesUseCase()
-        assertEquals(result.first().size, 2)
+    fun `should fetch movies and return success when DB is empty`() = runTest(testDispatcher) {
+        val fakeMovieRepository = FakeMovieRepositoryBis()
+        val observeAllMoviesUseCase = ObserveAllMoviesUseCase(
+            fakeMovieRepository,
+            FetchMoviesUseCase(fakeMovieRepository),
+            testDispatcher
+        )
+
+        fakeMovieRepository.setMovies(emptyList())
+
+        val results = mutableListOf<Result<ObserveAllMoviesSuccess, ObserveAllMoviesErrors>>()
+        observeAllMoviesUseCase(Parameters.StringParam("en")).collect {
+            results.add(it)
+        }
+
+        assertEquals(2, results.size)
+        assert(results[0] is Result.Success)
+        assert((results[0] as Result.Success).data is ObserveAllMoviesSuccess.Loading)
+
+        assert(results[1] is Result.Success)
+        assert((results[1] as Result.Success).data is ObserveAllMoviesSuccess.DataLoadedInDB)
     }
 
     @Test
-    fun `observeAllMoviesUseCase returns empty list when list is empty`() = runBlocking {
-        fakeMovieRepository.clearData()
-        val result = observeMoviesUseCase()
-        assertEquals(result.first().size, 0)
+    fun `should return network error when movies fails`() = runTest(testDispatcher) {
+        val fakeMovieRepository = FakeMovieRepositoryBis()
+        val observeAllMoviesUseCase = ObserveAllMoviesUseCase(
+            fakeMovieRepository,
+            FetchMoviesUseCase(fakeMovieRepository),
+            testDispatcher
+        )
+
+        fakeMovieRepository.setMovies(emptyList())
+
+        val results = mutableListOf<Result<ObserveAllMoviesSuccess, ObserveAllMoviesErrors>>()
+        observeAllMoviesUseCase(Parameters.StringParam("fr")).collect {
+            results.add(it)
+        }
+
+        assertEquals(2, results.size)
+        assert(results[0] is Result.Success)
+        assert((results[0] as Result.Success).data is ObserveAllMoviesSuccess.Loading)
+
+        assert(results[1] is Result.Failure)
+        assert((results[1] as Result.Failure).error is ObserveAllMoviesErrors.NetworkError)
     }
 }
