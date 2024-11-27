@@ -22,6 +22,11 @@ class FakeSessionRepository : SessionRepository {
     }
 
     override suspend fun createUser(user: SessionUserDomainModel): Result<Boolean, SessionErrors.CreateUserError> {
-        TODO("Not yet implemented")
+        return if (user.email.isEmpty()) {
+            Result.Failure(SessionErrors.CreateUserError.SaveError("Empty email"))
+        } else {
+            Result.Success(true)
+        }
+
     }
 }

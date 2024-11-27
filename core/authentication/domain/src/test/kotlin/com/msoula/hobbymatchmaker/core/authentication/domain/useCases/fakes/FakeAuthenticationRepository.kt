@@ -31,18 +31,34 @@ class FakeAuthenticationRepository : AuthenticationRepository {
         email: String,
         password: String
     ): Result<String, CreateUserWithEmailAndPasswordError> {
-        TODO("Not yet implemented")
+        return if (email.isEmpty() && password.isEmpty()) {
+            Result.Failure(CreateUserWithEmailAndPasswordError.InternalError)
+        } else if (email.isNotEmpty() && password.isEmpty()) {
+            Result.Failure(CreateUserWithEmailAndPasswordError.EmailAlreadyExists)
+        } else {
+            Result.Success("")
+        }
     }
 
     override suspend fun signInWithEmailAndPassword(
         email: String,
         password: String
     ): Result<String, SignInWithEmailAndPasswordError> {
-        TODO("Not yet implemented")
+        return if (email.isNotEmpty() && password.isNotEmpty()) {
+            Result.Success("")
+        } else if (password.isEmpty() && email.isNotEmpty()) {
+            Result.Failure(SignInWithEmailAndPasswordError.WrongPassword)
+        } else {
+            Result.Failure(SignInWithEmailAndPasswordError.Other("Empty email value"))
+        }
     }
 
     override suspend fun resetPassword(email: String): Result<Boolean, ResetPasswordError> {
-        TODO("Not yet implemented")
+        return if (email.isNotEmpty()) {
+            Result.Success(true)
+        } else {
+            Result.Failure(ResetPasswordError(""))
+        }
     }
 
     override suspend fun signInWithCredential(authCredential: AuthCredential): Result<AuthResult?, SocialMediaError> {

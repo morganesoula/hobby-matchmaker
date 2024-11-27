@@ -19,18 +19,7 @@ class LogOutUseCaseTest {
 
     @Test
     fun `should return failure when log out does not succeed`() = runTest(testDispatcher) {
-        val logOutUseCase = LogOutUseCase(
-            dispatcher = testDispatcher,
-            authenticationRepository = fakeAuthenticationRepository,
-            setIsConnectedUseCase = SetIsConnectedUseCase(fakeSessionRepository)
-        )
-
-        fakeAuthenticationRepository.shouldLogOut(false)
-
-        val results = mutableListOf<Result<LogOutSuccess, LogOutError>>()
-        logOutUseCase(Parameters.StringParam("")).collect {
-            results.add(it)
-        }
+        val results = setUp(false)
 
         assert(results.size == 2)
         assert(results[0] is Result.Loading)
@@ -40,23 +29,27 @@ class LogOutUseCaseTest {
 
     @Test
     fun `should be logged out when log out succeeds`() = runTest(testDispatcher) {
+        val results = setUp(true)
+
+        assert(results.size == 1)
+        assert(results[0] is Result.Loading)
+        assert(!fakeSessionRepository.observeIsConnected().first())
+    }
+
+    private suspend fun setUp(logOut: Boolean): MutableList<Result<LogOutSuccess, LogOutError>> {
         val logOutUseCase = LogOutUseCase(
             dispatcher = testDispatcher,
             authenticationRepository = fakeAuthenticationRepository,
             setIsConnectedUseCase = SetIsConnectedUseCase(fakeSessionRepository)
         )
 
-        fakeAuthenticationRepository.shouldLogOut(true)
+        fakeAuthenticationRepository.shouldLogOut(logOut)
 
         val results = mutableListOf<Result<LogOutSuccess, LogOutError>>()
         logOutUseCase(Parameters.StringParam("")).collect {
             results.add(it)
         }
 
-        println("Results: $results")
-
-        assert(results.size == 1)
-        assert(results[0] is Result.Loading)
-        assert(!fakeSessionRepository.observeIsConnected().first())
+        return results
     }
 }
