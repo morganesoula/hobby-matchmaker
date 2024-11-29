@@ -14,6 +14,7 @@ dependencies {
     // AndroidX
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.lifecycle.runtime.ktx)
+    implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.kotlinx.collections.immutable)
 
     // Coil
@@ -38,10 +39,4 @@ dependencies {
     implementation(project(Modules.DI))
     implementation(project(Modules.MOVIE_DOMAIN))
     implementation(project(Modules.NAVIGATION))
-
-    // Test
-    testImplementation(libs.junit.ktx)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.turbine)
-    testImplementation(libs.mockk)
 }

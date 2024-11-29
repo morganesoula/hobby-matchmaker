@@ -2,13 +2,12 @@ plugins {
     `android-library`
     `kotlin-android`
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.serialization)
 }
 
-apply<MainGradlePlugin>()
+apply<TestGradlePlugin>()
 
 android {
-    namespace = "com.msoula.hobbymatchmaker.core.authentication.domain"
+    namespace = "com.msoula.hobbymatchmaker.testUtils.core"
 }
 
 dependencies {
@@ -23,11 +22,14 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firebase.auth)
 
-    // Koin
-    implementation(libs.koin.android)
-
     // Modules
-    implementation(project(Modules.DI))
+    implementation(project(Modules.AUTHENTICATION_DOMAIN))
     implementation(project(Modules.COMMON))
+    implementation(project(Modules.LOGIN_DOMAIN))
     implementation(project(Modules.SESSION_DOMAIN))
+
+    // Test
+    testImplementation(project(Modules.TEST_COMMON))
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.junit.ktx)
 }

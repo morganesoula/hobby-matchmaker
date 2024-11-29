@@ -42,12 +42,6 @@ dependencies {
     implementation(project(Modules.DESIGN))
     implementation(project(Modules.MOVIE_DETAIL_DOMAIN))
 
-    // Test
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.junit.ktx)
-    testImplementation(libs.turbine)
-    testImplementation(libs.mockk)
-
     // Youtube
     implementation(libs.youtube.player)
 }

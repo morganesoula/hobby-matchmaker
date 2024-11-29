@@ -162,21 +162,4 @@ dependencies {
 
     // Navigation
     implementation(libs.compose.navigation)
-
-    // Unit Test
-    testImplementation(libs.assertk)
-    testImplementation(libs.test.core.ktx)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.junit.jupiter)
-    testImplementation(libs.mockk)
-    testImplementation(libs.mockk.android)
-    testImplementation(libs.truth)
-
-    // Instrumentation Test
-    androidTestImplementation(libs.junit.ktx)
-    androidTestImplementation(libs.core.testing)
-    androidTestImplementation(libs.navigation.testing)
-    androidTestImplementation(libs.kotlinx.coroutines.test)
-    androidTestImplementation(libs.mockk)
-    androidTestImplementation(libs.truth)
 }
