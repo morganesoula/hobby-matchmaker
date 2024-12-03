@@ -115,7 +115,10 @@ class SignInViewModel(
                             SignInEvent.Loading
                         }
 
-                        is Result.Success -> SignInEvent.Success
+                        is Result.Success -> {
+                            circularProgressLoading.value = false
+                            SignInEvent.Success
+                        }
                         is Result.Failure -> {
                             circularProgressLoading.value = false
                             SignInEvent.Error(socialMediaResult.error.message)
@@ -158,6 +161,7 @@ class SignInViewModel(
                     }
 
                     is Result.Success -> {
+                        circularProgressLoading.value = false
                         clearFormState()
                         SignInEvent.Success
                     }

@@ -25,11 +25,14 @@ dependencies {
     // Modules
     implementation(project(Modules.AUTHENTICATION_DOMAIN))
     implementation(project(Modules.COMMON))
+    implementation(project(Modules.DI))
     implementation(project(Modules.LOGIN_DOMAIN))
+    implementation(project(Modules.LOGIN_PRESENTATION))
     implementation(project(Modules.SESSION_DOMAIN))
 
     // Test
     testImplementation(project(Modules.TEST_COMMON))
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.junit.ktx)
+    testImplementation(libs.mockk.android)
 }

@@ -22,6 +22,7 @@ dependencies {
     implementation(project(Modules.MOVIE_DOMAIN))
     implementation(project(Modules.MOVIE_PRESENTATION))
     implementation(project(Modules.MOVIE_DETAIL_DOMAIN))
+    implementation(project(Modules.MOVIE_DETAIL_PRESENTATION))
     implementation(project(Modules.COMMON))
     testImplementation(project(Modules.TEST_COMMON))
 

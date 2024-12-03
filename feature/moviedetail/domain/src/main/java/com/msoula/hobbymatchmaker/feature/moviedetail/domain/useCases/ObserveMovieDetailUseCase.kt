@@ -35,9 +35,7 @@ class ObserveMovieDetailUseCase(
                     }
                 } else if (movieDetail != null) {
                     send(Result.Success(ObserveMovieSuccess.Success(movieDetail)))
-                } else {
-                    send(Result.Failure(ObserveMovieErrors.Empty))
-                }
+                } else send(Result.Failure(ObserveMovieErrors.Empty))
             }
         }.flowOn(dispatcher)
     }

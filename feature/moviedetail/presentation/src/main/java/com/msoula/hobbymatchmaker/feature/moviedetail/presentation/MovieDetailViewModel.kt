@@ -67,7 +67,9 @@ class MovieDetailViewModel(
                             }
                         }
 
-                        is Result.Failure -> MovieDetailViewStateModel.Error(result.error.message)
+                        is Result.Failure -> {
+                            MovieDetailViewStateModel.Error(result.error.message)
+                        }
                     }
                 }
         }

@@ -30,12 +30,18 @@ class TestGradlePlugin : Plugin<Project> {
             }
 
             testOptions {
-                unitTests.isReturnDefaultValues = true
+                unitTests.apply {
+                    isReturnDefaultValues = true
+                    all { testTask ->
+                        testTask.jvmArgs("-XX:+EnableDynamicAgentLoading")
+                    }
+                }
             }
         }
     }
-
-    private fun Project.android(): LibraryExtension {
-        return extensions.getByType(LibraryExtension::class.java)
-    }
 }
+
+private fun Project.android(): LibraryExtension {
+    return extensions.getByType(LibraryExtension::class.java)
+}
+

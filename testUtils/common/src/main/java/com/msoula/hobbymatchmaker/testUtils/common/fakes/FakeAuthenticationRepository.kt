@@ -73,7 +73,7 @@ class FakeAuthenticationRepository : AuthenticationRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun fetchFirebaseUserInfo(): FirebaseUserInfoDomainModel? {
+    override suspend fun fetchFirebaseUserInfo(): FirebaseUserInfoDomainModel {
         return FirebaseUserInfoDomainModel("uid123", "", emptyList())
     }
 
