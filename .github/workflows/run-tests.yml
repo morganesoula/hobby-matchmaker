@@ -39,10 +39,10 @@ jobs:
                 run: echo "${{ secrets.FACEBOOK_CLIENT_TOKEN }}" | base64 -d > facebook.properties
 
             -   name: Set google-services.json
-                run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 -d > app/google-services.json
+                run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | tr -d '\n' | base64 -d > app/google-services.json
 
-            -   name: Create Facebook file
-                run: cat /home/runner/work/hobby-matchmaker/hobby-matchmaker/facebook.properties | base64
+            #-   name: Create Facebook file
+            #    run: cat /home/runner/work/hobby-matchmaker/hobby-matchmaker/facebook.properties | base64
 
             #-   name: Fill facebook file
             #    env:
