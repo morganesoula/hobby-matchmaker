@@ -22,14 +22,14 @@ jobs:
                     restore-keys: ${{ runner.os }}-gradle-
 
             -   name: Set up JDK 21
-                uses: actions/setup-java@v4
+                uses: actions/setup-java@v3
                 with:
                     java-version: '21'
                     distribution: 'zulu'
                     cache: gradle
 
             -   name: Setup Android SDK
-                uses: android-actions/setup-android@v4
+                uses: android-actions/setup-android@v3
 
             -   name: Create Facebook file
                 run: cat /home/runner/work/hobby-matchmaker/hobby-matchmaker/facebook.properties | base64
