@@ -46,4 +46,4 @@ jobs:
 
             -   uses: actions/checkout@v4
             -   name: Run Unit tests
-                run: ./gradlew :app:testDebugUnitTest :testsUtils:core:testDebugUnitTest :testUtils:feature:testDebugUnitTest
+                run: ./gradlew :app:testDebugUnitTest :testUtils:core:testDebugUnitTest :testUtils:feature:testDebugUnitTest
