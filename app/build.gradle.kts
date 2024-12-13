@@ -162,4 +162,10 @@ dependencies {
 
     // Navigation
     implementation(libs.compose.navigation)
+
+    // Unit Test
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.junit.ktx)
+    testImplementation(libs.mockk.android)
+    testImplementation(libs.turbine)
 }

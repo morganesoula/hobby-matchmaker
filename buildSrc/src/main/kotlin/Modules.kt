@@ -20,6 +20,4 @@ object Modules {
     const val SESSION_DOMAIN = ":core:session:domain"
     const val SPLASHSCREEN_PRESENTATION = ":core:splashscreen:presentation"
     const val TEST_COMMON = ":testUtils:common"
-    const val TEST_CORE = ":testUtils:core"
-    const val TEST_FEATURE = ":testUtils:feature"
 }
