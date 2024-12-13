@@ -44,6 +44,5 @@ jobs:
             -   name: Grant execute permission for gradlew
                 run: chmod +x ./gradlew
 
-            -   uses: actions/checkout@v4
             -   name: Run Unit tests
                 run: ./gradlew :app:testDebugUnitTest :testUtils:core:testDebugUnitTest :testUtils:feature:testDebugUnitTest
