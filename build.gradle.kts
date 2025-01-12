@@ -19,6 +19,7 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.serialization) apply false
     id("io.gitlab.arturbosch.detekt") version "1.23.7"
+
 }
 
 val projectStructure = file(projectDir)
