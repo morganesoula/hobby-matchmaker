@@ -138,6 +138,12 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
 
+    // Ktor
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.negotiation)
+    implementation(libs.ktor.serialization.json)
+
     // Modules
     implementation(project(Modules.AUTHENTICATION_DATA))
     implementation(project(Modules.AUTHENTICATION_DOMAIN))

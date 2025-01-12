@@ -27,6 +27,12 @@ dependencies {
     // Koin
     implementation(libs.koin.android)
 
+    // Ktor
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.negotiation)
+    implementation(libs.ktor.serialization.json)
+
     // Modules
     implementation(project(Modules.NETWORK))
     implementation(project(Modules.DAO))
