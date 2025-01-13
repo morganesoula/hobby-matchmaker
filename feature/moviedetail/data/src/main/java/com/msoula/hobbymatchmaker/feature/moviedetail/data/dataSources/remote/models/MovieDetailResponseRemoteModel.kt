@@ -1,29 +1,34 @@
 package com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote.models
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class MovieDetailResponseRemoteModel(
-    @SerializedName("id") val id: Int = -1,
-    @SerializedName("genres") val genres: List<GenreResponseRemoteModel> = emptyList(),
-    @SerializedName("original_title") val originalTitle: String = "",
-    @SerializedName("overview") val overview: String,
-    @SerializedName("popularity") val popularity: Double = -1.0,
-    @SerializedName("release_date") val releaseDate: String = "",
-    @SerializedName("status") val status: String = "",
-    @SerializedName("title") val title: String = ""
+    @SerialName("id") val id: Int = -1,
+    @SerialName("genres") val genres: List<GenreResponseRemoteModel> = emptyList(),
+    @SerialName("original_title") val originalTitle: String = "",
+    @SerialName("overview") val overview: String,
+    @SerialName("popularity") val popularity: Double = -1.0,
+    @SerialName("release_date") val releaseDate: String = "",
+    @SerialName("status") val status: String = "",
+    @SerialName("title") val title: String = ""
 )
 
+@Serializable
 data class GenreResponseRemoteModel(
-    @SerializedName("id") val id: Int? = null,
-    @SerializedName("name") val name: String? = null
+    @SerialName("id") val id: Int? = null,
+    @SerialName("name") val name: String? = null
 )
 
+@Serializable
 data class CastResponseRemoteModel(
-    @SerializedName("cast") val cast: List<ActorResponseRemoteModel>? = null
+    @SerialName("cast") val cast: List<ActorResponseRemoteModel>? = null
 )
 
+@Serializable
 data class ActorResponseRemoteModel(
-    @SerializedName("id") val id: Int = -1,
-    @SerializedName("name") val name: String = "",
-    @SerializedName("character") val character: String = ""
+    @SerialName("id") val id: Int = -1,
+    @SerialName("name") val name: String = "",
+    @SerialName("character") val character: String = ""
 )

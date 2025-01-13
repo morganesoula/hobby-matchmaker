@@ -42,7 +42,7 @@ fun ExpandableTextComponent(
             }
 
             !isExpanded && textLayoutResult.hasVisualOverflow -> {
-                val lastCharIndex = textLayoutResult.getLineEnd(6 - 1)
+                val lastCharIndex = textLayoutResult.getLineEnd(6 - 1).coerceAtMost(text.length)
                 val adjustedText = text
                     .substring(startIndex = 0, endIndex = lastCharIndex)
                     .dropLast(showMore.length)

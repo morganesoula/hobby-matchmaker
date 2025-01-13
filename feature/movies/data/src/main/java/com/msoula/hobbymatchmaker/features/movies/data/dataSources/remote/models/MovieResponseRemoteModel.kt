@@ -1,7 +1,9 @@
 package com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class MovieResponseRemoteModel(
-    @SerializedName("results") val results: List<MovieRemoteModel>? = null
+    @SerialName("results") val results: List<MovieRemoteModel>? = null
 )

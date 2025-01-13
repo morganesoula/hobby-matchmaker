@@ -2,6 +2,7 @@ plugins {
     `android-library`
     `kotlin-android`
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.serialization)
 }
 
 apply<MainGradlePlugin>()
@@ -29,8 +30,4 @@ dependencies {
     implementation(project(Modules.MOVIE_DETAIL_DOMAIN))
     implementation(project(Modules.MOVIE_DATA))
     implementation(project(Modules.NETWORK))
-
-    // Retrofit
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.gson)
 }

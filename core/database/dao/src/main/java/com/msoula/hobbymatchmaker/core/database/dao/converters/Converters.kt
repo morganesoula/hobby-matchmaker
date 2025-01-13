@@ -8,6 +8,8 @@ import com.msoula.hobbymatchmaker.core.database.dao.models.Genre
 
 class Converters {
 
+    //TODO See if Gson can be replaced by Serialization
+
     @TypeConverter
     fun fromGenreStringList(genres: List<String>?): String? {
         return genres?.joinToString { "," }

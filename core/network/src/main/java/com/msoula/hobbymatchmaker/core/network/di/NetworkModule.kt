@@ -4,58 +4,61 @@ import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.FirebaseAuth
 import com.msoula.hobbymatchmaker.core.network.BuildConfig
-import okhttp3.Interceptor
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.request.header
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.URLProtocol
+import io.ktor.http.encodedPath
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.Json
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-
-private const val API_KEY = BuildConfig.TMDB_KEY
-private const val BASE_URL = "https://api.themoviedb.org/3/"
 
 val networkModule = module {
-    single<Interceptor> {
-        Interceptor { chain ->
-            val newUrl =
-                chain.request().url
-                    .newBuilder()
-                    .addQueryParameter("api_key", API_KEY)
-                    .build()
-
-            val newRequest =
-                chain.request()
-                    .newBuilder()
-                    .url(newUrl)
-                    .build()
-
-            chain.proceed(newRequest)
-        }
-    }
-
-    single<HttpLoggingInterceptor> {
-        HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        }
-    }
-
-    single<OkHttpClient> {
-        OkHttpClient().newBuilder()
-            .addInterceptor(get<Interceptor>())
-            //.addInterceptor(get<HttpLoggingInterceptor>())
-            .build()
-    }
-
     single<FirebaseAuth> { FirebaseAuth.getInstance() }
+    single<SignInClient> { Identity.getSignInClient(androidContext()) }
 
-    single<Retrofit> {
-        Retrofit.Builder()
-            .client(get<OkHttpClient>())
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+    single<Json> {
+        Json {
+            ignoreUnknownKeys = true
+            isLenient = true
+            prettyPrint = true
+            encodeDefaults = true
+        }
     }
 
-    single<SignInClient> { Identity.getSignInClient(androidContext()) }
+    single<HttpClient> {
+        HttpClient(CIO) {
+            install(Logging) {
+                logger = object : Logger {
+                    override fun log(message: String) {
+                        println("Ktor log: $message")
+                    }
+                }
+                level = LogLevel.ALL
+            }
+
+            install(ContentNegotiation) {
+                json(get())
+            }
+
+            defaultRequest {
+                url {
+                    protocol = URLProtocol.HTTPS
+                    host = "api.themoviedb.org"
+                    encodedPath = "3/"
+                    parameters.append("api_key", BuildConfig.TMDB_KEY)
+                }
+
+                header(HttpHeaders.ContentType, ContentType.Application.Json)
+            }
+        }
+    }
 }

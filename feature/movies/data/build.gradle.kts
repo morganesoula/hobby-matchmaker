@@ -30,6 +30,7 @@ dependencies {
     // Ktor
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.logging)
     implementation(libs.ktor.client.negotiation)
     implementation(libs.ktor.serialization.json)
 
@@ -38,12 +39,6 @@ dependencies {
     implementation(project(Modules.DAO))
     implementation(project(Modules.MOVIE_DOMAIN))
     implementation(project(Modules.COMMON))
-
-    // Retrofit
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.gson)
-    implementation(libs.okhttp)
-    implementation(libs.logging.interceptor)
 
     //Room
     api(libs.room.runtime)
