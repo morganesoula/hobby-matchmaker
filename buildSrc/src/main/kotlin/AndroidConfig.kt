@@ -1,8 +1,8 @@
 object AndroidConfig {
     const val APPLICATION_ID = "com.msoula.hobbymatchmaker"
     const val MIN_SDK = 26
-    const val TARGET_SDK = 34
-    const val COMPILE_SDK = 34
+    const val TARGET_SDK = 35
+    const val COMPILE_SDK = 35
 
     private const val VERSION_MAJOR = 1
     private const val VERSION_MINOR = 0
