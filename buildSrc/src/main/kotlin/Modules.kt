@@ -18,6 +18,7 @@ object Modules {
     const val NETWORK = ":core:network"
     const val SESSION_DATA = ":core:session:data"
     const val SESSION_DOMAIN = ":core:session:domain"
+    const val SHARED = ":shared"
     const val SPLASHSCREEN_PRESENTATION = ":core:splashscreen:presentation"
     const val TEST_COMMON = ":testUtils:common"
 }

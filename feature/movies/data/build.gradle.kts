@@ -49,3 +49,23 @@ dependencies {
     testImplementation(libs.junit.ktx)
     testImplementation(libs.kotlinx.coroutines.test)
 }
+
+/*plugins {
+    kotlin("multiplatform")
+    id("com.android.library")
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.serialization)
+}
+
+kotlin {
+    androidTarget()
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+}
+
+android {
+    namespace = "com.msoula.hobbymatchmaker.features.movies.data"
+    compileSdk = AndroidConfig.COMPILE_SDK
+}*/

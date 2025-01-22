@@ -8,7 +8,6 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.getDeviceLocale
-import com.msoula.hobbymatchmaker.core.di.domain.StringResourcesProvider
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesErrors
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesSuccess
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesUseCase

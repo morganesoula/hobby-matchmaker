@@ -10,7 +10,6 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AuthUiStateModel
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.core.di.domain.StringResourcesProvider
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveIsConnectedUseCase
 import com.msoula.hobbymatchmaker.presentation.models.LogOutState
 import kotlinx.coroutines.Dispatchers

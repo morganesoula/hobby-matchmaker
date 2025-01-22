@@ -65,7 +65,6 @@ import com.msoula.hobbymatchmaker.core.design.component.HMMButtonAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldPasswordComponent
 import com.msoula.hobbymatchmaker.core.design.component.HeaderTextComponent
-import com.msoula.hobbymatchmaker.core.di.data.StringResourcesProviderImpl
 import com.msoula.hobbymatchmaker.core.login.presentation.components.SocialMediaRowCustom
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent

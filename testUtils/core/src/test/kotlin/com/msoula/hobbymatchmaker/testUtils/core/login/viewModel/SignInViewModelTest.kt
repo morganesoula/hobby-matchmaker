@@ -8,11 +8,7 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInUseC
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SocialMediaSignInUseCase
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.core.di.domain.StringResourcesProvider
 import com.msoula.hobbymatchmaker.core.di.domain.useCase.AuthFormValidationUseCase
-import com.msoula.hobbymatchmaker.core.di.domain.useCase.ValidateEmailUseCase
-import com.msoula.hobbymatchmaker.core.di.domain.useCase.ValidateNameUseCase
-import com.msoula.hobbymatchmaker.core.di.domain.useCase.ValidatePasswordUseCase
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.ResetPasswordEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.SignInEvent

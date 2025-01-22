@@ -163,6 +163,7 @@ dependencies {
     implementation(project(Modules.MOVIE_DETAIL_PRESENTATION))
     implementation(project(Modules.NAVIGATION))
     implementation(project(Modules.NETWORK))
+    implementation(project(Modules.SHARED))
     implementation(project(Modules.SESSION_DATA))
     implementation(project(Modules.SESSION_DOMAIN))
     implementation(project(Modules.SPLASHSCREEN_PRESENTATION))

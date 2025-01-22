@@ -6,7 +6,6 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutSucc
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutUseCase
 import com.msoula.hobbymatchmaker.core.common.AuthUiStateModel
 import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.core.di.domain.StringResourcesProvider
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveIsConnectedUseCase
 import com.msoula.hobbymatchmaker.presentation.models.LogOutState
 import com.msoula.hobbymatchmaker.presentation.util.MainDispatcherRule
