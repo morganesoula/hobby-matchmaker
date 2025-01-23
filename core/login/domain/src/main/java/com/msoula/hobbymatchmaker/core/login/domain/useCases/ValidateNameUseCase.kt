@@ -1,6 +1,5 @@
 package com.msoula.hobbymatchmaker.core.login.domain.useCases
 
-import com.msoula.hobbymatchmaker.core.common.ValidationResult
 import com.msoula.hobbymatchmaker.core.login.domain.R
 
 class ValidateNameUseCase {

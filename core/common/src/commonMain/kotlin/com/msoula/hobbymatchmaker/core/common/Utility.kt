@@ -1,12 +1,8 @@
 package com.msoula.hobbymatchmaker.core.common
 
-import java.util.Locale
 import kotlin.coroutines.cancellation.CancellationException
 
-fun getDeviceLocale(): String {
-    val locale = Locale.getDefault()
-    return "${locale.language}-${locale.country}"
-}
+expect fun getDeviceLocale(): String
 
 suspend fun <Data> safeCall(
     appError: (String) -> AppError,

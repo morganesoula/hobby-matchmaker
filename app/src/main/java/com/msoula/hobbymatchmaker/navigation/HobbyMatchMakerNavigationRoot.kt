@@ -12,7 +12,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.msoula.hobbymatchmaker.core.common.AuthUiStateModel
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SignInScreen
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SignInViewModel
 import com.msoula.hobbymatchmaker.core.login.presentation.signUp.SignUpScreen

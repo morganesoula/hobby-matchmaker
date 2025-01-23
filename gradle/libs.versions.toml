@@ -28,6 +28,7 @@ kotlinGradlePlugin = "2.1.0"
 kotlinxCollectionsImmutable = "0.3.7"
 kotlinxCoroutinesTest = "1.8.0"
 kotlinxSerialization = "1.6.3"
+kotlinxCoroutineKMP = "1.10.1"
 ksp = "2.1.0-1.0.29"
 ktor = "2.3.12"
 lifecycleViewmodelCompose = "2.8.7"
@@ -44,6 +45,7 @@ runtime = "1.7.6"
 truth = "1.4.1"
 turbine = "0.12.1"
 uiTooling = "1.7.6"
+voyager = "1.1.0-beta03"
 youtube = "12.1.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -64,6 +66,8 @@ core-testing = { module = "androidx.arch.core:core-testing", version.ref = "core
 credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
 credentials-play-services = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
+espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 facebook-android-sdk = { module = "com.facebook.android:facebook-android-sdk", version.ref = "facebookAndroidSdk" }
 facebook-login = { module = "com.facebook.android:facebook-login", version.ref = "facebookAndroidSdk" }
 firebase-kmp-auth = { module = "dev.gitlive:firebase-auth", version.ref = "firebaseKMP" }
@@ -77,6 +81,7 @@ google-services = { module = "com.google.gms:google-services", version.ref = "go
 gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 javapoet = { module = "com.squareup:javapoet", version.ref = "javapoet" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junitJupiter" }
 junit-ktx = { module = "androidx.test.ext:junit-ktx", version.ref = "junitKtx" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
@@ -85,6 +90,7 @@ koin-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = 
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinGradlePlugin" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
+kotlinx-coroutines-kmp = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutineKMP"}
 kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 ksp = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
@@ -113,10 +119,8 @@ test-core-ktx = { module = "androidx.test:core-ktx", version.ref = "coreKtxVersi
 truth = { module = "com.google.truth:truth", version.ref = "truth" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "uiTooling" }
+voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
 youtube-player = { module = "com.pierfrancescosoffritti.androidyoutubeplayer:core", version.ref = "youtube" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 
 [plugins]
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlinGradlePlugin" }

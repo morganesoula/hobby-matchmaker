@@ -1,5 +1,6 @@
 package com.msoula.hobbymatchmaker.core.navigation.contracts
 
+import cafe.adriel.voyager.core.screen.Screen
 import kotlinx.serialization.Serializable
 
 sealed class Destinations {
@@ -27,4 +28,3 @@ sealed class Destinations {
         object SplashScreen
     }
 }
-

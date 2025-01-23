@@ -1,7 +1,5 @@
 package com.msoula.hobbymatchmaker.core.login.domain.useCases
 
-import com.msoula.hobbymatchmaker.core.common.ValidationResult
-
 class ValidatePasswordUseCase {
     fun validatePassword(password: String): ValidationResult {
         return if (password.matches(

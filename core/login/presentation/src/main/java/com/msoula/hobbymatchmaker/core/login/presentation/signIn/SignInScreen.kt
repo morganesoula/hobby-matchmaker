@@ -84,6 +84,18 @@ fun SignInScreen(
     redirectToSignUpScreen: () -> Unit,
     connectWithSocialMedia: (facebookAccessToken: AccessToken?, context: Context) -> Unit
 ) {
+
+}
+
+@Composable
+fun SignInScreenContent(
+    modifier: Modifier = Modifier,
+    signInViewModel: SignInViewModel,
+    oneTimeEventChannelFlow: Flow<AuthenticationEvent>,
+    redirectToAppScreen: () -> Unit,
+    redirectToSignUpScreen: () -> Unit,
+    connectWithSocialMedia: (facebookAccessToken: AccessToken?, context: Context) -> Unit
+) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 

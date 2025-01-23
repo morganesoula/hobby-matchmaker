@@ -4,7 +4,6 @@ import app.cash.turbine.test
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutError
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutSuccess
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutUseCase
-import com.msoula.hobbymatchmaker.core.common.AuthUiStateModel
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveIsConnectedUseCase
 import com.msoula.hobbymatchmaker.presentation.models.LogOutState
