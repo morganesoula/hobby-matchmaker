@@ -1,28 +1,68 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
+    `kotlin-multiplatform`
     `android-library`
-    `kotlin-android`
-    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.room.multiplatform)
 }
 
-apply<MainGradlePlugin>()
+kotlin {
+    applyDefaultHierarchyTemplate()
+
+    androidTarget {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
+        }
+    }
+
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+
+    sourceSets {
+        commonMain.dependencies {
+            // Koin
+            implementation(libs.koin.core)
+
+            // Modules
+            implementation(project(Modules.DAO))
+
+            // Room
+            implementation(libs.room.runtime)
+        }
+
+        androidMain.dependencies {
+            implementation(libs.room.runtime)
+
+            // Koin
+            implementation(libs.koin.android)
+        }
+
+        iosMain.dependencies {
+            implementation(libs.room.runtime)
+        }
+    }
+}
+
+room { schemaDirectory("$projectDir/schemas") }
+
+dependencies {
+    ksp(libs.room.compiler)
+}
 
 android {
     namespace = "com.msoula.hobbymatchmaker.core.database"
+    compileSdk = AndroidConfig.COMPILE_SDK
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
+    defaultConfig {
+        minSdk = AndroidConfig.MIN_SDK
+    }
 }
 
-dependencies {
-    // Koin
-    implementation(libs.koin.android)
 
-    // Modules
-    implementation(project(Modules.DAO))
-
-    //Room Workaround
-    implementation("androidx.navigation:navigation-compose:2.8.1")
-
-    //Room
-    api(libs.room.runtime)
-    ksp(libs.room.compiler)
-    implementation(libs.room.ktx)
-}

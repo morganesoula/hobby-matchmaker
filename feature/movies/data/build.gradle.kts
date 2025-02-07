@@ -43,7 +43,6 @@ dependencies {
     //Room
     api(libs.room.runtime)
     ksp(libs.room.compiler)
-    implementation(libs.room.ktx)
 
     // Test
     testImplementation(libs.junit.ktx)

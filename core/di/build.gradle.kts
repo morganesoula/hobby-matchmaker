@@ -1,31 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-/* plugins {
-    kotlin("multiplatform")
-    `android-library`
-    //`kotlin-android`
-    alias(libs.plugins.compose.compiler)
-}
-
-//apply<MainGradlePlugin>()
-
-android {
-    namespace = "com.msoula.hobbymatchmaker.core.di"
-}
-
-dependencies {
-    // Core
-    implementation(libs.core.ktx)
-    implementation(libs.appcompat)
-    implementation(libs.runtime)
-
-    // Koin
-    implementation(libs.koin.android)
-
-    // Modules
-    implementation(project(Modules.DESIGN))
-} */
-
 plugins {
     kotlin("multiplatform")
     `android-library`
@@ -34,6 +8,8 @@ plugins {
 }
 
 kotlin {
+    applyDefaultHierarchyTemplate()
+
     androidTarget {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_21)
@@ -52,7 +28,6 @@ kotlin {
 
             // Koin
             implementation(libs.koin.core)
-            //implementation(libs.koin.android)
 
             // Modules
             implementation(project(Modules.DESIGN))

@@ -1,7 +1,6 @@
 package com.msoula.hobbymatchmaker.features.movies.data.dataSources.local
 
 import android.util.Log
-import com.msoula.hobbymatchmaker.core.database.dao.MovieDAO
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.mappers.toMovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.mappers.toMovieEntityModel
 import com.msoula.hobbymatchmaker.features.movies.domain.dataSources.MovieLocalDataSource

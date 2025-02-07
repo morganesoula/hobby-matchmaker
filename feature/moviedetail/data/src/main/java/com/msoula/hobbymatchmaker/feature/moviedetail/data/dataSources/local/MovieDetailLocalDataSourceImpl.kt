@@ -1,6 +1,5 @@
 package com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.local
 
-import com.msoula.hobbymatchmaker.core.database.dao.MovieDAO
 import com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.local.mappers.toMovieDetailDomainModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.local.mappers.toMovieWithActors
 import com.msoula.hobbymatchmaker.feature.moviedetail.domain.dataSources.local.MovieDetailLocalDataSource

@@ -1,37 +1,84 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
+    kotlin("multiplatform")
     `android-library`
-    `kotlin-android`
+    alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
 }
 
-apply<MainGradlePlugin>()
+kotlin {
+    applyDefaultHierarchyTemplate()
+
+    androidTarget {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
+        }
+    }
+
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+
+    sourceSets {
+        commonMain.dependencies {
+            implementation(compose.runtime)
+
+            // Firebase - through GitLive
+            implementation(libs.firebase.kmp.auth)
+
+            // Koin
+            implementation(libs.koin.core)
+
+            // Ktor
+            implementation(libs.bundles.ktor)
+
+            // Modules
+            implementation(project(Modules.DESIGN))
+            implementation(project(Modules.COMMON))
+        }
+
+        androidMain.dependencies {
+            // Google
+            implementation(libs.play.services.auth)
+        }
+    }
+}
 
 android {
     namespace = "com.msoula.hobbymatchmaker.core.network"
-}
+    compileSdk = AndroidConfig.COMPILE_SDK
 
-dependencies {
-    // Core
-    implementation(libs.runtime)
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
 
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.firebase.auth)
+    val secretsPropertiesFile = project.rootProject.file("secrets.properties")
+    val secretProperties = Properties()
 
-    // Google
-    implementation(libs.play.services.auth)
+    if (secretsPropertiesFile.exists()) {
+        secretProperties.load(FileInputStream(secretsPropertiesFile))
+    }
 
-    // Koin
-    implementation(libs.koin.android)
+    val tmdbPropertiesFile = project.rootProject.file("./tmdb.properties")
+    val tmdbProperties = Properties()
 
-    // Ktor
-    implementation(libs.ktor.client.core)
-    implementation(libs.ktor.client.cio)
-    implementation(libs.ktor.client.logging)
-    implementation(libs.ktor.client.negotiation)
-    implementation(libs.ktor.serialization.json)
+    if (tmdbPropertiesFile.exists()) {
+        tmdbProperties.load(tmdbPropertiesFile.inputStream())
+    }
 
-    // Modules
-    implementation(project(Modules.DESIGN))
-    implementation(project(Modules.COMMON))
+    defaultConfig {
+        minSdk = AndroidConfig.MIN_SDK
+        buildFeatures.buildConfig = true
+
+        buildConfigField("String", "TMDB_KEY", "\"${tmdbProperties["tmdb_key"]}\"")
+        buildConfigField(
+            "String",
+            "WEB_CLIENT_ID",
+            "\"${secretProperties["web_client_id"]}\""
+        )
+    }
 }
