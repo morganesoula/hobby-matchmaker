@@ -1,8 +1,8 @@
-package com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote.mappers
+package com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.mappers
 
-import com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote.models.CastResponseRemoteModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote.models.MovieDetailResponseRemoteModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote.models.MovieVideosResponseRemoteModel
+import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.CastResponseRemoteModel
+import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.MovieDetailResponseRemoteModel
+import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.MovieVideosResponseRemoteModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.GenreDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieActorDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieCastDomainModel

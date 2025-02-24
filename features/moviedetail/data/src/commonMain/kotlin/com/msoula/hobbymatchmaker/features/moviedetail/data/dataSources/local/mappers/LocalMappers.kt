@@ -1,4 +1,4 @@
-package com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.local.mappers
+package com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.local.mappers
 
 import com.msoula.hobbymatchmaker.core.database.dao.models.Actor
 import com.msoula.hobbymatchmaker.core.database.dao.models.Genre

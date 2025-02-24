@@ -1,4 +1,4 @@
-package com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote.models
+package com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

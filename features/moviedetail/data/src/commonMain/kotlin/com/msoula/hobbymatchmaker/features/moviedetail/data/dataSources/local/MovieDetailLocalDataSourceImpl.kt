@@ -1,7 +1,8 @@
-package com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.local
+package com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.local
 
-import com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.local.mappers.toMovieDetailDomainModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.local.mappers.toMovieWithActors
+import com.msoula.hobbymatchmaker.core.database.dao.MovieDAO
+import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.local.mappers.toMovieDetailDomainModel
+import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.local.mappers.toMovieWithActors
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.dataSources.local.MovieDetailLocalDataSource
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
 import kotlinx.coroutines.flow.Flow

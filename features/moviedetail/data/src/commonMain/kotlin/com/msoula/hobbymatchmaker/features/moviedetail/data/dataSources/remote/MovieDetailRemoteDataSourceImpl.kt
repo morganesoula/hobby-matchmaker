@@ -1,12 +1,11 @@
-package com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote
+package com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote
 
-import android.util.Log
 import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote.mappers.toMovieActorDomainModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote.mappers.toMovieDetailDomainModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote.mappers.toMovieVideoDomainModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote.services.MovieDetailKtorService
-import com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote.services.MovieVideosKtorService
+import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.mappers.toMovieActorDomainModel
+import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.mappers.toMovieDetailDomainModel
+import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.mappers.toMovieVideoDomainModel
+import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.services.MovieDetailKtorService
+import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.services.MovieVideosKtorService
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.dataSources.remote.MovieDetailRemoteDataSource
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.FetchMovieCreditRemoteError
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.FetchMovieDetailRemoteError
@@ -33,7 +32,8 @@ class MovieDetailRemoteDataSourceImpl(
 
             Result.Success(data)
         } catch (e: Exception) {
-            Log.d("HMM", "fetchMovieDetail error: ${e.message}")
+            //Log.d("HMM", "fetchMovieDetail error: ${e.message}")
+            println("fetchMovieDetail error: ${e.message}")
             Result.Failure(FetchMovieDetailRemoteError(e.message.toString()))
         }
     }
@@ -50,7 +50,8 @@ class MovieDetailRemoteDataSourceImpl(
             }
             Result.Success(data)
         } catch (e: Exception) {
-            Log.d("HMM", "fetchMovieCredit error: ${e.message}")
+            //Log.d("HMM", "fetchMovieCredit error: ${e.message}")
+            println("fetchMovieCredit error: ${e.message}")
             Result.Failure(FetchMovieCreditRemoteError(e.message.toString()))
         }
     }
@@ -68,7 +69,8 @@ class MovieDetailRemoteDataSourceImpl(
 
             Result.Success(data)
         } catch (e: Exception) {
-            Log.d("HMM", "fetchMovieTrailer error: ${e.message}")
+            //Log.d("HMM", "fetchMovieTrailer error: ${e.message}")
+            println("fetchMovieTrailer error: ${e.message}")
             Result.Failure(FetchMovieTrailerRemoteError(e.message.toString()))
         }
     }

@@ -1,16 +1,15 @@
-package com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote.services
+package com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.services
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote.models.CastResponseRemoteModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote.models.MovieDetailResponseRemoteModel
+import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.CastResponseRemoteModel
+import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.MovieDetailResponseRemoteModel
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.request
 import io.ktor.http.HttpMethod
 import io.ktor.http.encodedPath
 
-private const val PARAMS_MOVIE_ID = "movie_id"
 private const val PARAMS_LANGUAGE = "language"
 
 interface MovieDetailKtorService {

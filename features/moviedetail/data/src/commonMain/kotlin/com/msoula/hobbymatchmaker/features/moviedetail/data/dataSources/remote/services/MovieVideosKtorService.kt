@@ -1,8 +1,8 @@
-package com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote.services
+package com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.services
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote.models.MovieVideosResponseRemoteModel
+import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.MovieVideosResponseRemoteModel
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.request

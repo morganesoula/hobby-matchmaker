@@ -15,8 +15,8 @@ import com.msoula.hobbymatchmaker.core.network.di.networkModule
 import com.msoula.hobbymatchmaker.core.session.data.di.sessionDataModule
 import com.msoula.hobbymatchmaker.core.session.domain.di.sessionDomainModule
 import com.msoula.hobbymatchmaker.database.di.localDatabaseModule
-import com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.di.movieDetailDataModule
 import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.di.movieDetailViewModelModule
+import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.di.movieDetailDataModule
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.di.movieDetailDomainModule
 import com.msoula.hobbymatchmaker.features.movies.data.di.movieDataModule
 import com.msoula.hobbymatchmaker.features.movies.domain.di.movieDomainModule
