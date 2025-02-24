@@ -16,7 +16,6 @@ sealed class Parameters {
 }
 
 expect class PlatformAccessToken
-expect class PlatformContext
 
 abstract class FlowUseCase<in Parameters, Success, BusinessRuleError>(private val dispatcher: CoroutineDispatcher) {
 

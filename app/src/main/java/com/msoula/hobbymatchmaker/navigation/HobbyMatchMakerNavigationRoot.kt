@@ -12,6 +12,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.msoula.hobbymatchmaker.core.common.AuthUiStateModel
+import com.msoula.hobbymatchmaker.core.login.presentation.clients.AndroidGoogleUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SignInScreen
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SignInViewModel
 import com.msoula.hobbymatchmaker.core.login.presentation.signUp.SignUpScreen
@@ -29,7 +31,8 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun HobbyMatchMakerNavigationRoot(
     navController: NavHostController,
-    appViewModel: AppViewModel
+    appViewModel: AppViewModel,
+    googleUIClient: AndroidGoogleUIClient
 ) {
     val authenticationState by appViewModel.authenticationState.collectAsStateWithLifecycle()
 
@@ -41,14 +44,15 @@ fun HobbyMatchMakerNavigationRoot(
 
     NavHost(navController, startDestination = startDestination) {
         splashGraph()
-        authGraph(navController)
+        authGraph(navController, googleUIClient)
         mainGraph(navController, appViewModel)
     }
 }
 
 @SuppressLint("RestrictedApi")
 private fun NavGraphBuilder.authGraph(
-    navController: NavHostController
+    navController: NavHostController,
+    googleUIClient: AndroidGoogleUIClient
 ) {
     navigation<Destinations.Auth>(
         startDestination = Destinations.Auth.SignIn,
@@ -65,8 +69,9 @@ private fun NavGraphBuilder.authGraph(
                     }
                 },
                 oneTimeEventChannelFlow = signInViewModel.oneTimeEventChannelFlow,
-                connectWithSocialMedia = { facebookAccessToken, context ->
-                    signInViewModel.connectWithSocialMedia(facebookAccessToken, context)
+                googleUIClient = googleUIClient,
+                connectWithSocialMedia = { credential, providerType ->
+                    signInViewModel.signInWithSocial(credential, providerType)
                 }
             )
         }

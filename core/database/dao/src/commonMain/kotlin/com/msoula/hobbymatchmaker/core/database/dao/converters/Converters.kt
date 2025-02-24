@@ -8,9 +8,11 @@ import kotlinx.serialization.json.Json
 
 class Converters {
 
+    val jsonParser = Json { encodeDefaults = true; ignoreUnknownKeys = true }
+
     @TypeConverter
     fun fromGenreStringList(genres: List<String>?): String? {
-        return genres?.joinToString { "," }
+        return genres?.joinToString(",")
     }
 
     @TypeConverter
@@ -20,21 +22,21 @@ class Converters {
 
     @TypeConverter
     fun fromGenreList(genres: List<Genre>?): String? {
-        return genres?.let { Json.encodeToString(it) }
+        return genres?.let { jsonParser.encodeToString(it) }
     }
 
     @TypeConverter
     fun toGenreList(genreString: String?): List<Genre> {
-        return genreString?.let { Json.decodeFromString<List<Genre>>(it) } ?: emptyList()
+        return genreString?.let { jsonParser.decodeFromString<List<Genre>>(it) } ?: emptyList()
     }
 
     @TypeConverter
     fun fromActorList(actors: List<Actor>?): String? {
-        return actors?.let { Json.encodeToString(it) }
+        return actors?.let { jsonParser.encodeToString(it) }
     }
 
     @TypeConverter
     fun toActorList(actorString: String?): List<Actor> {
-        return actorString?.let { Json.decodeFromString<List<Actor>>(it) } ?: emptyList()
+        return actorString?.let { jsonParser.decodeFromString<List<Actor>>(it) } ?: emptyList()
     }
 }

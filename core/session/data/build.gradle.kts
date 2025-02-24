@@ -1,34 +1,59 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
+    `kotlin-multiplatform`
     `android-library`
-    `kotlin-android`
-    alias(libs.plugins.compose.compiler)
 }
 
-apply<MainGradlePlugin>()
+kotlin {
+    applyDefaultHierarchyTemplate()
+
+    androidTarget {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
+        }
+    }
+
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+
+    sourceSets {
+        commonMain.dependencies {
+            implementation(libs.kotlinx.coroutines.kmp)
+
+            // DataStore
+            implementation(libs.datastore.preferences)
+
+            // Firebase - FireStore
+            implementation(libs.firebase.kmp.auth)
+            implementation(libs.firebase.kmp.firestore)
+
+            // Koin
+            implementation(libs.koin.core)
+
+            // Modules
+            implementation(project(Modules.COMMON))
+            implementation(project(Modules.SESSION_DOMAIN))
+        }
+
+        androidMain.dependencies {
+            // Koin
+            implementation(libs.koin.android)
+        }
+    }
+}
 
 android {
     namespace = "com.msoula.hobbymatchmaker.core.session.data"
-}
+    compileSdk = AndroidConfig.COMPILE_SDK
 
-dependencies {
-    // Compose
-    implementation(libs.runtime)
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
 
-    // Datastore
-    implementation(libs.datastore.preferences)
-
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.firebase.auth)
-
-    // Firestore
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.firebase.firestore)
-
-    // Koin
-    implementation(libs.koin.android)
-
-    // Modules
-    implementation(project(Modules.COMMON))
-    implementation(project(Modules.SESSION_DOMAIN))
+    defaultConfig {
+        minSdk = AndroidConfig.MIN_SDK
+    }
 }

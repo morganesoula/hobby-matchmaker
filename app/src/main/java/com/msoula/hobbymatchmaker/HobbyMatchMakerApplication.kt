@@ -5,9 +5,9 @@ import com.google.firebase.FirebaseApp
 import com.msoula.hobbymatchmaker.core.authentication.data.di.authenticationDataModule
 import com.msoula.hobbymatchmaker.core.authentication.domain.di.authenticationDomainModule
 import com.msoula.hobbymatchmaker.core.common.databaseModule
-import com.msoula.hobbymatchmaker.core.di.module.authValidationDataUseCaseModule
-import com.msoula.hobbymatchmaker.core.di.module.dispatcherModule
-import com.msoula.hobbymatchmaker.core.di.module.stringResourcesProviderModule
+import com.msoula.hobbymatchmaker.core.di.di.authValidationDataUseCaseModule
+import com.msoula.hobbymatchmaker.core.di.di.dispatcherModule
+import com.msoula.hobbymatchmaker.core.di.di.stringResourcesProviderModule
 import com.msoula.hobbymatchmaker.core.login.domain.useCases.di.loginFormValidationModule
 import com.msoula.hobbymatchmaker.core.login.presentation.di.signInViewModelModule
 import com.msoula.hobbymatchmaker.core.login.presentation.di.signUpViewModelModule

@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    kotlin("multiplatform")
+    `kotlin-multiplatform`
     `android-library`
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.compose.multiplatform)

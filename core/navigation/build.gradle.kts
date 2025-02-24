@@ -1,9 +1,9 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    kotlin("multiplatform")
-    kotlin("plugin.serialization") version "2.1.0"
+    `kotlin-multiplatform`
     `android-library`
+    kotlin("plugin.serialization") version "2.1.10"
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.compose.multiplatform)
 }

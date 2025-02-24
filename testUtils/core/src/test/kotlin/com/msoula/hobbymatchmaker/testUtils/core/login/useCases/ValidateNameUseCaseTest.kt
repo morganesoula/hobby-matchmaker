@@ -1,6 +1,5 @@
 package com.msoula.hobbymatchmaker.testUtils.core.login.useCases
 
-import com.msoula.hobbymatchmaker.core.login.domain.useCases.ValidateNameUseCase
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test

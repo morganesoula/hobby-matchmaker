@@ -1,34 +1,35 @@
 package com.msoula.hobbymatchmaker
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.credentials.CredentialManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import com.msoula.hobbymatchmaker.app.HobbyMatchMakerApp
-import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.GoogleClient
 import com.msoula.hobbymatchmaker.core.design.theme.HobbyMatchmakerTheme
-import com.msoula.hobbymatchmaker.shared.Greeting
+import com.msoula.hobbymatchmaker.core.login.presentation.clients.AndroidGoogleUIClient
 import org.koin.android.ext.android.inject
-import org.koin.core.parameter.parametersOf
 
 class MainActivity : ComponentActivity() {
 
     val auth: FirebaseAuth by inject()
     private lateinit var authStateListener: AuthStateListener
 
-    val googleClient by inject<GoogleClient> { parametersOf(this) }
+    private val googleClient by lazy {
+        AndroidGoogleUIClient(
+            credentialManager = CredentialManager.create(this),
+            context = this
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        Log.i("HMM", "Hello from shared module: " + Greeting().greet())
         setAuthenticationListener()
 
         setContent {
             HobbyMatchmakerTheme {
-                HobbyMatchMakerApp()
+                HobbyMatchMakerApp(googleUIClient = googleClient)
             }
         }
     }

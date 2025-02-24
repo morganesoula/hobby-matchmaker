@@ -1,6 +1,5 @@
 package com.msoula.hobbymatchmaker.testUtils.core.login.useCases
 
-import com.msoula.hobbymatchmaker.core.login.domain.useCases.ValidateEmailUseCase
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import org.junit.Test

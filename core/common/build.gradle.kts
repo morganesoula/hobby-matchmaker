@@ -25,8 +25,7 @@ kotlin {
             implementation(compose.runtime)
             implementation(libs.kotlinx.coroutines.kmp)
 
-            // Firebase/FireStore - via GitLive https://github.com/GitLiveApp/firebase-kotlin-sdk
-            implementation(libs.firebase.kmp.auth)
+            // FireStore - via GitLive https://github.com/GitLiveApp/firebase-kotlin-sdk
             implementation(libs.firebase.kmp.firestore)
 
             // Koin

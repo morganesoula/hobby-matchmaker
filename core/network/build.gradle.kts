@@ -50,6 +50,7 @@ kotlin {
 android {
     namespace = "com.msoula.hobbymatchmaker.core.network"
     compileSdk = AndroidConfig.COMPILE_SDK
+    buildFeatures.buildConfig = true
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
@@ -72,13 +73,7 @@ android {
 
     defaultConfig {
         minSdk = AndroidConfig.MIN_SDK
-        buildFeatures.buildConfig = true
 
         buildConfigField("String", "TMDB_KEY", "\"${tmdbProperties["tmdb_key"]}\"")
-        buildConfigField(
-            "String",
-            "WEB_CLIENT_ID",
-            "\"${secretProperties["web_client_id"]}\""
-        )
     }
 }

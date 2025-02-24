@@ -53,7 +53,7 @@ val networkModule = module {
                     protocol = URLProtocol.HTTPS
                     host = "api.themoviedb.org"
                     encodedPath = "3/"
-                    parameters.append("api_key", Utility().getPlatformTMDBKey())
+                    parameters.append("api_key", Utility.getPlatformTMDBKey())
                 }
 
                 header(HttpHeaders.ContentType, ContentType.Application.Json)

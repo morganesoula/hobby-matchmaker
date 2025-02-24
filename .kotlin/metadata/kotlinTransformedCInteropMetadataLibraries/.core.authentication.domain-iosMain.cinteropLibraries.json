@@ -1,0 +1,32 @@
+[
+  {
+    "moduleId": "dev.gitlive:firebase-auth:2.1.0",
+    "file": "/Users/morganesoula/AndroidStudioProjects/HobbyMatchmaker/.kotlin/metadata/kotlinTransformedCInteropMetadataLibraries/dev.gitlive-firebase-auth-2.1.0-iosMain-cinterop/dev.gitlive_firebase-auth-cinterop-FirebaseAuth-GIv_gQ.klib",
+    "sourceSetName": "iosMain"
+  },
+  {
+    "moduleId": "org.jetbrains.kotlinx:atomicfu:0.23.2",
+    "file": "/Users/morganesoula/AndroidStudioProjects/HobbyMatchmaker/.kotlin/metadata/kotlinTransformedCInteropMetadataLibraries/org.jetbrains.kotlinx-atomicfu-0.23.2-nativeMain-cinterop/org.jetbrains.kotlinx_atomicfu-cinterop-interop-yBS35w.klib",
+    "sourceSetName": "nativeMain"
+  },
+  {
+    "moduleId": "dev.gitlive:firebase-app:2.1.0",
+    "file": "/Users/morganesoula/AndroidStudioProjects/HobbyMatchmaker/.kotlin/metadata/kotlinTransformedCInteropMetadataLibraries/dev.gitlive-firebase-app-2.1.0-iosMain-cinterop/dev.gitlive_firebase-app-cinterop-FirebaseCore-YwAkWA.klib",
+    "sourceSetName": "iosMain"
+  },
+  {
+    "moduleId": "dev.gitlive:firebase-firestore:2.1.0",
+    "file": "/Users/morganesoula/AndroidStudioProjects/HobbyMatchmaker/.kotlin/metadata/kotlinTransformedCInteropMetadataLibraries/dev.gitlive-firebase-firestore-2.1.0-iosMain-cinterop/dev.gitlive_firebase-firestore-cinterop-FirebaseFirestoreInternal-Cap0TQ.klib",
+    "sourceSetName": "iosMain"
+  },
+  {
+    "moduleId": "dev.gitlive:firebase-firestore:2.1.0",
+    "file": "/Users/morganesoula/AndroidStudioProjects/HobbyMatchmaker/.kotlin/metadata/kotlinTransformedCInteropMetadataLibraries/dev.gitlive-firebase-firestore-2.1.0-iosMain-cinterop/dev.gitlive_firebase-firestore-cinterop-FirebaseFirestore-Cap0TQ.klib",
+    "sourceSetName": "iosMain"
+  },
+  {
+    "moduleId": "org.jetbrains.compose.ui:ui-uikit:1.7.3",
+    "file": "/Users/morganesoula/AndroidStudioProjects/HobbyMatchmaker/.kotlin/metadata/kotlinTransformedCInteropMetadataLibraries/org.jetbrains.compose.ui-ui-uikit-1.7.3-uikitMain-cinterop/org.jetbrains.compose.ui_ui-uikit-cinterop-utils-aNVDjg.klib",
+    "sourceSetName": "uikitMain"
+  }
+]
