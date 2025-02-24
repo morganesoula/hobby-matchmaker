@@ -1,6 +1,6 @@
-package com.msoula.hobbymatchmaker.feature.moviedetail.domain.useCases
+package com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases
 
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.repositories.MovieDetailRepository
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.repositories.MovieDetailRepository
 
 class UpdateMovieVideoURIUseCase(
     private val movieDetailRepository: MovieDetailRepository

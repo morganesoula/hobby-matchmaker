@@ -4,9 +4,9 @@ import com.msoula.hobbymatchmaker.core.database.dao.models.Actor
 import com.msoula.hobbymatchmaker.core.database.dao.models.Genre
 import com.msoula.hobbymatchmaker.core.database.dao.models.MovieEntityModel
 import com.msoula.hobbymatchmaker.core.database.dao.models.MovieWithActors
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.GenreDomainModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieActorDomainModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieDetailDomainModel
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.GenreDomainModel
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieActorDomainModel
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
 
 fun MovieWithActors.toMovieDetailDomainModel(): MovieDetailDomainModel {
     return MovieDetailDomainModel(

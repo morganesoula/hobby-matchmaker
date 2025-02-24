@@ -1,6 +1,6 @@
-package com.msoula.hobbymatchmaker.feature.moviedetail.domain.dataSources.local
+package com.msoula.hobbymatchmaker.features.moviedetail.domain.dataSources.local
 
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieDetailDomainModel
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
 import kotlinx.coroutines.flow.Flow
 
 interface MovieDetailLocalDataSource {

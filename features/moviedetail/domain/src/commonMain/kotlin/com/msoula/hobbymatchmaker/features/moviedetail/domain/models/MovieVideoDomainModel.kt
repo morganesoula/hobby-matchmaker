@@ -1,4 +1,4 @@
-package com.msoula.hobbymatchmaker.feature.moviedetail.domain.models
+package com.msoula.hobbymatchmaker.features.moviedetail.domain.models
 
 data class MovieVideoDomainModel(
     val key: String,

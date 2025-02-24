@@ -2,11 +2,11 @@ package feature.moviedetail.useCases
 
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieDetailDomainModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.useCases.FetchingTrailerError
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.useCases.ManageMovieTrailerUseCase
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.useCases.MovieTrailerReady
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.useCases.UpdateMovieVideoURIUseCase
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.FetchingTrailerError
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ManageMovieTrailerUseCase
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.MovieTrailerReady
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.UpdateMovieVideoURIUseCase
 import feature.moviedetail.fakes.FakeMovieDetailRepository
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.StandardTestDispatcher

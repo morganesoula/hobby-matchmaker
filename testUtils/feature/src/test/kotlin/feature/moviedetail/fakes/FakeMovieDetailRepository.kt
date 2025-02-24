@@ -4,12 +4,12 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.errors.FetchMovieTrailerRemoteError
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.errors.UpdateMovieTrailerLocalError
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieDetailDomainModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieVideoDomainModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.repositories.MovieDetailRepository
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.useCases.ObserveMovieErrors
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.FetchMovieTrailerRemoteError
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.UpdateMovieTrailerLocalError
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieVideoDomainModel
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.repositories.MovieDetailRepository
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieErrors
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 

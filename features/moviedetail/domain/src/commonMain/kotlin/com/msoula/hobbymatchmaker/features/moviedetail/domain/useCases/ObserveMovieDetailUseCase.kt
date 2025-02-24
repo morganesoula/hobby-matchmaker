@@ -1,11 +1,11 @@
-package com.msoula.hobbymatchmaker.feature.moviedetail.domain.useCases
+package com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.FlowUseCase
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieDetailDomainModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.repositories.MovieDetailRepository
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.repositories.MovieDetailRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow

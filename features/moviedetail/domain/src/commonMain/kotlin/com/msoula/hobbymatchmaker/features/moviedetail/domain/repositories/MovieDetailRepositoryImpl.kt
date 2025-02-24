@@ -1,15 +1,15 @@
-package com.msoula.hobbymatchmaker.feature.moviedetail.domain.repositories
+package com.msoula.hobbymatchmaker.features.moviedetail.domain.repositories
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.ExternalServiceError
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.safeCall
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.dataSources.local.MovieDetailLocalDataSource
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.dataSources.remote.MovieDetailRemoteDataSource
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.errors.FetchMovieTrailerRemoteError
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.errors.UpdateMovieTrailerLocalError
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieDetailDomainModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieVideoDomainModel
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.dataSources.local.MovieDetailLocalDataSource
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.dataSources.remote.MovieDetailRemoteDataSource
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.FetchMovieTrailerRemoteError
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.UpdateMovieTrailerLocalError
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieVideoDomainModel
 import kotlinx.coroutines.flow.Flow
 
 class MovieDetailRepositoryImpl(

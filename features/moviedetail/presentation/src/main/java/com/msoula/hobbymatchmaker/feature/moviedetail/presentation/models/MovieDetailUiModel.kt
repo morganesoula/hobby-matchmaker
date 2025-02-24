@@ -1,7 +1,7 @@
 package com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models
 
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieActorDomainModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieDetailDomainModel
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieActorDomainModel
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 

@@ -1,4 +1,4 @@
-package com.msoula.hobbymatchmaker.feature.moviedetail.domain.errors
+package com.msoula.hobbymatchmaker.features.moviedetail.domain.errors
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 

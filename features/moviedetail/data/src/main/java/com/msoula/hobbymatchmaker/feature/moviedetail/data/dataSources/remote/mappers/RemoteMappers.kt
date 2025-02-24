@@ -3,11 +3,11 @@ package com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote.m
 import com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote.models.CastResponseRemoteModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote.models.MovieDetailResponseRemoteModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote.models.MovieVideosResponseRemoteModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.GenreDomainModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieActorDomainModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieCastDomainModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieDetailDomainModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieVideoDomainModel
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.GenreDomainModel
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieActorDomainModel
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieCastDomainModel
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieVideoDomainModel
 
 fun MovieDetailResponseRemoteModel.toMovieDetailDomainModel(): MovieDetailDomainModel {
     return MovieDetailDomainModel(

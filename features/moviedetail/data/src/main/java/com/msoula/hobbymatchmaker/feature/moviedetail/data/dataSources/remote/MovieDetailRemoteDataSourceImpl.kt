@@ -7,13 +7,13 @@ import com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote.ma
 import com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote.mappers.toMovieVideoDomainModel
 import com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote.services.MovieDetailKtorService
 import com.msoula.hobbymatchmaker.feature.moviedetail.data.dataSources.remote.services.MovieVideosKtorService
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.dataSources.remote.MovieDetailRemoteDataSource
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.errors.FetchMovieCreditRemoteError
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.errors.FetchMovieDetailRemoteError
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.errors.FetchMovieTrailerRemoteError
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieCastDomainModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieDetailDomainModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.domain.models.MovieVideoDomainModel
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.dataSources.remote.MovieDetailRemoteDataSource
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.FetchMovieCreditRemoteError
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.FetchMovieDetailRemoteError
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.FetchMovieTrailerRemoteError
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieCastDomainModel
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieVideoDomainModel
 
 class MovieDetailRemoteDataSourceImpl(
     private val movieDetailKtorService: MovieDetailKtorService,
