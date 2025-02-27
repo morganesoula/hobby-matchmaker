@@ -9,7 +9,7 @@ import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
 
-val localIosDatabaseModule = module {
+actual val coreModuleDaoPlatformSpecific = module {
     single<HMMLocalDatabase> { configureRoomBuilder().build() }
 }
 

@@ -7,7 +7,7 @@ import com.msoula.hobbymatchmaker.core.database.HMMLocalDatabase
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
-val localAndroidDatabaseModule = module {
+actual val coreModuleDaoPlatformSpecific = module {
     single<HMMLocalDatabase> {
         configureRoomBuilder(androidContext()).build()
     }

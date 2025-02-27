@@ -11,7 +11,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SignInViewModel
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
-val androidSignInViewModelModule = module {
+actual val coreModuleSignInPlatformSpecific = module {
     single { AndroidStateSaver(get()) } bind StateSaver::class
     single<CredentialManager> { CredentialManager.create(get()) }
     single { AndroidGoogleUIClient(get(), get()) } bind GoogleUIClient::class
@@ -22,7 +22,6 @@ val androidSignInViewModelModule = module {
             stateSaver = get(),
             signInUseCase = get(),
             resetPasswordUseCase = get(),
-            resourceProvider = get(),
             signInWithCredentialUseCase = get(),
             googleUIClient = get(),
             appleUIClient = null,

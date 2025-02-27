@@ -8,7 +8,7 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
-val iosSocialMediaAuthenticationModule = module {
+actual val coreModuleAuthenticationDomainPlatformSpecific = module {
     singleOf(::IosAuthenticationRepositoryImpl) bind IosAuthenticationRepository::class
     factoryOf(::IosSocialMediaSignInUseCase)
 }

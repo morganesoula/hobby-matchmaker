@@ -10,7 +10,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SignInViewModel
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
-val iosSignInViewModelModule = module {
+actual val coreModuleSignInPlatformSpecific = module {
     single { IosStateSaver() } bind StateSaver::class
     single { IosGoogleUIClient() } bind GoogleUIClient::class
     single { IosAppleUIClient() } bind AppleUIClient::class
@@ -20,7 +20,6 @@ val iosSignInViewModelModule = module {
             stateSaver = get(),
             signInUseCase = get(),
             resetPasswordUseCase = get(),
-            resourceProvider = get(),
             signInWithCredentialUseCase = get(),
             googleUIClient = get(),
             appleUIClient = get(),

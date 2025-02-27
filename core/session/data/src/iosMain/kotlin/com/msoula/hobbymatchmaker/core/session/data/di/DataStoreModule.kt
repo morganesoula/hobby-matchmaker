@@ -6,6 +6,6 @@ import com.msoula.hobbymatchmaker.core.session.domain.dataSources.SessionLocalDa
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
-val iosDataStoreModule = module {
+actual val coreModuleSessionDataPlatformSpecific = module {
     single { SessionLocalDataSourceImpl(createDataStore()) } bind SessionLocalDataSource::class
 }

@@ -1,9 +1,8 @@
 package com.msoula.hobbymatchmaker.core.di.di
 
 import com.msoula.hobbymatchmaker.core.di.domain.StringResourcesProvider
-import org.koin.core.module.Module
 import org.koin.dsl.module
 
-actual fun provideStringResourcesPlatformModule(): Module = module {
+actual val coreDIModulePlatformSpecific = module {
     single { StringResourcesProvider(get()) }
 }

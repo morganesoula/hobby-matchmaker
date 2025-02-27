@@ -7,7 +7,7 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
-val androidSocialMediaAuthenticationModule = module {
+actual val coreModuleAuthenticationDomainPlatformSpecific = module {
     singleOf(::AndroidAuthenticationRepositoryImpl) bind  AndroidAuthenticationRepository::class
     singleOf(::AndroidSocialMediaSignInUseCase)
 }

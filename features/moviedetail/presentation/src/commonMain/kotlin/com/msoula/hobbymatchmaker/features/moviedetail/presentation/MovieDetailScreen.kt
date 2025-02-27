@@ -51,14 +51,6 @@ import com.msoula.hobbymatchmaker.core.design.component.LocalSnackBar
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiEventModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailViewStateModel
-import com.msoula.hobbymatchmaker.features.movies.presentation.Res
-import com.msoula.hobbymatchmaker.features.movies.presentation.cast
-import com.msoula.hobbymatchmaker.features.movies.presentation.no_data
-import com.msoula.hobbymatchmaker.features.movies.presentation.no_trailer_available
-import com.msoula.hobbymatchmaker.features.movies.presentation.play_icon_accessibility
-import com.msoula.hobbymatchmaker.features.movies.presentation.play_trailer
-import com.msoula.hobbymatchmaker.features.movies.presentation.show_less
-import com.msoula.hobbymatchmaker.features.movies.presentation.show_more
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import okio.Path.Companion.toPath
