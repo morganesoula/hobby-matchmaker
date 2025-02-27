@@ -10,10 +10,9 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInWith
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.core.di.domain.StringResourcesProvider
+import com.msoula.hobbymatchmaker.core.common.StateSaver
 import com.msoula.hobbymatchmaker.core.di.domain.useCases.AuthFormValidationUseCase
 import com.msoula.hobbymatchmaker.core.login.presentation.Res
-import com.msoula.hobbymatchmaker.core.login.presentation.StateSaver
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.AppleUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.GoogleUIClient
@@ -44,7 +43,6 @@ class SignInViewModel(
     private val stateSaver: StateSaver,
     private val signInUseCase: SignInUseCase,
     private val resetPasswordUseCase: ResetPasswordUseCase,
-    private val resourceProvider: StringResourcesProvider,
     private val signInWithCredentialUseCase: SignInWithCredentialUseCase,
     private val googleUIClient: GoogleUIClient,
     private val appleUIClient: AppleUIClient?,

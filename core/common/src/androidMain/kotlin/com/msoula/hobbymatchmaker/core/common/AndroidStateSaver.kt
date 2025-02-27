@@ -1,4 +1,4 @@
-package com.msoula.hobbymatchmaker.core.login.presentation
+package com.msoula.hobbymatchmaker.core.common
 
 import androidx.lifecycle.SavedStateHandle
 

@@ -1,7 +1,7 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.di
 
-import com.msoula.hobbymatchmaker.core.login.presentation.IosStateSaver
-import com.msoula.hobbymatchmaker.core.login.presentation.StateSaver
+import com.msoula.hobbymatchmaker.core.common.IosStateSaver
+import com.msoula.hobbymatchmaker.core.common.StateSaver
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.AppleUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.GoogleUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.IosAppleUIClient

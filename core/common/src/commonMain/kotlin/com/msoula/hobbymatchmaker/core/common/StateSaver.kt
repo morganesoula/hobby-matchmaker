@@ -1,4 +1,4 @@
-package com.msoula.hobbymatchmaker.core.login.presentation
+package com.msoula.hobbymatchmaker.core.common
 
 interface StateSaver {
     fun <T> getState(key: String, defaultValue: T): T

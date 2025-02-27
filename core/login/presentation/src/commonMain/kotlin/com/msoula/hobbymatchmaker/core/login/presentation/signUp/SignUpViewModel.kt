@@ -7,10 +7,10 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignUpUseC
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.core.common.StateSaver
 import com.msoula.hobbymatchmaker.core.di.domain.StringResourcesProvider
 import com.msoula.hobbymatchmaker.core.login.domain.useCases.LoginValidateFormUseCase
 import com.msoula.hobbymatchmaker.core.login.presentation.Res
-import com.msoula.hobbymatchmaker.core.login.presentation.StateSaver
 import com.msoula.hobbymatchmaker.core.login.presentation.email_already_exists_error
 import com.msoula.hobbymatchmaker.core.login.presentation.internal_error
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent

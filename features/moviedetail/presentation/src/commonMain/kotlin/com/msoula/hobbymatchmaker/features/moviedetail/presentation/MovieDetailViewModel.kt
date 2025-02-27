@@ -1,19 +1,18 @@
-package com.msoula.hobbymatchmaker.feature.moviedetail.presentation
+package com.msoula.hobbymatchmaker.features.moviedetail.presentation
 
-import android.annotation.SuppressLint
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.core.common.StateSaver
 import com.msoula.hobbymatchmaker.core.common.getDeviceLocale
-import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieDetailUiEventModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieDetailUiModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieDetailViewStateModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.toMovieDetailUiModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ManageMovieTrailerUseCase
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieDetailUseCase
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieSuccess
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiEventModel
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailViewStateModel
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.toMovieDetailUiModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -33,13 +32,13 @@ class MovieDetailViewModel(
     private val ioDispatcher: CoroutineDispatcher,
     private val observeMovieDetailUseCase: ObserveMovieDetailUseCase,
     private val manageMovieTrailerUseCase: ManageMovieTrailerUseCase,
-    savedStateHandle: SavedStateHandle
-) : ViewModel() {
+    stateSaver: StateSaver
+) : ScreenModel {
 
     private val _oneTimeEventChannel = Channel<MovieDetailUiEventModel>()
     val oneTimeEventChannelFlow = _oneTimeEventChannel.receiveAsFlow()
 
-    private val movieId = requireNotNull(savedStateHandle.get<Long>("movieId"))
+    private val movieId = requireNotNull(stateSaver.getState("movieId", 0L))
     private val movieIdFlow = MutableStateFlow<Long?>(null)
 
     private var currentMovie: MovieDetailUiModel? = MovieDetailUiModel()
@@ -49,7 +48,6 @@ class MovieDetailViewModel(
         setMovieId(movieId)
     }
 
-    @SuppressLint("NewApi")
     val viewState: StateFlow<MovieDetailViewStateModel> =
         movieIdFlow.filterNotNull().flatMapLatest { movieId ->
             observeMovieDetailUseCase(Parameters.LongStringParam(movieId, language))
@@ -74,7 +72,7 @@ class MovieDetailViewModel(
                 }
         }
             .stateIn(
-                viewModelScope,
+                screenModelScope,
                 SharingStarted.WhileSubscribed(5000),
                 MovieDetailViewStateModel.Loading
             )
@@ -82,7 +80,7 @@ class MovieDetailViewModel(
     fun onEvent(event: MovieDetailUiEventModel) {
         when (event) {
             is MovieDetailUiEventModel.OnPlayMovieTrailerClicked -> {
-                viewModelScope.launch(ioDispatcher) {
+                screenModelScope.launch(ioDispatcher) {
                     onPlayTrailerClicked(
                         event.movieId,
                         event.isVideoURIknown
@@ -94,7 +92,6 @@ class MovieDetailViewModel(
         }
     }
 
-    @SuppressLint("NewApi")
     private suspend fun onPlayTrailerClicked(movieId: Long, isVideoURIknown: Boolean) {
         if (isVideoURIknown) {
             sendOnce(

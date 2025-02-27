@@ -1,14 +1,17 @@
-package com.msoula.hobbymatchmaker.feature.moviedetail.presentation
+package com.msoula.hobbymatchmaker.features.moviedetail.presentation
 
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.pm.ActivityInfo
 import android.os.Build
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
@@ -17,7 +20,7 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.Ful
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 
 @Composable
-fun YoutubePlayerComponent(videoId: String) {
+actual fun YoutubeComponent(videoId: String) {
     val context = LocalContext.current
     val activity = context.findActivity()
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -33,18 +36,20 @@ fun YoutubePlayerComponent(videoId: String) {
                         activity?.window?.let { window ->
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                                 window.insetsController?.let { controller ->
-                                    controller.hide(WindowInsets.Type.statusBars()
-                                        or WindowInsets.Type.navigationBars())
+                                    controller.hide(
+                                        WindowInsets.Type.statusBars()
+                                                or WindowInsets.Type.navigationBars()
+                                    )
                                     controller.systemBarsBehavior =
                                         WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
                                 }
                             } else {
                                 @Suppress("DEPRECATION")
                                 window.decorView.systemUiVisibility = (
-                                    View.SYSTEM_UI_FLAG_FULLSCREEN
-                                        or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                                        or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                                    )
+                                        View.SYSTEM_UI_FLAG_FULLSCREEN
+                                                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                                                or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                                        )
                             }
                         }
                     }
@@ -52,13 +57,15 @@ fun YoutubePlayerComponent(videoId: String) {
                     override fun onExitFullscreen() {
                         activity?.window?.let { window ->
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                                window.insetsController?.show(WindowInsets.Type.statusBars()
-                                    or WindowInsets.Type.navigationBars())
+                                window.insetsController?.show(
+                                    WindowInsets.Type.statusBars()
+                                            or WindowInsets.Type.navigationBars()
+                                )
                             } else {
                                 @Suppress("DEPRECATION")
                                 window.decorView.systemUiVisibility = (
-                                    View.SYSTEM_UI_FLAG_VISIBLE
-                                    )
+                                        View.SYSTEM_UI_FLAG_VISIBLE
+                                        )
                             }
                         }
                     }
@@ -76,8 +83,57 @@ fun YoutubePlayerComponent(videoId: String) {
     )
 }
 
+@Composable
+actual fun EnterFullScreen() {
+    val context = LocalContext.current
+    val activity = context.findActivity()
+    activity?.let {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            it.window.insetsController?.apply {
+                hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
+                systemBarsBehavior =
+                    WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            it.window.decorView.systemUiVisibility = (
+                    View.SYSTEM_UI_FLAG_FULLSCREEN
+                            or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    )
+        }
+
+        // Force landscape mode when launching trailer
+        it.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+    }
+}
+
+@Composable
+actual fun ExitFullScreen() {
+    val context = LocalContext.current
+    val activity = context.findActivity()
+    activity?.let {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            it.window.insetsController?.apply {
+                show(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            it.window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
+        }
+
+        it.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+    }
+}
+
 fun Context.findActivity(): Activity? = when (this) {
     is Activity -> this
     is ContextWrapper -> baseContext.findActivity()
     else -> null
+}
+
+@Composable
+actual fun GetScreenHeight(): Float {
+    val configuration = LocalConfiguration.current
+    return configuration.screenHeightDp.dp.value
 }

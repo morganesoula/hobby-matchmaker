@@ -24,6 +24,7 @@ kotlin {
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(libs.kotlinx.coroutines.kmp)
+            implementation(libs.kotlinx.datetime)
 
             // FireStore - via GitLive https://github.com/GitLiveApp/firebase-kotlin-sdk
             implementation(libs.firebase.kmp.firestore)

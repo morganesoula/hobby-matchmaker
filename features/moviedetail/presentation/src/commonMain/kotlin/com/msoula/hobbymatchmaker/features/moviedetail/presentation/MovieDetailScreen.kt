@@ -1,13 +1,5 @@
-package com.msoula.hobbymatchmaker.feature.moviedetail.presentation
+package com.msoula.hobbymatchmaker.features.moviedetail.presentation
 
-import android.content.Context
-import android.content.pm.ActivityInfo
-import android.os.Build
-import android.view.View
-import android.view.WindowInsets
-import android.view.WindowInsetsController
-import android.widget.Toast
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,9 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
@@ -50,22 +39,30 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
+import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
+import cafe.adriel.voyager.navigator.internal.BackHandler
+import coil3.compose.AsyncImage
+import coil3.compose.LocalPlatformContext
+import coil3.request.ImageRequest
 import com.msoula.hobbymatchmaker.core.common.ObserveAsEvents
 import com.msoula.hobbymatchmaker.core.design.component.ExpandableTextComponent
 import com.msoula.hobbymatchmaker.core.design.component.LoadingCircularProgress
 import com.msoula.hobbymatchmaker.core.design.component.LocalSnackBar
-import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieDetailUiEventModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieDetailUiModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieDetailViewStateModel
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.R
-import kotlinx.coroutines.Dispatchers
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiEventModel
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailViewStateModel
+import com.msoula.hobbymatchmaker.features.movies.presentation.Res
+import com.msoula.hobbymatchmaker.features.movies.presentation.cast
+import com.msoula.hobbymatchmaker.features.movies.presentation.no_data
+import com.msoula.hobbymatchmaker.features.movies.presentation.no_trailer_available
+import com.msoula.hobbymatchmaker.features.movies.presentation.play_icon_accessibility
+import com.msoula.hobbymatchmaker.features.movies.presentation.play_trailer
+import com.msoula.hobbymatchmaker.features.movies.presentation.show_less
+import com.msoula.hobbymatchmaker.features.movies.presentation.show_more
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.R.string as StringRes
+import okio.Path.Companion.toPath
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun MovieDetailContent(
@@ -103,6 +100,7 @@ fun MovieDetailScreen(
     }
 }
 
+@OptIn(InternalVoyagerApi::class)
 @Composable
 fun MovieDetailContentScreen(
     modifier: Modifier = Modifier,
@@ -110,18 +108,15 @@ fun MovieDetailContentScreen(
     oneTimeEventFlow: Flow<MovieDetailUiEventModel>,
     onPlayTrailerClicked: (event: MovieDetailUiEventModel) -> Unit
 ) {
-    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
 
-    val errorFetchingMovieMessage = stringResource(R.string.no_trailer_available)
+    val errorFetchingMovieMessage = stringResource(Res.string.no_trailer_available)
 
-    val configuration = LocalConfiguration.current
-    val screenHeight = configuration.screenHeightDp.dp.value
     val videoPlayerVisibility = remember { mutableStateOf(false) }
-
     val movieVideoUri = remember { mutableStateOf(movie.videoKey) }
     val isLoading = remember { mutableStateOf(false) }
+    val exitFullScreen = remember { mutableStateOf(false) }
 
     val castMaxIndex = 5
     val verticalGradientHeight = 0.8f
@@ -162,14 +157,7 @@ fun MovieDetailContentScreen(
                         isLoading.value = false
                     }
 
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(
-                            context,
-                            errorFetchingMovieMessage + { event.message },
-                            Toast.LENGTH_SHORT
-                        )
-                            .show()
-                    }
+                    snackBarHostState.showSnackbar(message = errorFetchingMovieMessage + { event.message })
                 }
 
                 is MovieDetailUiEventModel.LoadingTrailer -> {
@@ -185,6 +173,10 @@ fun MovieDetailContentScreen(
         LoadingCircularProgress()
     }
 
+    if (exitFullScreen.value) {
+        ExitFullScreen()
+    }
+
     CompositionLocalProvider(value = LocalSnackBar provides snackBarHostState) {
         Box(
             modifier = modifier
@@ -192,7 +184,8 @@ fun MovieDetailContentScreen(
         ) {
             //Background image
             AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current).data(File(movie.posterPath))
+                model = ImageRequest.Builder(LocalPlatformContext.current)
+                    .data(movie.posterPath.toPath())
                     .build(),
                 contentDescription = "poster",
                 modifier = Modifier
@@ -200,16 +193,8 @@ fun MovieDetailContentScreen(
                 contentScale = ContentScale.Crop
             )
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, Color.Black),
-                            endY = screenHeight.div(verticalGradientHeight)
-                        )
-                    )
-            )
+            // Filter to darken background
+            BackgroundGradient(verticalGradientHeight)
 
             //Content on top of the image
             Box(
@@ -268,11 +253,11 @@ fun MovieDetailContentScreen(
                         Row {
                             Icon(
                                 imageVector = Icons.Default.PlayArrow,
-                                contentDescription = stringResource(id = StringRes.play_icon_accessibility)
+                                contentDescription = stringResource(Res.string.play_icon_accessibility)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = stringResource(id = StringRes.play_trailer),
+                                text = stringResource(Res.string.play_trailer),
                                 textAlign = TextAlign.Center
                             )
                         }
@@ -281,15 +266,13 @@ fun MovieDetailContentScreen(
 
                     ExpandableTextComponent(
                         text = movie.synopsis,
-                        showLess = stringResource(id = StringRes.show_less),
-                        showMore = stringResource(
-                            id = StringRes.show_more
-                        )
+                        showLess = stringResource(Res.string.show_less),
+                        showMore = stringResource(Res.string.show_more)
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = stringResource(id = StringRes.cast),
+                        text = stringResource(Res.string.cast),
                         color = MaterialTheme.colorScheme.onBackground,
                         fontWeight = FontWeight.Bold
                     )
@@ -300,6 +283,7 @@ fun MovieDetailContentScreen(
             }
 
             if (videoPlayerVisibility.value) {
+                exitFullScreen.value = false
                 VideoComponent(movieUri = movieVideoUri.value)
             }
         }
@@ -307,15 +291,29 @@ fun MovieDetailContentScreen(
 
     BackHandler(enabled = videoPlayerVisibility.value) {
         videoPlayerVisibility.value = false
-        context.exitFullScreen()
+        exitFullScreen.value = true
     }
 }
 
 @Composable
+fun BackgroundGradient(verticalGradientHeight: Float) {
+    val screenHeight = GetScreenHeight()
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(Color.Transparent, Color.Black),
+                    endY = screenHeight.div(verticalGradientHeight)
+                )
+            )
+    )
+}
+
+@Composable
 fun VideoComponent(movieUri: String) {
-    val context = LocalContext.current
-    context.enterFullScreen()
-    YoutubePlayerComponent(videoId = movieUri)
+    EnterFullScreen()
+    YoutubeComponent(videoId = movieUri)
 }
 
 @Composable
@@ -325,45 +323,5 @@ fun ErrorMovieDetailScreen(modifier: Modifier = Modifier, error: String) {
 
 @Composable
 fun EmptyMovieDetailScreen(modifier: Modifier = Modifier) {
-    Text(modifier = modifier, text = stringResource(id = StringRes.no_data))
-}
-
-private fun Context.enterFullScreen() {
-    val activity = this.findActivity()
-    activity?.let {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            it.window.insetsController?.apply {
-                hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
-                systemBarsBehavior =
-                    WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-            }
-        } else {
-            @Suppress("DEPRECATION")
-            it.window.decorView.systemUiVisibility = (
-                View.SYSTEM_UI_FLAG_FULLSCREEN
-                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                )
-        }
-
-        // Force landscape mode when launching trailer
-        it.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-    }
-
-}
-
-private fun Context.exitFullScreen() {
-    val activity = this.findActivity()
-    activity?.let {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            it.window.insetsController?.apply {
-                show(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
-            }
-        } else {
-            @Suppress("DEPRECATION")
-            it.window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
-        }
-
-        it.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-    }
+    Text(modifier = modifier, text = stringResource(Res.string.no_data))
 }

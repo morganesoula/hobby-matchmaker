@@ -1,8 +1,8 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.di
 
 import androidx.credentials.CredentialManager
-import com.msoula.hobbymatchmaker.core.login.presentation.AndroidStateSaver
-import com.msoula.hobbymatchmaker.core.login.presentation.StateSaver
+import com.msoula.hobbymatchmaker.core.common.AndroidStateSaver
+import com.msoula.hobbymatchmaker.core.common.StateSaver
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.AndroidFacebookUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.AndroidGoogleUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient

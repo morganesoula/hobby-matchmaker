@@ -1,9 +1,8 @@
-package com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models
+package com.msoula.hobbymatchmaker.features.moviedetail.presentation.models
 
+import com.msoula.hobbymatchmaker.core.common.extractYear
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieActorDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 data class MovieDetailUiModel(
     val id: Long = -1,
@@ -48,12 +47,3 @@ fun MovieDetailDomainModel.toMovieDetailUiModel(): MovieDetailUiModel {
     )
 }
 
-fun String.extractYear(): String {
-    return if (this.isNotEmpty()) {
-        val formatterBis = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        val date = LocalDate.parse(this, formatterBis)
-        date.year.toString()
-    } else {
-        ""
-    }
-}

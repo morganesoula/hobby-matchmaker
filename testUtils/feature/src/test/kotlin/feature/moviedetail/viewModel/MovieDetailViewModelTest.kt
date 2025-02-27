@@ -3,10 +3,6 @@ package feature.moviedetail.viewModel
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.MovieDetailViewModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieDetailUiEventModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieDetailUiModel
-import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models.MovieDetailViewStateModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.FetchingTrailerError
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ManageMovieTrailerUseCase
@@ -14,6 +10,10 @@ import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.MovieTrai
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieDetailUseCase
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieErrors
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieSuccess
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailViewModel
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiEventModel
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailViewStateModel
 import feature.MainDispatcherRule
 import io.mockk.every
 import io.mockk.mockk

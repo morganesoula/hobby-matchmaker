@@ -19,8 +19,8 @@ import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SignInViewModel
 import com.msoula.hobbymatchmaker.core.login.presentation.signUp.SignUpScreen
 import com.msoula.hobbymatchmaker.core.navigation.contracts.Destinations
 import com.msoula.hobbymatchmaker.core.splashscreen.presentation.SplashScreen
-import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.MovieDetailContent
-import com.msoula.hobbymatchmaker.feature.moviedetail.presentation.MovieDetailViewModel
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailContent
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailViewModel
 import com.msoula.hobbymatchmaker.presentation.AppScreen
 import com.msoula.hobbymatchmaker.presentation.AppViewModel
 import org.koin.androidx.compose.koinViewModel

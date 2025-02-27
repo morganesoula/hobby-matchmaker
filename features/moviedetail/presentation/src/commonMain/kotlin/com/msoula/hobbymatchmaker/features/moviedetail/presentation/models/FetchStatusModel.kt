@@ -1,4 +1,4 @@
-package com.msoula.hobbymatchmaker.feature.moviedetail.presentation.models
+package com.msoula.hobbymatchmaker.features.moviedetail.presentation.models
 
 sealed interface FetchStatusModel {
     data object NeverFetched : FetchStatusModel
