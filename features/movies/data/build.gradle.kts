@@ -26,7 +26,7 @@ kotlin {
                 implementation(libs.firebase.kmp.firestore)
 
                 // Koin
-                implementation(libs.koin.core)
+                api(libs.koin.core)
 
                 // Ktor
                 implementation(libs.ktor.client.core)
@@ -59,5 +59,9 @@ android {
 
     defaultConfig {
         minSdk = AndroidConfig.MIN_SDK
+    }
+
+    lint {
+        disable += listOf("CoroutineCreationDuringComposition")
     }
 }

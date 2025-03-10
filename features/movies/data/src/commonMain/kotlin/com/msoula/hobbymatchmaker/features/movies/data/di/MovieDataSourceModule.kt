@@ -9,7 +9,7 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
-val movieDataModule = module {
+val featuresModuleMovieData = module {
     includes(featuresModuleMovieDataPlatformSpecific)
 
     singleOf(::MovieLocalDataSourceImpl) bind MovieLocalDataSource::class

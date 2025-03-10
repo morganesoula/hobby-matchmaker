@@ -75,15 +75,16 @@ import com.msoula.hobbymatchmaker.core.login.presentation.your_email
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 
 @Composable
-fun SignInScreen(
+fun SignInScreenContent(
     modifier: Modifier = Modifier,
     signInViewModel: SignInViewModel,
     oneTimeEventChannelFlow: Flow<AuthenticationEvent>,
-    redirectToAppScreen: () -> Unit,
+    redirectToMovieScreen: () -> Unit,
     redirectToSignUpScreen: () -> Unit,
-    resourcesProvider: StringResourcesProvider
+    resourcesProvider: StringResourcesProvider = koinInject()
 ) {
     val coroutineScope = rememberCoroutineScope()
     val resetPasswordState by signInViewModel.resetPasswordState.collectAsState()
@@ -119,7 +120,7 @@ fun SignInScreen(
                 )
             }
 
-            is SignInEvent.Success -> redirectToAppScreen()
+            is SignInEvent.Success -> redirectToMovieScreen()
             else -> Unit
         }
     }
@@ -132,7 +133,7 @@ fun SignInScreen(
                     snackBarHostState.showSnackbar(event.message)
                 }
 
-                AuthenticationEvent.OnSignInSuccess -> redirectToAppScreen()
+                AuthenticationEvent.OnSignInSuccess -> redirectToMovieScreen()
                 AuthenticationEvent.OnSignUpClicked -> redirectToSignUpScreen()
                 else -> Unit
             }
@@ -146,9 +147,9 @@ fun SignInScreen(
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier =
-                Modifier
-                    .padding(paddingValues)
-                    .verticalScroll(rememberScrollState()),
+                    Modifier
+                        .padding(paddingValues)
+                        .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -202,9 +203,9 @@ fun SignInScreen(
 
             Box(
                 modifier =
-                Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 8.dp)
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 8.dp)
             ) {
                 AnnotatedStringWithLinkAnnotation(isSystemInDarkTheme()) {
                     redirectToSignUpScreen()
@@ -300,10 +301,10 @@ fun ColumnScope.SignInScreenMainContent(
         },
         style = TextStyle(color = MaterialTheme.colorScheme.onBackground),
         modifier =
-        Modifier
-            .wrapContentSize()
-            .align(Alignment.End)
-            .padding(end = 16.dp)
+            Modifier
+                .wrapContentSize()
+                .align(Alignment.End)
+                .padding(end = 16.dp)
     )
 
     Spacer(modifier = Modifier.height(40.dp))
@@ -335,9 +336,9 @@ fun ColumnScope.SignInScreenMainContent(
 fun DividerRowComponent(modifier: Modifier = Modifier, dividerConnectText: String) {
     Row(
         modifier =
-        modifier
-            .fillMaxWidth()
-            .padding(start = 8.dp, end = 8.dp),
+            modifier
+                .fillMaxWidth()
+                .padding(start = 8.dp, end = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceAround
     ) {
@@ -415,10 +416,10 @@ fun ForgotPasswordAlertDialog(
             Button(
                 onClick = { authUIEvent(AuthenticationUIEvent.HideForgotPasswordDialog) },
                 colors =
-                ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.onBackground
-                )
+                    ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        contentColor = MaterialTheme.colorScheme.onBackground
+                    )
             ) {
                 Text(text = stringResource(Res.string.cancel))
             }

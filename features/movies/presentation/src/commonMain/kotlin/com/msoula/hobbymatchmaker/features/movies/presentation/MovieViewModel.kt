@@ -15,7 +15,6 @@ import com.msoula.hobbymatchmaker.features.movies.presentation.mappers.toMovieUi
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiStateModel
-import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -48,8 +47,7 @@ class MovieViewModel(
                     when (val movies = result.data) {
                         is ObserveAllMoviesSuccess.Loading -> MovieUiStateModel.Loading
                         is ObserveAllMoviesSuccess.Success ->
-                            MovieUiStateModel.Success(movies.movies.map { it.toMovieUiModel() }
-                                .toPersistentList())
+                            MovieUiStateModel.Success(movies.movies.map { it.toMovieUiModel() })
 
                         is ObserveAllMoviesSuccess.DataLoadedInDB -> MovieUiStateModel.Empty
                     }

@@ -9,7 +9,7 @@ import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
-val sessionDomainModule = module {
+val coreModuleSessionDomain = module {
     factoryOf(::SessionRepositoryImpl) bind SessionRepository::class
     factoryOf(::ObserveIsConnectedUseCase)
     factoryOf(::SetIsConnectedUseCase)

@@ -27,7 +27,7 @@ kotlin {
                 implementation(project(Modules.COMMON))
 
                 // Koin
-                implementation(libs.koin.core)
+                api(libs.koin.core)
             }
         }
     }

@@ -24,6 +24,7 @@ kotlin {
 
     listOf(
         iosX64(),
+        iosArm64(),
         iosSimulatorArm64()
     ).forEach {
         it.compilations {
@@ -48,7 +49,8 @@ kotlin {
             implementation(libs.firebase.kmp.auth)
 
             // Koin
-            implementation(libs.koin.core)
+            api(libs.koin.core)
+            implementation(libs.koin.compose)
 
             // Modules
             implementation(project(Modules.AUTHENTICATION_DATA))
@@ -57,12 +59,12 @@ kotlin {
             implementation(project(Modules.DESIGN))
             implementation(project(Modules.DI))
             implementation(project(Modules.LOGIN_DOMAIN))
-            implementation(project(Modules.NAVIGATION))
             implementation(project(Modules.SESSION_DOMAIN))
 
             // Voyager
             implementation(libs.voyager.screen.model)
             implementation(libs.voyager.navigator)
+            implementation(libs.voyager.koin)
         }
 
         androidMain.dependencies {
@@ -110,6 +112,10 @@ android {
             "WEB_CLIENT_ID",
             "\"${secretProperties["web_client_id"]}\""
         )
+    }
+
+    lint {
+        disable += listOf("CoroutineCreationDuringComposition")
     }
 }
 

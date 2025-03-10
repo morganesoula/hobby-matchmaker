@@ -10,7 +10,7 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
-val sessionDataModule = module {
+val coreModuleSessionData = module {
     includes(coreModuleSessionDataPlatformSpecific)
 
     single<FirebaseFirestore> { Firebase.firestore }

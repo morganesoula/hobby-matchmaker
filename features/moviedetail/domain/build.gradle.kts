@@ -23,7 +23,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.kmp)
 
             // Koin
-            implementation(libs.koin.core)
+            api(libs.koin.core)
 
             // Modules
             implementation(project(Modules.COMMON))

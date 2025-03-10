@@ -27,7 +27,7 @@ kotlin {
                 implementation(libs.firebase.kmp.auth)
 
                 // Koin
-                implementation(libs.koin.core)
+                api(libs.koin.core)
 
                 // Modules
                 implementation(project(Modules.DI))
@@ -55,5 +55,9 @@ android {
 
     defaultConfig {
         minSdk = AndroidConfig.MIN_SDK
+    }
+
+    lint {
+        disable += listOf("FlowOperatorInvokedInComposition")
     }
 }

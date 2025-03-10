@@ -63,10 +63,10 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun SignUpScreen(
+fun SignUpScreenContent(
     modifier: Modifier = Modifier,
-    redirectToLogInScreen: () -> Unit,
-    redirectToAppScreen: () -> Unit,
+    redirectToSignInScreen: () -> Unit,
+    redirectToMovieScreen: () -> Unit,
     signUpViewModel: SignUpViewModel
 ) {
 
@@ -85,11 +85,11 @@ fun SignUpScreen(
             append(stringResource(Res.string.already_a_member) + " ")
             withStyle(
                 style =
-                SpanStyle(
-                    color = if (isSystemInDarkTheme()) Color(0, 191, 255)
-                    else Color.Blue,
-                    textDecoration = TextDecoration.Underline
-                )
+                    SpanStyle(
+                        color = if (isSystemInDarkTheme()) Color(0, 191, 255)
+                        else Color.Blue,
+                        textDecoration = TextDecoration.Underline
+                    )
             ) {
                 append(stringResource(Res.string.already_a_member_connect))
             }
@@ -97,7 +97,7 @@ fun SignUpScreen(
 
     LaunchedEffect(signUpState) {
         when (signUpState) {
-            is SignUpEvent.Success -> redirectToAppScreen()
+            is SignUpEvent.Success -> redirectToMovieScreen()
             is SignUpEvent.Error -> {
                 coroutineScope.launch {
                     snackBarHostState.showSnackbar((signUpState as SignUpEvent.Error).message)
@@ -147,7 +147,7 @@ fun SignUpScreen(
 
             SignUpScreenBottomContent(
                 redirectText = annotatedString,
-                redirectToLogInScreen = { redirectToLogInScreen() })
+                redirectToLogInScreen = { redirectToSignInScreen() })
         }
     }
 }
@@ -167,9 +167,9 @@ fun SignUpScreenMainContent(
 ) {
     Box(
         modifier =
-        Modifier
-            .wrapContentSize()
-            .padding(paddingValues),
+            Modifier
+                .wrapContentSize()
+                .padding(paddingValues),
         contentAlignment = Alignment.Center
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
@@ -191,9 +191,9 @@ fun SignUpScreenMainContent(
 
             HMMTextFieldAuthComponent(
                 modifier =
-                modifier.onFocusChanged {
-                    emailTipVisibility.value = it.isFocused
-                },
+                    modifier.onFocusChanged {
+                        emailTipVisibility.value = it.isFocused
+                    },
                 value = registrationState.email.trimEnd(),
                 onValueChange = {
                     onEmailChanged(it)
@@ -210,9 +210,9 @@ fun SignUpScreenMainContent(
 
             HMMTextFieldPasswordComponent(
                 modifier =
-                Modifier.onFocusChanged {
-                    passwordTipVisibility.value = it.isFocused
-                },
+                    Modifier.onFocusChanged {
+                        passwordTipVisibility.value = it.isFocused
+                    },
                 value = registrationState.password,
                 onValueChange = {
                     onPasswordChanged(it)

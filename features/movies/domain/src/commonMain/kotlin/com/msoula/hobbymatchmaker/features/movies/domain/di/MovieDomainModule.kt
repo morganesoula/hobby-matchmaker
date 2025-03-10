@@ -10,7 +10,7 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
-val movieDomainModule = module {
+val featuresModuleMovieDomain = module {
     singleOf(::MovieRepositoryImpl) bind MovieRepository::class
     factoryOf(::SetMovieFavoriteUseCase)
     factoryOf(::FetchMoviesUseCase)

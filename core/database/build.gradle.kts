@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     `kotlin-multiplatform`
     `android-library`
-    alias(libs.plugins.ksp)
+    //alias(libs.plugins.ksp)
     alias(libs.plugins.room.multiplatform)
 }
 
@@ -23,7 +23,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             // Koin
-            implementation(libs.koin.core)
+            api(libs.koin.core)
 
             // Modules
             implementation(project(Modules.DAO))
@@ -33,31 +33,13 @@ kotlin {
         }
 
         androidMain.dependencies {
-            implementation(libs.room.runtime)
-
             // Koin
             implementation(libs.koin.android)
-        }
-
-        iosMain.dependencies {
-            implementation(libs.room.runtime)
         }
     }
 }
 
 room { schemaDirectory("$projectDir/schemas") }
-
-dependencies {
-    add("kspAndroid", libs.room.compiler)
-    add("kspIosSimulatorArm64", libs.room.compiler)
-    add("kspIosX64", libs.room.compiler)
-    add("kspIosArm64", libs.room.compiler)
-
-    add("kspAndroid", libs.koin.compiler)
-    add("kspIosSimulatorArm64", libs.koin.compiler)
-    add("kspIosX64", libs.koin.compiler)
-    add("kspIosSimulatorArm64", libs.koin.compiler)
-}
 
 android {
     namespace = "com.msoula.hobbymatchmaker.core.database"

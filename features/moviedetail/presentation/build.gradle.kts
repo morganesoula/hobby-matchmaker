@@ -33,7 +33,7 @@ kotlin {
             implementation(compose.material3)
 
             // Koin
-            implementation(libs.koin.core)
+            api(libs.koin.core)
 
             // Modules
             implementation(project(Modules.COMMON))
@@ -42,6 +42,7 @@ kotlin {
 
             // Voyager
             implementation(libs.voyager.screen.model)
+            implementation(libs.voyager.koin)
         }
 
         androidMain.dependencies {

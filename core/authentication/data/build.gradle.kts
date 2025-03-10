@@ -24,7 +24,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.kmp)
 
             // Koin
-            implementation(libs.koin.core)
+            api(libs.koin.core)
 
             // Firebase - FireStore
             implementation(libs.firebase.kmp.auth)
@@ -65,49 +65,3 @@ android {
         minSdk = AndroidConfig.MIN_SDK
     }
 }
-
-/*plugins {
-    `android-library`
-    `kotlin-android`
-    alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.serialization)
-}
-
-apply<MainGradlePlugin>()
-
-android {
-    namespace = "com.msoula.hobbymatchmaker.core.authentication.data"
-}
-
-dependencies {
-    // Core
-    implementation(libs.runtime)
-
-    // Credentials Manager
-    implementation(libs.credentials)
-    implementation(libs.credentials.play.services)
-    implementation(libs.google.identity)
-
-    // Facebook
-    implementation(libs.facebook.android.sdk)
-    implementation(libs.facebook.login)
-
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.firebase.auth)
-
-    // Firestore
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.firebase.firestore)
-
-    // Google
-    implementation(libs.play.services.auth)
-
-    // Koin
-    implementation(libs.koin.android)
-
-    // Modules
-    implementation(project(Modules.AUTHENTICATION_DOMAIN))
-    implementation(project(Modules.COMMON))
-    implementation(project(Modules.NETWORK))
-}*/

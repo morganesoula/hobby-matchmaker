@@ -6,7 +6,7 @@ import com.msoula.hobbymatchmaker.core.login.domain.useCases.ValidateNameUseCase
 import com.msoula.hobbymatchmaker.core.login.domain.useCases.ValidatePasswordUseCase
 import org.koin.dsl.module
 
-val loginFormValidationModule = module {
+val coreModuleLoginFormValidation = module {
     factory {
         LoginValidateFormUseCase(
             ValidateEmailUseCase(),

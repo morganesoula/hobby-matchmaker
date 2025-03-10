@@ -1,9 +1,144 @@
 @file:Suppress("UnstableApiUsage")
 
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
+    `kotlin-multiplatform`
+    `android-library`
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.compose.multiplatform)
+}
+
+kotlin {
+    applyDefaultHierarchyTemplate()
+
+    androidTarget {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
+        }
+    }
+
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+
+    sourceSets {
+        commonMain.dependencies {
+            implementation(libs.kotlinx.coroutines.kmp)
+
+            // Coil
+            implementation(libs.coil.compose)
+
+            // Compose
+            implementation(compose.components.resources)
+            implementation(compose.material3)
+
+            // Koin
+            api(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+
+            // Modules
+            implementation(project(Modules.AUTHENTICATION_DATA))
+            implementation(project(Modules.AUTHENTICATION_DOMAIN))
+            implementation(project(Modules.COMMON))
+            implementation(project(Modules.DAO))
+            implementation(project(Modules.DATABASE))
+            implementation(project(Modules.DESIGN))
+            implementation(project(Modules.DI))
+            implementation(project(Modules.LOGIN_DOMAIN))
+            implementation(project(Modules.LOGIN_PRESENTATION))
+            implementation(project(Modules.MOVIE_DATA))
+            implementation(project(Modules.MOVIE_DOMAIN))
+            implementation(project(Modules.MOVIE_PRESENTATION))
+            implementation(project(Modules.MOVIE_DETAIL_DATA))
+            implementation(project(Modules.MOVIE_DETAIL_DOMAIN))
+            implementation(project(Modules.MOVIE_DETAIL_PRESENTATION))
+            implementation(project(Modules.NETWORK))
+            implementation(project(Modules.SHARED))
+            implementation(project(Modules.SESSION_DATA))
+            implementation(project(Modules.SESSION_DOMAIN))
+            implementation(project(Modules.SPLASHSCREEN_PRESENTATION))
+
+            // Navigation
+            implementation(libs.voyager.koin)
+            implementation(libs.voyager.screen.model)
+        }
+
+        androidMain.dependencies {
+            // AndroidX
+            api(libs.appcompat)
+            implementation(libs.activity.compose)
+
+            // Firebase
+            implementation(project.dependencies.platform(libs.firebase.bom))
+            implementation(libs.firebase.firebase.auth)
+            implementation(libs.firebase.ui.auth)
+
+            // Koin
+            implementation(libs.koin.android)
+        }
+    }
+}
+
+android {
+    val secretsPropertiesFile = rootProject.file("secrets.properties")
+    val secretProperties = Properties()
+
+    if (secretsPropertiesFile.exists()) {
+        secretProperties.load(FileInputStream(secretsPropertiesFile))
+    }
+
+    namespace = "com.msoula.hobbymatchmaker"
+    compileSdk = AndroidConfig.COMPILE_SDK
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
+    defaultConfig {
+        minSdk = AndroidConfig.MIN_SDK
+
+        manifestPlaceholders["facebookApplicationID"] =
+            secretProperties["facebook_application_id"] ?: ""
+        manifestPlaceholders["facebookClientToken"] =
+            secretProperties["facebook_client_token"] ?: ""
+
+        testInstrumentationRunner = AndroidConfig.TEST_INSTRUMENTATION_RUNNER
+        vectorDrawables.useSupportLibrary = true
+    }
+
+    buildTypes {
+        debug {
+            isMinifyEnabled = false
+            isJniDebuggable = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
+        }
+
+        release {
+            isMinifyEnabled = false
+            isJniDebuggable = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
+        }
+    }
+}
+
+compose.resources {
+    publicResClass = true
+    packageOfResClass = "com.msoula.hobbymatchmaker"
+    generateResClass = always
+}
+
+/* plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("kotlin-parcelize")
@@ -176,4 +311,4 @@ dependencies {
     testImplementation(libs.junit.ktx)
     testImplementation(libs.mockk.android)
     testImplementation(libs.turbine)
-}
+} */

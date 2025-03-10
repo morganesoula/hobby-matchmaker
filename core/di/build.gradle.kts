@@ -27,7 +27,7 @@ kotlin {
             implementation(compose.runtime)
 
             // Koin
-            implementation(libs.koin.core)
+            api(libs.koin.core)
 
             // Modules
             implementation(project(Modules.DESIGN))

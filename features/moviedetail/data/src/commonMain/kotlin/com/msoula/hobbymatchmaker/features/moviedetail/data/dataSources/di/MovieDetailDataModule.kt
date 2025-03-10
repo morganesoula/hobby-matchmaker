@@ -12,7 +12,7 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
-val movieDetailDataModule = module {
+val featuresModuleMovieDetailData = module {
     singleOf(::MovieDetailKtorServiceImpl) bind MovieDetailKtorService::class
     singleOf(::MovieVideosKtorServiceImpl) bind MovieVideosKtorService::class
     singleOf(::MovieDetailLocalDataSourceImpl) bind MovieDetailLocalDataSource::class

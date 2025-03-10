@@ -30,7 +30,7 @@ kotlin {
             implementation(libs.firebase.kmp.auth)
 
             // Koin
-            implementation(libs.koin.core)
+            api(libs.koin.core)
 
             // Ktor
             implementation(libs.bundles.ktor)

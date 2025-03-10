@@ -1,8 +1,9 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.presentation.di
 
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailViewModel
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
-val movieDetailViewModelModule = module {
-    single { MovieDetailViewModel(get(), get(), get(), get()) }
+val featuresModuleMovieDetailViewModel = module {
+    singleOf(::MovieDetailViewModel)
 }

@@ -5,7 +5,7 @@ import com.msoula.hobbymatchmaker.core.database.dao.MovieDAO
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
-val daoModule = module {
+val coreModuleDAO = module {
     includes(coreModuleDaoPlatformSpecific)
 
     single<MovieDAO> {

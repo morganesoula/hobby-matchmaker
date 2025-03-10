@@ -26,7 +26,7 @@ kotlin {
             implementation(compose.components.resources)
 
             // Koin
-            implementation(libs.koin.core)
+            api(libs.koin.core)
 
             // Modules
             implementation(project(Modules.COMMON))

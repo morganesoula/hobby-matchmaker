@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 @Composable
-fun MovieScreen(
+fun MovieScreenContent(
     modifier: Modifier = Modifier,
     movies: List<MovieUiModel>,
     oneTimeEventChannelFlow: Flow<MovieUiEventModel>,

@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun SplashScreen(modifier: Modifier = Modifier) {
+fun SplashScreenContent(modifier: Modifier = Modifier) {
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Image(
             painter = painterResource(Res.drawable.ic_launcher_foreground),

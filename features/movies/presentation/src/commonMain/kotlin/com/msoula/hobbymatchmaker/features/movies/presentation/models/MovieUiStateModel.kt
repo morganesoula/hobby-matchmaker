@@ -2,7 +2,6 @@ package com.msoula.hobbymatchmaker.features.movies.presentation.models
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import kotlinx.collections.immutable.PersistentList
 
 @Stable
 sealed interface MovieUiStateModel {
@@ -11,7 +10,7 @@ sealed interface MovieUiStateModel {
     data object Empty : MovieUiStateModel
 
     @Immutable
-    data class Success(val list: PersistentList<MovieUiModel>) : MovieUiStateModel
+    data class Success(val list: List<MovieUiModel>) : MovieUiStateModel
 
     @Immutable
     data class Error(val errorMessage: String) : MovieUiStateModel

@@ -22,7 +22,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             // Koin
-            implementation(libs.koin.core)
+            api(libs.koin.core)
 
             // Ktor
             implementation(libs.ktor.client.core)

@@ -6,6 +6,6 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
-val authenticationDataModule = module {
+val coreModuleAuthenticationData = module {
     singleOf(::AuthenticationRemoteDataSourceImpl) bind AuthenticationRemoteDataSource::class
 }

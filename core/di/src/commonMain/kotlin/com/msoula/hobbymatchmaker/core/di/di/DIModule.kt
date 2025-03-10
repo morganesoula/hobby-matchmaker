@@ -10,8 +10,8 @@ import kotlinx.coroutines.IO
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
-val diModule = module {
-    includes(coreDIModulePlatformSpecific)
+val coreModuleDI = module {
+    includes(coreModuleDIPlatformSpecific)
 
     single<CoroutineDispatcher> { Dispatchers.IO }
     factory { ValidateEmailUseCase() }
@@ -21,4 +21,4 @@ val diModule = module {
     factory { AuthFormValidationUseCase(get(), get(), get(), get()) }
 }
 
-expect val coreDIModulePlatformSpecific: Module
+expect val coreModuleDIPlatformSpecific: Module

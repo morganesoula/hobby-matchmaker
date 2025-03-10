@@ -4,7 +4,6 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.core.common.StateSaver
 import com.msoula.hobbymatchmaker.core.common.getDeviceLocale
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ManageMovieTrailerUseCase
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieDetailUseCase
@@ -31,22 +30,16 @@ import kotlinx.coroutines.launch
 class MovieDetailViewModel(
     private val ioDispatcher: CoroutineDispatcher,
     private val observeMovieDetailUseCase: ObserveMovieDetailUseCase,
-    private val manageMovieTrailerUseCase: ManageMovieTrailerUseCase,
-    stateSaver: StateSaver
+    private val manageMovieTrailerUseCase: ManageMovieTrailerUseCase
 ) : ScreenModel {
 
     private val _oneTimeEventChannel = Channel<MovieDetailUiEventModel>()
     val oneTimeEventChannelFlow = _oneTimeEventChannel.receiveAsFlow()
 
-    private val movieId = requireNotNull(stateSaver.getState("movieId", 0L))
     private val movieIdFlow = MutableStateFlow<Long?>(null)
 
     private var currentMovie: MovieDetailUiModel? = MovieDetailUiModel()
     private val language = getDeviceLocale()
-
-    init {
-        setMovieId(movieId)
-    }
 
     val viewState: StateFlow<MovieDetailViewStateModel> =
         movieIdFlow.filterNotNull().flatMapLatest { movieId ->
@@ -76,6 +69,8 @@ class MovieDetailViewModel(
                 SharingStarted.WhileSubscribed(5000),
                 MovieDetailViewStateModel.Loading
             )
+
+    fun loadMovieDetails(movieId: Long) = setMovieId(movieId)
 
     fun onEvent(event: MovieDetailUiEventModel) {
         when (event) {
