@@ -37,6 +37,7 @@ kotlin {
 
                 // Modules
                 implementation(project(Modules.NETWORK))
+                implementation(project(Modules.DATABASE))
                 implementation(project(Modules.DAO))
                 implementation(project(Modules.MOVIE_DOMAIN))
                 implementation(project(Modules.COMMON))

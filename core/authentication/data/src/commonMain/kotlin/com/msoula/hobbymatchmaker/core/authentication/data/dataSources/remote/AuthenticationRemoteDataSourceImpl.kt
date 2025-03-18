@@ -9,6 +9,7 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SignInWithEm
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SocialMediaError
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.safeCall
 import dev.gitlive.firebase.auth.AuthCredential
@@ -116,15 +117,39 @@ class AuthenticationRemoteDataSourceImpl(
         } catch (exception: CancellationException) {
             throw exception
         } catch (e: Exception) {
-            //Log.e("HMM", "Exception caught while logging user: ${e.message}")
+            Logger.e("Exception caught while logging user: ${e.message}")
             if (e is FirebaseAuthException) {
-                //TODO No more e.errorCode so fix it
-                when (e.message) {
-                    "ERROR_USER_DISABLED" -> Result.Failure(SignInWithEmailAndPasswordError.UserDisabled)
-                    "ERROR_USER_NOT_FOUND" -> Result.Failure(SignInWithEmailAndPasswordError.UserNotFound)
-                    "ERROR_WRONG_PASSWORD" -> Result.Failure(SignInWithEmailAndPasswordError.WrongPassword)
-                    "ERROR_TOO_MANY_REQUESTS" -> Result.Failure(SignInWithEmailAndPasswordError.TooManyRequests)
-                    else -> Result.Failure(SignInWithEmailAndPasswordError.Other(""))
+                val errorMessage = e.message
+                if (errorMessage != null) {
+                    when {
+                        errorMessage.contains(
+                            "ERROR_USER_DISABLED",
+                            ignoreCase = true
+                        ) -> Result.Failure(SignInWithEmailAndPasswordError.UserDisabled)
+
+                        errorMessage.contains(
+                            "ERROR_USER_NOT_FOUND",
+                            ignoreCase = true
+                        ) -> Result.Failure(SignInWithEmailAndPasswordError.UserNotFound)
+
+                        errorMessage.contains(
+                            "ERROR_WRONG_PASSWORD",
+                            ignoreCase = true
+                        ) -> Result.Failure(SignInWithEmailAndPasswordError.WrongPassword)
+
+                        errorMessage.contains(
+                            "ERROR_TOO_MANY_REQUESTS",
+                            ignoreCase = true
+                        ) -> Result.Failure(SignInWithEmailAndPasswordError.TooManyRequests)
+
+                        else -> Result.Failure(
+                            SignInWithEmailAndPasswordError.Other(
+                                e.message ?: ""
+                            )
+                        )
+                    }
+                } else {
+                    Result.Failure(SignInWithEmailAndPasswordError.Other("Error while signing in"))
                 }
             } else {
                 Result.Failure(

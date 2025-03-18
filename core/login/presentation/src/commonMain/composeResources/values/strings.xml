@@ -44,4 +44,5 @@
     <string name="internal_error">Une erreur interne est survenue: les \\u00E9quipes de développement ont \\u00E9t\\u00E9 notifi\\u00E9es</string>
     <string name="user_not_found_error">Utilisateur inconnu. Merci de vous inscrire</string>
     <string name="reset_password_error">Impossible de réinitialiser votre mot de passe</string>
+    <string name="malformed_sign_in_error">Identifiants incorrects. Veuillez vérifier vos informations.</string>
 </resources>

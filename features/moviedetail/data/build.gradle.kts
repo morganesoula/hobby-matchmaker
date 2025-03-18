@@ -32,10 +32,14 @@ kotlin {
 
             // Modules
             implementation(project(Modules.COMMON))
+            implementation(project(Modules.DATABASE))
             implementation(project(Modules.DAO))
             implementation(project(Modules.MOVIE_DETAIL_DOMAIN))
             implementation(project(Modules.MOVIE_DATA))
             implementation(project(Modules.NETWORK))
+
+            // Room
+            implementation(libs.room.runtime)
         }
     }
 }

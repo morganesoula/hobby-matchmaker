@@ -37,7 +37,7 @@ class SignInUseCase(
                         is SignInWithEmailAndPasswordError.WrongPassword -> SignInError.WrongPassword
                         is SignInWithEmailAndPasswordError.UserDisabled -> SignInError.UserDisabled
                         is SignInWithEmailAndPasswordError.TooManyRequests -> SignInError.TooManyRequests
-                        else -> SignInError.Other
+                        else -> SignInError.Other(result.error.message)
                     }
                     emit(Result.Failure(error))
                 }
@@ -54,5 +54,5 @@ sealed class SignInError(override val message: String) : AppError {
     data object UserNotFound : SignInError("")
     data object UserDisabled : SignInError("")
     data object TooManyRequests : SignInError("")
-    data object Other : SignInError("")
+    data class Other(val customErrorMessage: String) : SignInError(customErrorMessage)
 }

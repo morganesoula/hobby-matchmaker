@@ -18,10 +18,6 @@ dependencies {
     implementation(libs.facebook.android.sdk)
     implementation(libs.facebook.login)
 
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.firebase.auth)
-
     // Module
     implementation(project(Modules.AUTHENTICATION_DOMAIN))
     implementation(project(Modules.COMMON))

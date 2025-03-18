@@ -8,6 +8,7 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInErro
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInWithCredentialUseCase
 import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.StateSaver
@@ -17,6 +18,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.clients.AppleUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.GoogleUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.login_error
+import com.msoula.hobbymatchmaker.core.login.presentation.malformed_sign_in_error
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.ResetPasswordEvent
@@ -50,8 +52,8 @@ class SignInViewModel(
 ) : ScreenModel {
 
     private val savedStateHandleKey: String = "loginState"
-    val formDataFlow =
-        MutableStateFlow(stateSaver.getState(savedStateHandleKey, SignInFormStateModel()))
+
+    val formDataFlow = stateSaver.getStateFlow(savedStateHandleKey, SignInFormStateModel())
     val circularProgressLoading = MutableStateFlow(false)
 
     private val _oneTimeEventChannel = Channel<AuthenticationEvent>()
@@ -97,6 +99,7 @@ class SignInViewModel(
             }
 
             AuthenticationUIEvent.OnGoogleButtonClicked -> {
+                Logger.d("GoogleUIClient in SignInVM is: $googleUIClient")
                 signInWithSocial(ProviderType.GOOGLE, googleUIClient = googleUIClient)
             }
 
@@ -118,7 +121,7 @@ class SignInViewModel(
         }
     }
 
-    fun signInWithSocial(
+    private fun signInWithSocial(
         providerType: ProviderType,
         googleUIClient: GoogleUIClient? = null,
         appleUIClient: AppleUIClient? = null,
@@ -239,12 +242,13 @@ class SignInViewModel(
                 Res.string.too_many_requests_error
             )
 
-            else -> error.message
+            else -> if (error.message.contains("incorrect")) getString(Res.string.malformed_sign_in_error) else error.message
         }
     }
 
-    private fun updateFormState(update: (SignInFormStateModel) -> SignInFormStateModel) =
-        stateSaver.updateState(savedStateHandleKey, update)
+    private fun updateFormState(update: (SignInFormStateModel) -> SignInFormStateModel) {
+        formDataFlow.value = update(formDataFlow.value)
+    }
 
     private fun clearFormState() = stateSaver.removeState("loginState")
 }

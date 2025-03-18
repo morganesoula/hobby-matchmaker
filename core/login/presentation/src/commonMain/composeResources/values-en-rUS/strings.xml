@@ -43,4 +43,5 @@
     <string name="internal_error">An internal error occurred: the development teams have been notified</string>
     <string name="user_not_found_error">User not found. Please register first</string>
     <string name="reset_password_error">Could not reset your password</string>
+    <string name="malformed_sign_in_error">Oops, please check your credentials</string>
 </resources>

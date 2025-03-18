@@ -46,12 +46,12 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.ObserveAsEvents
 import com.msoula.hobbymatchmaker.core.design.component.HMMButtonAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldPasswordComponent
 import com.msoula.hobbymatchmaker.core.design.component.HeaderTextComponent
-import com.msoula.hobbymatchmaker.core.di.domain.StringResourcesProvider
 import com.msoula.hobbymatchmaker.core.login.presentation.Res
 import com.msoula.hobbymatchmaker.core.login.presentation.cancel
 import com.msoula.hobbymatchmaker.core.login.presentation.components.SocialMediaButtonListPlatformSpecificUI
@@ -75,7 +75,6 @@ import com.msoula.hobbymatchmaker.core.login.presentation.your_email
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 
 @Composable
 fun SignInScreenContent(
@@ -83,8 +82,7 @@ fun SignInScreenContent(
     signInViewModel: SignInViewModel,
     oneTimeEventChannelFlow: Flow<AuthenticationEvent>,
     redirectToMovieScreen: () -> Unit,
-    redirectToSignUpScreen: () -> Unit,
-    resourcesProvider: StringResourcesProvider = koinInject()
+    redirectToSignUpScreen: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val resetPasswordState by signInViewModel.resetPasswordState.collectAsState()
@@ -170,6 +168,7 @@ fun SignInScreenContent(
                 SignInScreenMainContent(
                     email = loginFormState.email.trimEnd(),
                     onEmailChanged = {
+                        Logger.d("Updating email in View with value: $it")
                         signInViewModel.onEvent(
                             AuthenticationUIEvent.OnEmailChanged(
                                 it
@@ -188,7 +187,7 @@ fun SignInScreenContent(
                     },
                     canSubmit = loginFormState.submit,
                     circularProgressLoading = circularProgressLoading,
-                    dividerConnectText = resourcesProvider.getStringByKey(Res.string.continue_with_rs.key),
+                    dividerConnectText = stringResource(Res.string.continue_with_rs),
                     onGoogleButtonClicked = {
                         signInViewModel.onEvent(AuthenticationUIEvent.OnGoogleButtonClicked)
                     },
@@ -328,7 +327,7 @@ fun ColumnScope.SignInScreenMainContent(
         modifier = modifier,
         onFacebookButtonClicked = onFacebookButtonClicked,
         onAppleButtonClicked = onAppleButtonClicked,
-        onGoogleButtonClicked = onGoogleButtonClicked,
+        onGoogleButtonClicked = onGoogleButtonClicked
     )
 }
 

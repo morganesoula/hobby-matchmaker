@@ -1,6 +1,7 @@
 package com.msoula.hobbymatchmaker.features.movies.data.dataSources.local
 
-import com.msoula.hobbymatchmaker.core.database.dao.MovieDAO
+import com.msoula.hobbymatchmaker.core.common.Logger
+import com.msoula.hobbymatchmaker.core.database.HMMLocalDatabase
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.mappers.toMovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.mappers.toMovieEntityModel
 import com.msoula.hobbymatchmaker.features.movies.domain.dataSources.MovieLocalDataSource
@@ -9,11 +10,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlin.coroutines.cancellation.CancellationException
 
-class MovieLocalDataSourceImpl
-    (private val movieDAO: MovieDAO) : MovieLocalDataSource {
+class MovieLocalDataSourceImpl(private val database: HMMLocalDatabase) : MovieLocalDataSource {
 
     override fun observeMovies(): Flow<List<MovieDomainModel>> {
-        return movieDAO.observeMovies()
+        return database.movieDao().observeMovies()
             .map { list ->
                 list.map { movieEntity -> movieEntity.toMovieDomainModel() }
             }
@@ -24,23 +24,21 @@ class MovieLocalDataSourceImpl
         isFavorite: Boolean,
     ) {
         try {
-            movieDAO.updateMovieFavorite(id, isFavorite)
+            database.movieDao().updateMovieFavorite(id, isFavorite)
         } catch (exception: CancellationException) {
             throw exception
         } catch (exception: Exception) {
-            //Log.e("HMM", "Error updating movie: $exception")
-            println("Error updating movie: $exception")
+            Logger.e("Error updating movie", throwable = exception)
         }
     }
 
     override suspend fun insertMovie(movie: MovieDomainModel) {
         try {
-            movieDAO.upsertMovie(movie.toMovieEntityModel())
+            database.movieDao().upsertMovie(movie.toMovieEntityModel())
         } catch (exception: CancellationException) {
             throw exception
         } catch (exception: Exception) {
-            //Log.e("HMM", "Error on inserting movie: $exception")
-            println("Error on inserting movie: $exception")
+            Logger.e("Error on inserting movie", exception)
         }
     }
 
@@ -49,23 +47,21 @@ class MovieLocalDataSourceImpl
         localCoverFilePath: String
     ) {
         try {
-            movieDAO.updateMovieCover(coverFileName, localCoverFilePath)
+            database.movieDao().updateMovieCover(coverFileName, localCoverFilePath)
         } catch (exception: CancellationException) {
             throw exception
         } catch (e: Exception) {
-            //Log.e("HMM", "Error updating movie with local cover: $e")
-            println("Error updating movie with local cover: $e")
+            Logger.e("Error updating movie with local cover", throwable = e)
         }
     }
 
     override suspend fun upsertAll(movies: List<MovieDomainModel>) {
         try {
-            movieDAO.upsertMovies(movies.map { it.toMovieEntityModel() })
+            database.movieDao().upsertMovies(movies.map { it.toMovieEntityModel() })
         } catch (exception: CancellationException) {
             throw exception
         } catch (e: Exception) {
-            //Log.e("HMM", "Error upserting movies: $e")
-            println("Error upserting movies: $e")
+            Logger.e("Error upserting movies", e)
         }
     }
 }

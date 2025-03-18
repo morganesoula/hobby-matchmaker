@@ -35,12 +35,6 @@ kotlin {
                 implementation(project(Modules.SESSION_DOMAIN))
             }
         }
-
-        androidMain.dependencies {
-            // Facebook
-            implementation(libs.facebook.android.sdk)
-            implementation(libs.facebook.login)
-        }
     }
 }
 

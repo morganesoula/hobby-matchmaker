@@ -8,9 +8,7 @@ import org.koin.dsl.module
 val coreModuleDAO = module {
     includes(coreModuleDaoPlatformSpecific)
 
-    single<MovieDAO> {
-        get<HMMLocalDatabase>().movieDao()
-    }
+    single<MovieDAO> { get<HMMLocalDatabase>().movieDao() }
 }
 
 expect val coreModuleDaoPlatformSpecific: Module

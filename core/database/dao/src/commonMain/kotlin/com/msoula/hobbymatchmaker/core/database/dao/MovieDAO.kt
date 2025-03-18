@@ -55,13 +55,13 @@ interface MovieDAO {
     suspend fun upsertMovieActorCrossRefs(crossRefs: List<MovieActorCrossRef>)
 
     @Query("UPDATE movie SET localCoverFilePath = :localCoverFilePath WHERE posterFileName = :remotePosterFileName")
-    fun updateMovieCover(remotePosterFileName: String, localCoverFilePath: String)
+    suspend fun updateMovieCover(remotePosterFileName: String, localCoverFilePath: String)
 
     @Query("UPDATE movie SET isFavorite = :isFavorite WHERE movieId = :movieId")
-    fun updateMovieFavorite(movieId: Long, isFavorite: Boolean)
+    suspend fun updateMovieFavorite(movieId: Long, isFavorite: Boolean)
 
     @Query("UPDATE movie SET videoKey = :videoKey WHERE movieId = :movieId")
-    fun updateMovieVideoKey(movieId: Long, videoKey: String)
+    suspend fun updateMovieVideoKey(movieId: Long, videoKey: String)
 
     @Query(
         "UPDATE movie " +

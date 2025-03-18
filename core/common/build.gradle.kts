@@ -34,6 +34,9 @@ kotlin {
 
             // Modules
             implementation(project(Modules.DESIGN))
+
+            // Logger
+            implementation(libs.napier)
         }
 
         androidMain.dependencies {
@@ -41,6 +44,9 @@ kotlin {
 
             // Facebook
             implementation(libs.facebook.android.sdk)
+
+            // Timber
+            implementation(libs.timber.android)
         }
     }
 }
