@@ -10,6 +10,7 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ResetPassw
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInWithCredentialUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignUpUseCase
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.UnifiedSignInUseCase
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -25,4 +26,5 @@ val coreModuleAuthenticationDomain = module {
     factoryOf(::SignInWithCredentialUseCase)
     factoryOf(::IsFirstSignInUseCase)
     factoryOf(::FetchFirebaseUserInfo)
+    factoryOf(::UnifiedSignInUseCase)
 }

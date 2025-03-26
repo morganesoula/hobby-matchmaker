@@ -22,23 +22,28 @@ class MovieRepositoryImpl(
         id: Long,
         isFavorite: Boolean
     ) {
-        //Log.d("HMM", "repository favorite value: $id, $isFavorite")
-        println("HMM: repository favorite value: $id, $isFavorite")
         movieLocalDataSource.updateMovieWithFavoriteValue(id, isFavorite)
         movieRemoteDataSource.updateUserFavoriteMovieList(uuidUser, id, isFavorite)
     }
 
     override suspend fun updateMovieWithLocalCoverFilePath(
         coverFileName: String,
-        localCoverFilePath: String
+        localCoverFilePath: String,
+        movieId: Long
     ) {
-        movieLocalDataSource.updateMovieWithLocalCoverFilePath(coverFileName, localCoverFilePath)
+        movieLocalDataSource.updateMovieWithLocalCoverFilePath(
+            coverFileName,
+            localCoverFilePath,
+            movieId
+        )
     }
 
-    override suspend fun fetchMovies(language: String): Result<Unit, MovieErrors> =
-        movieRemoteDataSource.fetchMovies(language)
+    override suspend fun fetchMovies(language: String): Result<Unit, MovieErrors> {
+        val result = movieRemoteDataSource.fetchMovies(language)
+        return result
             .mapSuccess { movies ->
                 movieLocalDataSource.upsertAll(movies)
                 Result.Success(Unit)
             }
+    }
 }

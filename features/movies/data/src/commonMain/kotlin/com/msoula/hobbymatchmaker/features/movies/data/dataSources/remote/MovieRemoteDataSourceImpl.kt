@@ -1,5 +1,6 @@
 package com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote
 
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.mappers.toMovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.services.TMDBKtorService
@@ -9,7 +10,10 @@ import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.ImageRepository
 import dev.gitlive.firebase.firestore.FieldValue
 import dev.gitlive.firebase.firestore.FirebaseFirestore
-import io.ktor.utils.io.errors.IOException
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.io.IOException
 
 class MovieRemoteDataSourceImpl(
     private val imageRepository: ImageRepository,
@@ -22,7 +26,7 @@ class MovieRemoteDataSourceImpl(
         val pages = listOf(1, 2, 3)
         val movies = mutableListOf<MovieDomainModel>()
 
-        pages.forEach { page ->
+        for (page in pages) {
             when (val result = fetchMoviesByPage(language, page)) {
                 is Result.Success -> movies.addAll(result.data)
                 is Result.Failure -> return result
@@ -60,29 +64,40 @@ class MovieRemoteDataSourceImpl(
                     Result.Success(data)
                 }
 
-                is Result.Failure -> Result.Failure(MovieErrors.FetchMovieByPageError(response.error.message))
-                else -> Result.Success(emptyList())
+                is Result.Failure -> {
+                    Logger.e("Returning failure from fetchMoviesByPage: ${response.error}")
+                    Result.Failure(MovieErrors.FetchMovieByPageError(response.error.message))
+                }
 
+                else -> Result.Success(emptyList())
             }
         } catch (e: IOException) {
+            Logger.e("Error fetching movies by page: $e")
             Result.Failure(MovieErrors.NetworkError(e.message ?: ""))
         } catch (e: Exception) {
+            Logger.e("Error fetching movies by page: $e")
             Result.Failure(MovieErrors.UnknownError(e.message ?: ""))
         }
     }
 
     private suspend fun updateLocalPosterPath(list: List<MovieDomainModel>): List<MovieDomainModel> {
-        val mutableMovieList = list.toMutableList()
+        return coroutineScope {
+            list.map { movie ->
+                async {
+                    if (movie.coverFileName.isBlank()) {
+                        Logger.w("Skipping movie ${movie.title} (${movie.id}: poster")
+                        return@async movie
+                    }
 
-        for ((index, movie) in mutableMovieList.withIndex()) {
-            mutableMovieList[index] =
-                movie.copy(
-                    localCoverFilePath = imageRepository.getRemoteImage(
-                        movie.coverFileName
-                    )
-                )
+                    try {
+                        val localPath = imageRepository.getRemoteImage(movie.coverFileName)
+                        movie.copy(localCoverFilePath = localPath)
+                    } catch (e: Exception) {
+                        Logger.e("Error downloading image for ${movie.title}: ${e.message}")
+                        movie
+                    }
+                }
+            }.awaitAll()
         }
-
-        return mutableMovieList.map { it }
     }
 }

@@ -1,19 +1,19 @@
 package com.msoula.hobbymatchmaker.features.movies.data.dataSources.local
 
 import com.msoula.hobbymatchmaker.core.common.Logger
-import com.msoula.hobbymatchmaker.core.database.HMMLocalDatabase
+import com.msoula.hobbymatchmaker.core.database.services.MovieDAOImpl
+import com.msoula.hobbymatchmaker.features.movies.data.dataSources.mappers.toMovieDB
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.mappers.toMovieDomainModel
-import com.msoula.hobbymatchmaker.features.movies.data.dataSources.mappers.toMovieEntityModel
 import com.msoula.hobbymatchmaker.features.movies.domain.dataSources.MovieLocalDataSource
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlin.coroutines.cancellation.CancellationException
 
-class MovieLocalDataSourceImpl(private val database: HMMLocalDatabase) : MovieLocalDataSource {
+class MovieLocalDataSourceImpl(private val movieDAO: MovieDAOImpl) : MovieLocalDataSource {
 
     override fun observeMovies(): Flow<List<MovieDomainModel>> {
-        return database.movieDao().observeMovies()
+        return movieDAO.observeMovies()
             .map { list ->
                 list.map { movieEntity -> movieEntity.toMovieDomainModel() }
             }
@@ -21,10 +21,11 @@ class MovieLocalDataSourceImpl(private val database: HMMLocalDatabase) : MovieLo
 
     override suspend fun updateMovieWithFavoriteValue(
         id: Long,
-        isFavorite: Boolean,
+        isFavorite: Boolean
     ) {
         try {
-            database.movieDao().updateMovieFavorite(id, isFavorite)
+            val isFavoriteDB = if (isFavorite) 1 else 0
+            movieDAO.updateMovieFavorite(id, isFavoriteDB.toLong())
         } catch (exception: CancellationException) {
             throw exception
         } catch (exception: Exception) {
@@ -34,7 +35,7 @@ class MovieLocalDataSourceImpl(private val database: HMMLocalDatabase) : MovieLo
 
     override suspend fun insertMovie(movie: MovieDomainModel) {
         try {
-            database.movieDao().upsertMovie(movie.toMovieEntityModel())
+            movieDAO.insertMovie(movie.toMovieDB())
         } catch (exception: CancellationException) {
             throw exception
         } catch (exception: Exception) {
@@ -44,10 +45,11 @@ class MovieLocalDataSourceImpl(private val database: HMMLocalDatabase) : MovieLo
 
     override suspend fun updateMovieWithLocalCoverFilePath(
         coverFileName: String,
-        localCoverFilePath: String
+        localCoverFilePath: String,
+        movieId: Long
     ) {
         try {
-            database.movieDao().updateMovieCover(coverFileName, localCoverFilePath)
+            movieDAO.updateMovieCover(coverFileName, localCoverFilePath, movieId)
         } catch (exception: CancellationException) {
             throw exception
         } catch (e: Exception) {
@@ -57,11 +59,12 @@ class MovieLocalDataSourceImpl(private val database: HMMLocalDatabase) : MovieLo
 
     override suspend fun upsertAll(movies: List<MovieDomainModel>) {
         try {
-            database.movieDao().upsertMovies(movies.map { it.toMovieEntityModel() })
+            Logger.d("Local data source upsertAll")
+            movieDAO.upsertMovies(movies.map { it.toMovieDB() })
         } catch (exception: CancellationException) {
             throw exception
         } catch (e: Exception) {
-            Logger.e("Error upserting movies", e)
+            Logger.e("Error inserting movies", e)
         }
     }
 }

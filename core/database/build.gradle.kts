@@ -1,11 +1,9 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompileCommon
 
 plugins {
     `kotlin-multiplatform`
     `android-library`
-    alias(libs.plugins.room.multiplatform)
-    alias(libs.plugins.ksp)
+    alias(libs.plugins.sqldelight)
 }
 
 kotlin {
@@ -22,45 +20,35 @@ kotlin {
 
     applyDefaultHierarchyTemplate()
 
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
-        }
-    }
-
+    androidTarget()
     iosX64()
     iosArm64()
     iosSimulatorArm64()
 
     sourceSets {
-        commonMain {
-            kotlin.srcDir("build/generated/ksp/metadata")
+        commonMain.dependencies {
+            // Koin
+            api(libs.koin.core)
 
-            dependencies {
-                // Koin
-                api(libs.koin.core)
-
-                // Modules
-                implementation(project(Modules.DAO))
-
-                // Room
-                implementation(libs.room.runtime)
-                implementation(libs.sqlite)
-                implementation(libs.sqlite.bundled)
-            }
+            // SQLDelight
+            implementation(libs.sqldelight.runtime)
+            implementation(libs.sqldelight.coroutines)
         }
+
 
         androidMain.dependencies {
             // Koin
             implementation(libs.koin.android)
 
-            // Room
-            implementation(libs.room.runtime.android)
+            // SQLDelight
+            implementation(libs.sqldelight.android.driver)
+        }
+
+        iosMain.dependencies {
+            implementation(libs.sqldelight.native.driver)
         }
     }
 }
-
-room { schemaDirectory("$projectDir/schemas") }
 
 android {
     namespace = "com.msoula.hobbymatchmaker.core.database"
@@ -76,10 +64,10 @@ android {
     }
 }
 
-dependencies {
-    add("kspCommonMainMetadata", libs.room.compiler)
-    add("kspAndroid", libs.room.compiler)
-    add("kspIosX64", libs.room.compiler)
-    add("kspIosArm64", libs.room.compiler)
-    add("kspIosSimulatorArm64", libs.room.compiler)
+sqldelight {
+    databases {
+        create("HMMDatabase") {
+            packageName = "com.msoula.hobbymatchmaker.core.database"
+        }
+    }
 }

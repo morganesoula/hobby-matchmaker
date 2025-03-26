@@ -51,7 +51,6 @@ kotlin {
             implementation(project(Modules.AUTHENTICATION_DATA))
             implementation(project(Modules.AUTHENTICATION_DOMAIN))
             implementation(project(Modules.COMMON))
-            implementation(project(Modules.DAO))
             implementation(project(Modules.DATABASE))
             implementation(project(Modules.DESIGN))
             implementation(project(Modules.DI))
@@ -63,6 +62,8 @@ kotlin {
             implementation(project(Modules.MOVIE_DETAIL_DATA))
             implementation(project(Modules.MOVIE_DETAIL_DOMAIN))
             implementation(project(Modules.MOVIE_DETAIL_PRESENTATION))
+            implementation(project(Modules.NAVIGATION_DOMAIN))
+            implementation(project(Modules.NAVIGATION_PRESENTATION))
             implementation(project(Modules.NETWORK))
             implementation(project(Modules.SHARED))
             implementation(project(Modules.SESSION_DATA))
@@ -70,8 +71,8 @@ kotlin {
             implementation(project(Modules.SPLASHSCREEN_PRESENTATION))
 
             // Navigation
-            implementation(libs.voyager.koin)
-            implementation(libs.voyager.screen.model)
+            implementation(libs.decompose.core)
+            implementation(libs.decompose.compose)
         }
 
 
@@ -312,7 +313,6 @@ dependencies {
     implementation(project(Modules.AUTHENTICATION_DATA))
     implementation(project(Modules.AUTHENTICATION_DOMAIN))
     implementation(project(Modules.COMMON))
-    implementation(project(Modules.DAO))
     implementation(project(Modules.DATABASE))
     implementation(project(Modules.DESIGN))
     implementation(project(Modules.DI))

@@ -68,10 +68,12 @@ fun MovieItem(
                 ).size(coil3.size.Size(150, 150))
                 .build()
         }
-        else ImageRequest.Builder(LocalPlatformContext.current)
-            .data(movie.coverFilePath.toPath())
-            .size(coil3.size.Size.ORIGINAL)
-            .build()
+        else {
+            ImageRequest.Builder(LocalPlatformContext.current)
+                .data(movie.coverFilePath.toPath())
+                .size(coil3.size.Size.ORIGINAL)
+                .build()
+        }
     )
 
     if (painter.state.value is AsyncImagePainter.State.Loading) {

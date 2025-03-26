@@ -1,0 +1,107 @@
+CREATE TABLE movie (
+    movieId INTEGER NOT NULL PRIMARY KEY,
+    title TEXT,
+    posterFileName TEXT,
+    synopsis TEXT,
+    releaseDate TEXT,
+    genres TEXT, -- Stocké en JSON
+    localCoverFilePath TEXT,
+    isFavorite INTEGER DEFAULT 0,
+    isSeen INTEGER DEFAULT 0,
+    popularity REAL DEFAULT 0.0,
+    status TEXT,
+    videoKey TEXT
+);
+
+CREATE TABLE genre (
+    genreId INTEGER NOT NULL PRIMARY KEY,
+    name TEXT
+);
+
+CREATE TABLE actor (
+    actorId INTEGER NOT NULL PRIMARY KEY,
+    name TEXT,
+    role TEXT
+);
+
+CREATE TABLE movie_actor_cross_ref (
+    movieId INTEGER NOT NULL,
+    actorId INTEGER NOT NULL,
+    FOREIGN KEY(movieId) REFERENCES movie(movieId) ON DELETE CASCADE,
+    FOREIGN KEY(actorId) REFERENCES actor(actorId) ON DELETE CASCADE,
+    PRIMARY KEY(movieId, actorId)
+);
+
+ -- QUERIES --
+
+ insertMovie:
+ INSERT INTO movie (
+     movieId, title, posterFileName, synopsis, releaseDate, genres, localCoverFilePath,
+     isFavorite, isSeen, popularity, status, videoKey
+ ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+ updateExistingMovie:
+ UPDATE movie
+ SET title = ?, posterFileName = ?, synopsis = ?, releaseDate = ?, genres = ?,
+     localCoverFilePath = ?, isFavorite = ?, isSeen = ?, popularity = ?,
+     status = ?, videoKey = ?
+ WHERE movieId = ?;
+
+insertActor:
+INSERT INTO actor (actorId, name, role)
+VALUES (?, ?, ?);
+
+updateExistingActor:
+UPDATE actor SET
+    name = ?,
+    role = ?
+WHERE actorId = ?;
+
+updateMovieWithCover:
+UPDATE movie SET
+    localCoverFilePath = :localCoverFilePath,
+    posterFileName = :remotePosterFileName
+WHERE movieId = :movieId;
+
+updateMovieWithFavoriteValue:
+UPDATE movie SET
+    isFavorite = :isFavorite
+WHERE movieId = :movieId;
+
+updateMovieWithVideoKey:
+UPDATE movie SET
+    videoKey = :videoKey
+WHERE movieId = :movieId;
+
+updateMovieWithDetail:
+UPDATE movie SET
+    releaseDate = :releaseDate,
+    synopsis = :overview,
+    status = :status,
+    popularity = :popularity,
+    genres = :genres
+WHERE movieId = :movieId;
+
+observeMovies:
+SELECT * FROM movie;
+
+observeDetailMovie:
+SELECT m.movieId, m.title, m.genres, m.popularity, m.releaseDate, m.synopsis,
+       m.status, m.localCoverFilePath, m.videoKey,
+       a.actorId, a.name AS actorName, a.role AS actorRole
+FROM movie m
+LEFT JOIN movie_actor_cross_ref c ON m.movieId = c.movieId
+LEFT JOIN actor a ON c.actorId = a.actorId
+WHERE m.movieId = ?;
+
+insertMovieActorCrossRef:
+INSERT INTO movie_actor_cross_ref (movieId, actorId)
+VALUES (?, ?);
+
+deleteMovieActorCrossRefsByMovie:
+DELETE FROM movie_actor_cross_ref WHERE movieId = ?;
+
+getMovieById:
+SELECT *
+FROM movie
+WHERE movieId = :movieId;

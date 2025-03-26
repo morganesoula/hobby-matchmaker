@@ -12,7 +12,6 @@ class AndroidStateSaver(
     }
 
     override fun <T> updateState(key: String, update: (T) -> T) {
-        Logger.d("Updating state in AndroidStateSaver with key: $key and update $update")
         val oldValue = savedStateHandle.get<T>(key)
         val newValue = oldValue?.let(update) ?: return
         savedStateHandle[key] = newValue

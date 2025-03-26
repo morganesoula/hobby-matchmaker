@@ -14,3 +14,16 @@ class AndroidLogger : Antilog() {
         Timber.tag(tag ?: "Napier").log(priority.ordinal, message, throwable)
     }
 }
+
+class AndroidLogFormatter : LogFormatter {
+    override fun format(message: String): String {
+        val element = Throwable().stackTrace.getOrNull(4)
+        val prefix = if (element != null) {
+            "[${element.className}.${element.methodName}:${element.lineNumber}]"
+        } else {
+            "[Unknown]"
+        }
+
+        return "$prefix $message"
+    }
+}

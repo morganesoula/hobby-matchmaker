@@ -4,18 +4,16 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.ImageRepository
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import java.net.URL
 
 class ImageRepositoryImpl(
     private val coroutineDispatcher: CoroutineDispatcher,
     private val context: Context
 ): ImageRepository {
-
-    override suspend fun getRemoteImage(localPosterPath: String) = downloadImage(localPosterPath)
 
     override suspend fun saveRemoteImageAndUpdateMovie(
         coverFileName: String,
@@ -25,21 +23,27 @@ class ImageRepositoryImpl(
         updateMovie(localImagePath)
     }
 
+    override suspend fun getRemoteImage(localPosterPath: String) = downloadImage(localPosterPath)
+
     override suspend fun downloadImage(remotePosterPath: String): String {
         val imgPrefix = "https://image.tmdb.org/t/p/w500"
-        val response = CoroutineScope(coroutineDispatcher).async {
-            val bitmap =
-                BitmapFactory.decodeStream(URL(imgPrefix + remotePosterPath).openStream())
-            if (bitmap == null) {
-                //Log.e("HMM", "Bitmap is null into method downloadImage")
-                println("Bitmap is null into method downloadImage")
-                return@async ""
-            }
-            val savedImagePath = saveImageToLocal(bitmap, remotePosterPath)
-            savedImagePath
-        }.await()
+        val fullURL = "$imgPrefix$remotePosterPath"
 
-        return response
+        return try {
+            val bitmap = withContext(coroutineDispatcher) {
+                BitmapFactory.decodeStream(URL(fullURL).openStream())
+            }
+
+            if (bitmap == null) {
+                Logger.e("Bitmap is null for URL: $fullURL")
+                ""
+            } else {
+                saveImageToLocal(bitmap, remotePosterPath)
+            }
+        } catch (e: Exception) {
+            Logger.e("Exception while downloading image: ${e.message}")
+            ""
+        }
     }
 
     private fun saveImageToLocal(

@@ -4,13 +4,25 @@ import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 
 object Logger {
-    fun init() {
+    private var formatter: LogFormatter? = null
+
+    fun init(formatter: LogFormatter) {
+        this.formatter = formatter
         Napier.base(DebugAntilog())
     }
 
-    fun d(message: String, tag: String = "HMM DEBUG") = Napier.d(message, tag = tag)
-    fun i(message: String, tag: String = "HMM INFO") = Napier.i(message, tag = tag)
-    fun w(message: String, tag: String = "HMM WARNING") = Napier.w(message, tag = tag)
+    private fun formatMessage(message: String): String =
+        formatter?.format(message) ?: message
+
+    fun d(message: String, tag: String = "HMM DEBUG") = Napier.d(formatMessage(message), tag = tag)
+    fun i(message: String, tag: String = "HMM INFO") = Napier.i(formatMessage(message), tag = tag)
+    fun w(message: String, tag: String = "HMM WARNING") =
+        Napier.w(formatMessage(message), tag = tag)
+
     fun e(message: String, throwable: Throwable? = null, tag: String = "HMM ERROR") =
-        Napier.e(message, throwable, tag = tag)
+        Napier.e(formatMessage(throwable?.message ?: ""), throwable, tag = tag)
+}
+
+interface LogFormatter {
+    fun format(message: String): String
 }

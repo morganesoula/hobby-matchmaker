@@ -28,9 +28,6 @@ kotlin {
 
             // Modules
             implementation(project(Modules.DESIGN))
-
-            // Voyager
-            implementation(libs.voyager.screen.model)
         }
     }
 }

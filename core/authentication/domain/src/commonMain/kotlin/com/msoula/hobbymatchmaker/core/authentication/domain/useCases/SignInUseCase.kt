@@ -6,7 +6,6 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.FlowUseCase
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetIsConnectedUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -14,8 +13,7 @@ import kotlinx.coroutines.flow.flowOn
 
 class SignInUseCase(
     private val dispatcher: CoroutineDispatcher,
-    private val authenticationRepository: AuthenticationRepository,
-    private val setIsConnectedUseCase: SetIsConnectedUseCase
+    private val authenticationRepository: AuthenticationRepository
 ) : FlowUseCase<Parameters.DoubleStringParam, SignInSuccess, SignInError>(dispatcher) {
 
     override fun execute(parameters: Parameters.DoubleStringParam): Flow<Result<SignInSuccess, SignInError>> {
@@ -26,11 +24,7 @@ class SignInUseCase(
                 parameters.firstValue,
                 parameters.secondValue
             )) {
-                is Result.Success -> {
-                    setIsConnectedUseCase(true)
-                    emit(Result.Success(SignInSuccess))
-                }
-
+                is Result.Success -> emit(Result.Success(SignInSuccess))
                 is Result.Failure -> {
                     val error: SignInError = when (result.error) {
                         is SignInWithEmailAndPasswordError.UserNotFound -> SignInError.UserNotFound

@@ -10,6 +10,7 @@ import com.msoula.hobbymatchmaker.features.movies.domain.repositories.MovieRepos
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 class ObserveAllMoviesUseCase(
     private val movieRepository: MovieRepository,
@@ -20,7 +21,7 @@ class ObserveAllMoviesUseCase(
     override fun execute(parameters: Parameters.StringParam):
         Flow<Result<ObserveAllMoviesSuccess, ObserveAllMoviesErrors>> {
         return channelFlow {
-            movieRepository.observeMovies().collect { list ->
+            movieRepository.observeMovies().distinctUntilChanged().collect { list ->
                 if (list.isEmpty()) {
                     send(Result.Success(ObserveAllMoviesSuccess.Loading))
 

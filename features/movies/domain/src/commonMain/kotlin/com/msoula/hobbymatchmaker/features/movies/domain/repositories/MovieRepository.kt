@@ -16,7 +16,8 @@ interface MovieRepository {
 
     suspend fun updateMovieWithLocalCoverFilePath(
         coverFileName: String,
-        localCoverFilePath: String
+        localCoverFilePath: String,
+        movieId: Long
     )
 
     suspend fun fetchMovies(language: String): Result<Unit, MovieErrors>

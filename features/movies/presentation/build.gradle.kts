@@ -35,6 +35,7 @@ kotlin {
 
             // Koin
             api(libs.koin.core)
+            implementation(libs.koin.compose.viewmodel)
 
             // Modules
             implementation(project(Modules.AUTHENTICATION_DOMAIN))
@@ -42,11 +43,6 @@ kotlin {
             implementation(project(Modules.DESIGN))
             implementation(project(Modules.DI))
             implementation(project(Modules.MOVIE_DOMAIN))
-
-            // Voyager
-            implementation(libs.voyager.screen.model)
-            implementation(libs.voyager.navigator)
-            implementation(libs.voyager.koin)
         }
     }
 }

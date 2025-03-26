@@ -24,6 +24,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -39,11 +40,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
-import cafe.adriel.voyager.navigator.internal.BackHandler
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.ObserveAsEvents
 import com.msoula.hobbymatchmaker.core.design.component.ExpandableTextComponent
 import com.msoula.hobbymatchmaker.core.design.component.LoadingCircularProgress
@@ -92,7 +92,6 @@ fun MovieDetailScreen(
     }
 }
 
-@OptIn(InternalVoyagerApi::class)
 @Composable
 fun MovieDetailContentScreen(
     modifier: Modifier = Modifier,
@@ -126,6 +125,10 @@ fun MovieDetailContentScreen(
                 append(", ")
             }
         }
+    }
+
+    LaunchedEffect(Unit) {
+        Logger.d("In LaunchedEffect with Movie title: ${movie.title}")
     }
 
     ObserveAsEvents(flow = oneTimeEventFlow) { event ->
@@ -281,10 +284,10 @@ fun MovieDetailContentScreen(
         }
     }
 
-    BackHandler(enabled = videoPlayerVisibility.value) {
+    /* BackHandler(enabled = true) {
         videoPlayerVisibility.value = false
         exitFullScreen.value = true
-    }
+    } */
 }
 
 @Composable

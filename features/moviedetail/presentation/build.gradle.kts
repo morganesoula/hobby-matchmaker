@@ -34,15 +34,12 @@ kotlin {
 
             // Koin
             api(libs.koin.core)
+            implementation(libs.koin.compose.viewmodel)
 
             // Modules
             implementation(project(Modules.COMMON))
             implementation(project(Modules.DESIGN))
             implementation(project(Modules.MOVIE_DETAIL_DOMAIN))
-
-            // Voyager
-            implementation(libs.voyager.screen.model)
-            implementation(libs.voyager.koin)
         }
 
         androidMain.dependencies {

@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     `kotlin-multiplatform`
     `android-library`
+    alias(libs.plugins.serialization)
 }
 
 kotlin {
@@ -27,6 +28,9 @@ kotlin {
 
             // Modules
             implementation(project(Modules.COMMON))
+
+            // Serialization
+            implementation(libs.kotlinx.serialization)
         }
     }
 }

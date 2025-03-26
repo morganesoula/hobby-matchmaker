@@ -1,7 +1,7 @@
 package com.msoula.hobbymatchmaker.features.movies.presentation
 
-import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfo
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.Parameters
@@ -33,7 +33,7 @@ class MovieViewModel(
     observeAllMoviesUseCase: ObserveAllMoviesUseCase,
     private val getUserInfo: FetchFirebaseUserInfo,
     private val ioDispatcher: CoroutineDispatcher
-) : ScreenModel {
+) : ViewModel() {
 
     private val _oneTimeEventChannel = Channel<MovieUiEventModel>()
     val oneTimeEventChannelFlow = _oneTimeEventChannel.receiveAsFlow()
@@ -62,7 +62,7 @@ class MovieViewModel(
             }
         }
             .stateIn(
-                screenModelScope,
+                viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
                 MovieUiStateModel.Loading
             )
@@ -83,7 +83,7 @@ class MovieViewModel(
             }
 
             is CardEventModel.OnSingleTap -> {
-                screenModelScope.launch {
+                viewModelScope.launch {
                     sendOnce(MovieUiEventModel.OnMovieDetailClicked(event.movieId))
                 }
             }
@@ -91,7 +91,7 @@ class MovieViewModel(
     }
 
     private fun toggleFavorite(movieId: Long, isFavorite: Boolean) {
-        screenModelScope.launch(ioDispatcher) {
+        viewModelScope.launch(ioDispatcher) {
             val uuid = getUserInfo()?.uid
             setMovieFavoriteUseCase(uuid ?: "", movieId, isFavorite)
         }

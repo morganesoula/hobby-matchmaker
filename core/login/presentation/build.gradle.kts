@@ -50,6 +50,7 @@ kotlin {
 
             // Koin
             api(libs.koin.core)
+            implementation(libs.koin.compose.viewmodel)
             implementation(libs.koin.compose)
 
             // Modules
@@ -60,11 +61,6 @@ kotlin {
             implementation(project(Modules.DI))
             implementation(project(Modules.LOGIN_DOMAIN))
             implementation(project(Modules.SESSION_DOMAIN))
-
-            // Voyager
-            implementation(libs.voyager.screen.model)
-            implementation(libs.voyager.navigator)
-            implementation(libs.voyager.koin)
         }
 
         androidMain.dependencies {

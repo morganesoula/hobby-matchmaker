@@ -3,6 +3,7 @@ package com.msoula.hobbymatchmaker
 import android.app.Application
 import com.msoula.hobbymatchmaker.core.authentication.data.di.coreModuleAuthenticationData
 import com.msoula.hobbymatchmaker.core.authentication.domain.di.coreModuleAuthenticationDomain
+import com.msoula.hobbymatchmaker.core.common.AndroidLogFormatter
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.di.coreCommonAndroidSavedStateHandle
 import com.msoula.hobbymatchmaker.core.common.di.coreModuleCommon
@@ -20,7 +21,6 @@ import com.msoula.hobbymatchmaker.features.moviedetail.presentation.di.featuresM
 import com.msoula.hobbymatchmaker.features.movies.data.di.featuresModuleMovieData
 import com.msoula.hobbymatchmaker.features.movies.domain.di.featuresModuleMovieDomain
 import com.msoula.hobbymatchmaker.features.movies.presentation.di.featuresModuleMovieViewModel
-import com.msoula.hobbymatchmaker.presentation.di.appModule
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.initialize
@@ -38,7 +38,6 @@ class HobbyMatchMakerApplication : Application() {
             androidContext(this@HobbyMatchMakerApplication)
             modules(
                 listOf(
-                    appModule,
                     coreModuleNetwork,
                     coreModuleSessionData,
                     coreModuleSessionDomain,
@@ -67,7 +66,7 @@ class HobbyMatchMakerApplication : Application() {
             Timber.plant(Timber.DebugTree())
         }
 
-        Logger.init()
+        Logger.init(AndroidLogFormatter())
     }
 
     private fun initFirebase() {

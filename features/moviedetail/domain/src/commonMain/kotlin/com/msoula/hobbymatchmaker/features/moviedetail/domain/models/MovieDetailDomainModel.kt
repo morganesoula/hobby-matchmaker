@@ -1,5 +1,7 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.domain.models
 
+import kotlinx.serialization.Serializable
+
 data class MovieDetailDomainModel(
     val id: Long? = null,
     val title: String? = null,
@@ -23,6 +25,7 @@ data class MovieDetailDomainModel(
     }
 }
 
+@Serializable
 data class GenreDomainModel(
     val id: Int? = null,
     val name: String? = null

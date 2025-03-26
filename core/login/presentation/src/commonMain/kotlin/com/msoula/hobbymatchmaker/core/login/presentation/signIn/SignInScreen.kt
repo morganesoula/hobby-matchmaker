@@ -47,7 +47,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.msoula.hobbymatchmaker.core.common.Logger
-import com.msoula.hobbymatchmaker.core.common.ObserveAsEvents
 import com.msoula.hobbymatchmaker.core.design.component.HMMButtonAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldPasswordComponent
@@ -61,7 +60,6 @@ import com.msoula.hobbymatchmaker.core.login.presentation.forgot_password
 import com.msoula.hobbymatchmaker.core.login.presentation.forgot_password_title
 import com.msoula.hobbymatchmaker.core.login.presentation.hide_password
 import com.msoula.hobbymatchmaker.core.login.presentation.log_in
-import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.ResetPasswordEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.SignInEvent
@@ -72,7 +70,6 @@ import com.msoula.hobbymatchmaker.core.login.presentation.reset_password
 import com.msoula.hobbymatchmaker.core.login.presentation.show_password
 import com.msoula.hobbymatchmaker.core.login.presentation.welcome_back_title
 import com.msoula.hobbymatchmaker.core.login.presentation.your_email
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
@@ -80,7 +77,6 @@ import org.jetbrains.compose.resources.stringResource
 fun SignInScreenContent(
     modifier: Modifier = Modifier,
     signInViewModel: SignInViewModel,
-    oneTimeEventChannelFlow: Flow<AuthenticationEvent>,
     redirectToMovieScreen: () -> Unit,
     redirectToSignUpScreen: () -> Unit
 ) {
@@ -120,21 +116,6 @@ fun SignInScreenContent(
 
             is SignInEvent.Success -> redirectToMovieScreen()
             else -> Unit
-        }
-    }
-
-    ObserveAsEvents(oneTimeEventChannelFlow) { event ->
-        coroutineScope.launch {
-            when (event) {
-                is AuthenticationEvent.OnFacebookFailedConnection,
-                is AuthenticationEvent.OnGoogleFailedConnection -> {
-                    snackBarHostState.showSnackbar(event.message)
-                }
-
-                AuthenticationEvent.OnSignInSuccess -> redirectToMovieScreen()
-                AuthenticationEvent.OnSignUpClicked -> redirectToSignUpScreen()
-                else -> Unit
-            }
         }
     }
 

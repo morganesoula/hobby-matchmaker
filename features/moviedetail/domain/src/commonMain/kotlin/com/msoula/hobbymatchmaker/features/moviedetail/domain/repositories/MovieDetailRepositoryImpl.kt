@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.features.moviedetail.domain.repositories
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.ExternalServiceError
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.safeCall
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.dataSources.local.MovieDetailLocalDataSource
@@ -59,6 +60,7 @@ class MovieDetailRepositoryImpl(
     }
 
     override suspend fun observeMovieDetail(movieId: Long): Flow<MovieDetailDomainModel?> {
+        Logger.d("Fetching movie detail for id: $movieId")
         return movieDetailLocalDataSource.observeMovieDetail(movieId)
     }
 

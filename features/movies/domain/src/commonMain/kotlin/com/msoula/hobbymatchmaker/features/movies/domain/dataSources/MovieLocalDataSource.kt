@@ -12,7 +12,8 @@ interface MovieLocalDataSource {
     suspend fun insertMovie(movie: MovieDomainModel)
     suspend fun updateMovieWithLocalCoverFilePath(
         coverFileName: String,
-        localCoverFilePath: String
+        localCoverFilePath: String,
+        movieId: Long
     )
     suspend fun upsertAll(movies: List<MovieDomainModel>)
 }

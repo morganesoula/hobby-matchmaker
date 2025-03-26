@@ -3,7 +3,7 @@ import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
-    kotlin("multiplatform")
+    `kotlin-multiplatform`
     `android-library`
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)

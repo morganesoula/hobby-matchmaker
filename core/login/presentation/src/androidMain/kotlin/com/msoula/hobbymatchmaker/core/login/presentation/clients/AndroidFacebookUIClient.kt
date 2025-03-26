@@ -26,8 +26,8 @@ class AndroidFacebookUIClient(
     private val context: Context
 ) : FacebookUIClient {
 
-    val callbackManager = CallbackManager.Factory.create()
-    val loginManager = LoginManager.getInstance()
+    private val callbackManager = CallbackManager.Factory.create()
+    private val loginManager = LoginManager.getInstance()
 
     override suspend fun getFacebookCredentials(): Pair<AuthCredential, String?> {
         return suspendCancellableCoroutine { continuation ->

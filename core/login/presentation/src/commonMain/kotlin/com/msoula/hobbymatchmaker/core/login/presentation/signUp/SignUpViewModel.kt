@@ -1,7 +1,7 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.signUp
 
-import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignUpErrors
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignUpUseCase
 import com.msoula.hobbymatchmaker.core.common.AppError
@@ -35,7 +35,7 @@ class SignUpViewModel(
     private val resourceProvider: StringResourcesProvider,
     private val stateSaver: StateSaver,
     private val signUpUseCase: SignUpUseCase
-) : ScreenModel {
+) : ViewModel() {
 
     private val savedStateHandleKey: String = "signUpState"
     val formDataFlow =
@@ -52,7 +52,7 @@ class SignUpViewModel(
     private val _password = MutableStateFlow(stateSaver.getState("password", ""))
 
     init {
-        screenModelScope.launch {
+        viewModelScope.launch {
             combine(
                 _email,
                 _firstName,
@@ -127,7 +127,7 @@ class SignUpViewModel(
     }
 
     private fun createFirebaseAccount() {
-        screenModelScope.launch {
+        viewModelScope.launch {
             signUpUseCase(
                 Parameters.DoubleStringParam(
                     formDataFlow.value.email,

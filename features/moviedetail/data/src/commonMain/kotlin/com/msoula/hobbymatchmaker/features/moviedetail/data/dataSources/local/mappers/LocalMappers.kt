@@ -1,23 +1,20 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.local.mappers
 
-import com.msoula.hobbymatchmaker.core.database.dao.models.Actor
-import com.msoula.hobbymatchmaker.core.database.dao.models.Genre
-import com.msoula.hobbymatchmaker.core.database.dao.models.MovieEntityModel
-import com.msoula.hobbymatchmaker.core.database.dao.models.MovieWithActors
+import com.msoula.hobbymatchmaker.core.common.Logger
+import com.msoula.hobbymatchmaker.core.database.Actor
+import com.msoula.hobbymatchmaker.core.database.models.MovieDetailDataEntity
+import com.msoula.hobbymatchmaker.core.database.models.MovieUpdatedDataEntity
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.GenreDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieActorDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
-fun MovieWithActors.toMovieDetailDomainModel(): MovieDetailDomainModel {
+fun MovieDetailDataEntity.toMovieDetailDomainModel(): MovieDetailDomainModel {
     return MovieDetailDomainModel(
         id = this.movie.movieId,
         title = this.movie.title,
-        genre = this.movie.genres?.map { genre ->
-            GenreDomainModel(
-                genre.genreId.toInt(),
-                genre.name
-            )
-        },
+        genre = parseGenresJson(this.movie.genres),
         popularity = this.movie.popularity,
         releaseDate = this.movie.releaseDate,
         synopsis = this.movie.synopsis,
@@ -34,25 +31,29 @@ fun MovieWithActors.toMovieDetailDomainModel(): MovieDetailDomainModel {
     )
 }
 
-fun MovieDetailDomainModel.toMovieWithActors(): MovieWithActors {
-    return MovieWithActors(
-        movie = MovieEntityModel(
-            movieId = this.id ?: 0L,
-            title = this.title,
-            synopsis = this.synopsis,
-            releaseDate = this.releaseDate,
-            genres = this.genre?.map { genre ->
-                Genre(
-                    genre.id?.toLong() ?: 0L,
-                    genre.name
-                )
-            },
-            popularity = this.popularity,
-            status = this.status,
-            videoKey = this.videoKey
-        ),
-        actors = this.cast?.map { actor ->
-            Actor(actor.id, actor.name, actor.role)
-        } ?: emptyList()
+fun MovieDetailDomainModel.toMovieUpdated(): MovieUpdatedDataEntity {
+    return MovieUpdatedDataEntity(
+        movieId = this.id ?: -1,
+        releaseDate = this.releaseDate,
+        overview = this.synopsis,
+        genres = this.genre?.toJson(),
+        status = this.status,
+        popularity = this.popularity,
+        cast = this.cast?.map { actor -> Actor(actor.id, actor.name, actor.role) } ?: emptyList()
     )
+}
+
+private fun List<GenreDomainModel>.toJson(): String {
+    return Json.encodeToString(this)
+}
+
+private fun parseGenresJson(json: String?): List<GenreDomainModel>? {
+    if (json.isNullOrBlank()) return null
+
+    return try {
+        Json.decodeFromString<List<GenreDomainModel>>(json)
+    } catch (e: Exception) {
+        Logger.e("Error while parsing genre string DB to genre domain model")
+        null
+    }
 }
