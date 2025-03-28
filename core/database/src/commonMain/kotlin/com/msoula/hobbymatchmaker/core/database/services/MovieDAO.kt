@@ -13,6 +13,7 @@ interface MovieDAO {
     suspend fun updateExistingMovie(
         movie: Movie
     )
+
     suspend fun updateExistingMovieWithDetail(
         movieUpdated: MovieUpdatedDataEntity
     )
@@ -34,4 +35,5 @@ interface MovieDAO {
     fun observeMovies(): Flow<List<Movie>>
     fun observeMovieWithActor(movieId: Long): Flow<MovieDetailDataEntity>
     fun getMovieById(movieId: Long): Movie?
+    fun getActorById(actorId: Long): Actor?
 }

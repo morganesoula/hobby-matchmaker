@@ -2,7 +2,6 @@ package com.msoula.hobbymatchmaker.features.moviedetail.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.getDeviceLocale
@@ -19,15 +18,14 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class MovieDetailViewModel(
-    private val movieId: Long,
+    movieId: Long,
     private val ioDispatcher: CoroutineDispatcher,
-    private val observeMovieDetailUseCase: ObserveMovieDetailUseCase,
+    observeMovieDetailUseCase: ObserveMovieDetailUseCase,
     private val manageMovieTrailerUseCase: ManageMovieTrailerUseCase
 ) : ViewModel() {
 
@@ -37,15 +35,8 @@ class MovieDetailViewModel(
     private var currentMovie: MovieDetailUiModel? = MovieDetailUiModel()
     private val language = getDeviceLocale()
 
-    init {
-        Logger.d("Instantiating MovieDetailViewModel with movieId: $movieId")
-    }
-
     val viewState: StateFlow<MovieDetailViewStateModel> =
         observeMovieDetailUseCase(Parameters.LongStringParam(movieId, language))
-            .onStart {
-                Logger.d("Started observing movieID: $movieId")
-            }
             .map { result ->
                 when (result) {
                     is Result.Loading -> MovieDetailViewStateModel.Loading

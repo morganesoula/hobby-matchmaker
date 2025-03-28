@@ -33,8 +33,7 @@ class AuthenticationRemoteDataSourceImpl(
         } catch (e: FirebaseAuthException) {
             Result.Failure(LogOutError.FirebaseException(e.message ?: ""))
         } catch (e: Exception) {
-            //Log.e("HMM", "Exception caught while logging out: ${e.message}")
-            println("Exception caught while logging out: ${e.message}")
+            Logger.e("Exception caught while logging out: ${e.message}")
             Result.Failure(LogOutError.UnknownError(e.message ?: ""))
         }
     }
@@ -64,7 +63,7 @@ class AuthenticationRemoteDataSourceImpl(
                 Result.Failure(SocialMediaError.LinkWithCredentialsError)
             }
         } catch (e: Exception) {
-            println("Exception caught while linking credentials: ${e.message}")
+            Logger.e("Exception caught while linking credentials: ${e.message}")
             Result.Failure(SocialMediaError.LinkWithCredentialsError)
         }
     }
@@ -79,25 +78,38 @@ class AuthenticationRemoteDataSourceImpl(
         } catch (exception: CancellationException) {
             throw exception
         } catch (e: FirebaseAuthException) {
-            //TODO No more e.errorCode so fix it
-            when (e.message) {
-                "ERROR_EMAIL_ALREADY_IN_USE" -> Result.Failure(
-                    CreateUserWithEmailAndPasswordError.EmailAlreadyExists
-                )
+            val errorMessage = e.message
+            if (errorMessage != null) {
+                when {
+                    errorMessage.contains(
+                        "ERROR_USER_DISABLED",
+                        ignoreCase = true
+                    ) -> Result.Failure(CreateUserWithEmailAndPasswordError.UserDisabled)
 
-                "ERROR_USER_DISABLED" -> Result.Failure(CreateUserWithEmailAndPasswordError.UserDisabled)
-                "ERROR_TOO_MANY_REQUESTS" -> Result.Failure(CreateUserWithEmailAndPasswordError.TooManyRequests)
-                "ERROR_INTERNAL_ERROR" -> Result.Failure(CreateUserWithEmailAndPasswordError.InternalError)
+                    errorMessage.contains(
+                        "ERROR_EMAIL_ALREADY_IN_USE",
+                        ignoreCase = true
+                    ) -> Result.Failure(CreateUserWithEmailAndPasswordError.EmailAlreadyExists)
 
-                else -> Result.Failure(
-                    CreateUserWithEmailAndPasswordError.Other(
-                        message = e.message ?: "Could not create user"
+                    errorMessage.contains(
+                        "ERROR_TOO_MANY_REQUESTS",
+                        ignoreCase = true
+                    ) -> Result.Failure(CreateUserWithEmailAndPasswordError.TooManyRequests)
+
+                    errorMessage.contains(
+                        "ERROR_INTERNAL_ERROR",
+                        ignoreCase = true
+                    ) -> Result.Failure(CreateUserWithEmailAndPasswordError.InternalError)
+
+                    else -> Result.Failure(
+                        CreateUserWithEmailAndPasswordError.Other(
+                            message = errorMessage
+                        )
                     )
-                )
-            }
+                }
+            } else Result.Failure(CreateUserWithEmailAndPasswordError.Other("Unknown error with empty message"))
         } catch (e: Exception) {
-            //Log.e("HMM", "Exception caught while creating user: ${e.message}")
-            println("Exception caught while creating user: ${e.message}")
+            Logger.e("Exception caught while creating user: ${e.message}")
             Result.Failure(
                 CreateUserWithEmailAndPasswordError.Other(
                     e.message ?: "Unexpected error"

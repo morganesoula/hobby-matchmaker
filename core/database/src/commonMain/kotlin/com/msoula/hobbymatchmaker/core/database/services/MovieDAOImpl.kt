@@ -102,11 +102,19 @@ class MovieDAOImpl(private val database: HMMDatabase) : MovieDAO {
             )
 
             movieUpdated.cast.forEach { actor ->
-                database.hmm_databaseQueries.insertActor(
-                    actorId = actor.actorId,
-                    name = actor.name,
-                    role = actor.role
-                )
+                val existingActor = getActorById(actor.actorId)
+
+                if (existingActor == null) {
+                    database.hmm_databaseQueries.insertActor(
+                        actorId = actor.actorId,
+                        name = actor.name,
+                        role = actor.role
+                    )
+                } else {
+                    database.hmm_databaseQueries.updateExistingActor(
+                        actor.name, actor.role, actor.actorId
+                    )
+                }
             }
 
             movieUpdated.cast.forEach { actor ->
@@ -218,5 +226,9 @@ class MovieDAOImpl(private val database: HMMDatabase) : MovieDAO {
 
     override fun getMovieById(movieId: Long): Movie? {
         return database.hmm_databaseQueries.getMovieById(movieId).executeAsOneOrNull()
+    }
+
+    override fun getActorById(actorId: Long): Actor? {
+        return database.hmm_databaseQueries.getActorById(actorId).executeAsOneOrNull()
     }
 }

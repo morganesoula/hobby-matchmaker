@@ -2,7 +2,6 @@ package com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.FlowUseCase
-import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
@@ -22,7 +21,6 @@ class ObserveMovieDetailUseCase(
     ) {
     override fun execute(parameters: Parameters.LongStringParam):
         Flow<Result<ObserveMovieSuccess, ObserveMovieErrors>> {
-        Logger.d("Fetching movie detail for id: ${parameters.longValue}, lang = ${parameters.stringValue}")
 
         return channelFlow {
             send(Result.Loading)

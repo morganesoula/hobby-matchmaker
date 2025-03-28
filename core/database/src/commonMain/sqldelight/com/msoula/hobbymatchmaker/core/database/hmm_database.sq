@@ -105,3 +105,8 @@ getMovieById:
 SELECT *
 FROM movie
 WHERE movieId = :movieId;
+
+getActorById:
+SELECT *
+FROM actor
+WHERE actorId = :actorId;
