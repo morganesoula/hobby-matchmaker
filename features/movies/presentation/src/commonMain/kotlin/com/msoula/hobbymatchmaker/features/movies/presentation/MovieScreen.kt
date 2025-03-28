@@ -1,9 +1,13 @@
 package com.msoula.hobbymatchmaker.features.movies.presentation
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,19 +50,28 @@ fun MovieScreenContent(
         }
     }
 
-    LazyRow(
-        modifier = modifier,
-        contentPadding = PaddingValues(start = 60.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        state = listState,
-    ) {
-        itemsIndexed(movies, key = { _, movie -> movie.id }) { index, currentMovie ->
-            MovieItem(
-                movie = currentMovie,
-                index = index,
-                onCardEvent = onCardEvent,
-                state = listState
-            )
+    Scaffold { padding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+            contentAlignment = Alignment.Center
+        ) {
+            LazyRow(
+                modifier = modifier,
+                contentPadding = PaddingValues(start = 60.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                state = listState,
+            ) {
+                itemsIndexed(movies, key = { _, movie -> movie.id }) { index, currentMovie ->
+                    MovieItem(
+                        movie = currentMovie,
+                        index = index,
+                        onCardEvent = onCardEvent,
+                        state = listState
+                    )
+                }
+            }
         }
     }
 }

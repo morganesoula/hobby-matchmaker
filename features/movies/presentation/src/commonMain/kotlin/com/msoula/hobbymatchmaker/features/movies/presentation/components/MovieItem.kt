@@ -36,6 +36,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -67,8 +69,7 @@ fun MovieItem(
                     Res.drawable.ic_movie_clapper_board
                 ).size(coil3.size.Size(150, 150))
                 .build()
-        }
-        else {
+        } else {
             ImageRequest.Builder(LocalPlatformContext.current)
                 .data(movie.coverFilePath.toPath())
                 .size(coil3.size.Size.ORIGINAL)
@@ -129,13 +130,18 @@ fun MovieItemContent(
         ) {
             MovieItemContentCard(modifier, movie, onCardEvent, painter)
         }
+
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
+            modifier = Modifier.width(270.dp),
             text = movie.title,
             fontSize = 20.sp,
             color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center
         )
     }
 }
