@@ -1,21 +1,23 @@
 package com.msoula.hobbymatchmaker.core.design.component
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.clickable
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextLayoutResult
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun ExpandableTextComponent(
@@ -24,58 +26,46 @@ fun ExpandableTextComponent(
     showLess: String,
     showMore: String
 ) {
-    var isExpanded by remember { mutableStateOf(false) }
-    val textLayoutResultState = remember { mutableStateOf<TextLayoutResult?>(null) }
-    var isClickable by remember { mutableStateOf(false) }
-    var finalText by remember { mutableStateOf(text) }
+    var expanded by remember { mutableStateOf(false) }
+    var showExpandButton by remember { mutableStateOf(false) }
 
-    val textLayoutResult = textLayoutResultState.value
+    Box(modifier = modifier.animateContentSize()) {
+        Column {
+            Box(
+                modifier = Modifier
+                    .height(if (expanded) Dp.Unspecified else 100.dp)
+                    .clip(RoundedCornerShape(8.dp))
+            ) {
+                Text(
+                    text = text,
+                    onTextLayout = { layoutResult ->
+                        if (!expanded && layoutResult.lineCount > 6) {
+                            showExpandButton = true
+                        }
+                    }
+                )
 
-    LaunchedEffect(textLayoutResult) {
-        if (textLayoutResult == null) return@LaunchedEffect
-    }
-
-    if (textLayoutResult != null) {
-        when {
-            isExpanded -> {
-                finalText = text
+                if (!expanded && showExpandButton) {
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .height(30.dp)
+                            .align(Alignment.BottomCenter)
+                    )
+                }
             }
 
-            !isExpanded && textLayoutResult.hasVisualOverflow -> {
-                val lastCharIndex = textLayoutResult.getLineEnd(6 - 1).coerceAtMost(text.length)
-                val adjustedText = text
-                    .substring(startIndex = 0, endIndex = lastCharIndex)
-                    .dropLast(showMore.length)
-                    .dropLastWhile { it == ' ' || it == '.' }
-
-                finalText = adjustedText
-                isClickable = true
-            }
-        }
-    }
-
-    val displayText = buildAnnotatedString {
-        append(finalText)
-        if (isExpanded) {
-            append(" ")
-            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                append(showLess)
-            }
-        } else {
-            append(" ")
-            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                append(showMore)
+            if (showExpandButton) {
+                TextButton(
+                    onClick = { expanded = !expanded },
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    Text(if (expanded) showLess else showMore)
+                }
             }
         }
     }
 
-    Text(
-        text = displayText,
-        color = MaterialTheme.colorScheme.onBackground,
-        maxLines = if (isExpanded) Int.MAX_VALUE else 6,
-        onTextLayout = { textLayoutResultState.value = it },
-        modifier = modifier
-            .clickable(isClickable) { isExpanded = !isExpanded }
-            .animateContentSize()
-    )
 }
+
+
