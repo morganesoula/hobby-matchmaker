@@ -7,3 +7,4 @@ class MovieDetailComponentImpl(
     componentContext: ComponentContext,
     override val movieId: Long
 ) : MovieDetailComponent, ComponentContext by componentContext
+

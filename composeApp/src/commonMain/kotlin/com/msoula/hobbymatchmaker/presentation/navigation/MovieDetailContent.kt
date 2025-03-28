@@ -5,6 +5,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.msoula.hobbymatchmaker.core.navigation.domain.MovieDetailComponent
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailViewModel
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailContent
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -20,9 +21,10 @@ fun MovieDetailContent(component: MovieDetailComponent) {
     val viewState by movieDetailViewModel.viewState.collectAsState()
     val oneTimeEventFlow = movieDetailViewModel.oneTimeEventChannelFlow
 
-    com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailContent(
+    MovieDetailContent(
         viewState = viewState,
         oneTimeEventFlow = oneTimeEventFlow,
-        onPlayTrailerClicked = movieDetailViewModel::onEvent
+        onPlayTrailerClicked = movieDetailViewModel::onEvent,
+        backHandler = component.backHandler
     )
 }

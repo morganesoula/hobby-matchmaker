@@ -1,5 +1,7 @@
 package com.msoula.hobbymatchmaker.core.navigation.domain
 
-interface MovieDetailComponent {
+import com.arkivanov.essenty.backhandler.BackHandlerOwner
+
+interface MovieDetailComponent : BackHandlerOwner {
     val movieId: Long
 }

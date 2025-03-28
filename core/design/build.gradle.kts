@@ -28,6 +28,10 @@ kotlin {
             implementation(compose.materialIconsExtended)
 
             implementation(libs.core.ktx)
+
+            // Navigation
+            implementation(libs.decompose.core)
+            implementation(libs.decompose.compose)
         }
     }
 }

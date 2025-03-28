@@ -42,7 +42,9 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
+import com.arkivanov.essenty.backhandler.BackHandler
 import com.msoula.hobbymatchmaker.core.common.ObserveAsEvents
+import com.msoula.hobbymatchmaker.core.design.component.DecomposeBackHandler
 import com.msoula.hobbymatchmaker.core.design.component.ExpandableTextComponent
 import com.msoula.hobbymatchmaker.core.design.component.LoadingCircularProgress
 import com.msoula.hobbymatchmaker.core.design.component.LocalSnackBar
@@ -58,6 +60,7 @@ import org.jetbrains.compose.resources.stringResource
 fun MovieDetailContent(
     viewState: MovieDetailViewStateModel,
     oneTimeEventFlow: Flow<MovieDetailUiEventModel>,
+    backHandler: BackHandler,
     onPlayTrailerClicked: (event: MovieDetailUiEventModel) -> Unit
 ) {
     when (viewState) {
@@ -68,7 +71,8 @@ fun MovieDetailContent(
             MovieDetailScreen(
                 oneTimeEventFlow = oneTimeEventFlow,
                 movie = viewState.movie,
-                onPlayTrailerClicked = onPlayTrailerClicked
+                onPlayTrailerClicked = onPlayTrailerClicked,
+                backHandler = backHandler
             )
     }
 }
@@ -78,6 +82,7 @@ fun MovieDetailScreen(
     modifier: Modifier = Modifier,
     oneTimeEventFlow: Flow<MovieDetailUiEventModel>,
     movie: MovieDetailUiModel,
+    backHandler: BackHandler,
     onPlayTrailerClicked: (event: MovieDetailUiEventModel) -> Unit
 ) {
     Scaffold {
@@ -85,7 +90,8 @@ fun MovieDetailScreen(
             movie = movie,
             modifier = modifier.padding(it),
             onPlayTrailerClicked = onPlayTrailerClicked,
-            oneTimeEventFlow = oneTimeEventFlow
+            oneTimeEventFlow = oneTimeEventFlow,
+            backHandler = backHandler
         )
     }
 }
@@ -94,6 +100,7 @@ fun MovieDetailScreen(
 fun MovieDetailContentScreen(
     modifier: Modifier = Modifier,
     movie: MovieDetailUiModel,
+    backHandler: BackHandler,
     oneTimeEventFlow: Flow<MovieDetailUiEventModel>,
     onPlayTrailerClicked: (event: MovieDetailUiEventModel) -> Unit
 ) {
@@ -278,10 +285,12 @@ fun MovieDetailContentScreen(
         }
     }
 
-    /* BackHandler(enabled = true) {
-        videoPlayerVisibility.value = false
-        exitFullScreen.value = true
-    } */
+    if (videoPlayerVisibility.value) {
+        DecomposeBackHandler(backHandler) {
+            videoPlayerVisibility.value = false
+            exitFullScreen.value = true
+        }
+    }
 }
 
 @Composable

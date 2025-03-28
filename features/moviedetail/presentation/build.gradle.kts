@@ -40,6 +40,10 @@ kotlin {
             implementation(project(Modules.COMMON))
             implementation(project(Modules.DESIGN))
             implementation(project(Modules.MOVIE_DETAIL_DOMAIN))
+
+            // Navigation
+            implementation(libs.decompose.core)
+            implementation(libs.decompose.compose)
         }
 
         androidMain.dependencies {
