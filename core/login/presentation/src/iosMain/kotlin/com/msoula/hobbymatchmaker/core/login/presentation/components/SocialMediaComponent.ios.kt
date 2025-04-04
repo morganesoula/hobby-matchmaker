@@ -14,17 +14,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.login.presentation.Res
+import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.google_alt
 import com.msoula.hobbymatchmaker.core.login.presentation.google_logo
+import dev.gitlive.firebase.auth.AuthCredential
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 actual fun SocialMediaButtonListPlatformSpecificUI(
     modifier: Modifier,
-    onFacebookButtonClicked: (() -> Unit)?,
+    onFacebookButtonClicked: ((credential: AuthCredential) -> Unit)?,
     onAppleButtonClicked: (() -> Unit)?,
-    onGoogleButtonClicked: () -> Unit
+    onGoogleButtonClicked: () -> Unit,
+    facebookUIClient: FacebookUIClient?
 ) {
     Row(
         modifier =

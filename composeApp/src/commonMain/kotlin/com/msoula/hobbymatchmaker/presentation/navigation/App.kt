@@ -1,19 +1,58 @@
 package com.msoula.hobbymatchmaker.presentation.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.getValue
 import com.arkivanov.decompose.extensions.compose.stack.Children
+import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient
+import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClientImpl
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.GoogleUIClient
+import com.msoula.hobbymatchmaker.core.login.presentation.clients.GoogleUIClientImpl
+import com.msoula.hobbymatchmaker.core.navigation.domain.AuthRootComponent
+import com.msoula.hobbymatchmaker.core.navigation.domain.MainRootComponent
 import com.msoula.hobbymatchmaker.core.navigation.domain.RootComponent
+import com.msoula.hobbymatchmaker.core.splashscreen.presentation.SplashScreenContent
 
 @Composable
-fun App(component: RootComponent, modifier: Modifier = Modifier, googleUIClient: GoogleUIClient) {
-    Children(stack = component.childSck, modifier = modifier) { child ->
-        when (val instance = child.instance) {
-            is RootComponent.Child.Splash -> SplashContent(instance.onFinish)
-            is RootComponent.Child.Auth -> AuthContent(instance.component, googleUIClient)
-            is RootComponent.Child.Main -> MovieContent(instance.component)
-            is RootComponent.Child.MovieDetail -> MovieDetailContent(instance.component)
+fun App(
+    component: RootComponent,
+    googleUIClient: GoogleUIClient,
+    facebookUIClient: FacebookUIClient
+) {
+    val slotChild by component.currentRootSlot.subscribeAsState()
+    val instance = slotChild.child?.instance
+
+    instance?.let { inst ->
+        when (inst) {
+            is RootComponent.RootChild.SplashFlow -> SplashScreenContent()
+
+            is RootComponent.RootChild.AuthFlow -> {
+                val authStack by instance.stack.subscribeAsState()
+
+                Children(stack = authStack) { child ->
+                    when (val authScreen = child.instance) {
+                        is AuthRootComponent.Child.SignIn -> SignInContent(
+                            authScreen.component,
+                            GoogleUIClientImpl(googleUIClient),
+                            FacebookUIClientImpl(facebookUIClient),
+                            facebookUIClient = facebookUIClient
+                        )
+
+                        is AuthRootComponent.Child.SignUp -> SignUpContent(authScreen.component)
+                    }
+                }
+            }
+
+            is RootComponent.RootChild.MainFlow -> {
+                val mainStack by instance.stack.subscribeAsState()
+
+                Children(stack = mainStack) { child ->
+                    when (val mainScreen = child.instance) {
+                        is MainRootComponent.Child.Main -> MovieContent(mainScreen.component)
+                        is MainRootComponent.Child.MovieDetail -> MovieDetailContent(mainScreen.component)
+                    }
+                }
+            }
         }
     }
 }

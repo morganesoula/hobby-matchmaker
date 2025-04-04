@@ -46,13 +46,13 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.design.component.HMMButtonAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldPasswordComponent
 import com.msoula.hobbymatchmaker.core.design.component.HeaderTextComponent
 import com.msoula.hobbymatchmaker.core.login.presentation.Res
 import com.msoula.hobbymatchmaker.core.login.presentation.cancel
+import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.components.SocialMediaButtonListPlatformSpecificUI
 import com.msoula.hobbymatchmaker.core.login.presentation.continue_with_rs
 import com.msoula.hobbymatchmaker.core.login.presentation.email
@@ -70,6 +70,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.reset_password
 import com.msoula.hobbymatchmaker.core.login.presentation.show_password
 import com.msoula.hobbymatchmaker.core.login.presentation.welcome_back_title
 import com.msoula.hobbymatchmaker.core.login.presentation.your_email
+import dev.gitlive.firebase.auth.AuthCredential
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
@@ -78,7 +79,9 @@ fun SignInScreenContent(
     modifier: Modifier = Modifier,
     signInViewModel: SignInViewModel,
     redirectToMovieScreen: () -> Unit,
-    redirectToSignUpScreen: () -> Unit
+    redirectToSignUpScreen: () -> Unit,
+    resetSignInState: () -> Unit,
+    facebookUIClient: FacebookUIClient
 ) {
     val coroutineScope = rememberCoroutineScope()
     val resetPasswordState by signInViewModel.resetPasswordState.collectAsState()
@@ -114,7 +117,11 @@ fun SignInScreenContent(
                 )
             }
 
-            is SignInEvent.Success -> redirectToMovieScreen()
+            is SignInEvent.Success -> {
+                redirectToMovieScreen()
+                resetSignInState()
+            }
+
             else -> Unit
         }
     }
@@ -149,7 +156,6 @@ fun SignInScreenContent(
                 SignInScreenMainContent(
                     email = loginFormState.email.trimEnd(),
                     onEmailChanged = {
-                        Logger.d("Updating email in View with value: $it")
                         signInViewModel.onEvent(
                             AuthenticationUIEvent.OnEmailChanged(
                                 it
@@ -175,9 +181,14 @@ fun SignInScreenContent(
                     onAppleButtonClicked = {
                         signInViewModel.onEvent(AuthenticationUIEvent.OnAppleButtonClicked)
                     },
-                    onFacebookButtonClicked = {
-                        signInViewModel.onEvent(AuthenticationUIEvent.OnFacebookButtonClicked)
-                    }
+                    onFacebookButtonClicked = { credential ->
+                        signInViewModel.onEvent(
+                            AuthenticationUIEvent.OnFacebookButtonClicked(
+                                credential
+                            )
+                        )
+                    },
+                    facebookUIClient = facebookUIClient
                 )
             }
 
@@ -248,7 +259,8 @@ fun ColumnScope.SignInScreenMainContent(
     dividerConnectText: String = "",
     onGoogleButtonClicked: () -> Unit,
     onAppleButtonClicked: () -> Unit,
-    onFacebookButtonClicked: () -> Unit
+    onFacebookButtonClicked: (credential: AuthCredential) -> Unit,
+    facebookUIClient: FacebookUIClient
 ) {
     HMMTextFieldAuthComponent(
         value = email,
@@ -308,7 +320,8 @@ fun ColumnScope.SignInScreenMainContent(
         modifier = modifier,
         onFacebookButtonClicked = onFacebookButtonClicked,
         onAppleButtonClicked = onAppleButtonClicked,
-        onGoogleButtonClicked = onGoogleButtonClicked
+        onGoogleButtonClicked = onGoogleButtonClicked,
+        facebookUIClient = facebookUIClient
     )
 }
 
@@ -367,8 +380,6 @@ fun ForgotPasswordAlertDialog(
             HMMTextFieldAuthComponent(
                 value = email,
                 onValueChange = {
-                    //Log.d("HMM", "Changing reset email with: $it")
-                    println("Changing reset email with: $it")
                     authUIEvent(AuthenticationUIEvent.OnEmailResetChanged(it))
                 },
                 placeHolderText = stringResource(Res.string.your_email),

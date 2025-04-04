@@ -3,6 +3,7 @@ package com.msoula.hobbymatchmaker.features.movies.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfo
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutUseCase
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
@@ -13,6 +14,7 @@ import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMovi
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.SetMovieFavoriteUseCase
 import com.msoula.hobbymatchmaker.features.movies.presentation.mappers.toMovieUiModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
+import com.msoula.hobbymatchmaker.features.movies.presentation.models.LogOutModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiStateModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -32,6 +34,7 @@ class MovieViewModel(
     private val setMovieFavoriteUseCase: SetMovieFavoriteUseCase,
     observeAllMoviesUseCase: ObserveAllMoviesUseCase,
     private val getUserInfo: FetchFirebaseUserInfo,
+    private val logOutUseCase: LogOutUseCase,
     private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
@@ -67,6 +70,18 @@ class MovieViewModel(
                 MovieUiStateModel.Loading
             )
 
+    fun logOut() {
+        viewModelScope.launch {
+            logOutUseCase(Parameters.StringParam("")).collect { result ->
+                when (result) {
+                    is Result.Success -> _oneTimeEventChannel.trySend(MovieUiEventModel.OnLogOutSuccess)
+                    is Result.Failure -> LogOutModel.Error(result.error.message)
+                    else -> LogOutModel.Idle
+                }
+            }
+        }
+    }
+
     private suspend fun handleError(error: AppError): String {
         return when (error) {
             is ObserveAllMoviesErrors.NetworkError -> getString(Res.string.movies_network_error)
@@ -98,9 +113,9 @@ class MovieViewModel(
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    private suspend fun sendOnce(event: MovieUiEventModel) {
+    private fun sendOnce(event: MovieUiEventModel) {
         if (!_oneTimeEventChannel.isClosedForSend) {
-            _oneTimeEventChannel.send(event)
+            _oneTimeEventChannel.trySend(event)
         }
     }
 }

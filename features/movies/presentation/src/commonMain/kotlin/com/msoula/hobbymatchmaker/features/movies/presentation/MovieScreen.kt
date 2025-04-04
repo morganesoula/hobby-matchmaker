@@ -7,9 +7,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -24,13 +30,16 @@ import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiMod
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieScreenContent(
     modifier: Modifier = Modifier,
     movies: List<MovieUiModel>,
     oneTimeEventChannelFlow: Flow<MovieUiEventModel>,
     redirectToMovieDetail: (movieId: Long) -> Unit,
-    onCardEvent: (CardEventModel) -> Unit
+    logOut: () -> Unit,
+    onCardEvent: (CardEventModel) -> Unit,
+    redirectToAuth: () -> Unit
 ) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -46,11 +55,28 @@ fun MovieScreenContent(
                 is MovieUiEventModel.OnMovieUiFetchedError -> {
                     snackBarHostState.showSnackbar(message = event.error)
                 }
+
+                is MovieUiEventModel.OnLogOutSuccess -> redirectToAuth()
             }
         }
     }
 
-    Scaffold { padding ->
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                { Text(text = "HobbyMatchMaker") },
+                actions = {
+                    IconButton(onClick = {
+                        logOut()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Logging out"
+                        )
+                    }
+                })
+        }
+    ) { padding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()

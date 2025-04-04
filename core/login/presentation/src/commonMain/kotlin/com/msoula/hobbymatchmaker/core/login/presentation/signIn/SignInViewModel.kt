@@ -7,6 +7,7 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ResetPassw
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInError
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.UnifiedSignInUseCase
 import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.StateSaver
@@ -21,6 +22,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.signIn.models.SignInFo
 import com.msoula.hobbymatchmaker.core.login.presentation.too_many_requests_error
 import com.msoula.hobbymatchmaker.core.login.presentation.user_disabled_error
 import com.msoula.hobbymatchmaker.core.login.presentation.user_not_found_error
+import dev.gitlive.firebase.auth.AuthCredential
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -87,8 +89,8 @@ class SignInViewModel(
             AuthenticationUIEvent.OnAppleButtonClicked ->
                 launchSocialSignIn(ProviderType.APPLE)
 
-            AuthenticationUIEvent.OnFacebookButtonClicked ->
-                launchSocialSignIn(ProviderType.FACEBOOK)
+            is AuthenticationUIEvent.OnFacebookButtonClicked ->
+                launchSocialSignIn(ProviderType.FACEBOOK, event.credential)
 
             AuthenticationUIEvent.OnResetPasswordConfirmed ->
                 viewModelScope.launch { resetPassword() }
@@ -143,17 +145,22 @@ class SignInViewModel(
     }
 
     private fun launchSocialSignIn(
-        providerType: ProviderType
+        providerType: ProviderType,
+        fetchedCredential: AuthCredential? = null
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             val client = socialClients[providerType]
-            val credential = client?.getCredential()
+            val credential = fetchedCredential ?: client?.getCredential()
 
             if (credential != null) {
-                signInUnified(UnifiedSignInUseCase.Params.SocialMedia(
-                    credential, providerType
-                ))
+                Logger.d("Credential loaded")
+                signInUnified(
+                    UnifiedSignInUseCase.Params.SocialMedia(
+                        credential, providerType
+                    )
+                )
             } else {
+                Logger.e("Could not load social credentials")
                 _signInState.value = SignInEvent.Error("Unable to get credentials")
             }
         }
@@ -201,4 +208,8 @@ class SignInViewModel(
     }
 
     private fun clearFormState() = stateSaver.removeState("loginState")
+
+    fun resetSignInState() {
+        _signInState.value = SignInEvent.Idle
+    }
 }

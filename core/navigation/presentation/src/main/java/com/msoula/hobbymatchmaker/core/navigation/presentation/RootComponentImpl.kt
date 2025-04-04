@@ -1,88 +1,69 @@
 package com.msoula.hobbymatchmaker.core.navigation.presentation
 
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.DelicateDecomposeApi
-import com.arkivanov.decompose.router.stack.ChildStack
-import com.arkivanov.decompose.router.stack.StackNavigation
-import com.arkivanov.decompose.router.stack.childStack
-import com.arkivanov.decompose.router.stack.push
-import com.arkivanov.decompose.router.stack.replaceAll
+import com.arkivanov.decompose.router.slot.ChildSlot
+import com.arkivanov.decompose.router.slot.SlotNavigation
+import com.arkivanov.decompose.router.slot.activate
+import com.arkivanov.decompose.router.slot.childSlot
 import com.arkivanov.decompose.value.Value
-import com.msoula.hobbymatchmaker.core.navigation.domain.AuthComponent
-import com.msoula.hobbymatchmaker.core.navigation.domain.MainComponent
-import com.msoula.hobbymatchmaker.core.navigation.domain.MovieDetailComponent
+import com.msoula.hobbymatchmaker.core.navigation.domain.AuthRootComponent
+import com.msoula.hobbymatchmaker.core.navigation.domain.MainRootComponent
 import com.msoula.hobbymatchmaker.core.navigation.domain.RootComponent
-import com.msoula.hobbymatchmaker.core.navigation.domain.SplashComponent
-import com.msoula.hobbymatchmaker.core.navigation.domain.util.coroutineScope
-import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveIsConnectedUseCase
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import com.msoula.hobbymatchmaker.core.navigation.domain.SplashRootComponent
 import kotlinx.serialization.Serializable
 
 class RootComponentImpl(
     componentContext: ComponentContext,
-    private val observeIsConnectedUseCase: ObserveIsConnectedUseCase,
-    private val authComponentFactory: (context: ComponentContext, onAuthenticated: () -> Unit) -> AuthComponent,
-    private val mainComponentFactory: (ComponentContext, (Long) -> Unit) -> MainComponent,
-    private val movieDetailComponentFactory: (ComponentContext, Long) -> MovieDetailComponent,
-    private val splashComponentFactory: (ComponentContext, ObserveIsConnectedUseCase) -> SplashComponent
+    private val authComponentFactory: (context: ComponentContext, onAuthenticated: () -> Unit) -> AuthRootComponent,
+    private val mainComponentFactory: (ComponentContext, onMovieClicked: (Long) -> Unit, onLogOut: () -> Unit) -> MainRootComponent,
+    private val splashComponentFactory: (ComponentContext, onFinished: (Boolean) -> Unit) -> SplashRootComponent
 ) : RootComponent, ComponentContext by componentContext {
 
-    private val navigation = StackNavigation<Config>()
+    private val navigation = SlotNavigation<RootConfig>()
 
-    override val childSck: Value<ChildStack<*, RootComponent.Child>> =
-        childStack(
+    override val currentRootSlot: Value<ChildSlot<*, RootComponent.RootChild>> =
+        childSlot(
             source = navigation,
-            serializer = Config.serializer(),
-            initialConfiguration = Config.Splash,
+            serializer = RootConfig.serializer(),
+            initialConfiguration = { RootConfig.Splash },
             handleBackButton = true,
             childFactory = ::createChild
         )
 
-    @OptIn(DelicateDecomposeApi::class)
-    private fun createChild(config: Config, context: ComponentContext): RootComponent.Child =
-        when (config) {
-            Config.Splash -> RootComponent.Child.Splash {
-                val splashComponent = splashComponentFactory(context, observeIsConnectedUseCase)
-
-                splashComponent.isConnected
-                    .onEach { isConnected ->
-                        when (isConnected) {
-                            true -> navigation.replaceAll(Config.Main)
-                            false -> navigation.replaceAll(Config.Auth)
-                            else -> Unit
-                        }
-                    }
-                    .launchIn(context.coroutineScope())
-            }
-
-            Config.Auth -> RootComponent.Child.Auth(
-                authComponentFactory(context) {
-                    navigation.push(Config.Main)
+    private fun createChild(
+        config: RootConfig,
+        context: ComponentContext
+    ): RootComponent.RootChild {
+        return when (config) {
+            RootConfig.Splash -> RootComponent.RootChild.SplashFlow(
+                splashComponentFactory(context) { isConnected ->
+                    navigation.activate(if (isConnected) RootConfig.Main else RootConfig.Auth)
                 }
             )
 
-            Config.Main -> RootComponent.Child.Main(mainComponentFactory(context) { movieId ->
-                navigation.push(Config.MovieDetail(movieId))
-            })
+            RootConfig.Auth -> RootComponent.RootChild.AuthFlow(
+                authComponentFactory(context) {
+                    navigation.activate(RootConfig.Main)
+                }
+            )
 
-            is Config.MovieDetail -> RootComponent.Child.MovieDetail(
-                movieDetailComponentFactory(context, config.movieId)
+            RootConfig.Main -> RootComponent.RootChild.MainFlow(
+                mainComponentFactory(
+                    context, {},
+                    { navigation.activate(RootConfig.Auth) })
             )
         }
+    }
 
     @Serializable
-    private sealed interface Config {
+    private sealed interface RootConfig {
         @Serializable
-        data object Splash : Config
+        data object Auth : RootConfig
 
         @Serializable
-        data object Auth : Config
+        data object Main : RootConfig
 
         @Serializable
-        data object Main : Config
-
-        @Serializable
-        data class MovieDetail(val movieId: Long) : Config
+        data object Splash : RootConfig
     }
 }

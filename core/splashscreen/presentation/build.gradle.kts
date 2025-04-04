@@ -27,6 +27,7 @@ kotlin {
             implementation(compose.components.resources)
 
             // Modules
+            implementation(project(Modules.COMMON))
             implementation(project(Modules.DESIGN))
         }
     }

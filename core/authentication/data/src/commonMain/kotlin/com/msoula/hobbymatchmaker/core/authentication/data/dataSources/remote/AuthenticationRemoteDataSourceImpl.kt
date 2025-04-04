@@ -27,6 +27,7 @@ class AuthenticationRemoteDataSourceImpl(
     override suspend fun authenticationSignOut(): Result<Boolean, LogOutError> {
         return try {
             authManager.signOut()
+            Logger.d("Successfully logged out in DataSourceImpl")
             Result.Success(true)
         } catch (exception: CancellationException) {
             throw exception

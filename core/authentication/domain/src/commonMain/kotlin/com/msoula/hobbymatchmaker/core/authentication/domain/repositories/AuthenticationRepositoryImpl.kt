@@ -8,6 +8,7 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SignInWithEm
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SocialMediaError
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.mapError
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
@@ -19,9 +20,14 @@ class AuthenticationRepositoryImpl(
 ) : AuthenticationRepository {
     override suspend fun logOut(): Result<Boolean, LogOutError> {
         return try {
+            Logger.d("Inside Repository and executing logging out")
             when (val result = remoteDataSource.authenticationSignOut()) {
-                is Result.Success, Result.Loading -> Result.Success(true)
+                is Result.Success, Result.Loading -> {
+                    Logger.d("Success in Repository")
+                    Result.Success(true)
+                }
                 is Result.Failure -> {
+                    Logger.d("Error in Repository")
                     Result.Failure(result.error)
                 }
             }

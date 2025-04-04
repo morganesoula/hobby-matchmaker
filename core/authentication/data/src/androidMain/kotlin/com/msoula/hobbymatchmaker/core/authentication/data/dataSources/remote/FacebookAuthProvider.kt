@@ -4,6 +4,7 @@ import com.facebook.login.LoginManager
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.errors.ProviderError
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.mappers.toFirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Result
 import dev.gitlive.firebase.auth.AuthCredential
 import dev.gitlive.firebase.auth.FirebaseAuth
@@ -27,6 +28,7 @@ class FacebookAuthProvider(
     }
 
     override suspend fun signOut(): Result<Boolean, ProviderError> {
+        Logger.d("Signing out with Facebook")
         return try {
             LoginManager.getInstance().logOut()
             auth.signOut()

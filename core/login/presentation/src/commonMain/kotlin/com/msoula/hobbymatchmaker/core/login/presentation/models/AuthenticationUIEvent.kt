@@ -1,5 +1,7 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.models
 
+import dev.gitlive.firebase.auth.AuthCredential
+
 sealed interface AuthenticationUIEvent {
     data class OnEmailChanged(val email: String) : AuthenticationUIEvent
 
@@ -13,7 +15,7 @@ sealed interface AuthenticationUIEvent {
 
     data object OnAppleButtonClicked : AuthenticationUIEvent
 
-    data object OnFacebookButtonClicked : AuthenticationUIEvent
+    data class OnFacebookButtonClicked(val credential: AuthCredential) : AuthenticationUIEvent
 
     data object HideForgotPasswordDialog : AuthenticationUIEvent
 

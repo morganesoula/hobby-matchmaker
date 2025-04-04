@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.msoula.hobbymatchmaker.core.navigation.domain.MovieDetailComponent
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailViewModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailContent
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailViewModel
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 

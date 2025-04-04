@@ -81,6 +81,9 @@ kotlin {
             api(libs.appcompat)
             implementation(libs.activity.compose)
 
+            // Facebook
+            implementation(libs.facebook.android.sdk)
+
             // Firebase to make :generateDebugAndroidTestLintModel pass
             implementation("com.google.firebase:firebase-auth-ktx:23.2.0")
             implementation("com.google.firebase:firebase-common-ktx:21.0.0")

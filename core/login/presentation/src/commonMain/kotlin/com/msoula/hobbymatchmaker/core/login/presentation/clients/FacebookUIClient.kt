@@ -5,7 +5,12 @@ import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SocialUIClient
 import dev.gitlive.firebase.auth.AuthCredential
 
 interface FacebookUIClient {
-    suspend fun getFacebookCredentials(): Pair<AuthCredential, String?>
+    suspend fun getFacebookCredentials(): Pair<AuthCredential?, String?>
+    fun registerCallback(
+        onSuccess: (AuthCredential, String?) -> Unit,
+        onError: (Exception) -> Unit
+    )
+    fun logIn()
 }
 
 class FacebookUIClientImpl(
@@ -15,7 +20,7 @@ class FacebookUIClientImpl(
     override val providerType: ProviderType
         get() = ProviderType.FACEBOOK
 
-    override suspend fun getCredential(): AuthCredential {
+    override suspend fun getCredential(): AuthCredential? {
         return facebookUIClient.getFacebookCredentials().first
     }
 }

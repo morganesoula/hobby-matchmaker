@@ -26,6 +26,7 @@ kotlin {
             implementation(compose.material3)
             implementation(compose.components.resources)
             implementation(compose.materialIconsExtended)
+            implementation("org.jetbrains.compose.ui:ui-backhandler:1.8.0-alpha03")
 
             implementation(libs.core.ktx)
 

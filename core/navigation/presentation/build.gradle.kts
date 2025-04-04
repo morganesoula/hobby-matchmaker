@@ -32,6 +32,7 @@ kotlin {
             implementation(libs.decompose.compose)
 
             // Module
+            implementation(project(Modules.COMMON))
             implementation(project(Modules.NAVIGATION_DOMAIN))
             implementation(project(Modules.SESSION_DOMAIN))
         }
