@@ -1,5 +1,6 @@
 package com.msoula.hobbymatchmaker.core.session.data.dataSources.remote
 
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.safeCall
 import com.msoula.hobbymatchmaker.core.session.data.dataSources.remote.mappers.toUserFireStoreModel
@@ -17,8 +18,7 @@ class SessionRemoteDataSourceImpl(
         val document = firestore.collection("users").document(user.uid).get()
 
         if (document.exists) {
-            //Log.i("HMM", "User already exists - nothing to do here")
-            println("User already exists - nothing to do here")
+            Logger.i("User already exists - nothing to do here")
             return Result.Success(true)
         } else {
             val firestoreUser = user.toUserFireStoreModel()
@@ -41,8 +41,7 @@ class SessionRemoteDataSourceImpl(
         userFireStoreModel: HashMap<String, String>
     ): Result<Boolean, SessionErrors.CreateUserError> {
         return safeCall(appError = { errorMessage ->
-            //Log.e("HMM", "Error while saving firestore user online")
-            println("Error while saving firestore user online")
+            Logger.e("Error while saving firestore user online: $errorMessage")
             SessionErrors.CreateUserError.SaveError(errorMessage)
         }) {
             firestore.collection("users").document(uid).set(userFireStoreModel)

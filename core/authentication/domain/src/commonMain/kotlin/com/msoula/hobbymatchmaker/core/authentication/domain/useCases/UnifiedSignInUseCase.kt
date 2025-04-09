@@ -6,8 +6,8 @@ import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetIsConnectedUseCase
 import dev.gitlive.firebase.auth.AuthCredential
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flow
 
 class UnifiedSignInUseCase(
     private val signInUseCase: SignInUseCase,
@@ -22,8 +22,8 @@ class UnifiedSignInUseCase(
     }
 
     fun signIn(params: Params): Flow<Result<SignInSuccess, SignInError>> = when (params) {
-        is Params.EmailPassword -> flow {
-            emit(Result.Loading)
+        is Params.EmailPassword -> channelFlow {
+            send(Result.Loading)
 
             signInUseCase(
                 Parameters.DoubleStringParam(params.email, params.password)
@@ -31,17 +31,17 @@ class UnifiedSignInUseCase(
                 when (result) {
                     is Result.Success -> {
                         setIsConnectedUseCase(true)
-                        emit(Result.Success(SignInSuccess))
+                        send(Result.Success(SignInSuccess))
                     }
 
-                    is Result.Failure -> emit(Result.Failure(result.error))
+                    is Result.Failure -> send(Result.Failure(result.error))
                     else -> Unit
                 }
             }
         }
 
-        is Params.SocialMedia -> flow {
-            emit(Result.Loading)
+        is Params.SocialMedia -> channelFlow {
+            send(Result.Loading)
 
             when (val result = signInWithCredentialUseCase(
                 params.credential, params.providerType
@@ -49,10 +49,10 @@ class UnifiedSignInUseCase(
 
                 is Result.Success -> {
                     setIsConnectedUseCase(true)
-                    emit(Result.Success(SignInSuccess))
+                    send(Result.Success(SignInSuccess))
                 }
 
-                is Result.Failure -> emit(Result.Failure(SignInError.Other(result.error.message)))
+                is Result.Failure -> send(Result.Failure(SignInError.Other(result.error.message)))
                 else -> Unit
             }
         }

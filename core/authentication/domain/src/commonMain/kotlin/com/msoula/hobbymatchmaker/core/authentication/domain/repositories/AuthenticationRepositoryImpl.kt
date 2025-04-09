@@ -20,14 +20,13 @@ class AuthenticationRepositoryImpl(
 ) : AuthenticationRepository {
     override suspend fun logOut(): Result<Boolean, LogOutError> {
         return try {
-            Logger.d("Inside Repository and executing logging out")
             when (val result = remoteDataSource.authenticationSignOut()) {
                 is Result.Success, Result.Loading -> {
-                    Logger.d("Success in Repository")
                     Result.Success(true)
                 }
+
                 is Result.Failure -> {
-                    Logger.d("Error in Repository")
+                    Logger.d("Error in Repository - ${result.error}")
                     Result.Failure(result.error)
                 }
             }

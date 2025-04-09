@@ -10,7 +10,6 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.core.common.StateSaver
 import com.msoula.hobbymatchmaker.core.di.domain.useCases.AuthFormValidationUseCase
 import com.msoula.hobbymatchmaker.core.login.presentation.Res
 import com.msoula.hobbymatchmaker.core.login.presentation.login_error
@@ -35,15 +34,13 @@ import org.jetbrains.compose.resources.getString
 
 class SignInViewModel(
     private val authFormValidationUseCases: AuthFormValidationUseCase,
-    private val stateSaver: StateSaver,
     private val resetPasswordUseCase: ResetPasswordUseCase,
     private val unifiedSignInUseCase: UnifiedSignInUseCase,
     private val socialClients: Map<ProviderType, SocialUIClient>
 ) : ViewModel() {
+    private val _formDataFlow = MutableStateFlow(SignInFormStateModel())
+    val formDataFlow = _formDataFlow.asStateFlow()
 
-    private val savedStateHandleKey: String = "loginState"
-
-    val formDataFlow = stateSaver.getStateFlow(savedStateHandleKey, SignInFormStateModel())
     val circularProgressLoading = MutableStateFlow(false)
 
     val openResetDialog = MutableStateFlow(false)
@@ -59,12 +56,12 @@ class SignInViewModel(
     fun onEvent(event: AuthenticationUIEvent) {
         when (event) {
             is AuthenticationUIEvent.OnEmailChanged -> {
-                updateFormState { it.copy(email = event.email.trimEnd()) }
+                _formDataFlow.update { it.copy(email = event.email.trimEnd()) }
                 validateInput()
             }
 
             is AuthenticationUIEvent.OnEmailResetChanged -> {
-                updateFormState {
+                _formDataFlow.update {
                     it.copy(
                         emailReset = event.emailReset.trimEnd(),
                         submitEmailReset = validateEmailReset(event.emailReset)
@@ -73,7 +70,7 @@ class SignInViewModel(
             }
 
             is AuthenticationUIEvent.OnPasswordChanged -> {
-                updateFormState { it.copy(password = event.password.trimEnd()) }
+                _formDataFlow.update { it.copy(password = event.password.trimEnd()) }
                 validateInput()
             }
 
@@ -113,7 +110,7 @@ class SignInViewModel(
             authFormValidationUseCases.validatePasswordUseCase.validateLoginPassword(formDataFlow.value.password)
         val hasError = listOf(emailResult, passwordResult).any { !it.successful }
 
-        updateFormState { it.copy(submit = !hasError) }
+        _formDataFlow.update { it.copy(submit = !hasError) }
     }
 
     private fun validateEmailReset(emailReset: String): Boolean =
@@ -130,7 +127,6 @@ class SignInViewModel(
 
                     is Result.Success -> {
                         circularProgressLoading.value = false
-                        clearFormState()
                         SignInEvent.Success
                     }
 
@@ -153,7 +149,6 @@ class SignInViewModel(
             val credential = fetchedCredential ?: client?.getCredential()
 
             if (credential != null) {
-                Logger.d("Credential loaded")
                 signInUnified(
                     UnifiedSignInUseCase.Params.SocialMedia(
                         credential, providerType
@@ -173,7 +168,7 @@ class SignInViewModel(
                 when (result) {
                     is Result.Loading -> ResetPasswordEvent.Loading
                     is Result.Success -> {
-                        updateFormState { it.copy(emailReset = "") }
+                        _formDataFlow.update { it.copy(emailReset = "") }
                         ResetPasswordEvent.Success
                     }
 
@@ -202,12 +197,6 @@ class SignInViewModel(
                 getString(Res.string.malformed_sign_in_error) else error.message
         }
     }
-
-    private fun updateFormState(update: (SignInFormStateModel) -> SignInFormStateModel) {
-        formDataFlow.value = update(formDataFlow.value)
-    }
-
-    private fun clearFormState() = stateSaver.removeState("loginState")
 
     fun resetSignInState() {
         _signInState.value = SignInEvent.Idle

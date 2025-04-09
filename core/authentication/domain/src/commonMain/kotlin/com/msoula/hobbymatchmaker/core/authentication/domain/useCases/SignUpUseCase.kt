@@ -41,13 +41,15 @@ class SignUpUseCase(
                 }
 
                 is Result.Failure -> {
-                    val error: AppError = when (result.error) {
+                    val error: AppError = when (val e = result.error) {
                         is CreateUserWithEmailAndPasswordError.EmailAlreadyExists -> SignUpErrors.EmailAlreadyExists
                         is CreateUserWithEmailAndPasswordError.UserDisabled -> SignUpErrors.UserDisabled
                         is CreateUserWithEmailAndPasswordError.TooManyRequests -> SignUpErrors.TooManyRequests
                         is CreateUserWithEmailAndPasswordError.InternalError -> SignUpErrors.InternalError
-                        else -> SignUpErrors.UnknownError(result.error.message)
+                        is CreateUserWithEmailAndPasswordError.Connection -> SignUpErrors.Connection
+                        else -> SignUpErrors.UnknownError(e.message)
                     }
+
                     emit(Result.Failure(error))
                 }
 
@@ -58,11 +60,13 @@ class SignUpUseCase(
 }
 
 data class SignUpSuccess(val uid: String)
+
 sealed class SignUpErrors(override val message: String) : AppError {
     data object EmailAlreadyExists : SignUpErrors("")
     data object UserDisabled : SignUpErrors("")
     data object TooManyRequests : SignUpErrors("")
     data object InternalError : SignUpErrors("")
+    data object Connection : SignUpErrors("")
     data class UnknownError(override val message: String) : SignUpErrors("")
     sealed class CreateUserError(override val message: String) : AppError {
         data class SaveError(val saveErrorMessage: String) :

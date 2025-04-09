@@ -2,8 +2,6 @@ package com.msoula.hobbymatchmaker.core.login.presentation.di
 
 import androidx.credentials.CredentialManager
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
-import com.msoula.hobbymatchmaker.core.common.AndroidStateSaver
-import com.msoula.hobbymatchmaker.core.common.StateSaver
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClientImpl
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.GoogleUIClientImpl
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SignInViewModel
@@ -12,7 +10,6 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 actual val coreModuleSignInPlatformSpecific = module {
-    single { AndroidStateSaver(get()) } bind StateSaver::class
     single<CredentialManager> { CredentialManager.create(get()) }
 
     single { GoogleUIClientImpl(get()) } bind SocialUIClient::class
@@ -28,7 +25,6 @@ actual val coreModuleSignInPlatformSpecific = module {
     single {
         SignInViewModel(
             authFormValidationUseCases = get(),
-            stateSaver = get(),
             resetPasswordUseCase = get(),
             unifiedSignInUseCase = get(),
             socialClients = get()

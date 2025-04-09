@@ -44,4 +44,5 @@
     <string name="user_not_found_error">User not found. Please register first</string>
     <string name="reset_password_error">Could not reset your password</string>
     <string name="malformed_sign_in_error">Oops, please check your credentials</string>
+    <string name="connection_issue">Connection issue. Please check your network</string>
 </resources>

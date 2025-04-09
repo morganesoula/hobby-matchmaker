@@ -3,7 +3,6 @@ package com.msoula.hobbymatchmaker.core.authentication.domain.useCases
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutError
 import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepository
 import com.msoula.hobbymatchmaker.core.common.FlowUseCase
-import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveIsConnectedUseCase
@@ -24,7 +23,6 @@ class LogOutUseCase(
     override fun execute(parameters: Parameters): Flow<Result<LogOutSuccess, LogOutError>> {
         return flow {
             emit(Result.Loading)
-            Logger.d("Inside UseCase and executing logging out")
 
             when (val result = authenticationRepository.logOut()) {
                 is Result.Success -> {
@@ -32,7 +30,6 @@ class LogOutUseCase(
 
                     observeIsConnectedUseCase()
                         .first { it == false }
-                        .also { Logger.d("Is connected is now false") }
 
                     emit(Result.Success(LogOutSuccess))
                 }

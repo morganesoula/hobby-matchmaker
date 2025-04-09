@@ -7,6 +7,7 @@ import java.util.Properties
 plugins {
     `kotlin-multiplatform`
     `android-library`
+    `kotlin-parcelize`
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.serialization)
@@ -19,6 +20,8 @@ kotlin {
     androidTarget {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_21)
+            freeCompilerArgs.addAll("-P",
+                "plugin:org.jetbrains.kotlin.parcelize:additionalAnnotation=com.msoula.hobbymatchmaker.core.login.presentation.models.HMMParcelize")
         }
     }
 

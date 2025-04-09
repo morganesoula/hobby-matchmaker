@@ -1,8 +1,6 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.di
 
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
-import com.msoula.hobbymatchmaker.core.common.IosStateSaver
-import com.msoula.hobbymatchmaker.core.common.StateSaver
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.AppleUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.AppleUIClientImpl
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.GoogleUIClient
@@ -15,7 +13,6 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 actual val coreModuleSignInPlatformSpecific = module {
-    single { IosStateSaver() } bind StateSaver::class
     single { IosGoogleUIClient() } bind GoogleUIClient::class
     single { IosAppleUIClient() } bind AppleUIClient::class
 
@@ -32,12 +29,7 @@ actual val coreModuleSignInPlatformSpecific = module {
     single {
         SignInViewModel(
             authFormValidationUseCases = get(),
-            stateSaver = get(),
             resetPasswordUseCase = get(),
-            signInWithCredentialUseCase = get(),
-            googleUIClient = get(),
-            appleUIClient = get(),
-            facebookUIClient = null,
             unifiedSignInUseCase = get(),
             socialClients = get()
         )

@@ -14,8 +14,6 @@ interface AppError {
     val message: String
 }
 
-class NetworkError(override val message: String = "No internet connection") : AppError
-class ServerError(override val message: String = "Server error occurred") : AppError
 class ExternalServiceError(override val message: String = "External service error occurred") :
     AppError
 
@@ -36,10 +34,3 @@ fun <Data, Error> Result<Data, Error>.mapError(
         is Result.Failure -> Result.Failure(transform(this.error))
         is Result.Loading -> Result.Loading
     }
-
-fun <Data, Error> Result<Data, Error>.onEach(
-    action: (Result<Data, Error>) -> Unit
-): Result<Data, Error> {
-    action(this@onEach)
-    return this
-}

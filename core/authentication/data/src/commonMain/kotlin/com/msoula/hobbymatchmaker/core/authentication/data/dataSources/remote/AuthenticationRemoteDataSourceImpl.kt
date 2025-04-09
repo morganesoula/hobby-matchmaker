@@ -1,5 +1,6 @@
 package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote
 
+import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.mappers.safeCallTyped
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.mappers.toFirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.dataSources.AuthenticationRemoteDataSource
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.CreateUserWithEmailAndPasswordError
@@ -11,7 +12,6 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUser
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.core.common.safeCall
 import dev.gitlive.firebase.auth.AuthCredential
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.FirebaseAuthException
@@ -27,7 +27,6 @@ class AuthenticationRemoteDataSourceImpl(
     override suspend fun authenticationSignOut(): Result<Boolean, LogOutError> {
         return try {
             authManager.signOut()
-            Logger.d("Successfully logged out in DataSourceImpl")
             Result.Success(true)
         } catch (exception: CancellationException) {
             throw exception
@@ -58,7 +57,7 @@ class AuthenticationRemoteDataSourceImpl(
         return try {
             val result = auth.currentUser?.linkWithCredential(credential)
 
-            return if (result?.user != null) {
+            if (result?.user != null) {
                 Result.Success(result.user!!.toFirebaseUserInfoDomainModel())
             } else {
                 Result.Failure(SocialMediaError.LinkWithCredentialsError)
@@ -72,120 +71,27 @@ class AuthenticationRemoteDataSourceImpl(
     override suspend fun createUserWithEmailAndPassword(
         email: String,
         password: String
-    ): Result<String, CreateUserWithEmailAndPasswordError> {
-        return try {
+    ): Result<String, CreateUserWithEmailAndPasswordError> =
+        safeCallTyped<String, CreateUserWithEmailAndPasswordError> {
             auth.createUserWithEmailAndPassword(email, password)
             Result.Success(auth.currentUser?.uid ?: "")
-        } catch (exception: CancellationException) {
-            throw exception
-        } catch (e: FirebaseAuthException) {
-            val errorMessage = e.message
-            if (errorMessage != null) {
-                when {
-                    errorMessage.contains(
-                        "ERROR_USER_DISABLED",
-                        ignoreCase = true
-                    ) -> Result.Failure(CreateUserWithEmailAndPasswordError.UserDisabled)
-
-                    errorMessage.contains(
-                        "ERROR_EMAIL_ALREADY_IN_USE",
-                        ignoreCase = true
-                    ) -> Result.Failure(CreateUserWithEmailAndPasswordError.EmailAlreadyExists)
-
-                    errorMessage.contains(
-                        "ERROR_TOO_MANY_REQUESTS",
-                        ignoreCase = true
-                    ) -> Result.Failure(CreateUserWithEmailAndPasswordError.TooManyRequests)
-
-                    errorMessage.contains(
-                        "ERROR_INTERNAL_ERROR",
-                        ignoreCase = true
-                    ) -> Result.Failure(CreateUserWithEmailAndPasswordError.InternalError)
-
-                    else -> Result.Failure(
-                        CreateUserWithEmailAndPasswordError.Other(
-                            message = errorMessage
-                        )
-                    )
-                }
-            } else Result.Failure(CreateUserWithEmailAndPasswordError.Other("Unknown error with empty message"))
-        } catch (e: Exception) {
-            Logger.e("Exception caught while creating user: ${e.message}")
-            Result.Failure(
-                CreateUserWithEmailAndPasswordError.Other(
-                    e.message ?: "Unexpected error"
-                )
-            )
         }
-    }
 
     override suspend fun signInWithEmailAndPassword(
         email: String,
         password: String
-    ): Result<String, SignInWithEmailAndPasswordError> {
-        return try {
+    ): Result<String, SignInWithEmailAndPasswordError> =
+        safeCallTyped<String, SignInWithEmailAndPasswordError> {
             val result = auth.signInWithEmailAndPassword(email, password)
             val uid = result.user?.uid ?: throw Error("User not found")
             Result.Success(uid)
-        } catch (exception: CancellationException) {
-            throw exception
-        } catch (e: Exception) {
-            Logger.e("Exception caught while logging user: ${e.message}")
-            if (e is FirebaseAuthException) {
-                val errorMessage = e.message
-                if (errorMessage != null) {
-                    when {
-                        errorMessage.contains(
-                            "ERROR_USER_DISABLED",
-                            ignoreCase = true
-                        ) -> Result.Failure(SignInWithEmailAndPasswordError.UserDisabled)
-
-                        errorMessage.contains(
-                            "ERROR_USER_NOT_FOUND",
-                            ignoreCase = true
-                        ) -> Result.Failure(SignInWithEmailAndPasswordError.UserNotFound)
-
-                        errorMessage.contains(
-                            "ERROR_WRONG_PASSWORD",
-                            ignoreCase = true
-                        ) -> Result.Failure(SignInWithEmailAndPasswordError.WrongPassword)
-
-                        errorMessage.contains(
-                            "ERROR_TOO_MANY_REQUESTS",
-                            ignoreCase = true
-                        ) -> Result.Failure(SignInWithEmailAndPasswordError.TooManyRequests)
-
-                        else -> Result.Failure(
-                            SignInWithEmailAndPasswordError.Other(
-                                e.message ?: ""
-                            )
-                        )
-                    }
-                } else {
-                    Result.Failure(SignInWithEmailAndPasswordError.Other("Error while signing in"))
-                }
-            } else {
-                Result.Failure(
-                    SignInWithEmailAndPasswordError.Other(
-                        "Unexpected error with error message: ${e.message}"
-                    )
-                )
-            }
         }
-    }
 
-    override suspend fun resetPassword(email: String): Result<Boolean, ResetPasswordError> {
-        return safeCall(
-            appError = { errorMessage ->
-                ResetPasswordError(
-                    "Could not reset password: $errorMessage"
-                )
-            }
-        ) {
+    override suspend fun resetPassword(email: String): Result<Boolean, ResetPasswordError> =
+        safeCallTyped<Boolean, ResetPasswordError> {
             auth.sendPasswordResetEmail(email)
-            true
+            Result.Success(true)
         }
-    }
 
     override suspend fun getUserUid(): String? {
         return auth.currentUser?.uid

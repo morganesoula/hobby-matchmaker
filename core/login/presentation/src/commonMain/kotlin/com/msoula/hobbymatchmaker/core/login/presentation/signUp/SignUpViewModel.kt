@@ -7,10 +7,9 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignUpUseC
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.core.common.StateSaver
-import com.msoula.hobbymatchmaker.core.di.domain.StringResourcesProvider
 import com.msoula.hobbymatchmaker.core.login.domain.useCases.LoginValidateFormUseCase
 import com.msoula.hobbymatchmaker.core.login.presentation.Res
+import com.msoula.hobbymatchmaker.core.login.presentation.connection_issue
 import com.msoula.hobbymatchmaker.core.login.presentation.email_already_exists_error
 import com.msoula.hobbymatchmaker.core.login.presentation.internal_error
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
@@ -23,23 +22,20 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.StringResource
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(FlowPreview::class)
 class SignUpViewModel(
     private val loginValidateFormUseCase: LoginValidateFormUseCase,
-    private val resourceProvider: StringResourcesProvider,
-    private val stateSaver: StateSaver,
     private val signUpUseCase: SignUpUseCase
 ) : ViewModel() {
 
-    private val savedStateHandleKey: String = "signUpState"
-    val formDataFlow =
-        MutableStateFlow(stateSaver.getState(savedStateHandleKey, SignUpStateModel()))
+    private val _formDataFlow = MutableStateFlow(SignUpStateModel())
+    val formDataFlow = _formDataFlow.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
@@ -47,61 +43,34 @@ class SignUpViewModel(
     private val _signUpState: MutableStateFlow<SignUpEvent> = MutableStateFlow(SignUpEvent.Idle)
     val signUpState: StateFlow<SignUpEvent> = _signUpState.asStateFlow()
 
-    private val _email = MutableStateFlow(stateSaver.getState("email", ""))
-    private val _firstName = MutableStateFlow(stateSaver.getState("firstName", ""))
-    private val _password = MutableStateFlow(stateSaver.getState("password", ""))
-
     init {
         viewModelScope.launch {
-            combine(
-                _email,
-                _firstName,
-                _password
-            ) { email, firstName, password ->
-                SignUpStateModel(
-                    email = email,
-                    firstName = firstName,
-                    password = password
-                )
-            }
+            formDataFlow
                 .debounce(250.milliseconds)
-                .collectLatest { validateInput() }
+                .collectLatest { newState ->
+                    validateInput(newState)
+                }
         }
     }
 
     fun onEvent(event: AuthenticationUIEvent) {
         when (event) {
-            is AuthenticationUIEvent.OnEmailChanged -> handleInputChange(event.email, "email")
-            is AuthenticationUIEvent.OnFirstNameChanged -> handleInputChange(
-                event.firstName,
-                "firstName"
-            )
+            is AuthenticationUIEvent.OnEmailChanged ->
+                _formDataFlow.update { it.copy(email = event.email.trimEnd()) }
 
-            is AuthenticationUIEvent.OnPasswordChanged -> handleInputChange(
-                event.password,
-                "password"
-            )
+            is AuthenticationUIEvent.OnFirstNameChanged -> {
+                _formDataFlow.update { it.copy(firstName = event.firstName) }
+            }
+
+            is AuthenticationUIEvent.OnPasswordChanged ->
+                _formDataFlow.update { it.copy(password = event.password) }
 
             AuthenticationUIEvent.OnSignUp -> createFirebaseAccount()
             else -> Unit
         }
     }
 
-    private fun handleInputChange(input: String, field: String) {
-        when (field) {
-            "email" -> _email.value = input.trimEnd()
-            "firstName" -> _firstName.value = input
-            "password" -> _password.value = input
-        }
-
-        updateFormState {
-            it.copy(email = _email.value, firstName = _firstName.value, password = _password.value)
-        }
-    }
-
-    private fun validateInput() {
-        val formState = formDataFlow.value
-
+    private fun validateInput(formState: SignUpStateModel) {
         val emailResult = loginValidateFormUseCase.validateEmail(formState.email)
         val passwordResult =
             loginValidateFormUseCase.validatePassword.validatePassword(formState.password)
@@ -110,20 +79,13 @@ class SignUpViewModel(
 
         val results = listOf(emailResult, passwordResult, firstNameResult).any { !it.successful }
 
-        updateFormState {
+        _formDataFlow.update {
             it.copy(
                 submit = !results,
-                signUpError = if (formState.firstName.isNotEmpty()) firstNameResult.errorMessage?.let { error ->
-                    resourceProvider.getStringByKey(
-                        error
-                    )
-                } ?: "" else ""
+                signUpError = if (formState.firstName.isNotEmpty()) firstNameResult.errorMessage
+                    ?: "" else ""
             )
         }
-    }
-
-    private fun updateFormState(update: (SignUpStateModel) -> SignUpStateModel) {
-        stateSaver.updateState(savedStateHandleKey, update)
     }
 
     private fun createFirebaseAccount() {
@@ -136,10 +98,7 @@ class SignUpViewModel(
             ).collectLatest { result ->
                 _signUpState.update {
                     when (result) {
-                        is Result.Success -> {
-                            stateSaver.removeState("signUpState")
-                            SignUpEvent.Success
-                        }
+                        is Result.Success -> SignUpEvent.Success
 
                         is Result.Loading -> {
                             _isLoading.update { true }
@@ -148,8 +107,7 @@ class SignUpViewModel(
 
                         is Result.Failure -> {
                             _isLoading.update { false }
-                            val errorMessage = handleSignUpError(result.error)
-                            SignUpEvent.Error(errorMessage)
+                            SignUpEvent.Error(handleSignUpError(result.error))
                         }
                     }
                 }
@@ -157,25 +115,24 @@ class SignUpViewModel(
         }
     }
 
-    private fun handleSignUpError(error: AppError): String {
+    private fun handleSignUpError(error: AppError): StringResource? {
         return when (error) {
-            is SignUpErrors.EmailAlreadyExists -> resourceProvider.getStringByKey(
-                Res.string.email_already_exists_error.key
-            )
+            is SignUpErrors.EmailAlreadyExists ->
+                Res.string.email_already_exists_error
 
-            is SignUpErrors.UserDisabled -> resourceProvider.getStringByKey(
-                Res.string.user_disabled_error.key
-            )
+            is SignUpErrors.UserDisabled ->
+                Res.string.user_disabled_error
 
-            is SignUpErrors.TooManyRequests -> resourceProvider.getStringByKey(
-                Res.string.too_many_requests_error.key
-            )
+            is SignUpErrors.TooManyRequests ->
+                Res.string.too_many_requests_error
 
-            is SignUpErrors.InternalError -> resourceProvider.getStringByKey(
-                Res.string.internal_error.key
-            )
+            is SignUpErrors.InternalError ->
+                Res.string.internal_error
 
-            else -> error.message
+            is SignUpErrors.Connection ->
+                Res.string.connection_issue
+
+            else -> null
         }
     }
 }

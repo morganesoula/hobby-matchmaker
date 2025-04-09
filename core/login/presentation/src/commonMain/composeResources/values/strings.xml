@@ -25,7 +25,7 @@
     <string name="log_in">Se connecter</string>
     <string name="new_member">Pas encore membre ?</string>
     <string name="new_member_clickable_part">Inscrivez-vous</string>
-    <string name="forgot_password_title">Merci d\'entrer votre e-mail. Nous allons vous envoyer un e-mail avec les instructions à suivre.</string>
+    <string name="forgot_password_title">Merci d'entrer votre e-mail. Nous allons vous envoyer un e-mail avec les instructions à suivre.</string>
     <string name="your_email">Votre e-mail</string>
     <string name="reset_password">R\u00E9initialiser</string>
     <string name="cancel">Annuler</string>
@@ -38,11 +38,12 @@
     // ERROR
     <string name="login_error">Identifiant ou mot de passe incorrect</string>
     <string name="signup_error">Cet email est déjà associé à un compte existant</string>
-    <string name="email_already_exists_error">Cet e-mail est déjà associ\u00E9 à un compte existant</string>
+    <string name="email_already_exists_error">Cet e-mail est déjà associé à un compte existant</string>
     <string name="user_disabled_error">Ce compte est d\\u00E9sactiv\\u00E9</string>
     <string name="too_many_requests_error">Trop de tentatives: merci de réessayer ultérieurement</string>
     <string name="internal_error">Une erreur interne est survenue: les \\u00E9quipes de développement ont \\u00E9t\\u00E9 notifi\\u00E9es</string>
     <string name="user_not_found_error">Utilisateur inconnu. Merci de vous inscrire</string>
     <string name="reset_password_error">Impossible de réinitialiser votre mot de passe</string>
     <string name="malformed_sign_in_error">Identifiants incorrects. Veuillez vérifier vos informations.</string>
+    <string name="connection_issue">Problème de connexion. Veuillez vérifier votre réseau</string>
 </resources>

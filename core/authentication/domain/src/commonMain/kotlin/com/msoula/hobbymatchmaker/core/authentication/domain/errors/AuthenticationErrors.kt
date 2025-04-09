@@ -17,6 +17,8 @@ sealed class CreateUserWithEmailAndPasswordError : AppError {
     data object InternalError : CreateUserWithEmailAndPasswordError()
     data class Other(override val message: String) : CreateUserWithEmailAndPasswordError()
 
+    data object Connection : CreateUserWithEmailAndPasswordError()
+
     override val message: String
         get() = ""
 }
@@ -28,28 +30,27 @@ sealed class SignInWithEmailAndPasswordError : AppError {
     data object TooManyRequests : SignInWithEmailAndPasswordError()
     data class Other(override val message: String) : SignInWithEmailAndPasswordError()
 
+    data object Connection : SignInWithEmailAndPasswordError()
+
     override val message: String
         get() = ""
 }
 
-data class ResetPasswordError(override val message: String) : AppError
+sealed class ResetPasswordError : AppError {
+    data object TooManyRequests : ResetPasswordError()
+    data object Other : ResetPasswordError()
+
+    data object Connection : ResetPasswordError()
+
+    override val message: String
+        get() = ""
+}
+
 sealed class LogOutError(override val message: String) : AppError {
     data class FirebaseException(val firebaseErrorMessage: String) :
         LogOutError(firebaseErrorMessage)
 
-    data class CredentialException(val credentialErrorMessage: String) :
-        LogOutError(credentialErrorMessage)
-
-    data class FacebookLogOutException(val facebookErrorMessage: String) :
-        LogOutError(facebookErrorMessage)
-
     data class UnknownError(val unknownError: String) : LogOutError(unknownError)
 }
 
-data class GetGoogleCredentialError(override val message: String) : AppError
-data class GetFacebookCredentialError(override val message: String) : AppError
-data class GetFacebookClientError(override val message: String) : AppError
-data class GetAppleCredentialError(override val message: String) : AppError
-
 data class InvalidCredentialError(override val message: String) : RuntimeException(message)
-data class GoogleCredentialNullError(override val message: String) : Exception(message)

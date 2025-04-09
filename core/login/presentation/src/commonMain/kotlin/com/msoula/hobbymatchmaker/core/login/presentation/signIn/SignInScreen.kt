@@ -72,6 +72,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.welcome_back_title
 import com.msoula.hobbymatchmaker.core.login.presentation.your_email
 import dev.gitlive.firebase.auth.AuthCredential
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -101,9 +102,12 @@ fun SignInScreenContent(
                 )
             }
 
-            is ResetPasswordEvent.Success -> signInViewModel.onEvent(
-                AuthenticationUIEvent.HideForgotPasswordDialog
-            )
+            is ResetPasswordEvent.Success -> {
+                signInViewModel.onEvent(
+                    AuthenticationUIEvent.HideForgotPasswordDialog
+                )
+                snackBarHostState.showSnackbar(getString(Res.string.reset_password))
+            }
 
             else -> Unit
         }
@@ -262,6 +266,8 @@ fun ColumnScope.SignInScreenMainContent(
     onFacebookButtonClicked: (credential: AuthCredential) -> Unit,
     facebookUIClient: FacebookUIClient
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     HMMTextFieldAuthComponent(
         value = email,
         placeHolderText = stringResource(Res.string.email),
@@ -303,6 +309,7 @@ fun ColumnScope.SignInScreenMainContent(
 
     HMMButtonAuthComponent(
         onClick = {
+            keyboardController?.hide()
             onSignInClicked()
         },
         text = stringResource(Res.string.log_in),
