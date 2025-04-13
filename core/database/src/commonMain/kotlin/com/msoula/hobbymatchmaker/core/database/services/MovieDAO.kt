@@ -36,4 +36,6 @@ interface MovieDAO {
     fun observeMovieWithActor(movieId: Long): Flow<MovieDetailDataEntity>
     fun getMovieById(movieId: Long): Movie?
     fun getActorById(actorId: Long): Actor?
+
+    suspend fun isMovieSynopsisAvailable(movieId: Long): Boolean
 }

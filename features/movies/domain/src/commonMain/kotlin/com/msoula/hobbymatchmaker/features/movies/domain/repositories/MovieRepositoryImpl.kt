@@ -46,4 +46,8 @@ class MovieRepositoryImpl(
                 Result.Success(Unit)
             }
     }
+
+    override suspend fun isSynopsisMovieAvailable(movieId: Long): Boolean {
+        return movieLocalDataSource.isMovieSynopsisAvailable(movieId)
+    }
 }

@@ -1,8 +1,10 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.mappers
 
+import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.errors.MovieDetailDataError
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.CastResponseRemoteModel
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.MovieDetailResponseRemoteModel
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.MovieVideosResponseRemoteModel
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainError
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.GenreDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieActorDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieCastDomainModel
@@ -42,3 +44,14 @@ fun MovieVideosResponseRemoteModel.toMovieVideoDomainModel(): MovieVideoDomainMo
         )
     }
 }
+
+fun MovieDetailDataError.toMovieDetailDomainError(): MovieDetailDomainError {
+    return when (this) {
+        is MovieDetailDataError.Other -> MovieDetailDomainError.Other(this.reason)
+        is MovieDetailDataError.NoConnectionError -> MovieDetailDomainError.NoConnection(this.reason)
+        is MovieDetailDataError.TrailerError -> MovieDetailDomainError.TrailerError(this.reason)
+        is MovieDetailDataError.CreditError -> MovieDetailDomainError.CreditError(this.reason)
+        is MovieDetailDataError.MovieDetail -> MovieDetailDomainError.MovieDetailError(this.reason)
+    }
+}
+

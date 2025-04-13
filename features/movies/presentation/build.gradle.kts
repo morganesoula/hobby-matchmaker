@@ -43,6 +43,7 @@ kotlin {
             implementation(project(Modules.DESIGN))
             implementation(project(Modules.DI))
             implementation(project(Modules.MOVIE_DOMAIN))
+            implementation(project(Modules.NETWORK))
         }
     }
 }

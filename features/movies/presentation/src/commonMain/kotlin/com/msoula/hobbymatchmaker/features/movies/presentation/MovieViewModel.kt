@@ -8,6 +8,8 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.getDeviceLocale
+import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
+import com.msoula.hobbymatchmaker.features.movies.domain.useCases.CheckMovieSynopsisValueUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesErrors
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesSuccess
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesUseCase
@@ -35,6 +37,8 @@ class MovieViewModel(
     observeAllMoviesUseCase: ObserveAllMoviesUseCase,
     private val getUserInfo: FetchFirebaseUserInfo,
     private val logOutUseCase: LogOutUseCase,
+    private val checkMovieSynopsisValueUseCase: CheckMovieSynopsisValueUseCase,
+    private val connectivityCheck: NetworkConnectivityChecker,
     private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
@@ -99,7 +103,19 @@ class MovieViewModel(
 
             is CardEventModel.OnSingleTap -> {
                 viewModelScope.launch {
-                    sendOnce(MovieUiEventModel.OnMovieDetailClicked(event.movieId))
+                    val localData = checkMovieSynopsisValueUseCase(event.movieId)
+                    val hasConnectivity = connectivityCheck.hasActiveConnection()
+
+                    when {
+                        localData -> sendOnce(MovieUiEventModel.OnMovieDetailClicked(event.movieId))
+                        hasConnectivity -> sendOnce(
+                            MovieUiEventModel.OnMovieDetailClicked(
+                                event.movieId
+                            )
+                        )
+
+                        else -> sendOnce(MovieUiEventModel.NoFetchingDetailPossible)
+                    }
                 }
             }
         }

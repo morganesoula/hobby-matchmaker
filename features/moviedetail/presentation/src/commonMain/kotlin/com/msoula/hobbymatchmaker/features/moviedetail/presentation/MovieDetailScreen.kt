@@ -20,10 +20,10 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -47,7 +47,6 @@ import com.msoula.hobbymatchmaker.core.common.ObserveAsEvents
 import com.msoula.hobbymatchmaker.core.design.component.DecomposeBackHandler
 import com.msoula.hobbymatchmaker.core.design.component.ExpandableTextComponent
 import com.msoula.hobbymatchmaker.core.design.component.LoadingCircularProgress
-import com.msoula.hobbymatchmaker.core.design.component.LocalSnackBar
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiEventModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailViewStateModel
@@ -85,13 +84,18 @@ fun MovieDetailScreen(
     backHandler: BackHandler,
     onPlayTrailerClicked: (event: MovieDetailUiEventModel) -> Unit
 ) {
-    Scaffold {
+    val snackBarHostState = remember { SnackbarHostState() }
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackBarHostState) }
+    ) {
         MovieDetailContentScreen(
             movie = movie,
             modifier = modifier.padding(it),
             onPlayTrailerClicked = onPlayTrailerClicked,
             oneTimeEventFlow = oneTimeEventFlow,
-            backHandler = backHandler
+            backHandler = backHandler,
+            snackBarHostState = snackBarHostState
         )
     }
 }
@@ -102,12 +106,13 @@ fun MovieDetailContentScreen(
     movie: MovieDetailUiModel,
     backHandler: BackHandler,
     oneTimeEventFlow: Flow<MovieDetailUiEventModel>,
-    onPlayTrailerClicked: (event: MovieDetailUiEventModel) -> Unit
+    onPlayTrailerClicked: (event: MovieDetailUiEventModel) -> Unit,
+    snackBarHostState: SnackbarHostState
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val snackBarHostState = remember { SnackbarHostState() }
 
     val errorFetchingMovieMessage = stringResource(Res.string.no_trailer_available)
+    val noConnectionMessage = stringResource(Res.string.connection_issue)
 
     val videoPlayerVisibility = remember { mutableStateOf(false) }
     val movieVideoUri = remember { mutableStateOf(movie.videoKey) }
@@ -135,9 +140,8 @@ fun MovieDetailContentScreen(
     ObserveAsEvents(flow = oneTimeEventFlow) { event ->
         coroutineScope.launch {
             when (event) {
-                is MovieDetailUiEventModel.OnMovieDetailUiFetchedError -> {
+                is MovieDetailUiEventModel.OnMovieDetailUiFetchedError ->
                     snackBarHostState.showSnackbar(event.error)
-                }
 
                 is MovieDetailUiEventModel.OnPlayMovieTrailerReady -> {
                     if (isLoading.value) {
@@ -153,12 +157,16 @@ fun MovieDetailContentScreen(
                         isLoading.value = false
                     }
 
-                    snackBarHostState.showSnackbar(message = errorFetchingMovieMessage + { event.message })
+                    snackBarHostState.showSnackbar(errorFetchingMovieMessage)
                 }
 
-                is MovieDetailUiEventModel.LoadingTrailer -> {
-                    isLoading.value = true
+                is MovieDetailUiEventModel.NoConnection -> {
+                    println("Inside view with no connection")
+                    snackBarHostState.showSnackbar(noConnectionMessage)
                 }
+
+                is MovieDetailUiEventModel.LoadingTrailer ->
+                    isLoading.value = true
 
                 else -> Unit
             }
@@ -173,99 +181,99 @@ fun MovieDetailContentScreen(
         ExitFullScreen()
     }
 
-    CompositionLocalProvider(value = LocalSnackBar provides snackBarHostState) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+    ) {
+        //Background image
+        AsyncImage(
+            model = ImageRequest.Builder(LocalPlatformContext.current)
+                .data(movie.posterPath.toPath())
+                .build(),
+            contentDescription = "poster",
+            modifier = Modifier
+                .fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+
+        // Filter to darken background
+        BackgroundGradient(verticalGradientHeight)
+
+        //Content on top of the image
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
         ) {
-            //Background image
-            AsyncImage(
-                model = ImageRequest.Builder(LocalPlatformContext.current)
-                    .data(movie.posterPath.toPath())
-                    .build(),
-                contentDescription = "poster",
-                modifier = Modifier
-                    .fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-
-            // Filter to darken background
-            BackgroundGradient(verticalGradientHeight)
-
-            //Content on top of the image
-            Box(
-                modifier = Modifier
+            Column(
+                modifier = modifier
+                    .verticalScroll(rememberScrollState())
+                    .padding(top = 250.dp, start = 16.dp, end = 16.dp)
                     .fillMaxSize()
             ) {
-                Column(
-                    modifier = modifier
-                        .verticalScroll(rememberScrollState())
-                        .padding(top = 250.dp, start = 16.dp, end = 16.dp)
-                        .fillMaxSize()
+                Text(
+                    text = movie.status,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier
+                        .background(
+                            color = Color.Green.copy(alpha = 0.7f),
+                            shape = RoundedCornerShape(4.dp)
+                        )
+                        .padding(8.dp, 2.dp, 8.dp, 2.dp)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = movie.title,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Row {
+                    Text(text = movie.releaseDate)
+                    Text(text = " · " + movie.genre.toString().removeSurrounding("[", "]"))
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = {
+                        onPlayTrailerClicked(
+                            MovieDetailUiEventModel.OnPlayMovieTrailerClicked(
+                                movieId = movie.id,
+                                isVideoURIknown = movie.videoKey.isNotEmpty()
+                            )
+                        )
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = Color.White
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                        .padding(start = 4.dp, end = 4.dp)
                 ) {
-                    Text(
-                        text = movie.status,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier
-                            .background(
-                                color = Color.Green.copy(alpha = 0.7f),
-                                shape = RoundedCornerShape(4.dp)
-                            )
-                            .padding(8.dp, 2.dp, 8.dp, 2.dp)
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = movie.title,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
                     Row {
-                        Text(text = movie.releaseDate)
-                        Text(text = " · " + movie.genre.toString().removeSurrounding("[", "]"))
+                        Icon(
+                            imageVector = Icons.Default.PlayArrow,
+                            contentDescription = stringResource(Res.string.play_icon_accessibility)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = stringResource(Res.string.play_trailer),
+                            textAlign = TextAlign.Center
+                        )
                     }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                ExpandableTextComponent(
+                    text = movie.synopsis,
+                    showLess = stringResource(Res.string.show_less),
+                    showMore = stringResource(Res.string.show_more)
+                )
 
-                    Button(
-                        onClick = {
-                            onPlayTrailerClicked(
-                                MovieDetailUiEventModel.OnPlayMovieTrailerClicked(
-                                    movieId = movie.id,
-                                    isVideoURIknown = movie.videoKey.isNotEmpty()
-                                )
-                            )
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = Color.White
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
-                            .padding(start = 4.dp, end = 4.dp)
-                    ) {
-                        Row {
-                            Icon(
-                                imageVector = Icons.Default.PlayArrow,
-                                contentDescription = stringResource(Res.string.play_icon_accessibility)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = stringResource(Res.string.play_trailer),
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    ExpandableTextComponent(
-                        text = movie.synopsis,
-                        showLess = stringResource(Res.string.show_less),
-                        showMore = stringResource(Res.string.show_more)
-                    )
-
+                if (movie.cast.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = stringResource(Res.string.cast),
@@ -277,11 +285,11 @@ fun MovieDetailContentScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }
+        }
 
-            if (videoPlayerVisibility.value) {
-                exitFullScreen.value = false
-                VideoComponent(movieUri = movieVideoUri.value)
-            }
+        if (videoPlayerVisibility.value) {
+            exitFullScreen.value = false
+            VideoComponent(movieUri = movieVideoUri.value)
         }
     }
 

@@ -6,5 +6,6 @@
     <string name="play_icon_accessibility">Play trailer icon</string>
     <string name="show_less"> Show less</string>
     <string name="show_more">… Show more</string>
-    <string name="no_trailer_available">No trailer available for this movie</string>
+    <string name="no_trailer_available">No trailer available at the moment</string>
+    <string name="connection_issue">Connection issue. Please check your network</string>
 </resources>

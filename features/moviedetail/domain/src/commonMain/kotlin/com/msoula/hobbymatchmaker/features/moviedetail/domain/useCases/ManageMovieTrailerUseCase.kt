@@ -4,6 +4,7 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.FlowUseCase
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainError
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieVideoDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.repositories.MovieDetailRepository
 import kotlinx.coroutines.CoroutineDispatcher
@@ -63,11 +64,22 @@ class ManageMovieTrailerUseCase(
                         is Result.Loading -> Result.Loading
                     }
                 } else {
-                    Result.Failure(FetchingTrailerError(""))
+                    Result.Failure(FetchingTrailerError.TrailerUpdateError("Empty uri"))
                 }
             }
 
-            is Result.Failure -> Result.Failure(FetchingTrailerError(fetchResult.error.message))
+            is Result.Failure -> when (fetchResult.error) {
+                is MovieDetailDomainError.NoConnection -> Result.Failure(
+                    FetchingTrailerError.NoConnectionError(fetchResult.error.message)
+                )
+
+                else -> Result.Failure(
+                    FetchingTrailerError.NoTrailerFoundError(
+                        fetchResult.error.message
+                    )
+                )
+            }
+
             is Result.Loading -> Result.Loading
         }
     }
@@ -85,4 +97,8 @@ class ManageMovieTrailerUseCase(
 }
 
 data class MovieTrailerReady(val videoURI: String)
-data class FetchingTrailerError(override val message: String) : AppError
+sealed class FetchingTrailerError(override val message: String) : AppError {
+    data class NoConnectionError(val reason: String) : FetchingTrailerError(reason)
+    data class NoTrailerFoundError(val reason: String) : FetchingTrailerError(reason)
+    data class TrailerUpdateError(val reason: String) : FetchingTrailerError(reason)
+}

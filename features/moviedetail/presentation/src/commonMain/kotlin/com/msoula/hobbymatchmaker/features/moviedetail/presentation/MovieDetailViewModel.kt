@@ -2,9 +2,12 @@ package com.msoula.hobbymatchmaker.features.moviedetail.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.getDeviceLocale
+import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.FetchingTrailerError
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ManageMovieTrailerUseCase
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieDetailUseCase
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieSuccess
@@ -26,7 +29,8 @@ class MovieDetailViewModel(
     movieId: Long,
     private val ioDispatcher: CoroutineDispatcher,
     observeMovieDetailUseCase: ObserveMovieDetailUseCase,
-    private val manageMovieTrailerUseCase: ManageMovieTrailerUseCase
+    private val manageMovieTrailerUseCase: ManageMovieTrailerUseCase,
+    private val connectivityCheck: NetworkConnectivityChecker
 ) : ViewModel() {
 
     private val _oneTimeEventChannel = Channel<MovieDetailUiEventModel>()
@@ -44,16 +48,14 @@ class MovieDetailViewModel(
                         when (val data = result.data) {
                             is ObserveMovieSuccess.Success -> {
                                 currentMovie = data.data.toMovieDetailUiModel()
-                                MovieDetailViewStateModel.Success(data.data.toMovieDetailUiModel())
+                                MovieDetailViewStateModel.Success(currentMovie!!)
                             }
 
                             else -> MovieDetailViewStateModel.Empty
                         }
                     }
 
-                    is Result.Failure -> {
-                        MovieDetailViewStateModel.Error(result.error.message)
-                    }
+                    is Result.Failure -> MovieDetailViewStateModel.Error(result.error.message)
                 }
             }
             .stateIn(
@@ -80,9 +82,14 @@ class MovieDetailViewModel(
     private suspend fun onPlayTrailerClicked(movieId: Long, isVideoURIknown: Boolean) {
         if (isVideoURIknown) {
             sendOnce(
-                MovieDetailUiEventModel.OnPlayMovieTrailerReady(
-                    currentMovie?.videoKey ?: ""
-                )
+                if (connectivityCheck.hasActiveConnection()) {
+                    MovieDetailUiEventModel.OnPlayMovieTrailerReady(
+                        currentMovie?.videoKey ?: ""
+                    )
+                } else {
+                    Logger.e("No connection from the VM point of view")
+                    MovieDetailUiEventModel.NoConnection
+                }
             )
         } else {
             manageMovieTrailerUseCase(
@@ -99,11 +106,17 @@ class MovieDetailViewModel(
                     )
 
                     is Result.Loading -> sendOnce(MovieDetailUiEventModel.LoadingTrailer)
-                    is Result.Failure -> sendOnce(
-                        MovieDetailUiEventModel.ErrorFetchingTrailer(
-                            result.error.message
+                    is Result.Failure -> {
+                        sendOnce(
+                            when (result.error) {
+                                is FetchingTrailerError.NoConnectionError -> MovieDetailUiEventModel.NoConnection
+                                else -> {
+                                    Logger.e("Error fetching trailer - ${result.error.message}")
+                                    MovieDetailUiEventModel.ErrorFetchingTrailer
+                                }
+                            }
                         )
-                    )
+                    }
                 }
             }
         }

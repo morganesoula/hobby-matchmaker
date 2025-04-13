@@ -40,6 +40,7 @@ kotlin {
             implementation(project(Modules.COMMON))
             implementation(project(Modules.DESIGN))
             implementation(project(Modules.MOVIE_DETAIL_DOMAIN))
+            implementation(project(Modules.NETWORK))
 
             // Navigation
             implementation(libs.decompose.core)

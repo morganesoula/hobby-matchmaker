@@ -1,7 +1,7 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.services
 
-import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.errors.MovieDetailDataError
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.MovieVideosResponseRemoteModel
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -14,7 +14,7 @@ interface MovieVideosKtorService {
     suspend fun fetchMovieVideos(
         movie: Long,
         language: String
-    ): Result<MovieVideosResponseRemoteModel, FetchMovieVideosKtorError>
+    ): Result<MovieVideosResponseRemoteModel, MovieDetailDataError>
 }
 
 class MovieVideosKtorServiceImpl(private val client: HttpClient) : MovieVideosKtorService {
@@ -22,7 +22,7 @@ class MovieVideosKtorServiceImpl(private val client: HttpClient) : MovieVideosKt
     override suspend fun fetchMovieVideos(
         movie: Long,
         language: String
-    ): Result<MovieVideosResponseRemoteModel, FetchMovieVideosKtorError> {
+    ): Result<MovieVideosResponseRemoteModel, MovieDetailDataError> {
         return try {
             val response = client.request {
                 url {
@@ -34,9 +34,8 @@ class MovieVideosKtorServiceImpl(private val client: HttpClient) : MovieVideosKt
 
             Result.Success(response)
         } catch (e: Exception) {
-            Result.Failure(FetchMovieVideosKtorError(e.message.toString()))
+            Result.Failure(MovieDetailDataError.TrailerError(e.message.toString()))
         }
     }
 }
 
-class FetchMovieVideosKtorError(override val message: String) : AppError

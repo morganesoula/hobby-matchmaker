@@ -231,4 +231,8 @@ class MovieDAOImpl(private val database: HMMDatabase) : MovieDAO {
     override fun getActorById(actorId: Long): Actor? {
         return database.hmm_databaseQueries.getActorById(actorId).executeAsOneOrNull()
     }
+
+    override suspend fun isMovieSynopsisAvailable(movieId: Long): Boolean {
+        return database.hmm_databaseQueries.isMovieSynopsisAvailable(movieId).executeAsOne()
+    }
 }

@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.features.movies.domain.di
 
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.MovieRepository
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.MovieRepositoryImpl
+import com.msoula.hobbymatchmaker.features.movies.domain.useCases.CheckMovieSynopsisValueUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.FetchMoviesUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.SetMovieFavoriteUseCase
@@ -15,4 +16,5 @@ val featuresModuleMovieDomain = module {
     factoryOf(::SetMovieFavoriteUseCase)
     factoryOf(::FetchMoviesUseCase)
     factoryOf(::ObserveAllMoviesUseCase)
+    factoryOf(::CheckMovieSynopsisValueUseCase)
 }

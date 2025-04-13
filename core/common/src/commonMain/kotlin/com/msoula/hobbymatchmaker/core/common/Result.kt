@@ -14,6 +14,14 @@ interface AppError {
     val message: String
 }
 
+sealed class NetworkError(override val message: String) : AppError {
+    data class Connection(val reason: String) : NetworkError(reason)
+}
+
+sealed class KtorError(override val message: String) : AppError {
+    data class KtorException(val reason: String) : KtorError(reason)
+}
+
 class ExternalServiceError(override val message: String = "External service error occurred") :
     AppError
 

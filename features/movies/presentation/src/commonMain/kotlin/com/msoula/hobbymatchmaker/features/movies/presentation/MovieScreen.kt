@@ -3,6 +3,7 @@ package com.msoula.hobbymatchmaker.features.movies.presentation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -13,6 +14,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -29,6 +32,7 @@ import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiEve
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,6 +49,8 @@ fun MovieScreenContent(
     val coroutineScope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
 
+    val noFetchingDetailPossibleMessage = stringResource(Res.string.no_fetching_detail_possible)
+
     ObserveAsEvents(flow = oneTimeEventChannelFlow) { event ->
         coroutineScope.launch {
             when (event) {
@@ -57,11 +63,22 @@ fun MovieScreenContent(
                 }
 
                 is MovieUiEventModel.OnLogOutSuccess -> redirectToAuth()
+
+                is MovieUiEventModel.NoFetchingDetailPossible -> {
+                    snackBarHostState.showSnackbar(noFetchingDetailPossibleMessage)
+                }
             }
         }
     }
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackBarHostState) { data ->
+                Snackbar(modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth()) {
+                    Text(text = data.visuals.message)
+                }
+            }
+        },
         topBar = {
             TopAppBar(
                 { Text(text = "HobbyMatchMaker") },

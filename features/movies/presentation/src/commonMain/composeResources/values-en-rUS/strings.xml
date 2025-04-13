@@ -3,4 +3,6 @@
     <string name="movies_network_error">Error loading movies</string>
     <string name="movies_api_error">The data source is not responding</string>
     <string name="movies_unknown_error">An unknown error occurred</string>
+    <string name="no_fetching_detail_possible">This movie's details need an internet
+        connection to load. Try again when you're back online!</string>
 </resources>

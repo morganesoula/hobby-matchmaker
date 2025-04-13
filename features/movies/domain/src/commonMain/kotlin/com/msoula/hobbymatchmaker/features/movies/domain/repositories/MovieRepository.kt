@@ -21,4 +21,6 @@ interface MovieRepository {
     )
 
     suspend fun fetchMovies(language: String): Result<Unit, MovieErrors>
+
+    suspend fun isSynopsisMovieAvailable(movieId: Long): Boolean
 }

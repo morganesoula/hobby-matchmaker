@@ -59,12 +59,22 @@ class MovieLocalDataSourceImpl(private val movieDAO: MovieDAOImpl) : MovieLocalD
 
     override suspend fun upsertAll(movies: List<MovieDomainModel>) {
         try {
-            Logger.d("Local data source upsertAll")
             movieDAO.upsertMovies(movies.map { it.toMovieDB() })
         } catch (exception: CancellationException) {
             throw exception
         } catch (e: Exception) {
             Logger.e("Error inserting movies", e)
+        }
+    }
+
+    override suspend fun isMovieSynopsisAvailable(movieId: Long): Boolean {
+        try {
+            return movieDAO.isMovieSynopsisAvailable(movieId)
+        } catch (exception: CancellationException) {
+            throw exception
+        } catch (e: Exception) {
+            Logger.e("Error checking if movie synopsis is available", e)
+            return false
         }
     }
 }
