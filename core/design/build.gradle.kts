@@ -1,54 +1,23 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
-    `kotlin-multiplatform`
-    `android-library`
-    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.compose.multiplatform)
+    alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform.compose)
+}
+
+multiplatformConfig {
+    useDecomposeWithCompose()
 }
 
 kotlin {
-    applyDefaultHierarchyTemplate()
-
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
-        }
-    }
-
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
-
     sourceSets {
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.material3)
-            implementation(compose.components.resources)
-            implementation(compose.materialIconsExtended)
             implementation("org.jetbrains.compose.ui:ui-backhandler:1.8.0-alpha03")
-
-            implementation(libs.core.ktx)
-
-            // Navigation
-            implementation(libs.decompose.core)
-            implementation(libs.decompose.compose)
+            implementation(libs.findLibrary("core-ktx").get())
         }
     }
 }
 
 android {
     namespace = "com.msoula.hobbymatchmaker.core.design"
-    compileSdk = AndroidConfig.COMPILE_SDK
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
-
-    defaultConfig {
-        minSdk = AndroidConfig.MIN_SDK
-    }
 }
 
 compose.resources {

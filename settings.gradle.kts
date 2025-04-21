@@ -1,8 +1,13 @@
 pluginManagement {
     repositories {
+        includeBuild("build-logic")
         google()
         mavenCentral()
         gradlePluginPortal()
+    }
+
+    plugins {
+        id("com.codingfeline.buildkonfig") version "0.17.1"
     }
 }
 dependencyResolutionManagement {
@@ -13,7 +18,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Hobby Matchmaker"
+rootProject.name = "HobbyMatchmaker"
 include(":composeApp")
 include(":core")
 include(":core:authentication")
@@ -46,7 +51,5 @@ include(":testUtils")
 include(":testUtils:core")
 include(":testUtils:feature")
 include(":testUtils:common")
-include(":shared")
 include(":core:navigation:domain")
 include(":core:navigation:presentation")
-include(":build-logic:convention")

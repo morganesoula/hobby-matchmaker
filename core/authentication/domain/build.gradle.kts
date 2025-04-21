@@ -1,34 +1,15 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
-    `kotlin-multiplatform`
-    `android-library`
+    alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform)
+}
+
+multiplatformConfig {
+    useFirebase()
 }
 
 kotlin {
-    applyDefaultHierarchyTemplate()
-
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
-        }
-    }
-
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
-
     sourceSets {
         commonMain {
             dependencies {
-                implementation(libs.kotlinx.coroutines.kmp)
-
-                // Firebase
-                implementation(libs.firebase.kmp.auth)
-
-                // Koin
-                api(libs.koin.core)
-
                 // Modules
                 implementation(project(Modules.DI))
                 implementation(project(Modules.COMMON))
@@ -40,18 +21,4 @@ kotlin {
 
 android {
     namespace = "com.msoula.hobbymatchmaker.core.authentication.domain"
-    compileSdk = AndroidConfig.COMPILE_SDK
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
-
-    defaultConfig {
-        minSdk = AndroidConfig.MIN_SDK
-    }
-
-    lint {
-        disable += listOf("FlowOperatorInvokedInComposition")
-    }
 }

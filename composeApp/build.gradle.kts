@@ -1,51 +1,24 @@
-@file:Suppress("UnstableApiUsage")
-
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
-    id("com.android.application")
-    `kotlin-multiplatform`
-    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.compose.multiplatform)
+    alias(libs.plugins.hobbymatchmaker.buildlogic.application)
+}
+
+multiplatformConfig {
+    useCoil()
+    useDecomposeWithCompose()
+    useFirebase()
 }
 
 kotlin {
-    applyDefaultHierarchyTemplate()
-
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
-        }
-    }
-
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
-
     sourceSets {
         commonMain.dependencies {
-            implementation(libs.kotlinx.coroutines.kmp)
-
-            // Coil
-            implementation(libs.coil.compose)
-
-            // Compose
-            implementation(compose.components.resources)
-            implementation(compose.material3)
-
-            // Firebase - FireStore
-            implementation(libs.firebase.kmp.auth)
-            implementation(libs.firebase.kmp.firestore)
-
-            // Koin
-            api(libs.koin.core)
-            implementation(libs.koin.compose)
-            implementation(libs.koin.compose.viewmodel)
-
             // Logger
-            implementation(libs.napier)
+            implementation(libs.findLibrary("napier").get())
 
             // Modules
             implementation(project(Modules.AUTHENTICATION_DATA))
@@ -65,24 +38,19 @@ kotlin {
             implementation(project(Modules.NAVIGATION_DOMAIN))
             implementation(project(Modules.NAVIGATION_PRESENTATION))
             implementation(project(Modules.NETWORK))
-            implementation(project(Modules.SHARED))
             implementation(project(Modules.SESSION_DATA))
             implementation(project(Modules.SESSION_DOMAIN))
             implementation(project(Modules.SPLASHSCREEN_PRESENTATION))
-
-            // Navigation
-            implementation(libs.decompose.core)
-            implementation(libs.decompose.compose)
         }
 
 
         androidMain.dependencies {
             // AndroidX
-            api(libs.appcompat)
-            implementation(libs.activity.compose)
+            api(libs.findLibrary("appcompat").get())
+            implementation(libs.findLibrary("activity-compose").get())
 
             // Facebook
-            implementation(libs.facebook.android.sdk)
+            implementation(libs.findLibrary("facebook-android-sdk").get())
 
             // Firebase to make :generateDebugAndroidTestLintModel pass
             implementation("com.google.firebase:firebase-auth-ktx:23.2.0")
@@ -90,22 +58,16 @@ kotlin {
             implementation("com.google.firebase:firebase-firestore:25.1.2")
 
             // Koin
-            implementation(libs.koin.android)
+            implementation(libs.findLibrary("koin-android").get())
 
             // Timber
-            implementation(libs.timber.android)
+            implementation(libs.findLibrary("timber-android").get())
         }
     }
 }
 
 android {
     namespace = "com.msoula.hobbymatchmaker"
-    compileSdk = AndroidConfig.COMPILE_SDK
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
 
     val secretsPropertiesFile = rootProject.file("secrets.properties")
     val secretProperties = Properties()
@@ -114,15 +76,7 @@ android {
         secretProperties.load(FileInputStream(secretsPropertiesFile))
     }
 
-    buildFeatures.buildConfig = true
-
     defaultConfig {
-        applicationId = AndroidConfig.APPLICATION_ID
-        minSdk = AndroidConfig.MIN_SDK
-        targetSdk = AndroidConfig.TARGET_SDK
-        versionCode = AndroidConfig.VERSION_CODE
-        versionName = AndroidConfig.VERSION_NAME
-
         manifestPlaceholders["facebookApplicationID"] =
             secretProperties["facebook_application_id"] ?: ""
         manifestPlaceholders["facebookClientToken"] =
@@ -139,28 +93,8 @@ android {
             "\"${secretProperties["firebase_api_key"]}\""
         )
 
-        testInstrumentationRunner = AndroidConfig.TEST_INSTRUMENTATION_RUNNER
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
-    }
-
-    buildTypes {
-        debug {
-            isMinifyEnabled = false
-            isJniDebuggable = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
-            )
-        }
-
-        release {
-            isMinifyEnabled = false
-            isJniDebuggable = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
-            )
-        }
     }
 }
 
@@ -312,27 +246,27 @@ dependencies {
     implementation(libs.ktor.client.negotiation)
     implementation(libs.ktor.serialization.json)
 
-    // Modules
-    implementation(project(Modules.AUTHENTICATION_DATA))
-    implementation(project(Modules.AUTHENTICATION_DOMAIN))
-    implementation(project(Modules.COMMON))
-    implementation(project(Modules.DATABASE))
-    implementation(project(Modules.DESIGN))
-    implementation(project(Modules.DI))
-    implementation(project(Modules.LOGIN_DOMAIN))
-    implementation(project(Modules.LOGIN_PRESENTATION))
-    implementation(project(Modules.MOVIE_DATA))
-    implementation(project(Modules.MOVIE_DOMAIN))
-    implementation(project(Modules.MOVIE_PRESENTATION))
-    implementation(project(Modules.MOVIE_DETAIL_DATA))
-    implementation(project(Modules.MOVIE_DETAIL_DOMAIN))
-    implementation(project(Modules.MOVIE_DETAIL_PRESENTATION))
-    implementation(project(Modules.NAVIGATION))
-    implementation(project(Modules.NETWORK))
-    implementation(project(Modules.SHARED))
-    implementation(project(Modules.SESSION_DATA))
-    implementation(project(Modules.SESSION_DOMAIN))
-    implementation(project(Modules.SPLASHSCREEN_PRESENTATION))
+    // com.msoula.convention.Modules
+    implementation(project(com.msoula.convention.Modules.AUTHENTICATION_DATA))
+    implementation(project(com.msoula.convention.Modules.AUTHENTICATION_DOMAIN))
+    implementation(project(com.msoula.convention.Modules.COMMON))
+    implementation(project(com.msoula.convention.Modules.DATABASE))
+    implementation(project(com.msoula.convention.Modules.DESIGN))
+    implementation(project(com.msoula.convention.Modules.DI))
+    implementation(project(com.msoula.convention.Modules.LOGIN_DOMAIN))
+    implementation(project(com.msoula.convention.Modules.LOGIN_PRESENTATION))
+    implementation(project(com.msoula.convention.Modules.MOVIE_DATA))
+    implementation(project(com.msoula.convention.Modules.MOVIE_DOMAIN))
+    implementation(project(com.msoula.convention.Modules.MOVIE_PRESENTATION))
+    implementation(project(com.msoula.convention.Modules.MOVIE_DETAIL_DATA))
+    implementation(project(com.msoula.convention.Modules.MOVIE_DETAIL_DOMAIN))
+    implementation(project(com.msoula.convention.Modules.MOVIE_DETAIL_PRESENTATION))
+    implementation(project(com.msoula.convention.Modules.NAVIGATION))
+    implementation(project(com.msoula.convention.Modules.NETWORK))
+    implementation(project(com.msoula.convention.Modules.SHARED))
+    implementation(project(com.msoula.convention.Modules.SESSION_DATA))
+    implementation(project(com.msoula.convention.Modules.SESSION_DOMAIN))
+    implementation(project(com.msoula.convention.Modules.SPLASHSCREEN_PRESENTATION))
 
     // Navigation
     implementation(libs.compose.navigation)

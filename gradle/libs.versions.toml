@@ -1,14 +1,9 @@
 [versions]
 activityCompose = "1.10.1"
 appcompat = "1.7.0"
-arrow = "1.2.1"
-assertk = "0.28.0"
 coil = "3.1.0"
-composeLintChecks = "1.3.1"
 composeMultiplatform = "1.8.0-alpha03"
 coreKtx = "1.15.0"
-coreKtxVersion = "1.6.1"
-coreTesting = "2.2.0"
 credentials = "1.5.0"
 datastore = "1.1.3"
 datetime = "0.6.1"
@@ -19,77 +14,39 @@ firebaseKMP = "2.1.0"
 googleIdentity = "1.1.1"
 googleServices = "4.4.2"
 gradle = "8.9.1"
-gson = "2.11.0"
-javapoet = "1.13.0"
-junitJupiter = "5.10.2"
-junitKtx = "1.2.1"
 koin = "4.0.2"
-koinCompiler = "1.4.0"
 kotlinGradlePlugin = "2.1.10"
 kotlinxCollectionsImmutable = "0.3.7"
 kotlinxCoroutinesTest = "1.10.1"
 kotlinxSerialization = "1.7.3"
 kotlinxCoroutineKMP = "1.10.1"
-ksp = "2.1.10-1.0.31"
 ktor = "3.0.2"
-lifecycleViewmodelCompose = "2.8.7"
-material = "1.7.8"
-material3 = "1.3.1"
-media3 = "1.5.1"
-mockk = "1.13.9"
-mockkAndroid = "1.13.9"
 napier = "2.6.1"
-navigationTesting = "2.8.9"
-navigationUiKtx = "2.8.9"
 playServicesAuth = "21.3.0"
-runtime = "1.7.8"
 savedState = "1.2.1"
 sqldelight = "2.0.1"
-sqlite = "2.4.0"
 timber = "5.0.1"
-truth = "1.4.1"
-turbine = "0.12.1"
-uiTooling = "1.7.8"
 youtube = "12.1.0"
-junit = "4.13.2"
-junitVersion = "1.2.1"
-espressoCore = "3.6.1"
-jetbrainsKotlinJvm = "1.9.24"
 
 [libraries]
 activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityCompose" }
 appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
-arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
-assertk = { module = "com.willowtreeapps.assertk:assertk", version.ref = "assertk" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
-compose-lint-checks = { module = "com.slack.lint.compose:compose-lint-checks", version.ref = "composeLintChecks" }
-compose-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "navigationUiKtx" }
+compose-gradle-plugin = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "composeMultiplatform" }
 core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "coreTesting" }
 credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
 credentials-play-services = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
 datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
 decompose-core = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
 decompose-compose = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decompose" }
-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 facebook-android-sdk = { module = "com.facebook.android:facebook-android-sdk", version.ref = "facebookAndroidSdk" }
 facebook-login = { module = "com.facebook.android:facebook-login", version.ref = "facebookAndroidSdk" }
 firebase-kmp-auth = { group = "dev.gitlive", name = "firebase-auth", version.ref = "firebaseKMP" }
 firebase-kmp-firestore = { group = "dev.gitlive", name = "firebase-firestore", version.ref = "firebaseKMP" }
 google-identity = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleIdentity" }
-google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
-gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
-javapoet = { module = "com.squareup:javapoet", version.ref = "javapoet" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junitJupiter" }
-junit-ktx = { module = "androidx.test.ext:junit-ktx", version.ref = "junitKtx" }
+gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
-koin-compiler = { module = "io.insert-koin:koin-ksp-compiler", version.ref = "koinCompiler" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
-koin-android-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinGradlePlugin" }
@@ -98,50 +55,36 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 kotlinx-coroutines-kmp = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutineKMP" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
 kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
-ksp = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 ktor-client-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-serialization-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleViewmodelCompose" }
-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleViewmodelCompose" }
-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
-material-icons = { module = "androidx.compose.material:material-icons-extended", version.ref = "material" }
-media3-common = { module = "androidx.media3:media3-common", version.ref = "media3" }
-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
-media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3" }
-mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
-mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockkAndroid" }
 napier = { group = "io.github.aakira", name = "napier", version.ref = "napier" }
-navigation-testing = { module = "androidx.navigation:navigation-testing", version.ref = "navigationTesting" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "runtime" }
-runtime-kmp = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "runtime" }
 saved-state-kmp = { module = "androidx.savedstate:savedstate-ktx", version.ref = "savedState" }
 sqldelight-android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
 sqldelight-native-driver = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
 sqldelight-runtime = { module = "app.cash.sqldelight:runtime", version.ref = "sqldelight" }
-sqlite = { module = "androidx.sqlite:sqlite", version.ref = "sqlite" }
-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
-test-core-ktx = { module = "androidx.test:core-ktx", version.ref = "coreKtxVersion" }
 timber-android = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
-truth = { module = "com.google.truth:truth", version.ref = "truth" }
-turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "uiTooling" }
 youtube-player = { module = "com.pierfrancescosoffritti.androidyoutubeplayer:core", version.ref = "youtube" }
 
 [bundles]
 ktor = ["ktor-client-core", "ktor-client-cio", "ktor-client-logging", "ktor-client-negotiation", "ktor-serialization-json"]
 
 [plugins]
+android-application = { id = "com.android.application", version.ref = "gradle" }
+android-library = { id = "com.android.library", version.ref = "gradle" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlinGradlePlugin" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinGradlePlugin" }
-jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlinGradlePlugin" }
+
+hobbymatchmaker-buildlogic-application = { id = "hobbymatchmaker.buildlogic.application", version = "unspecified" }
+hobbymatchmaker-buildlogic-multiplatform = { id = "hobbymatchmaker.buildlogic.multiplatform", version = "unspecified" }
+hobbymatchmaker-buildlogic-multiplatform-compose = { id = "hobbymatchmaker.buildlogic.multiplatformCompose", version = "unspecified" }
+hobbymatchmaker-buildlogic-multiplatform-minimalist = { id = "hobbymatchmaker.buildlogic.multiplatformMinimalist", version = "unspecified" }

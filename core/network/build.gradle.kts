@@ -1,39 +1,18 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
-    `kotlin-multiplatform`
-    `android-library`
-    alias(libs.plugins.compose.multiplatform)
-    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform)
+}
+
+multiplatformConfig {
+    useFirebase()
 }
 
 kotlin {
-    applyDefaultHierarchyTemplate()
-
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
-        }
-    }
-
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
-
     sourceSets {
         commonMain.dependencies {
-            implementation(compose.runtime)
-
-            // Firebase - through GitLive
-            implementation(libs.firebase.kmp.auth)
-
-            // Koin
-            api(libs.koin.core)
-
             // Ktor
-            implementation(libs.bundles.ktor)
+            implementation(libs.findBundle("ktor").get())
 
             // Modules
             implementation(project(Modules.DESIGN))
@@ -42,27 +21,14 @@ kotlin {
 
         androidMain.dependencies {
             // Google
-            implementation(libs.play.services.auth)
+            implementation(libs.findLibrary("play-services-auth").get())
         }
     }
 }
 
 android {
     namespace = "com.msoula.hobbymatchmaker.core.network"
-    compileSdk = AndroidConfig.COMPILE_SDK
     buildFeatures.buildConfig = true
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
-
-    val secretsPropertiesFile = project.rootProject.file("secrets.properties")
-    val secretProperties = Properties()
-
-    if (secretsPropertiesFile.exists()) {
-        secretProperties.load(FileInputStream(secretsPropertiesFile))
-    }
 
     val tmdbPropertiesFile = project.rootProject.file("./tmdb.properties")
     val tmdbProperties = Properties()
@@ -72,8 +38,6 @@ android {
     }
 
     defaultConfig {
-        minSdk = AndroidConfig.MIN_SDK
-
         buildConfigField("String", "TMDB_KEY", "\"${tmdbProperties["tmdb_key"]}\"")
     }
 }

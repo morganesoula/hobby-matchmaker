@@ -1,9 +1,23 @@
+import org.gradle.api.JavaVersion
+
+object ProjectApplication {
+    const val PROJECT_APPLICATION_ID = "com.msoula.hobbymatchmaker"
+    const val PROJECT_APPLICATION_VERSION_NAME = "1.0.0"
+    const val PROJECT_APPLICATION_VERSION_CODE = 1
+}
+
+object ProjectConfig {
+    const val PROJECT_CONFIG_SDK_VERSION = 35
+    const val PROJECT_CONFIG_MIN_SDK_VERSION = 26
+    const val PROJECT_CONFIG_TARGET_SDK_VERSION = 35
+    val PROJECT_CONFIG_JAVA_VERSION = JavaVersion.VERSION_21
+}
+
 object Modules {
     const val AUTHENTICATION_DATA = ":core:authentication:data"
     const val AUTHENTICATION_DOMAIN = ":core:authentication:domain"
     const val COMMON = ":core:common"
     const val DATABASE = ":core:database"
-    const val DAO = ":core:database:dao"
     const val DESIGN = ":core:design"
     const val DI = ":core:di"
     const val LOGIN_DOMAIN = ":core:login:domain"

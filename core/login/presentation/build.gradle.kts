@@ -5,18 +5,16 @@ import java.net.URI
 import java.util.Properties
 
 plugins {
-    `kotlin-multiplatform`
-    `android-library`
-    `kotlin-parcelize`
-    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.compose.multiplatform)
-    alias(libs.plugins.serialization)
+    alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform.compose)
     id("io.github.frankois944.spmForKmp") version "0.3.3"
 }
 
-kotlin {
-    applyDefaultHierarchyTemplate()
+multiplatformConfig {
+    useFirebase()
+}
 
+kotlin {
     androidTarget {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_21)
@@ -39,23 +37,6 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(libs.kotlinx.coroutines.kmp)
-            implementation(libs.kotlinx.serialization)
-
-            // Compose
-            implementation(compose.components.resources)
-            implementation(compose.material3)
-            implementation(compose.runtime)
-            implementation(compose.ui)
-
-            // Firebase
-            implementation(libs.firebase.kmp.auth)
-
-            // Koin
-            api(libs.koin.core)
-            implementation(libs.koin.compose.viewmodel)
-            implementation(libs.koin.compose)
-
             // Modules
             implementation(project(Modules.AUTHENTICATION_DATA))
             implementation(project(Modules.AUTHENTICATION_DOMAIN))
@@ -67,38 +48,30 @@ kotlin {
         }
 
         androidMain.dependencies {
-            implementation(libs.saved.state.kmp)
+            implementation(libs.findLibrary("saved-state-kmp").get())
 
             // Compose
-            implementation(libs.activity.compose)
+            implementation(libs.findLibrary("activity-compose").get())
 
             // Credentials Manager
-            implementation(libs.credentials)
-            implementation(libs.credentials.play.services)
-            implementation(libs.google.identity)
+            implementation(libs.findLibrary("credentials").get())
+            implementation(libs.findLibrary("credentials-play-services").get())
+            implementation(libs.findLibrary("google-identity").get())
 
             // Facebook
-            implementation(libs.facebook.android.sdk)
+            implementation(libs.findLibrary("facebook-android-sdk").get())
 
             // Google
-            implementation(libs.play.services.auth)
+            implementation(libs.findLibrary("play-services-auth").get())
         }
     }
 }
 
 android {
     namespace = "com.msoula.hobbymatchmaker.core.login.presentation"
-    compileSdk = AndroidConfig.COMPILE_SDK
     buildFeatures.buildConfig = true
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
-
     defaultConfig {
-        minSdk = AndroidConfig.MIN_SDK
-
         val secretsPropertiesFile = project.rootProject.file("secrets.properties")
         val secretProperties = Properties()
 

@@ -1,66 +1,35 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
-    kotlin("multiplatform")
-    `android-library`
-    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.compose.multiplatform)
+    alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform.compose)
 }
 
 kotlin {
-    applyDefaultHierarchyTemplate()
-
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
-        }
-    }
-
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
-
     sourceSets {
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(libs.kotlinx.coroutines.kmp)
-            implementation(libs.kotlinx.datetime)
+            implementation(libs.findLibrary("kotlinx-datetime").get())
 
-            // FireStore - via GitLive https://github.com/GitLiveApp/firebase-kotlin-sdk
-            implementation(libs.firebase.kmp.firestore)
-
-            // Koin
-            api(libs.koin.core)
+            // FireStore
+            implementation(libs.findLibrary("firebase-kmp-firestore").get())
 
             // Modules
             implementation(project(Modules.DESIGN))
 
             // Logger
-            implementation(libs.napier)
+            implementation(libs.findLibrary("napier").get())
         }
 
         androidMain.dependencies {
-            implementation(libs.activity.compose)
+            implementation(libs.findLibrary("activity-compose").get())
 
             // Facebook
-            implementation(libs.facebook.android.sdk)
+            implementation(libs.findLibrary("facebook-android-sdk").get())
 
             // Timber
-            implementation(libs.timber.android)
+            implementation(libs.findLibrary("timber-android").get())
         }
     }
 }
 
 android {
     namespace = "com.msoula.hobbymatchmaker.core.common"
-    compileSdk = AndroidConfig.COMPILE_SDK
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
-
-    defaultConfig {
-        minSdk = AndroidConfig.MIN_SDK
-    }
 }
