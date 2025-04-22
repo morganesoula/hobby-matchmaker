@@ -271,7 +271,8 @@ fun MovieDetailContentScreen(
                 ExpandableTextComponent(
                     text = movie.synopsis,
                     showLess = stringResource(Res.string.show_less),
-                    showMore = stringResource(Res.string.show_more)
+                    showMore = stringResource(Res.string.show_more),
+                    shouldBeExpandable = filteredCast.isNotEmpty()
                 )
 
                 if (filteredCast.isNotEmpty()) {

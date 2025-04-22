@@ -24,7 +24,8 @@ fun ExpandableTextComponent(
     modifier: Modifier = Modifier,
     text: String,
     showLess: String,
-    showMore: String
+    showMore: String,
+    shouldBeExpandable: Boolean = true
 ) {
     var expanded by remember { mutableStateOf(false) }
     var showExpandButton by remember { mutableStateOf(false) }
@@ -33,15 +34,16 @@ fun ExpandableTextComponent(
         Column {
             Box(
                 modifier = Modifier
-                    .height(if (expanded) Dp.Unspecified else 100.dp)
+                    .height(if (!shouldBeExpandable) Dp.Unspecified else if (expanded) Dp.Unspecified else 100.dp)
                     .clip(RoundedCornerShape(8.dp))
             ) {
                 Text(
                     text = text,
                     onTextLayout = { layoutResult ->
-                        if (!expanded && layoutResult.lineCount > 6) {
-                            showExpandButton = true
-                        }
+                        if (!shouldBeExpandable) showExpandButton = false else
+                            if (!expanded && layoutResult.lineCount > 6) {
+                                showExpandButton = true
+                            }
                     }
                 )
 
@@ -65,7 +67,6 @@ fun ExpandableTextComponent(
             }
         }
     }
-
 }
 
 
