@@ -17,7 +17,6 @@
 ## 🧱 Architecture
 
 Le projet suit une architecture **modulaire et Clean**, pensée pour Kotlin Multiplatform :
-📦 hobby-matchmaker/ 
 composeApp/ # Application Android (Jetpack Compose) 
 iosApp/ # Application iOS (Swift/SwiftUI) 
 
@@ -28,7 +27,6 @@ presentation/ # UI & logique d'affichage multiplateforme
 
 
 - 🧠 **MVVM** pour la séparation des responsabilités
-- 
 - 🧩 **Decompose** pour la navigation multiplateforme
 - 🧪 **Koin** pour l'injection de dépendances
 - 🌐 **Ktor** pour les appels réseau
