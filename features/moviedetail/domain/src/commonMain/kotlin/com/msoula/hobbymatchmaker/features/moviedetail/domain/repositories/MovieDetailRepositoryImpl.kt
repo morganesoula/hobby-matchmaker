@@ -59,7 +59,9 @@ class MovieDetailRepositoryImpl(
                 movieDetailRemoteDataSource.fetchMovieCredit(movieId, language)
 
             when (result) {
-                is Result.Success -> Result.Success(result.data?.cast)
+                is Result.Success -> {
+                    Result.Success(result.data?.cast)
+                }
                 is Result.Failure -> Result.Failure(result.error)
                 is Result.Loading -> Result.Loading
             }

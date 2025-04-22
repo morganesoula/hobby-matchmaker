@@ -6,6 +6,7 @@ import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainError
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieActorDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.repositories.MovieDetailRepository
 import kotlinx.coroutines.CoroutineDispatcher
@@ -39,7 +40,15 @@ class ObserveMovieDetailUseCase(
                             parameters.stringValue
                         )) {
                             is Result.Success -> {
-                                val updated = movieDetail.copy(cast = result.data ?: emptyList())
+                                val cast = result.data?.takeIf { it.isNotEmpty() }
+                                    ?: listOf(
+                                        MovieActorDomainModel(
+                                            name = "NO_CAST",
+                                            role = "MARKER"
+                                        )
+                                    )
+
+                                val updated = movieDetail.copy(cast = cast)
                                 movieDetailRepository.saveMovieDetail(updated)
                                 send(Result.Success(ObserveMovieSuccess.DataLoadedInDB))
                             }

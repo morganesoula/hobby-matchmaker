@@ -122,8 +122,9 @@ fun MovieDetailContentScreen(
     val castMaxIndex = 5
     val verticalGradientHeight = 0.8f
 
+    val filteredCast = movie.cast.filterNot { it.key == "NO_CAST" }
     val cast = buildAnnotatedString {
-        movie.cast.asIterable().take(6).forEachIndexed { index, (name, role) ->
+        filteredCast.entries.take(6).forEachIndexed { index, (name, role) ->
             append(name)
             append(" (")
             withStyle(style = SpanStyle(fontStyle = FontStyle.Italic)) {
@@ -273,7 +274,7 @@ fun MovieDetailContentScreen(
                     showMore = stringResource(Res.string.show_more)
                 )
 
-                if (movie.cast.isNotEmpty()) {
+                if (filteredCast.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = stringResource(Res.string.cast),
