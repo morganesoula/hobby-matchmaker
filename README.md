@@ -18,13 +18,13 @@
 
 Le projet suit une architecture **modulaire et Clean**, pensée pour Kotlin Multiplatform :
 📦 hobby-matchmaker/ 
-├── composeApp/ # Application Android (Jetpack Compose) 
-├── iosApp/ # Application iOS (Swift/SwiftUI) 
+composeApp/ # Application Android (Jetpack Compose) 
+iosApp/ # Application iOS (Swift/SwiftUI) 
 
 Pour chaque module, vous retrouvez les trois couches principales: data, domain et presentation (seulement quand c'est utile)
-├── domain/ # 100% commonMain (logique métier pure) 
-├── data/ # commonMain + androidMain + iosMain 
-├── presentation/ # UI & logique d'affichage multiplateforme
+domain/ # 100% commonMain (logique métier pure) 
+data/ # commonMain + androidMain + iosMain 
+presentation/ # UI & logique d'affichage multiplateforme
 
 
 - 🧠 **MVVM** pour la séparation des responsabilités
