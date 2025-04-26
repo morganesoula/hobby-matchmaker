@@ -2,7 +2,7 @@ import com.android.build.api.dsl.ApplicationExtension
 import com.msoula.convention.MultiplatformConfigExtension
 import com.msoula.convention.configureAndroidApplication
 import com.msoula.convention.configureCompose
-import com.msoula.convention.configureMultiplatformIos
+import com.msoula.convention.configureIOSApplication
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -25,9 +25,12 @@ class ApplicationConventionPlugin : Plugin<Project> {
 
         val compose = extensions.getByType(ComposeExtension::class.java).dependencies
 
+        extensions.configure<KotlinMultiplatformExtension> {
+            configureIOSApplication()
+        }
+
         target.afterEvaluate {
             extensions.configure<KotlinMultiplatformExtension> {
-                configureMultiplatformIos()
                 configureCompose(libs, config, compose)
             }
         }

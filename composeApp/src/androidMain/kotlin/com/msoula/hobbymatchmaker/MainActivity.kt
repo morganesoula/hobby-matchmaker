@@ -5,22 +5,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.credentials.CredentialManager
-import com.arkivanov.decompose.defaultComponentContext
 import com.facebook.CallbackManager
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.design.theme.HobbyMatchmakerTheme
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.AndroidFacebookUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.AndroidGoogleUIClient
-import com.msoula.hobbymatchmaker.core.navigation.domain.SignInComponent
-import com.msoula.hobbymatchmaker.core.navigation.domain.SignUpComponent
-import com.msoula.hobbymatchmaker.core.navigation.presentation.AuthRootComponentImpl
-import com.msoula.hobbymatchmaker.core.navigation.presentation.MainRootComponentImpl
-import com.msoula.hobbymatchmaker.core.navigation.presentation.MovieComponentImpl
-import com.msoula.hobbymatchmaker.core.navigation.presentation.MovieDetailComponentImpl
-import com.msoula.hobbymatchmaker.core.navigation.presentation.RootComponentImpl
-import com.msoula.hobbymatchmaker.core.navigation.presentation.SplashRootComponentImpl
 import com.msoula.hobbymatchmaker.presentation.navigation.App
-import org.koin.android.ext.android.get
+import com.msoula.hobbymatchmaker.presentation.navigation.getRootComponent
 
 class MainActivity : ComponentActivity() {
 
@@ -31,47 +22,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val facebookUIClient = AndroidFacebookUIClient({ this }, callbackManager)
-
-        val rootComponent = RootComponentImpl(
-            componentContext = defaultComponentContext(),
-            authComponentFactory = { context, onAuthenticated ->
-                AuthRootComponentImpl(
-                    context,
-                    signInComponentFactory = { _, onSignUp, onAuth ->
-                        object : SignInComponent {
-                            override fun onSignUpClicked() = onSignUp()
-                            override fun onAuthenticated() = onAuth()
-                        }
-                    },
-                    signUpComponentFactory = { _, onSignIn, onAuth ->
-                        object : SignUpComponent {
-                            override fun onSignInClicked() = onSignIn()
-                            override fun onAuthenticated() = onAuth()
-                        }
-                    },
-                    onAuthenticated = onAuthenticated
-                )
-            },
-            mainComponentFactory = { context, _, logOut ->
-                MainRootComponentImpl(
-                    context,
-                    mainComponentFactory = { ctx, onMovieClicked, onLogOut ->
-                        MovieComponentImpl(ctx, onMovieClicked, onLogOut)
-                    },
-                    movieDetailComponentFactory = { ctx, id ->
-                        MovieDetailComponentImpl(ctx, id)
-                    },
-                    onLogout = logOut
-                )
-            },
-            splashComponentFactory = { context, onFinished ->
-                SplashRootComponentImpl(
-                    context,
-                    observeIsConnectedUseCase = get(),
-                    onFinished = onFinished
-                )
-            }
-        )
+        val rootComponent = getRootComponent()
 
         setContent {
             HobbyMatchmakerTheme {

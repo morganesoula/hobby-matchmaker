@@ -1,4 +1,4 @@
-package com.msoula.hobbymatchmaker.core.navigation.presentation
+package presentation
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.DelicateDecomposeApi

@@ -7,14 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		25863FFD087247DD78557841 /* Pods_iosApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9E2582A83A49CA8D707CAF6 /* Pods_iosApp.framework */; };
-		81B6D17303D553BE828566CC /* Pods_iosAppTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 89F056EDA67A752307A5B1E8 /* Pods_iosAppTests.framework */; };
-		A105DE8C2D65E7660055CEA0 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = A105DE8B2D65E7660055CEA0 /* GoogleSignIn */; };
-		A141E2BB2D67844300D558DB /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = A141E2BA2D67844300D558DB /* GoogleSignIn */; };
-		A1A4F1DD2D64D782006DC1C4 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = A1A4F1DC2D64D782006DC1C4 /* FirebaseAuth */; };
-		A1A4F1DF2D64D782006DC1C4 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = A1A4F1DE2D64D782006DC1C4 /* FirebaseCore */; };
-		A1A4F1E12D64D782006DC1C4 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = A1A4F1E02D64D782006DC1C4 /* FirebaseFirestore */; };
-		E238C60DE282C42AC6A95B8A /* Pods_iosApp_iosAppUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF5BA7FD2049F61B7F4D7516 /* Pods_iosApp_iosAppUITests.framework */; };
+		A1016CB92DBA8BD3002292B6 /* exportedNativeIosShared in Frameworks */ = {isa = PBXBuildFile; productRef = A1016CB82DBA8BD3002292B6 /* exportedNativeIosShared */; settings = {ATTRIBUTES = (Required, ); }; };
+		A107BB8E2DBC08CA00ABD150 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A107BB8D2DBC08CA00ABD150 /* libsqlite3.tbd */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,24 +28,42 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		A107BB8C2DBC05FB00ABD150 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		60DDF2FA128D1B815999D5CE /* Pods-iosAppTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosAppTests.debug.xcconfig"; path = "Target Support Files/Pods-iosAppTests/Pods-iosAppTests.debug.xcconfig"; sourceTree = "<group>"; };
-		899552C17ABBFFC8EFDF6DC9 /* Pods-iosApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosApp.release.xcconfig"; path = "Target Support Files/Pods-iosApp/Pods-iosApp.release.xcconfig"; sourceTree = "<group>"; };
-		89F056EDA67A752307A5B1E8 /* Pods_iosAppTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iosAppTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		93E5A52FAB5CD22B0B1194BB /* Pods-iosApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosApp.debug.xcconfig"; path = "Target Support Files/Pods-iosApp/Pods-iosApp.debug.xcconfig"; sourceTree = "<group>"; };
+		A107BB8D2DBC08CA00ABD150 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		A1654D952D5BB95100F7F8E6 /* iosApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iosApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1654DA52D5BB95200F7F8E6 /* iosAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iosAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1654DAF2D5BB95200F7F8E6 /* iosAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iosAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		AF5BA7FD2049F61B7F4D7516 /* Pods_iosApp_iosAppUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iosApp_iosAppUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		BF858BDB1B7EBE3F978A860D /* Pods-iosApp-iosAppUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosApp-iosAppUITests.release.xcconfig"; path = "Target Support Files/Pods-iosApp-iosAppUITests/Pods-iosApp-iosAppUITests.release.xcconfig"; sourceTree = "<group>"; };
-		C55B0B3472FA542779CF0C50 /* Pods-iosApp-iosAppUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosApp-iosAppUITests.debug.xcconfig"; path = "Target Support Files/Pods-iosApp-iosAppUITests/Pods-iosApp-iosAppUITests.debug.xcconfig"; sourceTree = "<group>"; };
-		D9E2582A83A49CA8D707CAF6 /* Pods_iosApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iosApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		E0A7CF8EB4B51CB890AE6D27 /* Pods-iosAppTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosAppTests.release.xcconfig"; path = "Target Support Files/Pods-iosAppTests/Pods-iosAppTests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		A107BB902DBC0A6C00ABD150 /* Exceptions for "iosApp" folder in "iosApp" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = A1654D942D5BB95100F7F8E6 /* iosApp */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		A1654D972D5BB95100F7F8E6 /* iosApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A107BB902DBC0A6C00ABD150 /* Exceptions for "iosApp" folder in "iosApp" target */,
+			);
 			path = iosApp;
 			sourceTree = "<group>";
 		};
@@ -72,12 +84,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A105DE8C2D65E7660055CEA0 /* GoogleSignIn in Frameworks */,
-				A1A4F1E12D64D782006DC1C4 /* FirebaseFirestore in Frameworks */,
-				A1A4F1DF2D64D782006DC1C4 /* FirebaseCore in Frameworks */,
-				A1A4F1DD2D64D782006DC1C4 /* FirebaseAuth in Frameworks */,
-				25863FFD087247DD78557841 /* Pods_iosApp.framework in Frameworks */,
-				A141E2BB2D67844300D558DB /* GoogleSignIn in Frameworks */,
+				A107BB8E2DBC08CA00ABD150 /* libsqlite3.tbd in Frameworks */,
+				A1016CB92DBA8BD3002292B6 /* exportedNativeIosShared in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -85,7 +93,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				81B6D17303D553BE828566CC /* Pods_iosAppTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -93,7 +100,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E238C60DE282C42AC6A95B8A /* Pods_iosApp_iosAppUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -103,24 +109,9 @@
 		7DEDD20BC06CE39FE6B82CDD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				D9E2582A83A49CA8D707CAF6 /* Pods_iosApp.framework */,
-				AF5BA7FD2049F61B7F4D7516 /* Pods_iosApp_iosAppUITests.framework */,
-				89F056EDA67A752307A5B1E8 /* Pods_iosAppTests.framework */,
+				A107BB8D2DBC08CA00ABD150 /* libsqlite3.tbd */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		9EB077ECA11F6ABAB14D3CDB /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				93E5A52FAB5CD22B0B1194BB /* Pods-iosApp.debug.xcconfig */,
-				899552C17ABBFFC8EFDF6DC9 /* Pods-iosApp.release.xcconfig */,
-				C55B0B3472FA542779CF0C50 /* Pods-iosApp-iosAppUITests.debug.xcconfig */,
-				BF858BDB1B7EBE3F978A860D /* Pods-iosApp-iosAppUITests.release.xcconfig */,
-				60DDF2FA128D1B815999D5CE /* Pods-iosAppTests.debug.xcconfig */,
-				E0A7CF8EB4B51CB890AE6D27 /* Pods-iosAppTests.release.xcconfig */,
-			);
-			path = Pods;
 			sourceTree = "<group>";
 		};
 		A1654D8C2D5BB95100F7F8E6 = {
@@ -130,7 +121,6 @@
 				A1654DA82D5BB95200F7F8E6 /* iosAppTests */,
 				A1654DB22D5BB95200F7F8E6 /* iosAppUITests */,
 				A1654D962D5BB95100F7F8E6 /* Products */,
-				9EB077ECA11F6ABAB14D3CDB /* Pods */,
 				7DEDD20BC06CE39FE6B82CDD /* Frameworks */,
 			);
 			sourceTree = "<group>";
@@ -152,11 +142,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A1654DB92D5BB95200F7F8E6 /* Build configuration list for PBXNativeTarget "iosApp" */;
 			buildPhases = (
-				0F2F8CFD825803CD9772CB13 /* [CP] Check Pods Manifest.lock */,
-				A1654DC22D5BB99300F7F8E6 /* Run Script */,
+				A19BEE182DBD2464005F47AC /* Run Script - Sync KMP Framework */,
+				A1F4EC612DB95CFC00FDD17F /* Run Script - Embed and Sign KMP Framework */,
 				A1654D912D5BB95100F7F8E6 /* Sources */,
 				A1654D922D5BB95100F7F8E6 /* Frameworks */,
 				A1654D932D5BB95100F7F8E6 /* Resources */,
+				A107BB8C2DBC05FB00ABD150 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -247,8 +238,7 @@
 			mainGroup = A1654D8C2D5BB95100F7F8E6;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				A1A4F1DB2D64D782006DC1C4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
-				A105DE8A2D65E7660055CEA0 /* XCRemoteSwiftPackageReference "googlesignin-ios" */,
+				A13C33D12DBBC958004BBE59 /* XCLocalSwiftPackageReference "../composeApp/exportedNativeIosShared" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A1654D962D5BB95100F7F8E6 /* Products */;
@@ -287,28 +277,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		0F2F8CFD825803CD9772CB13 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-iosApp-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
 		7CAE2C38557D8F5DF1BFC79B /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -353,7 +321,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		A1654DC22D5BB99300F7F8E6 /* Run Script */ = {
+		A19BEE182DBD2464005F47AC /* Run Script - Sync KMP Framework */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -362,14 +330,33 @@
 			);
 			inputPaths = (
 			);
-			name = "Run Script";
+			name = "Run Script - Sync KMP Framework";
 			outputFileListPaths = (
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd \"$SRCROOT/..\"\n./gradlew :shared:embedAndSignAppleFrameworkForXcode\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncd \"${SRCROOT}/../\" # remonte au projet racine où est ton gradle\n./gradlew :composeApp:syncFramework -Pconfiguration=DEBUG\n";
+		};
+		A1F4EC612DB95CFC00FDD17F /* Run Script - Embed and Sign KMP Framework */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script - Embed and Sign KMP Framework";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncd \"$SRCROOT/..\"\n./gradlew :composeApp:embedAndSignAppleFrameworkForXcode\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -540,7 +527,6 @@
 		};
 		A1654DBA2D5BB95200F7F8E6 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 93E5A52FAB5CD22B0B1194BB /* Pods-iosApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -551,9 +537,13 @@
 				DEVELOPMENT_TEAM = P29KSRFXSR;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/Pods";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/Pods",
+					"$(PROJECT_DIR)/iosApp",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/Pods";
+				INFOPLIST_FILE = iosApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -565,6 +555,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/Pods";
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "-lsqlite3";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ms.hobbymatchmaker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -576,7 +567,6 @@
 		};
 		A1654DBB2D5BB95200F7F8E6 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 899552C17ABBFFC8EFDF6DC9 /* Pods-iosApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -587,9 +577,13 @@
 				DEVELOPMENT_TEAM = P29KSRFXSR;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/Pods";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/Pods",
+					"$(PROJECT_DIR)/iosApp",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/Pods";
+				INFOPLIST_FILE = iosApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -601,6 +595,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/Pods";
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "-lsqlite3";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ms.hobbymatchmaker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -612,7 +607,6 @@
 		};
 		A1654DBD2D5BB95200F7F8E6 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 60DDF2FA128D1B815999D5CE /* Pods-iosAppTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -632,7 +626,6 @@
 		};
 		A1654DBE2D5BB95200F7F8E6 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E0A7CF8EB4B51CB890AE6D27 /* Pods-iosAppTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -652,7 +645,6 @@
 		};
 		A1654DC02D5BB95200F7F8E6 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C55B0B3472FA542779CF0C50 /* Pods-iosApp-iosAppUITests.debug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -670,7 +662,6 @@
 		};
 		A1654DC12D5BB95200F7F8E6 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BF858BDB1B7EBE3F978A860D /* Pods-iosApp-iosAppUITests.release.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -727,49 +718,17 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		A105DE8A2D65E7660055CEA0 /* XCRemoteSwiftPackageReference "googlesignin-ios" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/google/googlesignin-ios";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 8.0.0;
-			};
+/* Begin XCLocalSwiftPackageReference section */
+		A13C33D12DBBC958004BBE59 /* XCLocalSwiftPackageReference "../composeApp/exportedNativeIosShared" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../composeApp/exportedNativeIosShared;
 		};
-		A1A4F1DB2D64D782006DC1C4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 11.8.1;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
+/* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		A105DE8B2D65E7660055CEA0 /* GoogleSignIn */ = {
+		A1016CB82DBA8BD3002292B6 /* exportedNativeIosShared */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A105DE8A2D65E7660055CEA0 /* XCRemoteSwiftPackageReference "googlesignin-ios" */;
-			productName = GoogleSignIn;
-		};
-		A141E2BA2D67844300D558DB /* GoogleSignIn */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = GoogleSignIn;
-		};
-		A1A4F1DC2D64D782006DC1C4 /* FirebaseAuth */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A1A4F1DB2D64D782006DC1C4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAuth;
-		};
-		A1A4F1DE2D64D782006DC1C4 /* FirebaseCore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A1A4F1DB2D64D782006DC1C4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseCore;
-		};
-		A1A4F1E02D64D782006DC1C4 /* FirebaseFirestore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A1A4F1DB2D64D782006DC1C4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseFirestore;
+			productName = exportedNativeIosShared;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

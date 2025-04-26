@@ -1,4 +1,5 @@
 import java.io.FileInputStream
+import java.net.URI
 import java.util.Properties
 
 plugins {
@@ -6,6 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.hobbymatchmaker.buildlogic.application)
+    id("io.github.frankois944.spmForKmp") version "0.8.1"
 }
 
 multiplatformConfig {
@@ -15,6 +17,18 @@ multiplatformConfig {
 }
 
 kotlin {
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach {
+        it.compilations {
+            val main by getting {
+                cinterops.create("nativeIosShared")
+            }
+        }
+    }
+
     sourceSets {
         commonMain.dependencies {
             // Logger
@@ -104,176 +118,26 @@ compose.resources {
     generateResClass = always
 }
 
-/* plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("kotlin-parcelize")
-    alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.google.services)
-    alias(libs.plugins.ksp)
-}
-
-val secretsPropertiesFile = rootProject.file("secrets.properties")
-val secretProperties = Properties()
-
-if (secretsPropertiesFile.exists()) {
-    secretProperties.load(FileInputStream(secretsPropertiesFile))
-}
-
-android {
-    namespace = "com.msoula.hobbymatchmaker"
-    compileSdk = AndroidConfig.COMPILE_SDK
-
-    defaultConfig {
-        applicationId = AndroidConfig.APPLICATION_ID
-        minSdk = AndroidConfig.MIN_SDK
-        targetSdk = AndroidConfig.TARGET_SDK
-        versionCode = AndroidConfig.VERSION_CODE
-        versionName = AndroidConfig.VERSION_NAME
-
-        manifestPlaceholders["facebookApplicationID"] =
-            secretProperties["facebook_application_id"] ?: ""
-        manifestPlaceholders["facebookClientToken"] =
-            secretProperties["facebook_client_token"] ?: ""
-
-        testInstrumentationRunner = AndroidConfig.TEST_INSTRUMENTATION_RUNNER
-        vectorDrawables.useSupportLibrary = true
-
-        ksp {
-            arg("room.schemaLocation", "$projectDir/schemas")
-        }
-    }
-
-    bundle {
-        language {
-            enableSplit = false
-        }
-    }
-
-    buildTypes {
-        debug {
-            isMinifyEnabled = false
-            isDebuggable = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
+swiftPackageConfig {
+    create("nativeIosShared") {
+        minIos = "18.0"
+        dependency {
+            remotePackageVersion(
+                url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
+                products = {
+                    add("FirebaseCore", exportToKotlin = true)
+                    add("FirebaseAuth", exportToKotlin = true)
+                    add("FirebaseFirestore", exportToKotlin = true)
+                },
+                version = "11.12.0"
             )
-        }
-
-        release {
-            isMinifyEnabled = true
-            isDebuggable = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
+            remotePackageVersion(
+                url = URI("https://github.com/google/GoogleSignIn-iOS"),
+                products = {
+                    add("GoogleSignIn", exportToKotlin = true)
+                },
+                version = "8.0.0"
             )
         }
     }
-
-    applicationVariants.all {
-        val variantName = name
-        sourceSets {
-            getByName("main") {
-                java.srcDir(File("build/generated/ksp/$variantName/kotlin"))
-            }
-        }
-    }
-
-    java {
-        toolchain {
-            languageVersion.set(JavaLanguageVersion.of(21))
-        }
-    }
-
-    buildFeatures {
-        buildConfig = true
-        compose = true
-    }
-
-    sourceSets {
-        getByName("main").java.srcDir("src/main/kotlin")
-        getByName("test").java.srcDir("src/test/kotlin")
-        getByName("androidTest").java.srcDir("src/androidTest/kotlin")
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.8"
-    }
-
-    packaging {
-        resources.excludes.add("META-INF/gradle/incremental.annotation.processors")
-    }
 }
-
-dependencies {
-    lintChecks(libs.compose.lint.checks)
-
-    // Compose
-    implementation(libs.ui.tooling)
-    implementation(libs.material3)
-    implementation(libs.activity.compose)
-    implementation(libs.runtime)
-    implementation(libs.lifecycle.viewmodel.compose)
-
-    // AndroidX
-    implementation(libs.core.ktx)
-    api(libs.appcompat)
-    implementation(libs.activity.ktx)
-    implementation(libs.lifecycle.runtime.compose)
-    implementation(libs.lifecycle.runtime.ktx)
-    implementation(libs.kotlinx.collections.immutable)
-
-    // Facebook
-    implementation(libs.facebook.android.sdk)
-
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.firebase.auth)
-    implementation(libs.firebase.ui.auth)
-
-    // Firestore
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.firebase.firestore)
-
-    // Koin
-    implementation(libs.koin.android)
-    implementation(libs.koin.compose)
-
-    // Ktor
-    implementation(libs.ktor.client.core)
-    implementation(libs.ktor.client.cio)
-    implementation(libs.ktor.client.logging)
-    implementation(libs.ktor.client.negotiation)
-    implementation(libs.ktor.serialization.json)
-
-    // com.msoula.convention.Modules
-    implementation(project(com.msoula.convention.Modules.AUTHENTICATION_DATA))
-    implementation(project(com.msoula.convention.Modules.AUTHENTICATION_DOMAIN))
-    implementation(project(com.msoula.convention.Modules.COMMON))
-    implementation(project(com.msoula.convention.Modules.DATABASE))
-    implementation(project(com.msoula.convention.Modules.DESIGN))
-    implementation(project(com.msoula.convention.Modules.DI))
-    implementation(project(com.msoula.convention.Modules.LOGIN_DOMAIN))
-    implementation(project(com.msoula.convention.Modules.LOGIN_PRESENTATION))
-    implementation(project(com.msoula.convention.Modules.MOVIE_DATA))
-    implementation(project(com.msoula.convention.Modules.MOVIE_DOMAIN))
-    implementation(project(com.msoula.convention.Modules.MOVIE_PRESENTATION))
-    implementation(project(com.msoula.convention.Modules.MOVIE_DETAIL_DATA))
-    implementation(project(com.msoula.convention.Modules.MOVIE_DETAIL_DOMAIN))
-    implementation(project(com.msoula.convention.Modules.MOVIE_DETAIL_PRESENTATION))
-    implementation(project(com.msoula.convention.Modules.NAVIGATION))
-    implementation(project(com.msoula.convention.Modules.NETWORK))
-    implementation(project(com.msoula.convention.Modules.SHARED))
-    implementation(project(com.msoula.convention.Modules.SESSION_DATA))
-    implementation(project(com.msoula.convention.Modules.SESSION_DOMAIN))
-    implementation(project(com.msoula.convention.Modules.SPLASHSCREEN_PRESENTATION))
-
-    // Navigation
-    implementation(libs.compose.navigation)
-
-    // Unit Test
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.junit.ktx)
-    testImplementation(libs.mockk.android)
-    testImplementation(libs.turbine)
-} */

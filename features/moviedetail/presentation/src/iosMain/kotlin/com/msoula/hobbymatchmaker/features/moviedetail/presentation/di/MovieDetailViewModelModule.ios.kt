@@ -1,6 +1,18 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.presentation.di
 
-import org.koin.core.module.Module
+import com.msoula.hobbymatchmaker.core.network.IOSNetworkConnectivityChecker
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailViewModel
+import org.koin.core.module.dsl.viewModel
+import org.koin.dsl.module
 
-actual val featuresModuleMovieDetailPresentationPlatformSpecific: Module
-    get() = TODO("Not yet implemented")
+actual val featuresModuleMovieDetailPresentationPlatformSpecific = module {
+    viewModel { (movieId: Long) ->
+        MovieDetailViewModel(
+            movieId = movieId,
+            get(),
+            get(),
+            get(),
+            connectivityCheck = IOSNetworkConnectivityChecker()
+        )
+    }
+}

@@ -1,5 +1,6 @@
 import com.android.build.gradle.LibraryExtension
 import com.msoula.convention.MultiplatformConfigExtension
+import com.msoula.convention.configureCInterops
 import com.msoula.convention.configureMultiplatform
 import com.msoula.convention.configureMultiplatformAndroid
 import com.msoula.convention.configureMultiplatformIos
@@ -25,6 +26,7 @@ class MultiplatformConventionPlugin : Plugin<Project> {
             extensions.configure<KotlinMultiplatformExtension> {
                 configureMultiplatformIos()
                 configureMultiplatform(libs, config)
+                configureCInterops(this@with)
             }
         }
 

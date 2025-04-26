@@ -2,6 +2,7 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform)
+    id("io.github.frankois944.spmForKmp") version "0.8.1"
 }
 
 multiplatformConfig {
@@ -40,4 +41,8 @@ android {
     defaultConfig {
         buildConfigField("String", "TMDB_KEY", "\"${tmdbProperties["tmdb_key"]}\"")
     }
+}
+
+swiftPackageConfig {
+    create("network") {}
 }

@@ -1,13 +1,11 @@
-import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.FileInputStream
-import java.net.URI
 import java.util.Properties
 
 plugins {
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform.compose)
-    id("io.github.frankois944.spmForKmp") version "0.3.3"
+    id("io.github.frankois944.spmForKmp") version "0.8.1"
 }
 
 multiplatformConfig {
@@ -23,7 +21,7 @@ kotlin {
         }
     }
 
-    listOf(
+    /* listOf(
         iosX64(),
         iosArm64(),
         iosSimulatorArm64()
@@ -33,7 +31,7 @@ kotlin {
                 cinterops.create("nativeIosShared")
             }
         }
-    }
+    } */
 
     sourceSets {
         commonMain.dependencies {
@@ -95,26 +93,4 @@ compose.resources {
     publicResClass = true
     packageOfResClass = "com.msoula.hobbymatchmaker.core.login.presentation"
     generateResClass = always
-}
-
-swiftPackageConfig {
-    create("nativeIosShared") {
-        minIos = "18.0"
-        dependency(
-            SwiftDependency.Package.Remote.Version(
-            url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
-            products = {
-                add("FirebaseCore", "FirebaseAuth", exportToKotlin = true)
-            },
-            version = "11.8.1"
-        ),
-            SwiftDependency.Package.Remote.Version(
-                url = URI("https://github.com/google/GoogleSignIn-iOS"),
-                products = {
-                    add("GoogleSignIn", exportToKotlin = true)
-                },
-                version = "8.0.0"
-            )
-        )
-    }
 }

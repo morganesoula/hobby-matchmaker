@@ -33,7 +33,6 @@ actual fun SocialMediaButtonListPlatformSpecificUI(
     onGoogleButtonClicked: () -> Unit,
     facebookUIClient: FacebookUIClient?
 ) {
-
     Row(
         modifier =
             modifier

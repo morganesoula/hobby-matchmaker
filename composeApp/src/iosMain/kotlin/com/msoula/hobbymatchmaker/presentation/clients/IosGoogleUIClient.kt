@@ -1,5 +1,6 @@
-package com.msoula.hobbymatchmaker.core.login.presentation.clients
+package com.msoula.hobbymatchmaker.presentation.clients
 
+import com.msoula.hobbymatchmaker.core.login.presentation.clients.GoogleUIClient
 import dev.gitlive.firebase.auth.AuthCredential
 import dev.gitlive.firebase.auth.GoogleAuthProvider
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -36,3 +37,4 @@ class IosGoogleUIClient : GoogleUIClient {
         }
     }
 }
+
