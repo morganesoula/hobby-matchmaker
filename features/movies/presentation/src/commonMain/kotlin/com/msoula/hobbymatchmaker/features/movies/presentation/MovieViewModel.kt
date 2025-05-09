@@ -34,7 +34,7 @@ import org.jetbrains.compose.resources.getString
 @OptIn(ExperimentalCoroutinesApi::class)
 class MovieViewModel(
     private val setMovieFavoriteUseCase: SetMovieFavoriteUseCase,
-    observeAllMoviesUseCase: ObserveAllMoviesUseCase,
+    private val observeAllMoviesUseCase: ObserveAllMoviesUseCase,
     private val getUserInfo: FetchFirebaseUserInfo,
     private val logOutUseCase: LogOutUseCase,
     private val checkMovieSynopsisValueUseCase: CheckMovieSynopsisValueUseCase,

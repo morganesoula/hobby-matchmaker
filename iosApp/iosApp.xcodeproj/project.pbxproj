@@ -7,8 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A1016CB92DBA8BD3002292B6 /* exportedNativeIosShared in Frameworks */ = {isa = PBXBuildFile; productRef = A1016CB82DBA8BD3002292B6 /* exportedNativeIosShared */; settings = {ATTRIBUTES = (Required, ); }; };
 		A107BB8E2DBC08CA00ABD150 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A107BB8D2DBC08CA00ABD150 /* libsqlite3.tbd */; };
+		A194D2AD2DC2897E001FDC09 /* exportedNativeIosShared in Frameworks */ = {isa = PBXBuildFile; productRef = A194D2AC2DC2897E001FDC09 /* exportedNativeIosShared */; };
+		A1F3BA3E2DCA4DE6005104EF /* composeApp.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1F3BA3D2DCA4DE6005104EF /* composeApp.xcframework */; };
+		A1F3BA3F2DCA4DE6005104EF /* composeApp.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A1F3BA3D2DCA4DE6005104EF /* composeApp.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,12 +31,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		A107BB8C2DBC05FB00ABD150 /* Embed Frameworks */ = {
+		A1F3BA402DCA4DE6005104EF /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				A1F3BA3F2DCA4DE6005104EF /* composeApp.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -43,9 +46,10 @@
 
 /* Begin PBXFileReference section */
 		A107BB8D2DBC08CA00ABD150 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
-		A1654D952D5BB95100F7F8E6 /* iosApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iosApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1654D952D5BB95100F7F8E6 /* HobbyMatchMaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HobbyMatchMaker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1654DA52D5BB95200F7F8E6 /* iosAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iosAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1654DAF2D5BB95200F7F8E6 /* iosAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iosAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1F3BA3D2DCA4DE6005104EF /* composeApp.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = composeApp.xcframework; path = ../composeApp/xcframeworks/composeApp.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -84,8 +88,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1F3BA3E2DCA4DE6005104EF /* composeApp.xcframework in Frameworks */,
 				A107BB8E2DBC08CA00ABD150 /* libsqlite3.tbd in Frameworks */,
-				A1016CB92DBA8BD3002292B6 /* exportedNativeIosShared in Frameworks */,
+				A194D2AD2DC2897E001FDC09 /* exportedNativeIosShared in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -109,6 +114,7 @@
 		7DEDD20BC06CE39FE6B82CDD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A1F3BA3D2DCA4DE6005104EF /* composeApp.xcframework */,
 				A107BB8D2DBC08CA00ABD150 /* libsqlite3.tbd */,
 			);
 			name = Frameworks;
@@ -128,7 +134,7 @@
 		A1654D962D5BB95100F7F8E6 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A1654D952D5BB95100F7F8E6 /* iosApp.app */,
+				A1654D952D5BB95100F7F8E6 /* HobbyMatchMaker.app */,
 				A1654DA52D5BB95200F7F8E6 /* iosAppTests.xctest */,
 				A1654DAF2D5BB95200F7F8E6 /* iosAppUITests.xctest */,
 			);
@@ -142,12 +148,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A1654DB92D5BB95200F7F8E6 /* Build configuration list for PBXNativeTarget "iosApp" */;
 			buildPhases = (
-				A19BEE182DBD2464005F47AC /* Run Script - Sync KMP Framework */,
 				A1F4EC612DB95CFC00FDD17F /* Run Script - Embed and Sign KMP Framework */,
 				A1654D912D5BB95100F7F8E6 /* Sources */,
 				A1654D922D5BB95100F7F8E6 /* Frameworks */,
 				A1654D932D5BB95100F7F8E6 /* Resources */,
-				A107BB8C2DBC05FB00ABD150 /* Embed Frameworks */,
+				A1F3BA402DCA4DE6005104EF /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -158,7 +163,7 @@
 			);
 			name = iosApp;
 			productName = iosApp;
-			productReference = A1654D952D5BB95100F7F8E6 /* iosApp.app */;
+			productReference = A1654D952D5BB95100F7F8E6 /* HobbyMatchMaker.app */;
 			productType = "com.apple.product-type.application";
 		};
 		A1654DA42D5BB95200F7F8E6 /* iosAppTests */ = {
@@ -238,7 +243,7 @@
 			mainGroup = A1654D8C2D5BB95100F7F8E6;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				A13C33D12DBBC958004BBE59 /* XCLocalSwiftPackageReference "../composeApp/exportedNativeIosShared" */,
+				A194D2AB2DC2897E001FDC09 /* XCLocalSwiftPackageReference "../composeApp/exportedNativeIosShared" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A1654D962D5BB95100F7F8E6 /* Products */;
@@ -320,24 +325,6 @@
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
-		};
-		A19BEE182DBD2464005F47AC /* Run Script - Sync KMP Framework */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Run Script - Sync KMP Framework";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncd \"${SRCROOT}/../\" # remonte au projet racine où est ton gradle\n./gradlew :composeApp:syncFramework -Pconfiguration=DEBUG\n";
 		};
 		A1F4EC612DB95CFC00FDD17F /* Run Script - Embed and Sign KMP Framework */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -537,10 +524,7 @@
 				DEVELOPMENT_TEAM = P29KSRFXSR;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/Pods",
-					"$(PROJECT_DIR)/iosApp",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../composeApp/build/XCFrameworks/debug/composeApp.xcframework";
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/Pods";
 				INFOPLIST_FILE = iosApp/Info.plist;
@@ -553,11 +537,14 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/Pods";
+				LIBRARY_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/Pods",
+					"$(PROJECT_DIR)",
+				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-lsqlite3";
-				PRODUCT_BUNDLE_IDENTIFIER = com.ms.hobbymatchmaker;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.msoula.hobbymatchmaker;
+				PRODUCT_NAME = HobbyMatchMaker;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 5.0;
@@ -577,10 +564,7 @@
 				DEVELOPMENT_TEAM = P29KSRFXSR;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/Pods",
-					"$(PROJECT_DIR)/iosApp",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../composeApp/build/XCFrameworks/debug/composeApp.xcframework";
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/Pods";
 				INFOPLIST_FILE = iosApp/Info.plist;
@@ -593,11 +577,14 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/Pods";
+				LIBRARY_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/Pods",
+					"$(PROJECT_DIR)",
+				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-lsqlite3";
-				PRODUCT_BUNDLE_IDENTIFIER = com.ms.hobbymatchmaker;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.msoula.hobbymatchmaker;
+				PRODUCT_NAME = HobbyMatchMaker;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 5.0;
@@ -719,14 +706,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		A13C33D12DBBC958004BBE59 /* XCLocalSwiftPackageReference "../composeApp/exportedNativeIosShared" */ = {
+		A194D2AB2DC2897E001FDC09 /* XCLocalSwiftPackageReference "../composeApp/exportedNativeIosShared" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../composeApp/exportedNativeIosShared;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		A1016CB82DBA8BD3002292B6 /* exportedNativeIosShared */ = {
+		A194D2AC2DC2897E001FDC09 /* exportedNativeIosShared */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = exportedNativeIosShared;
 		};

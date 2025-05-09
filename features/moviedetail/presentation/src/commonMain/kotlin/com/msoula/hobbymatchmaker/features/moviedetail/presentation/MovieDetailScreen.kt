@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,6 +25,8 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -39,13 +42,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
+import com.arkivanov.essenty.backhandler.BackCallback
 import com.arkivanov.essenty.backhandler.BackHandler
 import com.msoula.hobbymatchmaker.core.common.ObserveAsEvents
+import com.msoula.hobbymatchmaker.core.common.isIosPlatform
 import com.msoula.hobbymatchmaker.core.design.component.DecomposeBackHandler
 import com.msoula.hobbymatchmaker.core.design.component.ExpandableTextComponent
+import com.msoula.hobbymatchmaker.core.design.component.HMMDetailTopBar
 import com.msoula.hobbymatchmaker.core.design.component.LoadingCircularProgress
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiEventModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
@@ -60,7 +67,8 @@ fun MovieDetailContent(
     viewState: MovieDetailViewStateModel,
     oneTimeEventFlow: Flow<MovieDetailUiEventModel>,
     backHandler: BackHandler,
-    onPlayTrailerClicked: (event: MovieDetailUiEventModel) -> Unit
+    onPlayTrailerClicked: (event: MovieDetailUiEventModel) -> Unit,
+    onMovieDetailBackPressed: () -> Unit
 ) {
     when (viewState) {
         is MovieDetailViewStateModel.Error -> ErrorMovieDetailScreen(error = viewState.error)
@@ -71,7 +79,8 @@ fun MovieDetailContent(
                 oneTimeEventFlow = oneTimeEventFlow,
                 movie = viewState.movie,
                 onPlayTrailerClicked = onPlayTrailerClicked,
-                backHandler = backHandler
+                backHandler = backHandler,
+                onMovieDetailBackPressed = onMovieDetailBackPressed
             )
     }
 }
@@ -82,11 +91,21 @@ fun MovieDetailScreen(
     oneTimeEventFlow: Flow<MovieDetailUiEventModel>,
     movie: MovieDetailUiModel,
     backHandler: BackHandler,
-    onPlayTrailerClicked: (event: MovieDetailUiEventModel) -> Unit
+    onPlayTrailerClicked: (event: MovieDetailUiEventModel) -> Unit,
+    onMovieDetailBackPressed: () -> Unit
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
+    val videoPlayerVisibility = remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        if (!videoPlayerVisibility.value) {
+            val callBack = BackCallback { onMovieDetailBackPressed() }
+            backHandler.register(callBack)
+        }
+    }
 
     Scaffold(
+        modifier = Modifier.systemBarsPadding(),
         snackbarHost = { SnackbarHost(snackBarHostState) }
     ) {
         MovieDetailContentScreen(
@@ -95,7 +114,9 @@ fun MovieDetailScreen(
             onPlayTrailerClicked = onPlayTrailerClicked,
             oneTimeEventFlow = oneTimeEventFlow,
             backHandler = backHandler,
-            snackBarHostState = snackBarHostState
+            snackBarHostState = snackBarHostState,
+            videoPlayerVisibility = videoPlayerVisibility,
+            onMovieDetailBackPressed = onMovieDetailBackPressed
         )
     }
 }
@@ -107,14 +128,15 @@ fun MovieDetailContentScreen(
     backHandler: BackHandler,
     oneTimeEventFlow: Flow<MovieDetailUiEventModel>,
     onPlayTrailerClicked: (event: MovieDetailUiEventModel) -> Unit,
-    snackBarHostState: SnackbarHostState
+    snackBarHostState: SnackbarHostState,
+    videoPlayerVisibility: MutableState<Boolean>,
+    onMovieDetailBackPressed: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
 
     val errorFetchingMovieMessage = stringResource(Res.string.no_trailer_available)
     val noConnectionMessage = stringResource(Res.string.connection_issue)
 
-    val videoPlayerVisibility = remember { mutableStateOf(false) }
     val movieVideoUri = remember { mutableStateOf(movie.videoKey) }
     val isLoading = remember { mutableStateOf(false) }
     val exitFullScreen = remember { mutableStateOf(false) }
@@ -178,13 +200,14 @@ fun MovieDetailContentScreen(
         LoadingCircularProgress()
     }
 
-    if (exitFullScreen.value) {
+    if (exitFullScreen.value && !isIosPlatform()) {
         ExitFullScreen()
     }
 
     Box(
         modifier = modifier
             .fillMaxSize()
+            .zIndex(0f)
     ) {
         //Background image
         AsyncImage(
@@ -196,7 +219,6 @@ fun MovieDetailContentScreen(
                 .fillMaxSize(),
             contentScale = ContentScale.Crop
         )
-
         // Filter to darken background
         BackgroundGradient(verticalGradientHeight)
 
@@ -293,6 +315,10 @@ fun MovieDetailContentScreen(
             exitFullScreen.value = false
             VideoComponent(movieUri = movieVideoUri.value)
         }
+
+        HMMDetailTopBar {
+            onMovieDetailBackPressed()
+        }
     }
 
     if (videoPlayerVisibility.value) {
@@ -320,7 +346,9 @@ fun BackgroundGradient(verticalGradientHeight: Float) {
 
 @Composable
 fun VideoComponent(movieUri: String) {
-    EnterFullScreen()
+    if (!isIosPlatform()) {
+        EnterFullScreen()
+    }
     YoutubeComponent(videoId = movieUri)
 }
 

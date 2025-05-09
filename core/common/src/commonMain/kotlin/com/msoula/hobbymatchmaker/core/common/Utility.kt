@@ -4,6 +4,7 @@ import kotlinx.datetime.LocalDate
 import kotlin.coroutines.cancellation.CancellationException
 
 expect fun getDeviceLocale(): String
+expect fun isIosPlatform(): Boolean
 
 suspend fun <Data> safeCall(
     appError: (String) -> AppError,

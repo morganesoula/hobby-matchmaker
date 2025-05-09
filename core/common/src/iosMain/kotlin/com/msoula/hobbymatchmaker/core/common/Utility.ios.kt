@@ -10,3 +10,5 @@ actual fun getDeviceLocale(): String {
     val countryCode = NSLocale.currentLocale.countryCode
     return "$language-$countryCode"
 }
+
+actual fun isIosPlatform(): Boolean = true

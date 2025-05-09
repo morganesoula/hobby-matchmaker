@@ -1,13 +1,13 @@
 package com.msoula.hobbymatchmaker.presentation.navigation
 
+import androidx.compose.runtime.Composable
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.msoula.hobbymatchmaker.core.navigation.domain.RootComponent
 import com.msoula.hobbymatchmaker.core.navigation.domain.SignInComponent
 import com.msoula.hobbymatchmaker.core.navigation.domain.SignUpComponent
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveIsConnectedUseCase
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
+import org.koin.compose.getKoin
 import presentation.AuthRootComponentImpl
 import presentation.MainRootComponentImpl
 import presentation.MovieComponentImpl
@@ -15,10 +15,9 @@ import presentation.MovieDetailComponentImpl
 import presentation.RootComponentImpl
 import presentation.SplashRootComponentImpl
 
+@Composable
 fun getRootComponent(): RootComponent {
-    val observeIsConnectedUseCase = with(object : KoinComponent {}) {
-        get<ObserveIsConnectedUseCase>()
-    }
+    val observeIsConnectedUseCase: ObserveIsConnectedUseCase = getKoin().get<ObserveIsConnectedUseCase>()
 
     return RootComponentImpl(
         componentContext = DefaultComponentContext(lifecycle = LifecycleRegistry()),
@@ -46,8 +45,8 @@ fun getRootComponent(): RootComponent {
                 mainComponentFactory = { ctx, onMovieClicked, onLogOut ->
                     MovieComponentImpl(ctx, onMovieClicked, onLogOut)
                 },
-                movieDetailComponentFactory = { ctx, id ->
-                    MovieDetailComponentImpl(ctx, id)
+                movieDetailComponentFactory = { ctx, id, onMovieDetailBackPressed ->
+                    MovieDetailComponentImpl(ctx, id, onMovieDetailBackPressed)
                 },
                 onLogout = logOut
             )

@@ -48,19 +48,19 @@ fun HMMTextFieldAuthComponent(
 ) {
     OutlinedTextField(
         modifier =
-        modifier
-            .padding(start = 24.dp, end = 24.dp)
-            .fillMaxWidth(),
+            modifier
+                .padding(start = 24.dp, end = 24.dp)
+                .fillMaxWidth(),
         value = value,
         onValueChange = { onValueChange(it) },
         placeholder = { Text(text = placeHolderText) },
         shape = RoundedCornerShape(16.dp),
         colors =
-        TextFieldDefaults.colors(
-            cursorColor = MaterialTheme.colorScheme.secondary,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-        ),
+            TextFieldDefaults.colors(
+                cursorColor = MaterialTheme.colorScheme.secondary,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+            ),
         visualTransformation = visualTransformation ?: VisualTransformation.None,
         keyboardOptions = keyboardOptions ?: KeyboardOptions.Default,
     )
@@ -79,19 +79,19 @@ fun HMMTextFieldPasswordComponent(
 
     TextField(
         modifier =
-        modifier
-            .padding(start = 24.dp, end = 24.dp)
-            .fillMaxWidth(),
+            modifier
+                .padding(start = 24.dp, end = 24.dp)
+                .fillMaxWidth(),
         value = value.trimEnd(),
         onValueChange = { onValueChange(it) },
         placeholder = { Text(text = placeholder) },
         shape = RoundedCornerShape(16.dp),
         colors =
-        TextFieldDefaults.colors(
-            cursorColor = MaterialTheme.colorScheme.secondary,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-        ),
+            TextFieldDefaults.colors(
+                cursorColor = MaterialTheme.colorScheme.secondary,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+            ),
         visualTransformation = if (hiddenPassword) PasswordVisualTransformation() else VisualTransformation.None,
         trailingIcon = {
             IconButton(onClick = { hiddenPassword = !hiddenPassword }) {
@@ -122,10 +122,10 @@ fun HMMButtonAuthComponent(
     Button(
         onClick = onClick,
         modifier =
-        modifier
-            .fillMaxWidth()
-            .padding(start = 24.dp, end = 24.dp)
-            .clickable { !loading },
+            modifier
+                .fillMaxWidth()
+                .padding(start = 24.dp, end = 24.dp)
+                .clickable { !loading },
         enabled = enabled,
         shape = RoundedCornerShape(8.dp),
     ) {
@@ -155,9 +155,9 @@ fun HMMFormHelperText(
     if (isVisible) {
         Row(
             modifier =
-            modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
+                modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
             horizontalArrangement = Arrangement.Center,
         ) {
             Text(text = titleHint, fontSize = 10.sp)

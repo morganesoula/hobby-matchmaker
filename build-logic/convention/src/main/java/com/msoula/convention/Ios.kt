@@ -11,17 +11,6 @@ internal fun KotlinMultiplatformExtension.configureMultiplatformIos() {
 }
 
 internal fun KotlinMultiplatformExtension.configureIOSApplication() {
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
-            baseName = "ComposeApp"
-            isStatic = true
-        }
-    }
-
     targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget> {
         binaries.all {
             freeCompilerArgs += listOf(

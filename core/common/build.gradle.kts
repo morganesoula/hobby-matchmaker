@@ -13,9 +13,6 @@ kotlin {
 
             // Modules
             implementation(project(Modules.DESIGN))
-
-            // Logger
-            implementation(libs.findLibrary("napier").get())
         }
 
         androidMain.dependencies {
@@ -27,6 +24,8 @@ kotlin {
             // Timber
             implementation(libs.findLibrary("timber-android").get())
         }
+
+        iosMain.dependencies {  }
     }
 }
 

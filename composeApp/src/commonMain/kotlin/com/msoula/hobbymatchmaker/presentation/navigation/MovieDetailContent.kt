@@ -25,6 +25,7 @@ fun MovieDetailContent(component: MovieDetailComponent) {
         viewState = viewState,
         oneTimeEventFlow = oneTimeEventFlow,
         onPlayTrailerClicked = movieDetailViewModel::onEvent,
-        backHandler = component.backHandler
+        backHandler = component.backHandler,
+        onMovieDetailBackPressed = component.onMovieDetailBackPressed()
     )
 }

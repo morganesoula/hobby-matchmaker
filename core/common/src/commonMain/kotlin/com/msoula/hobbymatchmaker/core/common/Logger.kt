@@ -1,26 +1,30 @@
 package com.msoula.hobbymatchmaker.core.common
 
-import io.github.aakira.napier.DebugAntilog
-import io.github.aakira.napier.Napier
+expect fun logToPlatform(message: String, tag: String, level: LogLevel)
+
+enum class LogLevel {DEBUG, INFO, WARNING, ERROR}
 
 object Logger {
     private var formatter: LogFormatter? = null
 
     fun init(formatter: LogFormatter) {
         this.formatter = formatter
-        Napier.base(DebugAntilog())
     }
 
     private fun formatMessage(message: String): String =
         formatter?.format(message) ?: message
 
-    fun d(message: String, tag: String = "HMM DEBUG") = Napier.d(formatMessage(message), tag = tag)
-    fun i(message: String, tag: String = "HMM INFO") = Napier.i(formatMessage(message), tag = tag)
+    fun d(message: String, tag: String = "HMM DEBUG") =
+        logToPlatform(formatMessage(message), tag, LogLevel.DEBUG)
+
+    fun i(message: String, tag: String = "HMM INFO") =
+        logToPlatform(formatMessage(message), tag, LogLevel.INFO)
+
     fun w(message: String, tag: String = "HMM WARNING") =
-        Napier.w(formatMessage(message), tag = tag)
+        logToPlatform(formatMessage(message), tag, LogLevel.WARNING)
 
     fun e(message: String, throwable: Throwable? = null, tag: String = "HMM ERROR") =
-        Napier.e(formatMessage(throwable?.message ?: ""), throwable, tag = tag)
+        logToPlatform(formatMessage(message), tag, LogLevel.ERROR)
 }
 
 interface LogFormatter {

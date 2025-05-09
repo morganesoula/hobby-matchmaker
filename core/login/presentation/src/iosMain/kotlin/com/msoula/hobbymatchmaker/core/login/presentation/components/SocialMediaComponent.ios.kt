@@ -12,8 +12,11 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.login.presentation.Res
+import com.msoula.hobbymatchmaker.core.login.presentation.apple_alt
+import com.msoula.hobbymatchmaker.core.login.presentation.apple_logo
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.google_alt
 import com.msoula.hobbymatchmaker.core.login.presentation.google_logo
@@ -31,9 +34,9 @@ actual fun SocialMediaButtonListPlatformSpecificUI(
 ) {
     Row(
         modifier =
-        modifier
-            .fillMaxWidth()
-            .wrapContentHeight(),
+            modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
         horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
 
@@ -44,11 +47,12 @@ actual fun SocialMediaButtonListPlatformSpecificUI(
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                 modifier = modifier.size(80.dp)
             ) {
-                /*Image(
+                Image(
                     modifier = modifier,
                     painter = painterResource(Res.drawable.apple_logo),
-                    contentDescription = stringResource(Res.string.apple_alt)
-                )*/
+                    contentDescription = stringResource(Res.string.apple_alt),
+                    colorFilter = ColorFilter.tint(Color.White)
+                )
             }
         }
 

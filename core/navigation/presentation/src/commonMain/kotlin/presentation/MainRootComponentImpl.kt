@@ -5,6 +5,7 @@ import com.arkivanov.decompose.DelicateDecomposeApi
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
+import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.value.Value
 import com.msoula.hobbymatchmaker.core.navigation.domain.MainComponent
@@ -15,7 +16,7 @@ import kotlinx.serialization.Serializable
 class MainRootComponentImpl(
     componentContext: ComponentContext,
     private val mainComponentFactory: (ComponentContext, onMovieClicked: (Long) -> Unit, onLogout: () -> Unit) -> MainComponent,
-    private val movieDetailComponentFactory: (context: ComponentContext, movieId: Long) -> MovieDetailComponent,
+    private val movieDetailComponentFactory: (context: ComponentContext, movieId: Long, onMovieDetailBackPressed: () -> Unit) -> MovieDetailComponent,
     private val onLogout: () -> Unit
 ) : MainRootComponent, ComponentContext by componentContext {
 
@@ -44,10 +45,7 @@ class MainRootComponentImpl(
             )
 
             is MainConfig.MovieDetail -> MainRootComponent.Child.MovieDetail(
-                movieDetailComponentFactory(
-                    context,
-                    config.movieId
-                )
+                movieDetailComponentFactory(context, config.movieId) { navigation.pop() }
             )
         }
 }

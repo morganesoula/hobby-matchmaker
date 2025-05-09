@@ -8,4 +8,5 @@
     <string name="show_more">… Voir plus</string>
     <string name="no_trailer_available">Bande-annonce non disponible pour le moment</string>
     <string name="connection_issue">Problème de connexion. Veuillez vérifier votre réseau</string>
+    <string name="back">Retour</string>
 </resources>

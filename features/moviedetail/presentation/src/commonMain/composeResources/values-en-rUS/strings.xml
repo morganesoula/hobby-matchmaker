@@ -8,4 +8,5 @@
     <string name="show_more">… Show more</string>
     <string name="no_trailer_available">No trailer available at the moment</string>
     <string name="connection_issue">Connection issue. Please check your network</string>
+    <string name="back">Back</string>
 </resources>

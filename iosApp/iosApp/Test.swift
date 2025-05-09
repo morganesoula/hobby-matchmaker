@@ -5,10 +5,10 @@
 //  Created by Morgane Soula on 21/02/2025.
 //
 
-import UIKit
 import FirebaseCore
 import FirebaseAuth
 import GoogleSignIn
+import ComposeApp
 
 @objcMembers public class IosNativeSocialCredential: NSObject {
 
@@ -40,4 +40,3 @@ import GoogleSignIn
             }
         }
 }
-

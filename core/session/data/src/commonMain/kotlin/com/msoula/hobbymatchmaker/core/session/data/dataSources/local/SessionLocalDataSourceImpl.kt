@@ -16,7 +16,8 @@ class SessionLocalDataSourceImpl(
 ) : SessionLocalDataSource {
 
     companion object {
-        val IS_CONNECTED_KEY = booleanPreferencesKey("is_connected_key")
+        val IS_CONNECTED_KEY =
+            booleanPreferencesKey("is_connected_key")
     }
 
     override suspend fun setIsConnected(isConnected: Boolean) {

@@ -7,9 +7,9 @@ import GoogleSignIn
 
     @objc public static let shared = IosNativeSocialCredential()
 
-    @objc public func getGoogleCredentials(from viewController: UIViewController, completion: @escaping (String?, NSError?) -> Void) {
+    @objc public func getGoogleCredentials(from viewController: UIViewController, completion: @escaping (String?, String?, NSError?) -> Void) {
             guard let clientID = FirebaseApp.app()?.options.clientID else {
-                completion(nil, NSError(domain: "GoogleSignIn", code: -1, userInfo: [NSLocalizedDescriptionKey: "Google client ID not found"]))
+                completion(nil, nil, NSError(domain: "GoogleSignIn", code: -1, userInfo: [NSLocalizedDescriptionKey: "Google client ID not found"]))
                 return
             }
 
@@ -18,17 +18,24 @@ import GoogleSignIn
 
             GIDSignIn.sharedInstance.signIn(withPresenting: viewController) { signInResult, error in
                 if let error = error {
-                    completion(nil, NSError(domain: "apple.com", code: -1, userInfo: [NSLocalizedDescriptionKey: error.localizedDescription]))
+                    completion(nil, nil, NSError(domain: "apple.com", code: -1, userInfo: [NSLocalizedDescriptionKey: error.localizedDescription]))
                     return
                 }
 
-                guard let user = signInResult?.user,
-                      let idToken = user.idToken?.tokenString else {
-                    completion(nil, NSError(domain: "GoogleSignIn", code: -1, userInfo: [NSLocalizedDescriptionKey: "User or ID token not found"]))
+                guard let user = signInResult?.user else {
+                    completion(nil, nil, NSError(domain: "GoogleSignIn", code: -1, userInfo: [NSLocalizedDescriptionKey: "User not found"]))
                     return
                 }
 
-                completion(idToken, nil)
+                let idToken = user.idToken?.tokenString
+                let accessToken = user.accessToken.tokenString
+
+                guard let validIdToken = idToken else {
+                    completion(nil, nil, NSError(domain: "GoogleSignIn", code: -1, userInfo: [NSLocalizedDescriptionKey: "ID token not found"]))
+                    return
+                }
+
+                completion(validIdToken, accessToken, nil)
             }
         }
 }

@@ -22,9 +22,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val facebookUIClient = AndroidFacebookUIClient({ this }, callbackManager)
-        val rootComponent = getRootComponent()
 
         setContent {
+            val rootComponent = getRootComponent()
+
             HobbyMatchmakerTheme {
                 App(
                     component = rootComponent,

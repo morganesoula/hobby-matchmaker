@@ -25,8 +25,8 @@
     "sourceSetName": "iosMain"
   },
   {
-    "moduleId": "org.jetbrains.compose.ui:ui-uikit:1.8.0-alpha03",
-    "file": "/Users/morganesoula/AndroidStudioProjects/HobbyMatchmaker/.kotlin/metadata/kotlinTransformedCInteropMetadataLibraries/org.jetbrains.compose.ui-ui-uikit-1.8.0-alpha03-uikitMain-cinterop/org.jetbrains.compose.ui_ui-uikit-cinterop-utils-ZCWX1A.klib",
+    "moduleId": "org.jetbrains.compose.ui:ui-uikit:1.8.0",
+    "file": "/Users/morganesoula/AndroidStudioProjects/HobbyMatchmaker/.kotlin/metadata/kotlinTransformedCInteropMetadataLibraries/org.jetbrains.compose.ui-ui-uikit-1.8.0-uikitMain-cinterop/org.jetbrains.compose.ui_ui-uikit-cinterop-utils-oOVhOA.klib",
     "sourceSetName": "uikitMain"
   }
 ]

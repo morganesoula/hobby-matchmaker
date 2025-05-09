@@ -22,15 +22,15 @@ class IosGoogleUIClient : GoogleUIClient {
                     }
 
             IosNativeSocialCredential.shared()
-                .getGoogleCredentialsFrom(viewController) { idToken, error ->
+                .getGoogleCredentialsFrom(viewController) { idToken, accessToken, error ->
                     if (error != null) {
                         continuation.resumeWithException(Exception(error.localizedDescription))
-                    } else idToken?.let {
-                        val credential = GoogleAuthProvider.credential(idToken, null)
+                    } else if (idToken != null && accessToken != null) {
+                        val credential = GoogleAuthProvider.credential(idToken, accessToken)
                         continuation.resume(credential) { cause, _, _ ->
-                            continuation.resumeWithException(Exception(cause.message))
+                            continuation.resumeWithException(Exception("XXX IDTOKEN is $idToken" + cause.message))
                         }
-                    } ?: run {
+                    } else {
                         continuation.resumeWithException(Exception("Unknown error occurred during Google Sign-In"))
                     }
                 }

@@ -11,7 +11,6 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 actual val coreModuleSignInPlatformSpecific = module {
-    //TODO What about IosGoogleUIClient?
     single { IosAppleUIClient() } bind AppleUIClient::class
 
     single { GoogleUIClientImpl(get()) } bind SocialUIClient::class

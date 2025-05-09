@@ -7,7 +7,6 @@ import com.msoula.hobbymatchmaker.core.database.models.MovieUpdatedDataEntity
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.GenreDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieActorDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 fun MovieDetailDataEntity.toMovieDetailDomainModel(): MovieDetailDomainModel {

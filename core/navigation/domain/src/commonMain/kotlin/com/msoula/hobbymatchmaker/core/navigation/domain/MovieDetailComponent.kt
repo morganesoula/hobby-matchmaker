@@ -4,4 +4,5 @@ import com.arkivanov.essenty.backhandler.BackHandlerOwner
 
 interface MovieDetailComponent : BackHandlerOwner {
     val movieId: Long
+    fun onMovieDetailBackPressed(): () -> Unit
 }

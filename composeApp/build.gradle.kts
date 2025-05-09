@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 import java.io.FileInputStream
 import java.net.URI
 import java.util.Properties
@@ -7,7 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.hobbymatchmaker.buildlogic.application)
-    id("io.github.frankois944.spmForKmp") version "0.8.1"
+    id("io.github.frankois944.spmForKmp") version "0.8.2"
 }
 
 multiplatformConfig {
@@ -17,23 +18,19 @@ multiplatformConfig {
 }
 
 kotlin {
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach {
-        it.compilations {
-            val main by getting {
-                cinterops.create("nativeIosShared")
-            }
+    val xcf = XCFramework()
+
+    iosArm64().apply {
+        compilations["main"].cinterops.create("nativeIosShared")
+        binaries.framework {
+            baseName = "ComposeApp"
+            isStatic = true
+            xcf.add(this)
         }
     }
 
     sourceSets {
         commonMain.dependencies {
-            // Logger
-            implementation(libs.findLibrary("napier").get())
-
             // Modules
             implementation(project(Modules.AUTHENTICATION_DATA))
             implementation(project(Modules.AUTHENTICATION_DOMAIN))
@@ -121,6 +118,7 @@ compose.resources {
 swiftPackageConfig {
     create("nativeIosShared") {
         minIos = "18.0"
+
         dependency {
             remotePackageVersion(
                 url = URI("https://github.com/firebase/firebase-ios-sdk.git"),

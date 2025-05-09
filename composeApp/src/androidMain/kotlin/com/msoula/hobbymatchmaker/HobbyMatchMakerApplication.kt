@@ -1,8 +1,6 @@
 package com.msoula.hobbymatchmaker
 
 import android.app.Application
-import com.msoula.hobbymatchmaker.core.common.AndroidLogFormatter
-import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.di.coreCommonAndroidSavedStateHandle
 import com.msoula.hobbymatchmaker.presentation.navigation.appModule
 import dev.gitlive.firebase.Firebase
@@ -20,9 +18,8 @@ class HobbyMatchMakerApplication : Application() {
 
         startKoin {
             androidContext(this@HobbyMatchMakerApplication)
-            appModule()
             modules(
-                coreCommonAndroidSavedStateHandle
+                appModule() + coreCommonAndroidSavedStateHandle
             )
         }
     }
@@ -31,8 +28,6 @@ class HobbyMatchMakerApplication : Application() {
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
-
-        Logger.init(AndroidLogFormatter())
     }
 
     private fun initFirebase() {

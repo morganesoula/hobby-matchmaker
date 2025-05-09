@@ -1,5 +1,6 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.signUp
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -30,6 +31,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -168,11 +171,18 @@ fun SignUpScreenMainContent(
     emailTipVisibility: MutableState<Boolean> = mutableStateOf(false),
     passwordTipVisibility: MutableState<Boolean> = mutableStateOf(false)
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     Box(
         modifier =
             Modifier
                 .wrapContentSize()
-                .padding(paddingValues),
+                .padding(paddingValues)
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = {
+                        keyboardController?.hide()
+                    })
+                },
         contentAlignment = Alignment.Center
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
