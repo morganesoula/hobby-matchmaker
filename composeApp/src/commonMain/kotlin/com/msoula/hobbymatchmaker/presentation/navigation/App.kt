@@ -4,10 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient
-import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClientImpl
-import com.msoula.hobbymatchmaker.core.login.presentation.clients.GoogleUIClient
-import com.msoula.hobbymatchmaker.core.login.presentation.clients.GoogleUIClientImpl
+import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SocialUIClient
 import com.msoula.hobbymatchmaker.core.navigation.domain.AuthRootComponent
 import com.msoula.hobbymatchmaker.core.navigation.domain.MainRootComponent
 import com.msoula.hobbymatchmaker.core.navigation.domain.RootComponent
@@ -16,7 +15,7 @@ import com.msoula.hobbymatchmaker.core.splashscreen.presentation.SplashScreenCon
 @Composable
 fun App(
     component: RootComponent,
-    googleUIClient: GoogleUIClient,
+    socialClients: Map<ProviderType, SocialUIClient>,
     facebookUIClient: FacebookUIClient
 ) {
     val slotChild by component.currentRootSlot.subscribeAsState()
@@ -33,8 +32,7 @@ fun App(
                     when (val authScreen = child.instance) {
                         is AuthRootComponent.Child.SignIn -> SignInContent(
                             authScreen.component,
-                            GoogleUIClientImpl(googleUIClient),
-                            FacebookUIClientImpl(facebookUIClient),
+                            socialClients = socialClients,
                             facebookUIClient = facebookUIClient
                         )
 

@@ -64,14 +64,12 @@ fun MovieItem(
 ) {
     val painter = rememberAsyncImagePainter(
         model = if (movie.coverFilePath.isEmpty()) {
-            print("Movie cover file path is empty")
             ImageRequest.Builder(LocalPlatformContext.current)
                 .data(
                     Res.drawable.ic_movie_clapper_board
                 ).size(coil3.size.Size(150, 150))
                 .build()
         } else {
-            print("Movie cover file path is not empty - ${movie.coverFilePath}")
             ImageRequest.Builder(LocalPlatformContext.current)
                 .data(movie.coverFilePath.toPath())
                 .size(coil3.size.Size.ORIGINAL)

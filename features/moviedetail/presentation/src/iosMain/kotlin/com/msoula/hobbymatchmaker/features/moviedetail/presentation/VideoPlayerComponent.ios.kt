@@ -1,42 +1,28 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.presentation
 
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.UIKitView
-import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
-import platform.CoreGraphics.CGRect
-import platform.Foundation.NSURL
-import platform.Foundation.NSURLRequest
-import platform.Foundation.setValue
+import nativeIosPlayerShared.YoutubePlayerContainer
 import platform.UIKit.UIScreen
-import platform.WebKit.WKAudiovisualMediaTypeNone
-import platform.WebKit.WKWebView
-import platform.WebKit.WKWebViewConfiguration
-import nativeIosPlayerShared.CustomVideoPlayerView
 
 @OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 @Composable
-actual fun YoutubeComponent(videoId: String) {
-    val url = "https://www.youtube.com/embed/$videoId?autoplay=1&playsinline=1"
+actual fun YoutubeComponent(modifier: Modifier, videoId: String, onClose: () -> Unit) {
+    val container = remember { YoutubePlayerContainer() }
+    val viewController = remember { container.makeUIViewControllerWithVideoId(videoId = videoId) }
 
     UIKitView(
-        factory = {
-            val view = CustomVideoPlayerView()
-            view.configureVideo(url)
-            view
-        },
-        update = { view ->
-            view.configureVideo(url)
-        }
+        modifier = modifier.fillMaxWidth().height(300.dp),
+        factory = { viewController.view },
+        update = {}
     )
 }
-
-@Composable
-actual fun EnterFullScreen() {}
-
-@Composable
-actual fun ExitFullScreen() {}
 
 @OptIn(ExperimentalForeignApi::class)
 @Composable

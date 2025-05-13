@@ -49,7 +49,6 @@ fun HMMIosTopBar(
                 .padding(start = 12.dp, end = 16.dp)
                 .clickable {
                     if (onBack != null) {
-                        print("Back icon clicked")
                         onBack()
                     }
                 }

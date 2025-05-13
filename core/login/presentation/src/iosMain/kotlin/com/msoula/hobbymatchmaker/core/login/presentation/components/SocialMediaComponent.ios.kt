@@ -20,6 +20,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.apple_logo
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.google_alt
 import com.msoula.hobbymatchmaker.core.login.presentation.google_logo
+import com.msoula.hobbymatchmaker.core.login.presentation.models.SignInEvent
 import dev.gitlive.firebase.auth.AuthCredential
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -27,6 +28,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 actual fun SocialMediaButtonListPlatformSpecificUI(
     modifier: Modifier,
+    signInState: SignInEvent,
     onFacebookButtonClicked: ((credential: AuthCredential) -> Unit)?,
     onAppleButtonClicked: (() -> Unit)?,
     onGoogleButtonClicked: () -> Unit,
@@ -43,6 +45,7 @@ actual fun SocialMediaButtonListPlatformSpecificUI(
         if (onAppleButtonClicked != null) {
             OutlinedButton(
                 onClick = { onAppleButtonClicked() },
+                enabled = signInState !is SignInEvent.Loading,
                 shape = RoundedCornerShape(4.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                 modifier = modifier.size(80.dp)

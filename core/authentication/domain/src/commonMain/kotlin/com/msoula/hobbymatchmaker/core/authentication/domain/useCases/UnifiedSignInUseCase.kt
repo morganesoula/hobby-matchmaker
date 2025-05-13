@@ -41,19 +41,26 @@ class UnifiedSignInUseCase(
         }
 
         is Params.SocialMedia -> channelFlow {
-            send(Result.Loading)
+            try {
+                send(Result.Loading)
 
-            when (val result = signInWithCredentialUseCase(
-                params.credential, params.providerType
-            )) {
+                when (val result = signInWithCredentialUseCase(
+                    params.credential, params.providerType
+                )) {
 
-                is Result.Success -> {
-                    setIsConnectedUseCase(true)
-                    send(Result.Success(SignInSuccess))
+                    is Result.Success -> {
+                        setIsConnectedUseCase(true)
+                        send(Result.Success(SignInSuccess))
+                    }
+
+                    is Result.Failure -> send(Result.Failure(SignInError.Other(result.error.message
+                        .ifBlank { "Apple Sign-In failed" })))
+                    else -> Unit
                 }
-
-                is Result.Failure -> send(Result.Failure(SignInError.Other(result.error.message)))
-                else -> Unit
+            } catch (e: Exception) {
+                send(Result.Failure(SignInError.Other("Crash: ${e.message}")))
+            } finally {
+                close()
             }
         }
     }

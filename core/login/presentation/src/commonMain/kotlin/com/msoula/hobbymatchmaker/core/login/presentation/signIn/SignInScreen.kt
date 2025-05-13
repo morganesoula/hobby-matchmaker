@@ -201,7 +201,8 @@ fun SignInScreenContent(
                             )
                         )
                     },
-                    facebookUIClient = facebookUIClient
+                    facebookUIClient = facebookUIClient,
+                    signInState = signInState
                 )
             }
 
@@ -273,7 +274,8 @@ fun ColumnScope.SignInScreenMainContent(
     onGoogleButtonClicked: () -> Unit,
     onAppleButtonClicked: () -> Unit,
     onFacebookButtonClicked: (credential: AuthCredential) -> Unit,
-    facebookUIClient: FacebookUIClient
+    facebookUIClient: FacebookUIClient,
+    signInState: SignInEvent
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -334,6 +336,7 @@ fun ColumnScope.SignInScreenMainContent(
 
     SocialMediaButtonListPlatformSpecificUI(
         modifier = modifier,
+        signInState = signInState,
         onFacebookButtonClicked = onFacebookButtonClicked,
         onAppleButtonClicked = onAppleButtonClicked,
         onGoogleButtonClicked = onGoogleButtonClicked,

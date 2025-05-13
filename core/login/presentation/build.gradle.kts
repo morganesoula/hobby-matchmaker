@@ -5,7 +5,7 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform.compose)
-    id("io.github.frankois944.spmForKmp") version "0.8.1"
+    id("io.github.frankois944.spmForKmp") version "0.8.2"
 }
 
 multiplatformConfig {
@@ -19,6 +19,10 @@ kotlin {
             freeCompilerArgs.addAll("-P",
                 "plugin:org.jetbrains.kotlin.parcelize:additionalAnnotation=com.msoula.hobbymatchmaker.core.login.presentation.models.HMMParcelize")
         }
+    }
+
+    iosArm64().apply {
+        compilations["main"].cinterops.create("nativeIosAuthShared")
     }
 
     /* listOf(
@@ -93,4 +97,10 @@ compose.resources {
     publicResClass = true
     packageOfResClass = "com.msoula.hobbymatchmaker.core.login.presentation"
     generateResClass = always
+}
+
+swiftPackageConfig {
+    create("nativeIosAuthShared") {
+        minIos = "18.0"
+    }
 }

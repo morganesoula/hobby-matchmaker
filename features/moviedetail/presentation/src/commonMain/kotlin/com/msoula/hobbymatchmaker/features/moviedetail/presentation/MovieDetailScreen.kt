@@ -25,11 +25,11 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -46,11 +46,7 @@ import androidx.compose.ui.zIndex
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
-import com.arkivanov.essenty.backhandler.BackCallback
-import com.arkivanov.essenty.backhandler.BackHandler
 import com.msoula.hobbymatchmaker.core.common.ObserveAsEvents
-import com.msoula.hobbymatchmaker.core.common.isIosPlatform
-import com.msoula.hobbymatchmaker.core.design.component.DecomposeBackHandler
 import com.msoula.hobbymatchmaker.core.design.component.ExpandableTextComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMDetailTopBar
 import com.msoula.hobbymatchmaker.core.design.component.LoadingCircularProgress
@@ -66,7 +62,6 @@ import org.jetbrains.compose.resources.stringResource
 fun MovieDetailContent(
     viewState: MovieDetailViewStateModel,
     oneTimeEventFlow: Flow<MovieDetailUiEventModel>,
-    backHandler: BackHandler,
     onPlayTrailerClicked: (event: MovieDetailUiEventModel) -> Unit,
     onMovieDetailBackPressed: () -> Unit
 ) {
@@ -79,7 +74,6 @@ fun MovieDetailContent(
                 oneTimeEventFlow = oneTimeEventFlow,
                 movie = viewState.movie,
                 onPlayTrailerClicked = onPlayTrailerClicked,
-                backHandler = backHandler,
                 onMovieDetailBackPressed = onMovieDetailBackPressed
             )
     }
@@ -90,19 +84,10 @@ fun MovieDetailScreen(
     modifier: Modifier = Modifier,
     oneTimeEventFlow: Flow<MovieDetailUiEventModel>,
     movie: MovieDetailUiModel,
-    backHandler: BackHandler,
     onPlayTrailerClicked: (event: MovieDetailUiEventModel) -> Unit,
     onMovieDetailBackPressed: () -> Unit
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
-    val videoPlayerVisibility = remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        if (!videoPlayerVisibility.value) {
-            val callBack = BackCallback { onMovieDetailBackPressed() }
-            backHandler.register(callBack)
-        }
-    }
 
     Scaffold(
         modifier = Modifier.systemBarsPadding(),
@@ -113,9 +98,7 @@ fun MovieDetailScreen(
             modifier = modifier.padding(it),
             onPlayTrailerClicked = onPlayTrailerClicked,
             oneTimeEventFlow = oneTimeEventFlow,
-            backHandler = backHandler,
             snackBarHostState = snackBarHostState,
-            videoPlayerVisibility = videoPlayerVisibility,
             onMovieDetailBackPressed = onMovieDetailBackPressed
         )
     }
@@ -125,11 +108,9 @@ fun MovieDetailScreen(
 fun MovieDetailContentScreen(
     modifier: Modifier = Modifier,
     movie: MovieDetailUiModel,
-    backHandler: BackHandler,
     oneTimeEventFlow: Flow<MovieDetailUiEventModel>,
     onPlayTrailerClicked: (event: MovieDetailUiEventModel) -> Unit,
     snackBarHostState: SnackbarHostState,
-    videoPlayerVisibility: MutableState<Boolean>,
     onMovieDetailBackPressed: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -138,8 +119,8 @@ fun MovieDetailContentScreen(
     val noConnectionMessage = stringResource(Res.string.connection_issue)
 
     val movieVideoUri = remember { mutableStateOf(movie.videoKey) }
-    val isLoading = remember { mutableStateOf(false) }
-    val exitFullScreen = remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+    var videoPlayerVisibility by remember { mutableStateOf(false) }
 
     val castMaxIndex = 5
     val verticalGradientHeight = 0.8f
@@ -167,41 +148,36 @@ fun MovieDetailContentScreen(
                     snackBarHostState.showSnackbar(event.error)
 
                 is MovieDetailUiEventModel.OnPlayMovieTrailerReady -> {
-                    if (isLoading.value) {
-                        isLoading.value = false
+                    if (isLoading) {
+                        isLoading = false
                     }
 
                     movieVideoUri.value = event.movieUri
-                    videoPlayerVisibility.value = true
+                    videoPlayerVisibility = true
                 }
 
                 is MovieDetailUiEventModel.ErrorFetchingTrailer -> {
-                    if (isLoading.value) {
-                        isLoading.value = false
+                    if (isLoading) {
+                        isLoading = false
                     }
 
                     snackBarHostState.showSnackbar(errorFetchingMovieMessage)
                 }
 
                 is MovieDetailUiEventModel.NoConnection -> {
-                    println("Inside view with no connection")
                     snackBarHostState.showSnackbar(noConnectionMessage)
                 }
 
                 is MovieDetailUiEventModel.LoadingTrailer ->
-                    isLoading.value = true
+                    isLoading = true
 
                 else -> Unit
             }
         }
     }
 
-    if (isLoading.value) {
+    if (isLoading) {
         LoadingCircularProgress()
-    }
-
-    if (exitFullScreen.value && !isIosPlatform()) {
-        ExitFullScreen()
     }
 
     Box(
@@ -258,36 +234,43 @@ fun MovieDetailContentScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Button(
-                    onClick = {
-                        onPlayTrailerClicked(
-                            MovieDetailUiEventModel.OnPlayMovieTrailerClicked(
-                                movieId = movie.id,
-                                isVideoURIknown = movie.videoKey.isNotEmpty()
+                if (videoPlayerVisibility) {
+                    YoutubeComponent(modifier, movieVideoUri.value) {
+                        videoPlayerVisibility = false
+                    }
+                } else {
+                    Button(
+                        onClick = {
+                            onPlayTrailerClicked(
+                                MovieDetailUiEventModel.OnPlayMovieTrailerClicked(
+                                    movieId = movie.id,
+                                    isVideoURIknown = movie.videoKey.isNotEmpty()
+                                )
                             )
-                        )
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = Color.White
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                        .padding(start = 4.dp, end = 4.dp)
-                ) {
-                    Row {
-                        Icon(
-                            imageVector = Icons.Default.PlayArrow,
-                            contentDescription = stringResource(Res.string.play_icon_accessibility)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = stringResource(Res.string.play_trailer),
-                            textAlign = TextAlign.Center
-                        )
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                            .padding(start = 4.dp, end = 4.dp)
+                    ) {
+                        Row {
+                            Icon(
+                                imageVector = Icons.Default.PlayArrow,
+                                contentDescription = stringResource(Res.string.play_icon_accessibility)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = stringResource(Res.string.play_trailer),
+                                textAlign = TextAlign.Center
+                            )
+                        }
                     }
                 }
+
                 Spacer(modifier = Modifier.height(16.dp))
 
                 ExpandableTextComponent(
@@ -311,20 +294,8 @@ fun MovieDetailContentScreen(
             }
         }
 
-        if (videoPlayerVisibility.value) {
-            exitFullScreen.value = false
-            VideoComponent(movieUri = movieVideoUri.value)
-        }
-
         HMMDetailTopBar {
             onMovieDetailBackPressed()
-        }
-    }
-
-    if (videoPlayerVisibility.value) {
-        DecomposeBackHandler(backHandler) {
-            videoPlayerVisibility.value = false
-            exitFullScreen.value = true
         }
     }
 }
@@ -342,14 +313,6 @@ fun BackgroundGradient(verticalGradientHeight: Float) {
                 )
             )
     )
-}
-
-@Composable
-fun VideoComponent(movieUri: String) {
-    if (!isIosPlatform()) {
-        EnterFullScreen()
-    }
-    YoutubeComponent(videoId = movieUri)
 }
 
 @Composable

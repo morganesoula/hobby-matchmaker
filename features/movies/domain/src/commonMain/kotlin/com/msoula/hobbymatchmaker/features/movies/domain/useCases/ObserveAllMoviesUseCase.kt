@@ -2,7 +2,6 @@ package com.msoula.hobbymatchmaker.features.movies.domain.useCases
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.FlowUseCase
-import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.features.movies.domain.errors.MovieErrors
@@ -24,7 +23,6 @@ class ObserveAllMoviesUseCase(
         return channelFlow {
             movieRepository.observeMovies().distinctUntilChanged().collect { list ->
                 if (list.isEmpty()) {
-                    Logger.d("List is empty in DB so fetching data")
                     send(Result.Success(ObserveAllMoviesSuccess.Loading))
 
                     when (val fetchStatus = fetchMoviesUseCase(parameters.value)) {
@@ -47,7 +45,6 @@ class ObserveAllMoviesUseCase(
                         else -> send(Result.Success(ObserveAllMoviesSuccess.Loading))
                     }
                 } else {
-                    Logger.d("List is not empty: ${list.first().title} - ${list.first().localCoverFilePath}")
                     send(Result.Success(ObserveAllMoviesSuccess.Success(list)))
                 }
             }

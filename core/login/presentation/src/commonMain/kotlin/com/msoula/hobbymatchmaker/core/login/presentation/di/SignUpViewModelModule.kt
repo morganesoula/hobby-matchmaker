@@ -1,10 +1,8 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.di
 
-import org.koin.core.module.Module
+import com.msoula.hobbymatchmaker.core.login.presentation.signUp.SignUpViewModel
 import org.koin.dsl.module
 
 val coreModuleSignUpViewModel = module {
-    includes(coreModuleSignUpPlatformSpecific)
+    single { SignUpViewModel(get(), get()) }
 }
-
-expect val coreModuleSignUpPlatformSpecific: Module

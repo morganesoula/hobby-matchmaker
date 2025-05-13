@@ -1,49 +1,72 @@
 import UIKit
-import AVKit
+import YouTubeiOSPlayerHelper
 
-@objcMembers public class CustomVideoPlayerView: UIView {
+@objcMembers public class YoutubePlayerViewController: UIViewController, YTPlayerViewDelegate {
+    private var playerView: YTPlayerView!
+    private var videoId: String
 
-    private var playerViewController: AVPlayerViewController?
-    private var player: AVPlayer?
-
-    @objc public static let shared = CustomVideoPlayerView()
-
-    @objc public func configureVideo(_ urlString: String) {
-        guard let url = URL(string: urlString) else { return }
-
-        if playerViewController == nil {
-            let player = AVPlayer(url: url)
-            let controller = AVPlayerViewController()
-            controller.player = player
-            controller.showsPlaybackControls = true
-
-            controller.view.frame = self.bounds
-            controller.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-            self.addSubview(controller.view)
-
-            if let parentVC = self.parentViewController() {
-                parentVC.addChild(controller)
-                controller.didMove(toParent: parentVC)
-            }
-
-            self.playerViewController = controller
-            self.player = player
-
-            player.play()
-        } else {
-            player?.replaceCurrentItem(with: AVPlayerItem(url: url))
-            player?.play()
-        }
+    @objc public init(videoId: String) {
+        self.videoId = videoId
+        super.init(nibName: nil, bundle: nil)
     }
 
-    private func parentViewController() -> UIViewController? {
-        var parentResponder: UIResponder? = self
-        while let responder = parentResponder {
-            if let vc = responder as? UIViewController {
-                return vc
-            }
-            parentResponder = responder.next
-        }
-        return nil
+    @objc required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    @objc public override func viewDidLoad() {
+        super.viewDidLoad()
+        print("▶️ viewDidLoad called for videoId: \(videoId)")
+
+        playerView = YTPlayerView()
+        playerView.delegate = self
+        playerView.frame = view.bounds
+        playerView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        view.addSubview(playerView)
+        view.setNeedsLayout()
+
+        let playerVars: [String: Any] = [
+            "playsinline": 1,
+            "autoplay": 0,
+            "modestbranding": 1,
+            "controls": 1,
+        ]
+
+        playerView.load(withVideoId: videoId, playerVars: playerVars)
+    }
+
+    @objc public func stop() {
+        playerView.stopVideo()
+    }
+
+    @objc public override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        print("▶️ viewDidLayoutSubviews called")
+        playerView.frame = view.bounds
+    }
+
+    @objc public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        print("▶️ viewDidAppear called")
+        playerView.playVideo()
+    }
+
+    @objc public func playerViewDidBecomeReady(_ playerView: YTPlayerView) {
+        print("✅ YTPlayerView is ready to play")
+        playerView.playVideo()
+    }
+
+    @objc public func playerView(_ playerView: YTPlayerView, didChangeTo state: YTPlayerState) {
+        print("🎬 YTPlayerView changed state: \(state.rawValue)")
+    }
+
+    @objc public func playerView(_ playerView: YTPlayerView, receivedError error: YTPlayerError) {
+        print("❌ YTPlayerView error: \(error)")
+    }
+}
+
+@objcMembers public class YoutubePlayerContainer: NSObject {
+    @objc public func makeUIViewController(videoId: String) -> UIViewController {
+        return YoutubePlayerViewController(videoId: videoId)
     }
 }

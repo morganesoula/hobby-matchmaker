@@ -45,6 +45,8 @@ class SignInViewModel(
 
     val openResetDialog = MutableStateFlow(false)
 
+    private var isSignIn = false
+
     private val _resetPasswordState: MutableStateFlow<ResetPasswordEvent> =
         MutableStateFlow(ResetPasswordEvent.Idle)
     val resetPasswordState: StateFlow<ResetPasswordEvent> = _resetPasswordState.asStateFlow()
@@ -127,11 +129,13 @@ class SignInViewModel(
 
                     is Result.Success -> {
                         circularProgressLoading.value = false
+                        isSignIn = false
                         SignInEvent.Success
                     }
 
                     is Result.Failure -> {
                         circularProgressLoading.value = false
+                        isSignIn = false
                         val message = handleError(result.error)
                         SignInEvent.Error(message)
                     }
@@ -144,6 +148,9 @@ class SignInViewModel(
         providerType: ProviderType,
         fetchedCredential: AuthCredential? = null
     ) {
+        if (isSignIn) return
+        isSignIn = true
+
         viewModelScope.launch(Dispatchers.IO) {
             val client = socialClients[providerType]
             val credential = fetchedCredential ?: client?.getCredential()
@@ -157,9 +164,9 @@ class SignInViewModel(
             } else {
                 Logger.e("Could not load social credentials")
                 _signInState.value = SignInEvent.Error("Unable to get credentials")
+                isSignIn = false
             }
         }
-
     }
 
     private suspend fun resetPassword() {

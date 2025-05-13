@@ -5,6 +5,8 @@
 //  Created by Morgane Soula on 21/02/2025.
 //
 
+import SwiftUI
+import UIKit
 import FirebaseCore
 import FirebaseAuth
 import GoogleSignIn

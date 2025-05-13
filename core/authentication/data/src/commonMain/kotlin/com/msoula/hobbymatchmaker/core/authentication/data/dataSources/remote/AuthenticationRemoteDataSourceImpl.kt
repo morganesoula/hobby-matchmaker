@@ -49,6 +49,7 @@ class AuthenticationRemoteDataSourceImpl(
                 else -> Result.Failure(SocialMediaError.SignInWithCredentialsError)
             }
         } catch (e: Exception) {
+            Logger.e("Exception caught while signing in with credentials: ${e.message}")
             Result.Failure(SocialMediaError.SignInWithCredentialsError)
         }
     }
