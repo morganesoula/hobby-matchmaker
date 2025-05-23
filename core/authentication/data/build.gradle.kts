@@ -1,45 +1,36 @@
 plugins {
-    `android-library`
-    `kotlin-android`
-    alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.serialization)
+    alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform)
 }
 
-apply<MainGradlePlugin>()
+multiplatformConfig {
+    useFirebase()
+}
+
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            // Modules
+            implementation(project(Modules.AUTHENTICATION_DOMAIN))
+            implementation(project(Modules.COMMON))
+            implementation(project(Modules.NETWORK))
+        }
+
+        androidMain.dependencies {
+            // Credentials Manager
+            implementation(libs.findLibrary("credentials").get())
+            implementation(libs.findLibrary("credentials-play-services").get())
+            implementation(libs.findLibrary("google-identity").get())
+
+            // Facebook
+            implementation(libs.findLibrary("facebook-android-sdk").get())
+            implementation(libs.findLibrary("facebook-login").get())
+
+            // Google
+            implementation(libs.findLibrary("play-services-auth").get())
+        }
+    }
+}
 
 android {
     namespace = "com.msoula.hobbymatchmaker.core.authentication.data"
-}
-
-dependencies {
-    // Core
-    implementation(libs.runtime)
-
-    // Credentials Manager
-    implementation(libs.credentials)
-    implementation(libs.credentials.play.services)
-    implementation(libs.google.identity)
-
-    // Facebook
-    implementation(libs.facebook.android.sdk)
-    implementation(libs.facebook.login)
-
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.firebase.auth)
-
-    // Firestore
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.firebase.firestore)
-
-    // Google
-    implementation(libs.play.services.auth)
-
-    // Koin
-    implementation(libs.koin.android)
-
-    // Modules
-    implementation(project(Modules.AUTHENTICATION_DOMAIN))
-    implementation(project(Modules.COMMON))
-    implementation(project(Modules.NETWORK))
 }

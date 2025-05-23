@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="movies_network_error">Error loading movies</string>
-    <string name="movies_api_error">The data source is not responding</string>
-    <string name="movies_unknown_error">An unknown error occurred</string>
-</resources>

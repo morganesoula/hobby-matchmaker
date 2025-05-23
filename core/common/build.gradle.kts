@@ -1,37 +1,34 @@
 plugins {
-    `android-library`
-    `kotlin-android`
-    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.compose.multiplatform)
+    alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform.compose)
 }
 
-apply<MainGradlePlugin>()
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation(libs.findLibrary("kotlinx-datetime").get())
+
+            // FireStore
+            implementation(libs.findLibrary("firebase-kmp-firestore").get())
+
+            // Modules
+            implementation(project(Modules.DESIGN))
+        }
+
+        androidMain.dependencies {
+            implementation(libs.findLibrary("activity-compose").get())
+
+            // Facebook
+            implementation(libs.findLibrary("facebook-android-sdk").get())
+
+            // Timber
+            implementation(libs.findLibrary("timber-android").get())
+        }
+
+        iosMain.dependencies {  }
+    }
+}
 
 android {
-    namespace = "com.msoula.hobbymatchmaker.common"
-}
-
-dependencies {
-    // Compose
-    implementation(libs.activity.compose)
-    implementation(libs.runtime)
-
-    // Facebook
-    implementation(libs.facebook.android.sdk)
-
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.firebase.auth)
-
-    // Firestore
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.firebase.firestore)
-
-    // Koin
-    implementation(libs.koin.android)
-
-    // Modules
-    implementation(project(Modules.DESIGN))
-
-    // Retrofit
-    implementation(libs.retrofit)
+    namespace = "com.msoula.hobbymatchmaker.core.common"
 }

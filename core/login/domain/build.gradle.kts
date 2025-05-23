@@ -1,23 +1,16 @@
 plugins {
-    `android-library`
-    `kotlin-android`
-    alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.serialization)
+    alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform)
 }
 
-apply<MainGradlePlugin>()
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            // Modules
+            implementation(project(Modules.COMMON))
+        }
+    }
+}
 
 android {
     namespace = "com.msoula.hobbymatchmaker.core.login.domain"
-}
-
-dependencies {
-    // Core
-    implementation(libs.runtime)
-
-    // Koin
-    implementation(libs.koin.android)
-
-    // Modules
-    implementation(project(Modules.COMMON))
 }

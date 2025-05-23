@@ -1,36 +1,54 @@
+import java.util.Properties
+
 plugins {
-    `android-library`
-    `kotlin-android`
-    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform)
+    id("io.github.frankois944.spmForKmp") version "0.8.1"
 }
 
-apply<MainGradlePlugin>()
+multiplatformConfig {
+    useFirebase()
+}
+
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            // Ktor
+            implementation(libs.findBundle("ktor").get())
+            implementation(libs.findLibrary("ktor-client-cio").get())
+
+            // Modules
+            implementation(project(Modules.DESIGN))
+            implementation(project(Modules.COMMON))
+        }
+
+        androidMain.dependencies {
+            // Google
+            implementation(libs.findLibrary("play-services-auth").get())
+        }
+
+        iosMain.dependencies {
+            // Ktor client
+            implementation(libs.findLibrary("ktor-client-darwin").get())
+        }
+    }
+}
 
 android {
     namespace = "com.msoula.hobbymatchmaker.core.network"
+    buildFeatures.buildConfig = true
+
+    val tmdbPropertiesFile = project.rootProject.file("./tmdb.properties")
+    val tmdbProperties = Properties()
+
+    if (tmdbPropertiesFile.exists()) {
+        tmdbProperties.load(tmdbPropertiesFile.inputStream())
+    }
+
+    defaultConfig {
+        buildConfigField("String", "TMDB_KEY", "\"${tmdbProperties["tmdb_key"]}\"")
+    }
 }
 
-dependencies {
-    // Core
-    implementation(libs.runtime)
-
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.firebase.auth)
-
-    // Google
-    implementation(libs.play.services.auth)
-
-    // Koin
-    implementation(libs.koin.android)
-
-    // Modules
-    implementation(project(Modules.DESIGN))
-    implementation(project(Modules.COMMON))
-
-    // Retrofit
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.gson)
-    implementation(libs.okhttp)
-    implementation(libs.logging.interceptor)
+swiftPackageConfig {
+    create("network") {}
 }

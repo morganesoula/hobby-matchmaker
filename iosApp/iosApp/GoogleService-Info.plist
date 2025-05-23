@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>115887741528-qk5i9qh5te4ui54lk6dd2cgu79u0c51g.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.115887741528-qk5i9qh5te4ui54lk6dd2cgu79u0c51g</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>115887741528-frl3ib5qma2iklfliqo4a3jn40a07ev0.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyB0RYl1UogVwl_FXVQnLbAG3us0jH8Z9oc</string>
+	<key>GCM_SENDER_ID</key>
+	<string>115887741528</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.msoula.hobbymatchmaker</string>
+	<key>PROJECT_ID</key>
+	<string>hobby-matchmaker</string>
+	<key>STORAGE_BUCKET</key>
+	<string>hobby-matchmaker.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:115887741528:ios:ce46dec9b068fbd909082d</string>
+</dict>
+</plist>

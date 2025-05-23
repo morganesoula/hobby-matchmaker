@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="play_trailer">Play trailer</string>
+    <string name="cast">Top Cast</string>
+    <string name="no_data">No data found</string>
+    <string name="play_icon_accessibility">Play trailer icon</string>
+    <string name="show_less"> Show less</string>
+    <string name="show_more">… Show more</string>
+    <string name="no_trailer_available">No trailer available at the moment</string>
+    <string name="connection_issue">Connection issue. Please check your network</string>
+    <string name="back">Back</string>
+</resources>

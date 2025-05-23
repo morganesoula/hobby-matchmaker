@@ -1,0 +1,104 @@
+package com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases
+
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.FlowUseCase
+import com.msoula.hobbymatchmaker.core.common.Parameters
+import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainError
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieVideoDomainModel
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.repositories.MovieDetailRepository
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
+
+class ManageMovieTrailerUseCase(
+    private val movieDetailRepository: MovieDetailRepository,
+    private val updateMovieVideoURIUseCase: UpdateMovieVideoURIUseCase,
+    dispatcher: CoroutineDispatcher
+) :
+    FlowUseCase<Parameters.LongStringParam, MovieTrailerReady, FetchingTrailerError>(
+        dispatcher
+    ) {
+
+    private val maxAttempt: Int = 2
+    private val fallBackLanguages = listOf("en-US", "fr-FR")
+
+    override fun execute(parameters: Parameters.LongStringParam):
+        Flow<Result<MovieTrailerReady, FetchingTrailerError>> {
+        return channelFlow {
+            val movieId = parameters.longValue
+
+            var attempt = 0
+            var result: Result<MovieTrailerReady, FetchingTrailerError>
+
+            send(Result.Loading)
+
+            do {
+                val languageToUse = fallBackLanguages.getOrNull(attempt) ?: "en-US"
+                result = processVideoResponse(movieId, languageToUse)
+                send(result)
+                attempt++
+            } while (result is Result.Failure && attempt < maxAttempt)
+        }
+    }
+
+    private suspend fun processVideoResponse(
+        movieId: Long,
+        language: String
+    ): Result<MovieTrailerReady, FetchingTrailerError> {
+        return when (val fetchResult = movieDetailRepository.fetchMovieTrailer(movieId, language)) {
+            is Result.Success -> {
+                val uri = formatVideoResponse(fetchResult.data)
+
+                if (uri.isNotEmpty()) {
+                    when (val updateResult = updateMovieVideoURIUseCase(movieId, uri)) {
+                        is Result.Success -> {
+                            Result.Success(
+                                MovieTrailerReady(
+                                    uri
+                                )
+                            )
+                        }
+
+                        is Result.Failure -> Result.Failure(updateResult.error)
+                        is Result.Loading -> Result.Loading
+                    }
+                } else {
+                    Result.Failure(FetchingTrailerError.TrailerUpdateError("Empty uri"))
+                }
+            }
+
+            is Result.Failure -> when (fetchResult.error) {
+                is MovieDetailDomainError.NoConnection -> Result.Failure(
+                    FetchingTrailerError.NoConnectionError(fetchResult.error.message)
+                )
+
+                else -> Result.Failure(
+                    FetchingTrailerError.NoTrailerFoundError(
+                        fetchResult.error.message
+                    )
+                )
+            }
+
+            is Result.Loading -> Result.Loading
+        }
+    }
+
+    private fun formatVideoResponse(
+        videoResponse: MovieVideoDomainModel?
+    ): String {
+        return videoResponse?.let { videoModel ->
+            when (videoModel.site.lowercase()) {
+                "youtube" -> videoModel.key
+                else -> "https://vimeo.com/${videoModel.key}"
+            }
+        } ?: ""
+    }
+}
+
+data class MovieTrailerReady(val videoURI: String)
+sealed class FetchingTrailerError(override val message: String) : AppError {
+    data class NoConnectionError(val reason: String) : FetchingTrailerError(reason)
+    data class NoTrailerFoundError(val reason: String) : FetchingTrailerError(reason)
+    data class TrailerUpdateError(val reason: String) : FetchingTrailerError(reason)
+}

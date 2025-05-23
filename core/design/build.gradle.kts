@@ -1,21 +1,27 @@
 plugins {
-    `android-library`
-    `kotlin-android`
-    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.compose.multiplatform)
+    alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform.compose)
 }
 
-apply<MainGradlePlugin>()
+multiplatformConfig {
+    useDecomposeWithCompose()
+}
+
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation("org.jetbrains.compose.ui:ui-backhandler:1.8.0-alpha03")
+            implementation(libs.findLibrary("core-ktx").get())
+        }
+    }
+}
 
 android {
     namespace = "com.msoula.hobbymatchmaker.core.design"
 }
 
-dependencies {
-    // Compose
-    implementation(libs.material3)
-    implementation(libs.runtime)
-    implementation(libs.material.icons)
-
-    // Core
-    implementation(libs.core.ktx)
+compose.resources {
+    publicResClass = true
+    packageOfResClass = "com.msoula.hobbymatchmaker.core.design"
+    generateResClass = always
 }

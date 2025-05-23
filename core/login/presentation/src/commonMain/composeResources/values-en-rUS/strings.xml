@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    // GENERAL
+    <string name="welcome_title">Welcome to\n\nHobbyMatchMaker</string>
+    <string name="welcome_back_title">Welcome back to\n\nHobbyMatchMaker</string>
+
+    // ACCESSIBILITY
+    <string name="facebook_alt">Facebook logo</string>
+    <string name="google_alt">Google logo</string>
+    <string name="apple_alt">Apple Logo</string>
+
+    // FORM
+    <string name="firstname">First name</string>
+    <string name="lastname">Last name</string>
+    <string name="example">Example:&#160;</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="at_least">At least:&#160;</string>
+    <string name="password_hint"> 8 characters • 1 number • 1 uppercase \n• 1 lowercase • 1 special character</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="already_a_member">Already using HobbyMatchMaker? </string>
+    <string name="already_a_member_connect">Log in</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="log_in">Log In</string>
+    <string name="new_member">Not a member? </string>
+    <string name="new_member_clickable_part">Sign up</string>
+    <string name="forgot_password_title">Please enter your email address. We will send you an email with instructions to reset your password.</string>
+    <string name="your_email">Your email</string>
+    <string name="reset_password">Reset password</string>
+    <string name="cancel">Cancel</string>"
+    <string name="sign_out">Sign Out</string>
+    <string name="email_sent">Please check your inbox</string>
+    <string name="continue_with_rs">Or continue with</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
+
+    // ERROR
+    <string name="login_error">Incorrect email or password</string>
+    <string name="signup_error">This email is already associated with an existing account</string>
+    <string name="email_already_exists_error">This email is already associated with an existing account</string>
+    <string name="user_disabled_error">This account is disabled</string>
+    <string name="too_many_requests_error">Too many attempts: please try again later</string>
+    <string name="internal_error">An internal error occurred: the development teams have been notified</string>
+    <string name="user_not_found_error">User not found. Please register first</string>
+    <string name="reset_password_error">Could not reset your password</string>
+    <string name="malformed_sign_in_error">Oops, please check your credentials</string>
+    <string name="connection_issue">Connection issue. Please check your network</string>
+</resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="movies_network_error">Erreur de chargement des films</string>
+    <string name="movies_api_error">La source de donnée ne répond pas</string>
+    <string name="movies_unknown_error">Une erreur inconnue est survenue</string>
+    <string name="no_fetching_detail_possible">Les détails de ce film nécessitent une connexion internet !</string>
+</resources>
