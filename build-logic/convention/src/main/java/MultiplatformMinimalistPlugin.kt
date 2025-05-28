@@ -1,4 +1,5 @@
 import com.android.build.gradle.LibraryExtension
+import com.msoula.convention.MultiplatformConfigExtension
 import com.msoula.convention.configureMultiplatformAndroid
 import com.msoula.convention.configureMultiplatformIos
 import com.msoula.convention.configureMultiplatformMinimalist
@@ -18,6 +19,11 @@ class MultiplatformMinimalistPlugin : Plugin<Project> {
             apply("org.jetbrains.kotlin.plugin.serialization")
         }
 
+        // In order to unit test, JVM is necessary for KMP
+        extensions.configure<KotlinMultiplatformExtension> {
+            jvm()
+        }
+
         target.afterEvaluate {
             extensions.configure<KotlinMultiplatformExtension> {
                 configureMultiplatformIos()
@@ -28,6 +34,5 @@ class MultiplatformMinimalistPlugin : Plugin<Project> {
         extensions.configure<LibraryExtension> {
             configureMultiplatformAndroid()
         }
-
     }
 }

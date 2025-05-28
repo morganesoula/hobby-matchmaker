@@ -54,7 +54,6 @@ kotlin {
             implementation(project(Modules.SPLASHSCREEN_PRESENTATION))
         }
 
-
         androidMain.dependencies {
             // AndroidX
             api(libs.findLibrary("appcompat").get())

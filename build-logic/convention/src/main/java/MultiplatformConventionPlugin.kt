@@ -22,6 +22,11 @@ class MultiplatformConventionPlugin : Plugin<Project> {
             apply("org.jetbrains.kotlin.plugin.serialization")
         }
 
+        // In order to unit test, JVM is necessary for KMP
+        extensions.configure<KotlinMultiplatformExtension> {
+            jvm()
+        }
+
         target.afterEvaluate {
             extensions.configure<KotlinMultiplatformExtension> {
                 configureMultiplatformIos()
