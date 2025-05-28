@@ -38,4 +38,11 @@ gradlePlugin {
             implementationClass = "ApplicationConventionPlugin"
         }
     }
+
+    plugins {
+        register("multiplatformTest") {
+            id = "hobbymatchmaker.buildlogic.multiplatformTest"
+            implementationClass = "MultiplatformTestConventionPlugin"
+        }
+    }
 }

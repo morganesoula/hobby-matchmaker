@@ -15,6 +15,7 @@ googleIdentity = "1.1.1"
 googleServices = "4.4.2"
 gradle = "8.10.0"
 koin = "4.0.4"
+kotest = "5.9.1"
 kotlinGradlePlugin = "2.1.10"
 kotlinxCollectionsImmutable = "0.3.8"
 kotlinxCoroutinesTest = "1.10.2"
@@ -27,6 +28,7 @@ savedState = "1.2.1"
 sqldelight = "2.0.2"
 timber = "5.0.1"
 youtube = "12.1.1"
+jetbrainsKotlinJvm = "2.1.10"
 
 [libraries]
 activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
@@ -49,6 +51,9 @@ koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
+kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
+kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
+kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinGradlePlugin" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
@@ -89,3 +94,8 @@ hobbymatchmaker-buildlogic-application = { id = "hobbymatchmaker.buildlogic.appl
 hobbymatchmaker-buildlogic-multiplatform = { id = "hobbymatchmaker.buildlogic.multiplatform", version = "unspecified" }
 hobbymatchmaker-buildlogic-multiplatform-compose = { id = "hobbymatchmaker.buildlogic.multiplatformCompose", version = "unspecified" }
 hobbymatchmaker-buildlogic-multiplatform-minimalist = { id = "hobbymatchmaker.buildlogic.multiplatformMinimalist", version = "unspecified" }
+hobbymatchmaker-buildlogic-multiplatform-test = { id = "hobbymatchmaker.buildlogic.multiplatformTest", version = "unspecified" }
+
+### Test
+kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
