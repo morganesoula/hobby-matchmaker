@@ -6,8 +6,6 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 internal fun KotlinMultiplatformExtension.configureUnitTest(
     libs: VersionCatalog
 ) {
-    jvm()
-
     sourceSets.commonTest.dependencies {
         // Kotest
         implementation(libs.findLibrary("kotest-framework-engine").get())

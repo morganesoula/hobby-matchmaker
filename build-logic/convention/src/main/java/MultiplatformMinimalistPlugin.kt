@@ -1,5 +1,4 @@
 import com.android.build.gradle.LibraryExtension
-import com.msoula.convention.MultiplatformConfigExtension
 import com.msoula.convention.configureMultiplatformAndroid
 import com.msoula.convention.configureMultiplatformIos
 import com.msoula.convention.configureMultiplatformMinimalist

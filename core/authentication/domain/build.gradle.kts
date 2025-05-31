@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform)
+    alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform.test)
 }
 
 multiplatformConfig {
@@ -8,13 +9,15 @@ multiplatformConfig {
 
 kotlin {
     sourceSets {
-        commonMain {
-            dependencies {
-                // Modules
-                implementation(project(Modules.DI))
-                implementation(project(Modules.COMMON))
-                implementation(project(Modules.SESSION_DOMAIN))
-            }
+        commonMain.dependencies {
+            // Modules
+            implementation(project(Modules.DI))
+            implementation(project(Modules.COMMON))
+            implementation(project(Modules.SESSION_DOMAIN))
+        }
+
+        commonTest.dependencies {
+            implementation(libs.findLibrary("kotlinx-coroutines-test").get())
         }
     }
 }
