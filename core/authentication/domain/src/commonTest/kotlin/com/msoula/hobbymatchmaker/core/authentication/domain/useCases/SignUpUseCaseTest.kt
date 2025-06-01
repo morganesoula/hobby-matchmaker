@@ -4,6 +4,7 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.fakes.FakeAuthentic
 import com.msoula.hobbymatchmaker.core.authentication.domain.fakes.FakeSessionRepository
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.core.session.domain.useCases.CreateUserUseCase
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -13,17 +14,19 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SignInUseCaseTest : StringSpec({
+class SignUpUseCaseTest : StringSpec({
 
-    val dispatcher = StandardTestDispatcher()
     val testEmail = "john.doe@example.com"
     val testPassword = "password123"
 
+    val dispatcher = StandardTestDispatcher()
     val fakeSessionRepository = FakeSessionRepository()
     val fakeAuthenticationRepository = FakeAuthenticationRepository(fakeSessionRepository)
-    val useCase = SignInUseCase(dispatcher, fakeAuthenticationRepository)
 
-    "should emit Success when sign-in is successful" {
+    val createUserUseCase = CreateUserUseCase(fakeSessionRepository)
+    val useCase = SignUpUseCase(fakeAuthenticationRepository, createUserUseCase, dispatcher)
+
+    "should emit Success when sign up is successful" {
         runTest(dispatcher) {
             val results =
                 useCase.execute(Parameters.DoubleStringParam(testEmail, testPassword)).toList()
@@ -32,35 +35,7 @@ class SignInUseCaseTest : StringSpec({
 
             results shouldBe listOf(
                 Result.Loading,
-                Result.Success(SignInSuccess)
-            )
-        }
-    }
-
-    "should emit Failure.WrongPassword when password is empty" {
-        runTest(dispatcher) {
-            val results =
-                useCase.execute(Parameters.DoubleStringParam(testEmail, "")).toList()
-
-            advanceUntilIdle()
-
-            results shouldBe listOf(
-                Result.Loading,
-                Result.Failure(SignInError.WrongPassword)
-            )
-        }
-    }
-
-    "should emit Failure.UserNotFound when email is empty" {
-        runTest(dispatcher) {
-            val results =
-                useCase.execute(Parameters.DoubleStringParam("", testPassword)).toList()
-
-            advanceUntilIdle()
-
-            results shouldBe listOf(
-                Result.Loading,
-                Result.Failure(SignInError.UserNotFound)
+                Result.Success(SignUpSuccess("fakeUid"))
             )
         }
     }
@@ -74,21 +49,63 @@ class SignInUseCaseTest : StringSpec({
 
             results shouldBe listOf(
                 Result.Loading,
-                Result.Failure(SignInError.UserDisabled)
+                Result.Failure(SignUpErrors.UserDisabled)
             )
         }
     }
 
-    "should emit Failure.Other when email is unknown error" {
+    "should emit Failure.InternalError when password only is empty" {
         runTest(dispatcher) {
             val results =
-                useCase.execute(Parameters.DoubleStringParam("unknown error", testPassword)).toList()
+                useCase.execute(Parameters.DoubleStringParam(testEmail, "")).toList()
 
             advanceUntilIdle()
 
             results shouldBe listOf(
                 Result.Loading,
-                Result.Failure(SignInError.Other("Weird error message"))
+                Result.Failure(SignUpErrors.InternalError)
+            )
+        }
+    }
+
+    "should emit Failure.TooManyRequests when email only is empty" {
+        runTest(dispatcher) {
+            val results =
+                useCase.execute(Parameters.DoubleStringParam("", testPassword)).toList()
+
+            advanceUntilIdle()
+
+            results shouldBe listOf(
+                Result.Loading,
+                Result.Failure(SignUpErrors.TooManyRequests)
+            )
+        }
+    }
+
+    "should emit Failure.EmailAlreadyExists when email == password" {
+        runTest(dispatcher) {
+            val results =
+                useCase.execute(Parameters.DoubleStringParam(testEmail, testEmail)).toList()
+
+            advanceUntilIdle()
+
+            results shouldBe listOf(
+                Result.Loading,
+                Result.Failure(SignUpErrors.EmailAlreadyExists)
+            )
+        }
+    }
+
+    "should emit Failure.UnknownError when email == unknown error" {
+        runTest(dispatcher) {
+            val results =
+                useCase.execute(Parameters.DoubleStringParam("unknown error", testEmail)).toList()
+
+            advanceUntilIdle()
+
+            results shouldBe listOf(
+                Result.Loading,
+                Result.Failure(SignUpErrors.UnknownError("Weird error message"))
             )
         }
     }

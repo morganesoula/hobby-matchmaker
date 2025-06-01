@@ -11,13 +11,10 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.Authen
 import com.msoula.hobbymatchmaker.core.common.Result
 import dev.gitlive.firebase.auth.AuthCredential
 
-class FakeAuthenticationRepository : AuthenticationRepository {
+class FakeAuthenticationRepository(
+    private val fakeSessionRepository: FakeSessionRepository
+) : AuthenticationRepository {
 
-    var signUpResult: Result<String, CreateUserWithEmailAndPasswordError> =
-        Result.Success("fakeUid")
-    var signInResult: Result<String, SignInWithEmailAndPasswordError> = Result.Success("fakeUid")
-    var resetPasswordResult: Result<Boolean, ResetPasswordError> = Result.Success(true)
-    var logOutResult: Result<Boolean, LogOutError> = Result.Success(true)
     var signInWithCredentialResult: Result<FirebaseUserInfoDomainModel, SocialMediaError> =
         Result.Success(
             FirebaseUserInfoDomainModel(
@@ -43,25 +40,50 @@ class FakeAuthenticationRepository : AuthenticationRepository {
         )
 
     override suspend fun logOut(): Result<Boolean, LogOutError> {
-        return logOutResult
+        return if (fakeSessionRepository.isConnectedFlow.value) {
+            Result.Success(true)
+        } else {
+            Result.Failure(LogOutError.UnknownError("weird error message"))
+        }
     }
 
     override suspend fun signUp(
         email: String,
         password: String
     ): Result<String, CreateUserWithEmailAndPasswordError> {
-        return signUpResult
+        return when {
+            email.isEmpty() && password.isEmpty() -> Result.Failure(
+                CreateUserWithEmailAndPasswordError.UserDisabled
+            )
+
+            password.isEmpty() -> Result.Failure(CreateUserWithEmailAndPasswordError.InternalError)
+            email.isEmpty() -> Result.Failure(CreateUserWithEmailAndPasswordError.TooManyRequests)
+            email == password -> Result.Failure(CreateUserWithEmailAndPasswordError.EmailAlreadyExists)
+            email == "unknown error" -> Result.Failure(CreateUserWithEmailAndPasswordError.Other("Weird error message"))
+            else -> Result.Success("fakeUid")
+        }
     }
 
     override suspend fun signInWithEmailAndPassword(
         email: String,
         password: String
     ): Result<String, SignInWithEmailAndPasswordError> {
-        return signInResult
+        return when {
+            email.isEmpty() && password.isEmpty() -> Result.Failure(SignInWithEmailAndPasswordError.UserDisabled)
+            password.isEmpty() -> Result.Failure(SignInWithEmailAndPasswordError.WrongPassword)
+            email.isEmpty() -> Result.Failure(SignInWithEmailAndPasswordError.UserNotFound)
+            email == "unknown error" -> Result.Failure(SignInWithEmailAndPasswordError.Other("Weird error message"))
+            else -> Result.Success("fakeUUID")
+        }
     }
 
     override suspend fun resetPassword(email: String): Result<Boolean, ResetPasswordError> {
-        return resetPasswordResult
+        return when {
+            email.isEmpty() -> Result.Failure(ResetPasswordError.Other)
+            email == "too many requests" -> Result.Failure(ResetPasswordError.TooManyRequests)
+            email == "connection issue" -> Result.Failure(ResetPasswordError.Connection)
+            else -> Result.Success(true)
+        }
     }
 
     override suspend fun signInWithCredential(
