@@ -10,7 +10,10 @@ multiplatformConfig {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation("org.jetbrains.compose.ui:ui-backhandler:1.8.0-alpha03")
+            implementation("org.jetbrains.compose.ui:ui-backhandler:1.8.0")
+        }
+
+        androidMain.dependencies {
             implementation(libs.findLibrary("core-ktx").get())
         }
     }

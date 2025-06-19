@@ -8,7 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.hobbymatchmaker.buildlogic.application)
-    id("io.github.frankois944.spmForKmp") version "0.8.2"
+    id("io.github.frankois944.spmForKmp") version "0.11.2"
 }
 
 multiplatformConfig {
@@ -126,7 +126,7 @@ swiftPackageConfig {
                     add("FirebaseAuth", exportToKotlin = true)
                     add("FirebaseFirestore", exportToKotlin = true)
                 },
-                version = "11.12.0"
+                version = "11.14.0"
             )
             remotePackageVersion(
                 url = URI("https://github.com/google/GoogleSignIn-iOS"),

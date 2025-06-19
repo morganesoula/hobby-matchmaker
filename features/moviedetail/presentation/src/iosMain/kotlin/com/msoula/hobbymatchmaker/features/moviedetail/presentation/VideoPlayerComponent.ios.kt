@@ -11,7 +11,7 @@ import kotlinx.cinterop.useContents
 import nativeIosPlayerShared.YoutubePlayerContainer
 import platform.UIKit.UIScreen
 
-@OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
+@OptIn(ExperimentalForeignApi::class)
 @Composable
 actual fun YoutubeComponent(modifier: Modifier, videoId: String, onClose: () -> Unit) {
     val container = remember { YoutubePlayerContainer() }

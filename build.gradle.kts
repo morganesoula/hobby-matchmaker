@@ -33,3 +33,18 @@ tasks.register<io.gitlab.arturbosch.detekt.Detekt>("detektAll") {
         txt.required.set(false)
     }
 }
+
+tasks.register("runAllJvmTests") {
+    group = "verification"
+    description = "Runs all jvmTests tasks in submodules"
+}
+
+gradle.projectsEvaluated {
+    tasks.named("runAllJvmTests").configure {
+        subprojects.forEach { subproject ->
+            subproject.tasks.findByName("jvmTest")?.let { jvmTestTask ->
+                dependsOn(jvmTestTask)
+            }
+        }
+    }
+}

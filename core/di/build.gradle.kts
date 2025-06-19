@@ -6,11 +6,13 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            // Core
-            implementation(libs.findLibrary("core-ktx").get())
-
             // Modules
             implementation(project(Modules.DESIGN))
+        }
+
+        androidMain.dependencies {
+            // Core
+            implementation(libs.findLibrary("core-ktx").get())
         }
     }
 }

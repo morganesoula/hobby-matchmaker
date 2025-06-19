@@ -30,7 +30,8 @@
             tools:replace="android:value" />
         <meta-data
             android:name="com.facebook.sdk.ClientToken"
-            android:value="${facebookClientToken}" />
+            android:value="${facebookClientToken}"
+            tools:replace="android:value"/>
     </application>
 
 </manifest>

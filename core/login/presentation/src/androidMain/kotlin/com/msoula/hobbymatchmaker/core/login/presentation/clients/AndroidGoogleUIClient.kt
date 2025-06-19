@@ -12,20 +12,23 @@ import androidx.credentials.exceptions.GetCredentialException
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.InvalidCredentialError
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.login.presentation.BuildConfig
 import dev.gitlive.firebase.auth.AuthCredential
 import dev.gitlive.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class AndroidGoogleUIClient(private val credentialManager: CredentialManager, private val context: Context) :
+class AndroidGoogleUIClient(
+    private val credentialManager: CredentialManager,
+    private val context: Context
+) :
     GoogleUIClient {
 
     private val googleIdOption = GetGoogleIdOption.Builder()
         .setFilterByAuthorizedAccounts(false)
         .setServerClientId(BuildConfig.WEB_CLIENT_ID)
         .setAutoSelectEnabled(true)
-        .setNonce("random-string")
         .build()
 
     private val request: GetCredentialRequest = GetCredentialRequest.Builder()
@@ -73,6 +76,7 @@ class AndroidGoogleUIClient(private val credentialManager: CredentialManager, pr
 
             Pair(authCredential, email)
         } else {
+            Logger.e("❌ Unexpected credential type: ${credential::class.simpleName}")
             throw InvalidCredentialError("Received an invalid credential type")
         }
     }

@@ -3,7 +3,7 @@ import java.net.URI
 plugins {
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform.compose)
-    id("io.github.frankois944.spmForKmp") version "0.8.2"
+    id("io.github.frankois944.spmForKmp") version "0.11.2"
 }
 
 multiplatformConfig {

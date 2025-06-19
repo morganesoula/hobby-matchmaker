@@ -14,3 +14,9 @@
 .cxx
 *.properties
 iosApp/tmdb.plist
+**/google-services.json
+
+# iOS
+**/*.cinteropLibraries.json
+iosApp/**/*.xcuserdata/
+iosApp/**/*.xcuserstate
