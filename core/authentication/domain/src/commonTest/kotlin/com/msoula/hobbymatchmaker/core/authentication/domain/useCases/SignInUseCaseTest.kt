@@ -4,7 +4,7 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.fakes.FakeAuthentic
 import com.msoula.hobbymatchmaker.core.authentication.domain.fakes.FakeSessionRepository
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
-import io.kotest.core.spec.style.StringSpec
+import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
@@ -13,7 +13,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SignInUseCaseTest : StringSpec({
+class SignInUseCaseTest : FunSpec({
 
     val dispatcher = StandardTestDispatcher()
     val testEmail = "john.doe@example.com"
@@ -23,7 +23,7 @@ class SignInUseCaseTest : StringSpec({
     val fakeAuthenticationRepository = FakeAuthenticationRepository(fakeSessionRepository)
     val useCase = SignInUseCase(dispatcher, fakeAuthenticationRepository)
 
-    "should emit Success when sign-in is successful" {
+    test("should emit Success when sign-in is successful") {
         runTest(dispatcher) {
             val results =
                 useCase.execute(Parameters.DoubleStringParam(testEmail, testPassword)).toList()
@@ -37,7 +37,7 @@ class SignInUseCaseTest : StringSpec({
         }
     }
 
-    "should emit Failure.WrongPassword when password is empty" {
+    test("should emit Failure.WrongPassword when password is empty") {
         runTest(dispatcher) {
             val results =
                 useCase.execute(Parameters.DoubleStringParam(testEmail, "")).toList()
@@ -51,7 +51,7 @@ class SignInUseCaseTest : StringSpec({
         }
     }
 
-    "should emit Failure.UserNotFound when email is empty" {
+    test("should emit Failure.UserNotFound when email is empty") {
         runTest(dispatcher) {
             val results =
                 useCase.execute(Parameters.DoubleStringParam("", testPassword)).toList()
@@ -65,7 +65,7 @@ class SignInUseCaseTest : StringSpec({
         }
     }
 
-    "should emit Failure.UserDisabled when email && password are empty" {
+    test("should emit Failure.UserDisabled when email && password are empty") {
         runTest(dispatcher) {
             val results =
                 useCase.execute(Parameters.DoubleStringParam("", "")).toList()
@@ -79,7 +79,7 @@ class SignInUseCaseTest : StringSpec({
         }
     }
 
-    "should emit Failure.Other when email is unknown error" {
+    test("should emit Failure.Other when email is unknown error") {
         runTest(dispatcher) {
             val results =
                 useCase.execute(Parameters.DoubleStringParam("unknown error", testPassword)).toList()

@@ -14,5 +14,7 @@ internal fun KotlinMultiplatformExtension.configureUnitTest(
 
     sourceSets.jvmTest.dependencies {
         implementation(libs.findLibrary("kotest-runner-junit5").get())
+        implementation(libs.findLibrary("mockk").get())
+        implementation(libs.findLibrary("kotlinx-coroutines-test").get())
     }
 }
