@@ -4,7 +4,8 @@ import com.msoula.hobbymatchmaker.core.common.data.ValidationResult
 
 class ValidateNameUseCase {
     operator fun invoke(name: String): ValidationResult {
-        return if (name.matches("^[a-zA-Z-]+\$".toRegex())) {
+        return if (name.matches("^\\p{L}+(?:['’\\-]\\p{L}+)*$"
+                .toRegex())) {
             ValidationResult(true)
         } else {
             ValidationResult(false)
