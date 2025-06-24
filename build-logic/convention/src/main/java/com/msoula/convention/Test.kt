@@ -10,6 +10,9 @@ internal fun KotlinMultiplatformExtension.configureUnitTest(
         // Kotest
         implementation(libs.findLibrary("kotest-framework-engine").get())
         implementation(libs.findLibrary("kotest-assertions-core").get())
+
+        // Turbine
+        implementation(libs.findLibrary("turbine").get())
     }
 
     sourceSets.jvmTest.dependencies {

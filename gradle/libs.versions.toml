@@ -28,8 +28,8 @@ playServicesAuth = "21.3.0"
 savedState = "1.2.1"
 sqldelight = "2.0.2"
 timber = "5.0.1"
+turbine = "1.2.1"
 youtube = "12.1.1"
-jetbrainsKotlinJvm = "2.1.10"
 
 [libraries]
 activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
@@ -78,6 +78,7 @@ sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", 
 sqldelight-native-driver = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
 sqldelight-runtime = { module = "app.cash.sqldelight:runtime", version.ref = "sqldelight" }
 timber-android = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine"}
 youtube-player = { module = "com.pierfrancescosoffritti.androidyoutubeplayer:core", version.ref = "youtube" }
 
 [bundles]
@@ -102,4 +103,3 @@ hobbymatchmaker-buildlogic-multiplatform-test = { id = "hobbymatchmaker.buildlog
 
 ### Test
 kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }
-jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }

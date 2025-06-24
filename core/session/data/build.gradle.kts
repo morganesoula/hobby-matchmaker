@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform)
+    alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform.test)
 }
 
 multiplatformConfig {
@@ -12,7 +13,6 @@ kotlin {
             // DataStore
             implementation(libs.findLibrary("datastore-preferences").get())
 
-            // com.msoula.convention.Modules
             implementation(project(Modules.COMMON))
             implementation(project(Modules.SESSION_DOMAIN))
         }
