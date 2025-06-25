@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform)
+    alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform.test)
 }
 
 multiplatformConfig {
