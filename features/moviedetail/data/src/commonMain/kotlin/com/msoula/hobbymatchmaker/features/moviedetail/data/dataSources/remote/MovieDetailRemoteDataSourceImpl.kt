@@ -49,12 +49,11 @@ class MovieDetailRemoteDataSourceImpl(
     ): Result<MovieCastDomainModel?, MovieDetailDomainError> {
         return safeKtorCall(
             block = {
-                val response = movieDetailKtorService.fetchMovieCredits(movieId, language)
-                val data = when (response) {
-                    is Result.Success -> response.data.toMovieActorDomainModel()
-                    else -> null
+                when (val response = movieDetailKtorService.fetchMovieCredits(movieId, language)) {
+                    is Result.Success -> Result.Success(response.data.toMovieActorDomainModel())
+                    is Result.Failure -> throw Exception(response.error.message)
+                    else -> throw Exception("Unexpected response")
                 }
-                Result.Success(data)
             },
             errorMapper = { throwable ->
                 Logger.e("FetchMovieCredit error: ${throwable.message}")
@@ -75,14 +74,14 @@ class MovieDetailRemoteDataSourceImpl(
                 val response = movieVideosKtorServiceImpl.fetchMovieVideos(movieId, language)
                 val data = when (response) {
                     is Result.Success -> response.data.toMovieVideoDomainModel()
-                    else -> null
+                    is Result.Failure -> throw Exception(response.error.message)
+                    else -> throw Exception("Unexpected response")
                 }
 
                 Result.Success(data)
             },
             errorMapper = { throwable ->
                 Logger.e("fetchMovieTrailer error: ${throwable.message}")
-
                 when (throwable) {
                     is IOException -> MovieDetailDomainError.NoConnection(throwable.message ?: "")
                     else -> MovieDetailDomainError.TrailerError(throwable.message ?: "")

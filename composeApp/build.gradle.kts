@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.hobbymatchmaker.buildlogic.application)
+    alias(libs.plugins.kover)
     id("io.github.frankois944.spmForKmp") version "0.11.2"
 }
 
@@ -112,6 +113,18 @@ compose.resources {
     publicResClass = true
     packageOfResClass = "com.msoula.hobbymatchmaker"
     generateResClass = always
+}
+
+dependencies {
+    kover(project(Modules.AUTHENTICATION_DATA))
+    kover(project(Modules.AUTHENTICATION_DOMAIN))
+    kover(project(Modules.DI))
+    kover(project(Modules.LOGIN_DOMAIN))
+    kover(project(Modules.MOVIE_DATA))
+    kover(project(Modules.MOVIE_DOMAIN))
+    kover(project(Modules.MOVIE_DETAIL_DATA))
+    kover(project(Modules.MOVIE_DETAIL_DOMAIN))
+    kover(project(Modules.SESSION_DATA))
 }
 
 swiftPackageConfig {

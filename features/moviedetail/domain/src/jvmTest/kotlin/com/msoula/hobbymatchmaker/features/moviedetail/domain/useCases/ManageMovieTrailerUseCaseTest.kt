@@ -1,0 +1,139 @@
+package com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases
+
+import com.msoula.hobbymatchmaker.core.common.Parameters
+import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainError
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.UpdateMovieTrailerLocalError
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.fakes.FakeMovieDetailRepository
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieVideoDomainModel
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runTest
+
+class ManageMovieTrailerUseCaseTest : FunSpec({
+    val dispatcher = StandardTestDispatcher()
+
+    context("ManageMovieTrailer - Success") {
+        test("returns Success when trailer is fetched and update succeeds") {
+            val fakeTrailer = MovieVideoDomainModel(
+                key = "abc123",
+                type = "",
+                site = "YouTube"
+            )
+
+            val fakeMovieDetailRepository = FakeMovieDetailRepository(
+                fetchTrailerResult = Result.Success(fakeTrailer),
+                updateTrailerResult = Result.Success(true)
+            )
+
+            val updateMovieVideoURIUSeCase = UpdateMovieVideoURIUseCase(fakeMovieDetailRepository)
+
+            val useCase = ManageMovieTrailerUseCase(
+                movieDetailRepository = fakeMovieDetailRepository,
+                updateMovieVideoURIUseCase = updateMovieVideoURIUSeCase,
+                dispatcher = dispatcher
+            )
+
+            runTest(dispatcher) {
+                val result = useCase
+                    .execute(Parameters.LongStringParam(1L, "en"))
+                    .take(2)
+                    .toList()
+
+                result shouldBe listOf(
+                    Result.Loading,
+                    Result.Success(MovieTrailerReady("abc123"))
+                )
+
+                fakeMovieDetailRepository.updatedVideoURI shouldBe "abc123"
+            }
+        }
+    }
+
+    context("ManageMovieTrailer - Failure") {
+        test("Returns NoConnectionError when no connection") {
+            val fakeRepository = FakeMovieDetailRepository(
+                fetchTrailerResult = Result.Failure(
+                    MovieDetailDomainError.NoConnection("No internet connexion")
+                )
+            )
+
+            val useCase = ManageMovieTrailerUseCase(
+                movieDetailRepository = fakeRepository,
+                updateMovieVideoURIUseCase = UpdateMovieVideoURIUseCase(fakeRepository),
+                dispatcher = dispatcher
+            )
+
+            runTest(dispatcher) {
+                val result = useCase
+                    .execute(Parameters.LongStringParam(1L, "en"))
+                    .take(2)
+                    .toList()
+
+                result shouldBe listOf(
+                    Result.Loading,
+                    Result.Failure(FetchingTrailerError.NoConnectionError("No internet connexion"))
+                )
+            }
+        }
+
+        test("Returns no TrailerFound when no trailer is found") {
+            val fakeRepository = FakeMovieDetailRepository(
+                fetchTrailerResult = Result.Failure(
+                    FetchingTrailerError.NoTrailerFoundError(
+                        "No trailer found"
+                    )
+                )
+            )
+
+            val useCase = ManageMovieTrailerUseCase(
+                movieDetailRepository = fakeRepository,
+                updateMovieVideoURIUseCase = UpdateMovieVideoURIUseCase(fakeRepository),
+                dispatcher = dispatcher
+            )
+
+            runTest(dispatcher) {
+                val result = useCase
+                    .execute(Parameters.LongStringParam(1L, "en"))
+                    .take(2)
+                    .toList()
+
+                result shouldBe listOf(
+                    Result.Loading,
+                    Result.Failure(FetchingTrailerError.NoTrailerFoundError("No trailer found"))
+                )
+            }
+        }
+
+        test("Returns TrailerUpdateError when update fails") {
+            val fakeRepository = FakeMovieDetailRepository(
+                updateTrailerResult = Result.Failure(
+                    UpdateMovieTrailerLocalError("error updating trailer")
+                )
+            )
+
+            val useCase = ManageMovieTrailerUseCase(
+                movieDetailRepository = fakeRepository,
+                updateMovieVideoURIUseCase = UpdateMovieVideoURIUseCase(fakeRepository),
+                dispatcher = dispatcher
+            )
+
+            runTest(dispatcher) {
+                val result = useCase
+                    .execute(Parameters.LongStringParam(1L, "en"))
+                    .take(2)
+                    .toList()
+
+                result shouldBe listOf(
+                    Result.Loading,
+                    Result.Failure(
+                        FetchingTrailerError.TrailerUpdateError("Empty uri")
+                    )
+                )
+            }
+        }
+    }
+})

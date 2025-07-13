@@ -34,7 +34,10 @@ fun CastResponseRemoteModel.toMovieActorDomainModel(): MovieCastDomainModel {
 }
 
 fun MovieVideosResponseRemoteModel.toMovieVideoDomainModel(): MovieVideoDomainModel? {
-    val trailer = results.find { it.type == "Trailer" }
+    val trailer = results.firstOrNull {
+        it.site.equals("YouTube", ignoreCase = true) &&
+            it.type.equals("Trailer", ignoreCase = true)
+    }
 
     return trailer?.let {
         MovieVideoDomainModel(
