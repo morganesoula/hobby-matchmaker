@@ -52,19 +52,19 @@ fun MovieScreenContent(
     ObserveAsEvents(flow = oneTimeEventChannelFlow) { event ->
         coroutineScope.launch {
             when (event) {
-                is MovieUiEventModel.OnMovieDetailClicked -> {
+                is MovieUiEventModel.OnMovieDetailClicked ->
                     redirectToMovieDetail(event.movieId)
-                }
 
-                is MovieUiEventModel.OnMovieUiFetchedError -> {
+                is MovieUiEventModel.OnMovieUiFetchedError ->
                     snackBarHostState.showSnackbar(message = event.error)
-                }
+
+                is MovieUiEventModel.OnLogOutFailure ->
+                    snackBarHostState.showSnackbar(message = event.error)
 
                 is MovieUiEventModel.OnLogOutSuccess -> redirectToAuth()
 
-                is MovieUiEventModel.NoFetchingDetailPossible -> {
+                is MovieUiEventModel.NoFetchingDetailPossible ->
                     snackBarHostState.showSnackbar(noFetchingDetailPossibleMessage)
-                }
             }
         }
     }

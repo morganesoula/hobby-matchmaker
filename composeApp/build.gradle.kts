@@ -124,6 +124,8 @@ dependencies {
     kover(project(Modules.MOVIE_DOMAIN))
     kover(project(Modules.MOVIE_DETAIL_DATA))
     kover(project(Modules.MOVIE_DETAIL_DOMAIN))
+    kover(project(Modules.MOVIE_DETAIL_PRESENTATION))
+    kover(project(Modules.MOVIE_PRESENTATION))
     kover(project(Modules.SESSION_DATA))
 }
 

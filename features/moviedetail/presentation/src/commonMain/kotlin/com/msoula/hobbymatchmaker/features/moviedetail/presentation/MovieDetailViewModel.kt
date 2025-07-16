@@ -1,5 +1,6 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.presentation
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.common.Logger
@@ -79,7 +80,8 @@ class MovieDetailViewModel(
         }
     }
 
-    private suspend fun onPlayTrailerClicked(movieId: Long, isVideoURIknown: Boolean) {
+    @VisibleForTesting
+    internal suspend fun onPlayTrailerClicked(movieId: Long, isVideoURIknown: Boolean) {
         if (isVideoURIknown) {
             sendOnce(
                 if (connectivityCheck.hasActiveConnection()) {

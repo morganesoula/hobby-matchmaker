@@ -13,6 +13,7 @@ actual val featuresModuleMovieViewModelPresentationPlatformSpecific = module {
             get(),
             get(),
             AndroidNetworkConnectivityChecker(get()),
+            get(),
             get()
         )
     }

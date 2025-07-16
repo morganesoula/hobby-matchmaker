@@ -5,18 +5,17 @@ import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfo
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutUseCase
 import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.ErrorMessageProvider
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.getDeviceLocale
 import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.CheckMovieSynopsisValueUseCase
-import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesErrors
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesSuccess
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.SetMovieFavoriteUseCase
 import com.msoula.hobbymatchmaker.features.movies.presentation.mappers.toMovieUiModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
-import com.msoula.hobbymatchmaker.features.movies.presentation.models.LogOutModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiStateModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -29,7 +28,6 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.getString
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class MovieViewModel(
@@ -39,7 +37,8 @@ class MovieViewModel(
     private val logOutUseCase: LogOutUseCase,
     private val checkMovieSynopsisValueUseCase: CheckMovieSynopsisValueUseCase,
     private val connectivityCheck: NetworkConnectivityChecker,
-    private val ioDispatcher: CoroutineDispatcher
+    private val ioDispatcher: CoroutineDispatcher,
+    private val errorMessageProvider: ErrorMessageProvider
 ) : ViewModel() {
 
     private val _oneTimeEventChannel = Channel<MovieUiEventModel>()
@@ -79,21 +78,20 @@ class MovieViewModel(
             logOutUseCase(Parameters.StringParam("")).collect { result ->
                 when (result) {
                     is Result.Success -> _oneTimeEventChannel.trySend(MovieUiEventModel.OnLogOutSuccess)
-                    is Result.Failure -> LogOutModel.Error(result.error.message)
-                    else -> LogOutModel.Idle
+                    is Result.Failure -> _oneTimeEventChannel.trySend(
+                        MovieUiEventModel.OnLogOutFailure(
+                            result.error.message
+                        )
+                    )
+
+                    else -> Unit
                 }
             }
         }
     }
 
-    private suspend fun handleError(error: AppError): String {
-        return when (error) {
-            is ObserveAllMoviesErrors.NetworkError -> getString(Res.string.movies_network_error)
-            is ObserveAllMoviesErrors.ApiError -> getString(Res.string.movies_api_error)
-            is ObserveAllMoviesErrors.UnknownError -> getString(Res.string.movies_unknown_error)
-            else -> error.message
-        }
-    }
+    private suspend fun handleError(error: AppError): String =
+        errorMessageProvider.getMessage(error)
 
     fun onCardEvent(event: CardEventModel) {
         when (event) {
@@ -103,21 +101,20 @@ class MovieViewModel(
 
             is CardEventModel.OnSingleTap -> {
                 viewModelScope.launch {
-                    val localData = checkMovieSynopsisValueUseCase(event.movieId)
-                    val hasConnectivity = connectivityCheck.hasActiveConnection()
-
-                    when {
-                        localData -> sendOnce(MovieUiEventModel.OnMovieDetailClicked(event.movieId))
-                        hasConnectivity -> sendOnce(
-                            MovieUiEventModel.OnMovieDetailClicked(
-                                event.movieId
-                            )
-                        )
-
-                        else -> sendOnce(MovieUiEventModel.NoFetchingDetailPossible)
-                    }
+                    sendOnce(handleSingleTap(event.movieId))
                 }
             }
+        }
+    }
+
+    internal suspend fun handleSingleTap(movieId: Long): MovieUiEventModel {
+        val localData = checkMovieSynopsisValueUseCase(movieId)
+        val hasConnectivity = connectivityCheck.hasActiveConnection()
+
+        return when {
+            localData -> MovieUiEventModel.OnMovieDetailClicked(movieId)
+            hasConnectivity -> MovieUiEventModel.OnMovieDetailClicked(movieId)
+            else -> MovieUiEventModel.NoFetchingDetailPossible
         }
     }
 
