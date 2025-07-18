@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.serialization) apply false
     alias(libs.plugins.detekt) apply false
     alias(libs.plugins.kover) apply false
+    alias(libs.plugins.spm.kmp) apply false
 }
 
 val projectStructure = file(projectDir)

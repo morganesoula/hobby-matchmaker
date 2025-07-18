@@ -5,7 +5,9 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform.compose)
-    id("io.github.frankois944.spmForKmp") version "0.11.2"
+    alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform.test)
+    alias(libs.plugins.kover)
+    alias(libs.plugins.spm.kmp)
 }
 
 multiplatformConfig {

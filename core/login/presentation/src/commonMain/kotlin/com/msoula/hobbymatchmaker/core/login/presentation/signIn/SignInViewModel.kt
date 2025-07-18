@@ -1,51 +1,46 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.signIn
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ResetPasswordUseCase
-import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInError
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.UnifiedSignInUseCase
 import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.ErrorMessageProvider
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.di.domain.useCases.AuthFormValidationUseCase
-import com.msoula.hobbymatchmaker.core.login.presentation.Res
-import com.msoula.hobbymatchmaker.core.login.presentation.login_error
-import com.msoula.hobbymatchmaker.core.login.presentation.malformed_sign_in_error
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.ResetPasswordEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.SignInEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.models.SignInFormStateModel
-import com.msoula.hobbymatchmaker.core.login.presentation.too_many_requests_error
-import com.msoula.hobbymatchmaker.core.login.presentation.user_disabled_error
-import com.msoula.hobbymatchmaker.core.login.presentation.user_not_found_error
 import dev.gitlive.firebase.auth.AuthCredential
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.getString
 
 class SignInViewModel(
     private val authFormValidationUseCases: AuthFormValidationUseCase,
     private val resetPasswordUseCase: ResetPasswordUseCase,
     private val unifiedSignInUseCase: UnifiedSignInUseCase,
-    private val socialClients: Map<ProviderType, SocialUIClient>
+    private val socialClients: Map<ProviderType, SocialUIClient>,
+    private val ioDispatcher: CoroutineDispatcher,
+    private val errorMessageProvider: ErrorMessageProvider
 ) : ViewModel() {
     private val _formDataFlow = MutableStateFlow(SignInFormStateModel())
     val formDataFlow = _formDataFlow.asStateFlow()
 
     val circularProgressLoading = MutableStateFlow(false)
-
     val openResetDialog = MutableStateFlow(false)
 
-    private var isSignIn = false
+    @VisibleForTesting
+    internal var isSignIn = false
 
     private val _resetPasswordState: MutableStateFlow<ResetPasswordEvent> =
         MutableStateFlow(ResetPasswordEvent.Idle)
@@ -151,7 +146,7 @@ class SignInViewModel(
         if (isSignIn) return
         isSignIn = true
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             val client = socialClients[providerType]
             val credential = fetchedCredential ?: client?.getCredential()
 
@@ -170,40 +165,25 @@ class SignInViewModel(
     }
 
     private suspend fun resetPassword() {
-        resetPasswordUseCase(Parameters.StringParam(formDataFlow.value.emailReset)).collectLatest { result ->
-            _resetPasswordState.update {
-                when (result) {
-                    is Result.Loading -> ResetPasswordEvent.Loading
-                    is Result.Success -> {
-                        _formDataFlow.update { it.copy(emailReset = "") }
-                        ResetPasswordEvent.Success
-                    }
+        if (formDataFlow.value.submitEmailReset) {
+            resetPasswordUseCase(Parameters.StringParam(formDataFlow.value.emailReset)).collectLatest { result ->
+                _resetPasswordState.update {
+                    when (result) {
+                        is Result.Loading -> ResetPasswordEvent.Loading
+                        is Result.Success -> {
+                            _formDataFlow.update { it.copy(emailReset = "") }
+                            ResetPasswordEvent.Success
+                        }
 
-                    is Result.Failure -> ResetPasswordEvent.Error(result.error.message)
+                        is Result.Failure -> ResetPasswordEvent.Error(result.error.message)
+                    }
                 }
             }
         }
     }
 
-    private suspend fun handleError(error: AppError): String {
-        return when (error) {
-            is SignInError.WrongPassword -> getString(Res.string.login_error)
-            is SignInError.UserNotFound -> getString(
-                Res.string.user_not_found_error
-            )
-
-            is SignInError.UserDisabled -> getString(
-                Res.string.user_disabled_error
-            )
-
-            is SignInError.TooManyRequests -> getString(
-                Res.string.too_many_requests_error
-            )
-
-            else -> if (error.message.contains("incorrect"))
-                getString(Res.string.malformed_sign_in_error) else error.message
-        }
-    }
+    private suspend fun handleError(error: AppError): String =
+        errorMessageProvider.getMessage(error)
 
     fun resetSignInState() {
         _signInState.value = SignInEvent.Idle

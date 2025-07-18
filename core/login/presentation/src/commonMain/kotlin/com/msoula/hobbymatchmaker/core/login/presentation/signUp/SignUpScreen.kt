@@ -63,7 +63,6 @@ import com.msoula.hobbymatchmaker.core.login.presentation.signUp.models.SignUpSt
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_up
 import com.msoula.hobbymatchmaker.core.login.presentation.welcome_title
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -102,14 +101,10 @@ fun SignUpScreenContent(
         when (val state = signUpState) {
             is SignUpEvent.Success -> redirectToMovieScreen()
             is SignUpEvent.Error -> {
-                state.message?.let {
-                    coroutineScope.launch {
-                        snackBarHostState.showSnackbar(getString(it))
-                    }
+                coroutineScope.launch {
+                    snackBarHostState.showSnackbar(state.message)
                 }
-
             }
-
             else -> Unit
         }
     }

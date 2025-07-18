@@ -27,6 +27,7 @@ mediaPlayer = "2.0.9"
 mockk = "1.14.2"
 playServicesAuth = "21.3.0"
 savedState = "1.2.1"
+spm = "0.11.3"
 sqldelight = "2.0.2"
 timber = "5.0.1"
 turbine = "1.2.1"
@@ -95,6 +96,7 @@ detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlinGradlePlugin" }
+spm-kmp = { id = "io.github.frankois944.spmForKmp", version.ref = "spm" }
 
 hobbymatchmaker-buildlogic-application = { id = "hobbymatchmaker.buildlogic.application", version = "unspecified" }
 hobbymatchmaker-buildlogic-multiplatform = { id = "hobbymatchmaker.buildlogic.multiplatform", version = "unspecified" }

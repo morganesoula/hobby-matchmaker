@@ -9,7 +9,7 @@ plugins {
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.hobbymatchmaker.buildlogic.application)
     alias(libs.plugins.kover)
-    id("io.github.frankois944.spmForKmp") version "0.11.2"
+    alias(libs.plugins.spm.kmp)
 }
 
 multiplatformConfig {
@@ -115,11 +115,18 @@ compose.resources {
     generateResClass = always
 }
 
+kover {
+    reports {
+
+    }
+}
+
 dependencies {
     kover(project(Modules.AUTHENTICATION_DATA))
     kover(project(Modules.AUTHENTICATION_DOMAIN))
     kover(project(Modules.DI))
     kover(project(Modules.LOGIN_DOMAIN))
+    kover(project(Modules.LOGIN_PRESENTATION))
     kover(project(Modules.MOVIE_DATA))
     kover(project(Modules.MOVIE_DOMAIN))
     kover(project(Modules.MOVIE_DETAIL_DATA))

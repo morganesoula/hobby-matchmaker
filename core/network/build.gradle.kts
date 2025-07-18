@@ -2,7 +2,7 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform)
-    id("io.github.frankois944.spmForKmp") version "0.11.2"
+    alias(libs.plugins.spm.kmp)
 }
 
 multiplatformConfig {

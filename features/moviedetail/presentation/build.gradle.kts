@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform.compose)
     alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform.test)
     alias(libs.plugins.kover)
-    id("io.github.frankois944.spmForKmp") version "0.11.2"
+    alias(libs.plugins.spm.kmp)
 }
 
 multiplatformConfig {
