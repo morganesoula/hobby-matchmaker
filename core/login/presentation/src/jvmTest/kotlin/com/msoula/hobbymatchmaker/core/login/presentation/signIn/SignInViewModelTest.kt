@@ -233,7 +233,9 @@ class SignInViewModelTest : FunSpec({
                     signInVM.onEvent(AuthenticationUIEvent.OnResetPasswordConfirmed)
                     advanceUntilIdle()
 
-                    signInVM.resetPasswordState.value shouldBe ResetPasswordEvent.Error("")
+                    signInVM.resetPasswordState.value shouldBe ResetPasswordEvent.Error(
+                        "unknown error while resetting"
+                    )
                 } finally {
                     Dispatchers.resetMain()
                 }

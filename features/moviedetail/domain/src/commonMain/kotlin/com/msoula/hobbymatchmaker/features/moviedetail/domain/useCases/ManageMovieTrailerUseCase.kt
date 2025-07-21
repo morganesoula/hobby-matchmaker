@@ -9,7 +9,7 @@ import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieVideoD
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.repositories.MovieDetailRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.flow
 
 class ManageMovieTrailerUseCase(
     private val movieDetailRepository: MovieDetailRepository,
@@ -25,18 +25,17 @@ class ManageMovieTrailerUseCase(
 
     override fun execute(parameters: Parameters.LongStringParam):
         Flow<Result<MovieTrailerReady, FetchingTrailerError>> {
-        return channelFlow {
-            val movieId = parameters.longValue
+        return flow {
+            emit(Result.Loading)
 
+            val movieId = parameters.longValue
             var attempt = 0
             var result: Result<MovieTrailerReady, FetchingTrailerError>
-
-            send(Result.Loading)
 
             do {
                 val languageToUse = fallBackLanguages.getOrNull(attempt) ?: "en-US"
                 result = processVideoResponse(movieId, languageToUse)
-                send(result)
+                emit(result)
                 attempt++
             } while (result is Result.Failure && attempt < maxAttempt)
         }

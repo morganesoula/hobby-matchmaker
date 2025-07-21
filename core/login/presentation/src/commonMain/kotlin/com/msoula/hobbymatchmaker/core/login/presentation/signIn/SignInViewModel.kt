@@ -18,6 +18,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.models.SignInEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.models.SignInFormStateModel
 import dev.gitlive.firebase.auth.AuthCredential
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,8 +32,11 @@ class SignInViewModel(
     private val unifiedSignInUseCase: UnifiedSignInUseCase,
     private val socialClients: Map<ProviderType, SocialUIClient>,
     private val ioDispatcher: CoroutineDispatcher,
-    private val errorMessageProvider: ErrorMessageProvider
+    private val errorMessageProvider: ErrorMessageProvider,
+    private val externalScope: CoroutineScope? = null
 ) : ViewModel() {
+    private val scope = externalScope ?: viewModelScope
+
     private val _formDataFlow = MutableStateFlow(SignInFormStateModel())
     val formDataFlow = _formDataFlow.asStateFlow()
 
@@ -87,7 +91,7 @@ class SignInViewModel(
                 launchSocialSignIn(ProviderType.FACEBOOK, event.credential)
 
             AuthenticationUIEvent.OnResetPasswordConfirmed ->
-                viewModelScope.launch { resetPassword() }
+                scope.launch { resetPassword() }
 
             AuthenticationUIEvent.OnSignIn ->
                 signInUnified(
@@ -114,7 +118,7 @@ class SignInViewModel(
         authFormValidationUseCases.validateEmailUseCase(emailReset).successful
 
     private fun signInUnified(params: UnifiedSignInUseCase.Params) {
-        viewModelScope.launch {
+        scope.launch(ioDispatcher) {
             unifiedSignInUseCase.signIn(params).collectLatest { result ->
                 _signInState.value = when (result) {
                     is Result.Loading -> {
@@ -146,7 +150,7 @@ class SignInViewModel(
         if (isSignIn) return
         isSignIn = true
 
-        viewModelScope.launch(ioDispatcher) {
+        scope.launch(ioDispatcher) {
             val client = socialClients[providerType]
             val credential = fetchedCredential ?: client?.getCredential()
 
@@ -166,7 +170,7 @@ class SignInViewModel(
 
     private suspend fun resetPassword() {
         if (formDataFlow.value.submitEmailReset) {
-            resetPasswordUseCase(Parameters.StringParam(formDataFlow.value.emailReset)).collectLatest { result ->
+            resetPasswordUseCase(Parameters.StringParam(formDataFlow.value.emailReset)).collect { result ->
                 _resetPasswordState.update {
                     when (result) {
                         is Result.Loading -> ResetPasswordEvent.Loading
@@ -175,7 +179,10 @@ class SignInViewModel(
                             ResetPasswordEvent.Success
                         }
 
-                        is Result.Failure -> ResetPasswordEvent.Error(result.error.message)
+                        is Result.Failure -> {
+                            val errorMessage = handleError(result.error)
+                            ResetPasswordEvent.Error(errorMessage)
+                        }
                     }
                 }
             }

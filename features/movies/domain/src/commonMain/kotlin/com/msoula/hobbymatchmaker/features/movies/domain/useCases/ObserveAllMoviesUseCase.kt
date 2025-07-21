@@ -8,9 +8,11 @@ import com.msoula.hobbymatchmaker.features.movies.domain.errors.MovieErrors
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.MovieRepository
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 
 class ObserveAllMoviesUseCase(
     private val movieRepository: MovieRepository,
@@ -21,33 +23,37 @@ class ObserveAllMoviesUseCase(
     override fun execute(parameters: Parameters.StringParam):
         Flow<Result<ObserveAllMoviesSuccess, ObserveAllMoviesErrors>> {
         return channelFlow {
-            movieRepository.observeMovies().distinctUntilChanged().collect { list ->
-                if (list.isEmpty()) {
-                    send(Result.Success(ObserveAllMoviesSuccess.Loading))
+            val job = launch {
+                movieRepository.observeMovies().distinctUntilChanged().collect { list ->
+                    if (list.isEmpty()) {
+                        send(Result.Success(ObserveAllMoviesSuccess.Loading))
 
-                    when (val fetchStatus = fetchMoviesUseCase(parameters.value)) {
-                        is Result.Success -> send(Result.Success(ObserveAllMoviesSuccess.DataLoadedInDB))
-                        is Result.Failure -> {
-                            val error = when (fetchStatus.error) {
-                                is MovieErrors.NetworkError -> ObserveAllMoviesErrors.NetworkError(
-                                    fetchStatus.error.message
-                                )
+                        when (val fetchStatus = fetchMoviesUseCase(parameters.value)) {
+                            is Result.Success -> send(Result.Success(ObserveAllMoviesSuccess.DataLoadedInDB))
+                            is Result.Failure -> {
+                                val error = when (fetchStatus.error) {
+                                    is MovieErrors.NetworkError -> ObserveAllMoviesErrors.NetworkError(
+                                        fetchStatus.error.message
+                                    )
 
-                                is MovieErrors.ApiError -> ObserveAllMoviesErrors.ApiError(
-                                    fetchStatus.error.message
-                                )
+                                    is MovieErrors.ApiError -> ObserveAllMoviesErrors.ApiError(
+                                        fetchStatus.error.message
+                                    )
 
-                                else -> ObserveAllMoviesErrors.UnknownError(fetchStatus.error.message)
+                                    else -> ObserveAllMoviesErrors.UnknownError(fetchStatus.error.message)
+                                }
+                                send(Result.Failure(error))
                             }
-                            send(Result.Failure(error))
-                        }
 
-                        else -> send(Result.Success(ObserveAllMoviesSuccess.Loading))
+                            else -> send(Result.Success(ObserveAllMoviesSuccess.Loading))
+                        }
+                    } else {
+                        send(Result.Success(ObserveAllMoviesSuccess.Success(list)))
                     }
-                } else {
-                    send(Result.Success(ObserveAllMoviesSuccess.Success(list)))
                 }
             }
+
+            awaitClose { job.cancel() }
         }
     }
 }

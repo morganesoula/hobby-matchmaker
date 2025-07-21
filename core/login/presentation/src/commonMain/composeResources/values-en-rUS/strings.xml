@@ -45,4 +45,5 @@
     <string name="reset_password_error">Could not reset your password</string>
     <string name="malformed_sign_in_error">Oops, please check your credentials</string>
     <string name="connection_issue">Connection issue. Please check your network</string>
+    <string name="rest_password_other_error">An error occurred. Please contact the development team.</string>
 </resources>

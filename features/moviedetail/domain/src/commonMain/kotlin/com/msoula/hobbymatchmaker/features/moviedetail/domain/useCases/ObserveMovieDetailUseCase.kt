@@ -10,9 +10,11 @@ import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieActorD
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.repositories.MovieDetailRepository
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 
 class ObserveMovieDetailUseCase(
     private val movieDetailRepository: MovieDetailRepository,
@@ -26,48 +28,59 @@ class ObserveMovieDetailUseCase(
 
         return channelFlow {
             send(Result.Loading)
-            movieDetailRepository.observeMovieDetail(parameters.longValue).collect { movieDetail ->
 
-                when {
-                    movieDetail == null -> send(Result.Failure(ObserveMovieErrors.Empty))
+            val job = launch {
+                movieDetailRepository.observeMovieDetail(parameters.longValue)
+                    .collect { movieDetail ->
 
-                    movieDetail.synopsis.isNullOrBlank() ->
-                        send(fetchAndSaveMovieData(parameters.longValue, parameters.stringValue))
+                        when {
+                            movieDetail == null -> send(Result.Failure(ObserveMovieErrors.Empty))
 
-                    movieDetail.cast.isNullOrEmpty() -> {
-                        when (val result = movieDetailRepository.fetchMovieCredit(
-                            parameters.longValue,
-                            parameters.stringValue
-                        )) {
-                            is Result.Success -> {
-                                val cast = result.data?.takeIf { it.isNotEmpty() }
-                                    ?: listOf(
-                                        MovieActorDomainModel(
-                                            name = "NO_CAST",
-                                            role = "MARKER"
-                                        )
+                            movieDetail.synopsis.isNullOrBlank() ->
+                                send(
+                                    fetchAndSaveMovieData(
+                                        parameters.longValue,
+                                        parameters.stringValue
                                     )
+                                )
 
-                                val updated = movieDetail.copy(cast = cast)
-                                movieDetailRepository.saveMovieDetail(updated)
-                                send(Result.Success(ObserveMovieSuccess.DataLoadedInDB))
+                            movieDetail.cast.isNullOrEmpty() -> {
+                                when (val result = movieDetailRepository.fetchMovieCredit(
+                                    parameters.longValue,
+                                    parameters.stringValue
+                                )) {
+                                    is Result.Success -> {
+                                        val cast = result.data?.takeIf { it.isNotEmpty() }
+                                            ?: listOf(
+                                                MovieActorDomainModel(
+                                                    name = "NO_CAST",
+                                                    role = "MARKER"
+                                                )
+                                            )
+
+                                        val updated = movieDetail.copy(cast = cast)
+                                        movieDetailRepository.saveMovieDetail(updated)
+                                        send(Result.Success(ObserveMovieSuccess.DataLoadedInDB))
+                                    }
+
+                                    is Result.Failure -> {
+                                        Logger.e("Error fetching cast: ${result.error.message}")
+                                        send(Result.Failure(mapCreditError(result.error as MovieDetailDomainError)))
+                                    }
+
+                                    else -> {
+                                        Logger.e("Unexpected error while fetching cast")
+                                        send(Result.Failure(ObserveMovieErrors.Error("Unexpected error")))
+                                    }
+                                }
                             }
 
-                            is Result.Failure -> {
-                                Logger.e("Error fetching cast: ${result.error.message}")
-                                send(Result.Failure(mapCreditError(result.error as MovieDetailDomainError)))
-                            }
-
-                            else -> {
-                                Logger.e("Unexpected error while fetching cast")
-                                send(Result.Failure(ObserveMovieErrors.Error("Unexpected error")))
-                            }
+                            else -> send(Result.Success(ObserveMovieSuccess.Success(movieDetail)))
                         }
                     }
-
-                    else -> send(Result.Success(ObserveMovieSuccess.Success(movieDetail)))
-                }
             }
+
+            awaitClose { job.cancel() }
         }.flowOn(dispatcher)
     }
 
