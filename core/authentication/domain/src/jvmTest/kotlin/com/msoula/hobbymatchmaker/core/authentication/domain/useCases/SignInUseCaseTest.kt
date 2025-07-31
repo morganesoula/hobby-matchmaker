@@ -4,8 +4,13 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.fakes.FakeAuthentic
 import com.msoula.hobbymatchmaker.core.authentication.domain.fakes.FakeSessionRepository
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetIsConnectedUseCase
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.mockk.Runs
+import io.mockk.coEvery
+import io.mockk.just
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -21,10 +26,12 @@ class SignInUseCaseTest : FunSpec({
 
     val fakeSessionRepository = FakeSessionRepository()
     val fakeAuthenticationRepository = FakeAuthenticationRepository(fakeSessionRepository)
-    val useCase = SignInUseCase(dispatcher, fakeAuthenticationRepository)
+    val fakeSetIsConnectedUseCase = mockk<SetIsConnectedUseCase>()
+    val useCase = SignInUseCase(dispatcher, fakeAuthenticationRepository, fakeSetIsConnectedUseCase)
 
     test("should emit Success when sign-in is successful") {
         runTest(dispatcher) {
+            coEvery { fakeSetIsConnectedUseCase(any()) } just Runs
             val results =
                 useCase.execute(Parameters.DoubleStringParam(testEmail, testPassword)).toList()
 

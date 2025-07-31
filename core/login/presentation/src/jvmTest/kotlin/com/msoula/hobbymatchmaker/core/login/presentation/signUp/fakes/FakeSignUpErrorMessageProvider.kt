@@ -8,7 +8,7 @@ class FakeSignUpErrorMessageProvider : ErrorMessageProvider {
     override suspend fun getMessage(error: AppError): String {
         return when (error) {
             is SignUpErrors.UnknownError -> "Unknown error oopsie"
-            is SignUpErrors.EmailAlreadyExists -> "Adresse e-mail déjà utilisée"
+            is SignUpErrors.EmailAlreadyExists -> "Address already exists"
             else -> ""
         }
     }

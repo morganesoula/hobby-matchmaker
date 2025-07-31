@@ -19,6 +19,7 @@ import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventM
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiStateModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -32,14 +33,16 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalCoroutinesApi::class)
 class MovieViewModel(
     private val setMovieFavoriteUseCase: SetMovieFavoriteUseCase,
-    private val observeAllMoviesUseCase: ObserveAllMoviesUseCase,
+    observeAllMoviesUseCase: ObserveAllMoviesUseCase,
     private val getUserInfo: FetchFirebaseUserInfo,
     private val logOutUseCase: LogOutUseCase,
     private val checkMovieSynopsisValueUseCase: CheckMovieSynopsisValueUseCase,
     private val connectivityCheck: NetworkConnectivityChecker,
     private val ioDispatcher: CoroutineDispatcher,
-    private val errorMessageProvider: ErrorMessageProvider
+    private val errorMessageProvider: ErrorMessageProvider,
+    externalScope: CoroutineScope? = null
 ) : ViewModel() {
+    private val scope = externalScope ?: viewModelScope
 
     private val _oneTimeEventChannel = Channel<MovieUiEventModel>()
     val oneTimeEventChannelFlow = _oneTimeEventChannel.receiveAsFlow()
@@ -68,13 +71,13 @@ class MovieViewModel(
             }
         }
             .stateIn(
-                viewModelScope,
+                scope,
                 SharingStarted.WhileSubscribed(5000),
                 MovieUiStateModel.Loading
             )
 
     fun logOut() {
-        viewModelScope.launch {
+        scope.launch(ioDispatcher) {
             logOutUseCase(Parameters.StringParam("")).collect { result ->
                 when (result) {
                     is Result.Success -> _oneTimeEventChannel.trySend(MovieUiEventModel.OnLogOutSuccess)
@@ -96,13 +99,14 @@ class MovieViewModel(
     fun onCardEvent(event: CardEventModel) {
         when (event) {
             is CardEventModel.OnDoubleTap -> {
-                toggleFavorite(event.movie.id, !event.movie.isFavorite)
+                scope.launch(ioDispatcher) {
+                    toggleFavorite(event.movie.id, !event.movie.isFavorite)
+                }
             }
 
-            is CardEventModel.OnSingleTap -> {
-                viewModelScope.launch {
-                    sendOnce(handleSingleTap(event.movieId))
-                }
+            is CardEventModel.OnSingleTap -> scope.launch(ioDispatcher) {
+                val eventToSend = handleSingleTap(event.movieId)
+                sendOnce(eventToSend)
             }
         }
     }
@@ -118,17 +122,15 @@ class MovieViewModel(
         }
     }
 
-    private fun toggleFavorite(movieId: Long, isFavorite: Boolean) {
-        viewModelScope.launch(ioDispatcher) {
-            val uuid = getUserInfo()?.uid
-            setMovieFavoriteUseCase(uuid ?: "", movieId, isFavorite)
-        }
+    private suspend fun toggleFavorite(movieId: Long, isFavorite: Boolean) {
+        val uuid = getUserInfo()?.uid
+        setMovieFavoriteUseCase(uuid ?: "", movieId, isFavorite)
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    private fun sendOnce(event: MovieUiEventModel) {
+    private suspend fun sendOnce(event: MovieUiEventModel) {
         if (!_oneTimeEventChannel.isClosedForSend) {
-            _oneTimeEventChannel.trySend(event)
+            _oneTimeEventChannel.send(event)
         }
     }
 }

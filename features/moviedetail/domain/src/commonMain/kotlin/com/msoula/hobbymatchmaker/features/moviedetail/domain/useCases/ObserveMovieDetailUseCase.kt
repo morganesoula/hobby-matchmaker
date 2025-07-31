@@ -32,7 +32,6 @@ class ObserveMovieDetailUseCase(
             val job = launch {
                 movieDetailRepository.observeMovieDetail(parameters.longValue)
                     .collect { movieDetail ->
-
                         when {
                             movieDetail == null -> send(Result.Failure(ObserveMovieErrors.Empty))
 
@@ -132,7 +131,7 @@ sealed class ObserveMovieErrors(override val message: String) : AppError {
     data object NoConnection : ObserveMovieErrors("")
     data object CreditError : ObserveMovieErrors("")
     data object MovieDetailError : ObserveMovieErrors("")
-    data class Error(val error: String) : ObserveMovieErrors("")
+    data class Error(val error: String) : ObserveMovieErrors(error)
 }
 
 private fun mapDetailError(error: MovieDetailDomainError): ObserveMovieErrors =

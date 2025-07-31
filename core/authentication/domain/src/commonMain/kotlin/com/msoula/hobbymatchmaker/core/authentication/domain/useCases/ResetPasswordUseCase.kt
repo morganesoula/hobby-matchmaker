@@ -7,7 +7,7 @@ import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
 
 class ResetPasswordUseCase(
@@ -18,13 +18,19 @@ class ResetPasswordUseCase(
 
     override fun execute(parameters: Parameters.StringParam):
         Flow<Result<ResetPasswordSuccess, ResetPasswordErrors>> {
-        return flow {
-            emit(Result.Loading)
+        return channelFlow {
+            send(Result.Loading)
 
             when (val result = authenticationRepository.resetPassword(parameters.value)) {
-                is Result.Success -> emit(Result.Success(ResetPasswordSuccess))
-                is Result.Failure -> emit(Result.Failure(result.error))
-                else -> Unit
+                is Result.Success -> send(Result.Success(ResetPasswordSuccess))
+                is Result.Failure -> {
+                    println("Into failure branch of repository with result: $result")
+                    send(Result.Failure(result.error))
+                }
+
+                else -> {
+                    println("Into else branch of repository with result: $result")
+                }
             }
         }.flowOn(dispatcher)
     }

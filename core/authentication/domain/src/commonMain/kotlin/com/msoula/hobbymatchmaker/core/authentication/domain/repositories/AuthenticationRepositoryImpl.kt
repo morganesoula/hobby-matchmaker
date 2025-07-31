@@ -59,7 +59,7 @@ class AuthenticationRepositoryImpl(
         return remoteDataSource.signInWithEmailAndPassword(email, password)
             .mapSuccess { it }
             .mapError { error ->
-                return@mapError error
+                return@mapError error as SignInWithEmailAndPasswordError
             }
     }
 

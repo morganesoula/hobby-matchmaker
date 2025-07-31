@@ -21,18 +21,22 @@ class UnifiedSignInUseCaseTest : StringSpec({
     val dispatcher = StandardTestDispatcher()
     val fakeSessionRepository = FakeSessionRepository()
     val fakeAuthenticationRepository = FakeAuthenticationRepository(fakeSessionRepository)
-    val signInUseCase = SignInUseCase(dispatcher, fakeAuthenticationRepository)
-    val signInWithCredentialUseCase = SignInWithCredentialUseCase(fakeAuthenticationRepository)
     val setIsConnectedUseCase = SetIsConnectedUseCase(fakeSessionRepository)
+    val signInUseCase =
+        SignInUseCase(dispatcher, fakeAuthenticationRepository, setIsConnectedUseCase)
+    val signInWithCredentialUseCase = SignInWithCredentialUseCase(fakeAuthenticationRepository)
     val useCase = UnifiedSignInUseCase(
+        dispatcher,
         signInUseCase,
-        signInWithCredentialUseCase, setIsConnectedUseCase
+        signInWithCredentialUseCase,
+        setIsConnectedUseCase
     )
 
     "should emit Success when sign in with email and password is successful" {
         runTest(dispatcher) {
             val results =
-                useCase.signIn(UnifiedSignInUseCase.Params.EmailPassword(testEmail, testPassword)).toList()
+                useCase.signIn(UnifiedSignInUseCase.Params.EmailPassword(testEmail, testPassword))
+                    .toList()
 
             advanceUntilIdle()
 

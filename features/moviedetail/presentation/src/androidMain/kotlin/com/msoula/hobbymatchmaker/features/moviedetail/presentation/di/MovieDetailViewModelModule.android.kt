@@ -12,7 +12,8 @@ actual val featuresModuleMovieDetailPresentationPlatformSpecific = module {
             get(),
             get(),
             get(),
-            connectivityCheck = AndroidNetworkConnectivityChecker(get())
+            connectivityCheck = AndroidNetworkConnectivityChecker(get()),
+            get()
         )
     }
 }

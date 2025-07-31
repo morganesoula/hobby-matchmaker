@@ -10,6 +10,7 @@ import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.MovieTrai
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieDetailUseCase
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieErrors
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieSuccess
+import com.msoula.hobbymatchmaker.features.moviedetail.fakes.FakeMovieDetailErrorMessageProvider
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiEventModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailViewStateModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.toMovieDetailUiModel
@@ -31,6 +32,7 @@ class MovieDetailViewModelTest : FunSpec({
     val observeMovieDetailUseCase = mockk<ObserveMovieDetailUseCase>()
     val manageMovieTrailerUseCase = mockk<ManageMovieTrailerUseCase>()
     val connectivityCheck = mockk<NetworkConnectivityChecker>()
+    val fakeErrorMessageProvider = FakeMovieDetailErrorMessageProvider()
 
     lateinit var movieDetailVM: MovieDetailViewModel
 
@@ -49,7 +51,8 @@ class MovieDetailViewModelTest : FunSpec({
                     dispatcher,
                     observeMovieDetailUseCase,
                     manageMovieTrailerUseCase,
-                    connectivityCheck
+                    connectivityCheck,
+                    fakeErrorMessageProvider
                 )
 
                 movieDetailVM.viewState.test {
@@ -71,7 +74,8 @@ class MovieDetailViewModelTest : FunSpec({
                     dispatcher,
                     observeMovieDetailUseCase,
                     manageMovieTrailerUseCase,
-                    connectivityCheck
+                    connectivityCheck,
+                    fakeErrorMessageProvider
                 )
 
                 movieDetailVM.viewState.test {
@@ -94,7 +98,8 @@ class MovieDetailViewModelTest : FunSpec({
                     dispatcher,
                     observeMovieDetailUseCase,
                     manageMovieTrailerUseCase,
-                    connectivityCheck
+                    connectivityCheck,
+                    fakeErrorMessageProvider
                 )
 
                 movieDetailVM.viewState.test {
@@ -113,7 +118,10 @@ class MovieDetailViewModelTest : FunSpec({
                 movieDetailVM = MovieDetailViewModel(
                     42L,
                     dispatcher,
-                    observeMovieDetailUseCase, manageMovieTrailerUseCase, connectivityCheck
+                    observeMovieDetailUseCase,
+                    manageMovieTrailerUseCase,
+                    connectivityCheck,
+                    fakeErrorMessageProvider
                 )
 
                 movieDetailVM.oneTimeEventChannelFlow.test {
@@ -133,7 +141,10 @@ class MovieDetailViewModelTest : FunSpec({
                 movieDetailVM = MovieDetailViewModel(
                     42L,
                     dispatcher,
-                    observeMovieDetailUseCase, manageMovieTrailerUseCase, connectivityCheck
+                    observeMovieDetailUseCase,
+                    manageMovieTrailerUseCase,
+                    connectivityCheck,
+                    fakeErrorMessageProvider
                 )
 
                 movieDetailVM.oneTimeEventChannelFlow.test {
@@ -161,7 +172,10 @@ class MovieDetailViewModelTest : FunSpec({
                 movieDetailVM = MovieDetailViewModel(
                     42L,
                     dispatcher,
-                    observeMovieDetailUseCase, manageMovieTrailerUseCase, connectivityCheck
+                    observeMovieDetailUseCase,
+                    manageMovieTrailerUseCase,
+                    connectivityCheck,
+                    fakeErrorMessageProvider
                 )
 
                 movieDetailVM.oneTimeEventChannelFlow.test {
@@ -184,7 +198,10 @@ class MovieDetailViewModelTest : FunSpec({
                 movieDetailVM = MovieDetailViewModel(
                     42L,
                     dispatcher,
-                    observeMovieDetailUseCase, manageMovieTrailerUseCase, connectivityCheck
+                    observeMovieDetailUseCase,
+                    manageMovieTrailerUseCase,
+                    connectivityCheck,
+                    fakeErrorMessageProvider
                 )
 
                 movieDetailVM.oneTimeEventChannelFlow.test {
@@ -206,7 +223,10 @@ class MovieDetailViewModelTest : FunSpec({
                 movieDetailVM = MovieDetailViewModel(
                     42L,
                     dispatcher,
-                    observeMovieDetailUseCase, manageMovieTrailerUseCase, connectivityCheck
+                    observeMovieDetailUseCase,
+                    manageMovieTrailerUseCase,
+                    connectivityCheck,
+                    fakeErrorMessageProvider
                 )
 
                 movieDetailVM.oneTimeEventChannelFlow.test {

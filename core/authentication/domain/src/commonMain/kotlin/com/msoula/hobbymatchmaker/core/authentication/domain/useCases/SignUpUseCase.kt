@@ -10,7 +10,7 @@ import com.msoula.hobbymatchmaker.core.session.domain.models.SessionUserDomainMo
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.CreateUserUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
 
 class SignUpUseCase(
@@ -22,16 +22,15 @@ class SignUpUseCase(
     override fun execute(parameters: Parameters.DoubleStringParam): Flow<Result<SignUpSuccess, SignUpErrors>> {
         val email = parameters.firstValue
 
-        return flow {
-            emit(Result.Loading)
+        return channelFlow {
+            send(Result.Loading)
 
-            when (val result =
-                authenticationRepository.signUp(email, parameters.secondValue)) {
+            when (val result = authenticationRepository.signUp(email, parameters.secondValue)) {
                 is Result.Success -> when (val creatingUserResult = createUserUseCase(
                     SessionUserDomainModel(uid = result.data, email = email)
                 )) {
-                    is Result.Success -> emit(Result.Success(SignUpSuccess(result.data)))
-                    is Result.Failure -> emit(
+                    is Result.Success -> send(Result.Success(SignUpSuccess(result.data)))
+                    is Result.Failure -> send(
                         Result.Failure(
                             SignUpErrors.CreateUserError.SaveError(creatingUserResult.error.message)
                         )
@@ -50,7 +49,7 @@ class SignUpUseCase(
                         else -> SignUpErrors.UnknownError(e.message)
                     }
 
-                    emit(Result.Failure(error))
+                    send(Result.Failure(error))
                 }
 
                 is Result.Loading -> Unit

@@ -6,7 +6,6 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                // com.msoula.convention.Modules
                 implementation(project(Modules.COMMON))
             }
         }

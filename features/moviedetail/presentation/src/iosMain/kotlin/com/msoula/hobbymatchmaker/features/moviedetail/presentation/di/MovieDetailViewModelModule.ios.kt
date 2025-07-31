@@ -12,7 +12,8 @@ actual val featuresModuleMovieDetailPresentationPlatformSpecific = module {
             get(),
             get(),
             get(),
-            connectivityCheck = IOSNetworkConnectivityChecker()
+            connectivityCheck = IOSNetworkConnectivityChecker(),
+            get()
         )
     }
 }

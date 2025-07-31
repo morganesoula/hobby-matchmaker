@@ -13,6 +13,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationU
 import com.msoula.hobbymatchmaker.core.login.presentation.models.SignUpEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.signUp.models.SignUpStateModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,8 +29,10 @@ class SignUpViewModel(
     private val loginValidateFormUseCase: LoginValidateFormUseCase,
     private val signUpUseCase: SignUpUseCase,
     private val errorMessageProvider: ErrorMessageProvider,
-    private val ioDispatcher: CoroutineDispatcher
+    private val ioDispatcher: CoroutineDispatcher,
+    externalScope: CoroutineScope? = null
 ) : ViewModel() {
+    private val scope = externalScope ?: viewModelScope
 
     private val _formDataFlow = MutableStateFlow(SignUpStateModel())
     val formDataFlow = _formDataFlow.asStateFlow()
@@ -41,7 +44,7 @@ class SignUpViewModel(
     val signUpState: StateFlow<SignUpEvent> = _signUpState.asStateFlow()
 
     init {
-        viewModelScope.launch {
+        scope.launch {
             formDataFlow
                 .debounce(250.milliseconds)
                 .collectLatest { newState ->
@@ -62,7 +65,12 @@ class SignUpViewModel(
             is AuthenticationUIEvent.OnPasswordChanged ->
                 _formDataFlow.update { it.copy(password = event.password.trim()) }
 
-            AuthenticationUIEvent.OnSignUp -> createFirebaseAccount()
+            AuthenticationUIEvent.OnSignUp -> {
+                scope.launch(ioDispatcher) {
+                    createFirebaseAccount()
+                }
+            }
+
             else -> Unit
         }
     }
@@ -87,28 +95,26 @@ class SignUpViewModel(
     }
 
     @VisibleForTesting
-    internal fun createFirebaseAccount() {
-        viewModelScope.launch(ioDispatcher) {
-            signUpUseCase(
-                Parameters.DoubleStringParam(
-                    formDataFlow.value.email,
-                    formDataFlow.value.password
-                )
-            ).collectLatest { result ->
-                _signUpState.update {
-                    when (result) {
-                        is Result.Success -> SignUpEvent.Success
+    internal suspend fun createFirebaseAccount() {
+        signUpUseCase(
+            Parameters.DoubleStringParam(
+                formDataFlow.value.email,
+                formDataFlow.value.password
+            )
+        ).collect { result ->
+            _signUpState.update {
+                when (result) {
+                    is Result.Success -> SignUpEvent.Success
 
-                        is Result.Loading -> {
-                            _isLoading.update { true }
-                            SignUpEvent.Loading
-                        }
+                    is Result.Loading -> {
+                        _isLoading.update { true }
+                        SignUpEvent.Loading
+                    }
 
-                        is Result.Failure -> {
-                            _isLoading.update { false }
-                            val errorMessage = handleSignUpError(result.error)
-                            SignUpEvent.Error(errorMessage)
-                        }
+                    is Result.Failure -> {
+                        _isLoading.update { false }
+                        val errorMessage = handleSignUpError(result.error)
+                        SignUpEvent.Error(errorMessage)
                     }
                 }
             }

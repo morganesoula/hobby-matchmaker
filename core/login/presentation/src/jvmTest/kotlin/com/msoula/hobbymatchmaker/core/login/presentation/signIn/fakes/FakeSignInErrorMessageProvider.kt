@@ -9,6 +9,7 @@ class FakeSignInErrorMessageProvider : ErrorMessageProvider {
     override suspend fun getMessage(error: AppError): String {
         return when (error) {
             is SignInError.WrongPassword -> "wrong password error"
+            is SignInError.UserNotFound -> "user not found"
             is SignInError.Other -> "Simulated sign-in error"
             is ResetPasswordError.Other -> "unknown error while resetting"
             else -> "random error"

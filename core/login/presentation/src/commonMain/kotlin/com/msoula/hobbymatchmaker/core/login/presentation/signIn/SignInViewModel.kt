@@ -22,7 +22,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -33,7 +32,7 @@ class SignInViewModel(
     private val socialClients: Map<ProviderType, SocialUIClient>,
     private val ioDispatcher: CoroutineDispatcher,
     private val errorMessageProvider: ErrorMessageProvider,
-    private val externalScope: CoroutineScope? = null
+    externalScope: CoroutineScope? = null
 ) : ViewModel() {
     private val scope = externalScope ?: viewModelScope
 
@@ -82,24 +81,33 @@ class SignInViewModel(
                 openResetDialog.update { false }
 
             AuthenticationUIEvent.OnGoogleButtonClicked ->
-                launchSocialSignIn(ProviderType.GOOGLE)
+                scope.launch(ioDispatcher) {
+                    launchSocialSignIn(ProviderType.GOOGLE)
+                }
 
             AuthenticationUIEvent.OnAppleButtonClicked ->
-                launchSocialSignIn(ProviderType.APPLE)
+                scope.launch(ioDispatcher) {
+                    launchSocialSignIn(ProviderType.APPLE)
+                }
 
             is AuthenticationUIEvent.OnFacebookButtonClicked ->
-                launchSocialSignIn(ProviderType.FACEBOOK, event.credential)
+                scope.launch(ioDispatcher) {
+                    launchSocialSignIn(ProviderType.FACEBOOK, event.credential)
+                }
 
-            AuthenticationUIEvent.OnResetPasswordConfirmed ->
-                scope.launch { resetPassword() }
+            AuthenticationUIEvent.OnResetPasswordConfirmed -> {
+                scope.launch(ioDispatcher) { resetPassword() }
+            }
 
             AuthenticationUIEvent.OnSignIn ->
-                signInUnified(
-                    UnifiedSignInUseCase.Params.EmailPassword(
-                        email = formDataFlow.value.email,
-                        password = formDataFlow.value.password
+                scope.launch(ioDispatcher) {
+                    signInUnified(
+                        UnifiedSignInUseCase.Params.EmailPassword(
+                            email = formDataFlow.value.email,
+                            password = formDataFlow.value.password
+                        )
                     )
-                )
+                }
 
             else -> Unit
         }
@@ -117,10 +125,10 @@ class SignInViewModel(
     private fun validateEmailReset(emailReset: String): Boolean =
         authFormValidationUseCases.validateEmailUseCase(emailReset).successful
 
-    private fun signInUnified(params: UnifiedSignInUseCase.Params) {
-        scope.launch(ioDispatcher) {
-            unifiedSignInUseCase.signIn(params).collectLatest { result ->
-                _signInState.value = when (result) {
+    private suspend fun signInUnified(params: UnifiedSignInUseCase.Params) {
+        unifiedSignInUseCase.signIn(params).collect { result ->
+            _signInState.update {
+                when (result) {
                     is Result.Loading -> {
                         circularProgressLoading.value = true
                         SignInEvent.Loading
@@ -135,6 +143,7 @@ class SignInViewModel(
                     is Result.Failure -> {
                         circularProgressLoading.value = false
                         isSignIn = false
+
                         val message = handleError(result.error)
                         SignInEvent.Error(message)
                     }
@@ -143,28 +152,26 @@ class SignInViewModel(
         }
     }
 
-    private fun launchSocialSignIn(
+    private suspend fun launchSocialSignIn(
         providerType: ProviderType,
         fetchedCredential: AuthCredential? = null
     ) {
         if (isSignIn) return
         isSignIn = true
 
-        scope.launch(ioDispatcher) {
-            val client = socialClients[providerType]
-            val credential = fetchedCredential ?: client?.getCredential()
+        val client = socialClients[providerType]
+        val credential = fetchedCredential ?: client?.getCredential()
 
-            if (credential != null) {
-                signInUnified(
-                    UnifiedSignInUseCase.Params.SocialMedia(
-                        credential, providerType
-                    )
+        if (credential != null) {
+            signInUnified(
+                UnifiedSignInUseCase.Params.SocialMedia(
+                    credential, providerType
                 )
-            } else {
-                Logger.e("Could not load social credentials")
-                _signInState.value = SignInEvent.Error("Unable to get credentials")
-                isSignIn = false
-            }
+            )
+        } else {
+            Logger.e("Could not load social credentials")
+            _signInState.value = SignInEvent.Error("Unable to get credentials")
+            isSignIn = false
         }
     }
 

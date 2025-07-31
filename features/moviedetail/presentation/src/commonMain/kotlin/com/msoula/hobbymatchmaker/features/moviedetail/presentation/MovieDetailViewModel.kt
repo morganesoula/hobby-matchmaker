@@ -3,6 +3,8 @@ package com.msoula.hobbymatchmaker.features.moviedetail.presentation
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.ErrorMessageProvider
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
@@ -31,7 +33,8 @@ class MovieDetailViewModel(
     private val ioDispatcher: CoroutineDispatcher,
     observeMovieDetailUseCase: ObserveMovieDetailUseCase,
     private val manageMovieTrailerUseCase: ManageMovieTrailerUseCase,
-    private val connectivityCheck: NetworkConnectivityChecker
+    private val connectivityCheck: NetworkConnectivityChecker,
+    private val errorMessageProvider: ErrorMessageProvider
 ) : ViewModel() {
 
     private val _oneTimeEventChannel = Channel<MovieDetailUiEventModel>()
@@ -56,7 +59,10 @@ class MovieDetailViewModel(
                         }
                     }
 
-                    is Result.Failure -> MovieDetailViewStateModel.Error(result.error.message)
+                    is Result.Failure -> {
+                        val errorMessage = handleError(result.error)
+                        MovieDetailViewStateModel.Error(errorMessage)
+                    }
                 }
             }
             .stateIn(
@@ -130,4 +136,7 @@ class MovieDetailViewModel(
             _oneTimeEventChannel.send(event)
         }
     }
+
+    private suspend fun handleError(error: AppError): String =
+        errorMessageProvider.getMessage(error)
 }
