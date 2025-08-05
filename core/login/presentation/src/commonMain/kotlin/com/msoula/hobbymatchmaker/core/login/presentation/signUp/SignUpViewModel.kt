@@ -71,6 +71,8 @@ class SignUpViewModel(
                 }
             }
 
+            AuthenticationUIEvent.OnScreenChanged -> resetForm()
+
             else -> Unit
         }
     }
@@ -123,4 +125,8 @@ class SignUpViewModel(
 
     private suspend fun handleSignUpError(error: AppError): String =
         errorMessageProvider.getMessage(error)
+
+    private fun resetForm() {
+        _formDataFlow.update { SignUpStateModel() }
+    }
 }

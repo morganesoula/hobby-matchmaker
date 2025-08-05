@@ -13,8 +13,8 @@ import org.koin.dsl.module
 val coreModuleAuthenticationData = module {
     single { Firebase.auth }
     single { Firebase.firestore }
-
     includes(coreModuleAuthenticationDataPlatformSpecific)
+
     singleOf(::AuthenticationRemoteDataSourceImpl) bind AuthenticationRemoteDataSource::class
 }
 

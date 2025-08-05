@@ -55,7 +55,7 @@ class MovieRemoteDataSourceImpl(
     private suspend fun fetchMoviesByPage(
         language: String,
         page: Int
-    ): Result<List<MovieDomainModel>, MovieErrors.FetchMovieByPageError> {
+    ): Result<List<MovieDomainModel>, MovieErrors> {
         return try {
             when (val response = tmdbKtorService.getMoviesByPopularityDesc(language, page)) {
                 is Result.Success -> {

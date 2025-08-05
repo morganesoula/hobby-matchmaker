@@ -10,4 +10,11 @@
     <string name="connection_issue">Connection issue. Please check your network</string>
     <string name="credit_error">No cast found</string>
     <string name="back">Back</string>
+
+    <string name="movie_rumored">Rumored</string>
+    <string name="movie_planned">Planned</string>
+    <string name="movie_in_production">In Production</string>
+    <string name="movie_post_production">Post Production</string>
+    <string name="movie_released">Released</string>
+    <string name="movie_canceled">Canceled</string>
 </resources>

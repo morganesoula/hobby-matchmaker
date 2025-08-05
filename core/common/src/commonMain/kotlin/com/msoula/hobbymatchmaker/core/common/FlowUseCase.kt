@@ -16,11 +16,12 @@ abstract class FlowUseCase<in Parameters, Success, BusinessRuleError>(private va
     operator fun invoke(parameters: Parameters): Flow<Result<Success, BusinessRuleError>> {
         return execute(parameters)
             .catch { e ->
+                @Suppress("UNCHECKED_CAST")
                 emit(
                     Result.Failure(
                         FlowUseCaseError(
                             e.message ?: "An error occurred while executing the use case"
-                        )
+                        ) as BusinessRuleError
                     )
                 )
             }

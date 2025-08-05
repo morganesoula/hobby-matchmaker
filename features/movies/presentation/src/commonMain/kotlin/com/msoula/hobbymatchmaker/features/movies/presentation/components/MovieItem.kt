@@ -36,6 +36,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -143,7 +146,9 @@ fun MovieItemContent(
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            modifier = Modifier.width(270.dp),
+            modifier = Modifier
+                .width(270.dp)
+                .semantics { contentDescription = "movieTitle" },
             text = movie.title,
             fontSize = 20.sp,
             color = MaterialTheme.colorScheme.onBackground,
@@ -198,6 +203,7 @@ fun MovieItemContentCard(
                     }
                 )
             }
+            .testTag(movie.title + "1")
     ) {
         Image(
             painter = painter,

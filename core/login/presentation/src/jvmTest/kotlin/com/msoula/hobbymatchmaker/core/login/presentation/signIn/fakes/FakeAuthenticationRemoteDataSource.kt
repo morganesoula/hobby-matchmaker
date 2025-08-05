@@ -58,10 +58,10 @@ class FakeAuthenticationRemoteDataSource(
     override suspend fun resetPassword(email: String): Result<Boolean, ResetPasswordError> =
         resetPasswordResult
 
-    override suspend fun getUserUid(): String? = "test-uid"
+    override suspend fun getUserUid(): String = "test-uid"
 
     override suspend fun isFirstSignIn(uid: String): Boolean = isFirstSignValue
 
-    override suspend fun fetchFirebaseUserInfo(): FirebaseUserInfoDomainModel? =
+    override suspend fun fetchFirebaseUserInfo(): FirebaseUserInfoDomainModel =
         FirebaseUserInfoDomainModel("test-uid", "test-email", emptyList())
 }

@@ -23,6 +23,8 @@ sealed interface AuthenticationUIEvent {
 
     data object OnResetPasswordConfirmed : AuthenticationUIEvent
 
+    data object OnScreenChanged : AuthenticationUIEvent
+
     data object OnSignUp : AuthenticationUIEvent
 
     data object OnSignIn : AuthenticationUIEvent

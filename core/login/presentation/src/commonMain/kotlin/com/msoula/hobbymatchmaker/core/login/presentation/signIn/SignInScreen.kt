@@ -213,6 +213,7 @@ fun SignInScreenContent(
                         .padding(bottom = 8.dp)
             ) {
                 AnnotatedStringWithLinkAnnotation(isSystemInDarkTheme()) {
+                    signInViewModel.onEvent(AuthenticationUIEvent.OnScreenChanged)
                     redirectToSignUpScreen()
                 }
             }

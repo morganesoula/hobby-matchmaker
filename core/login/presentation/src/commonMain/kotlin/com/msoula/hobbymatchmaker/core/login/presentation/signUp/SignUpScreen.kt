@@ -105,6 +105,7 @@ fun SignUpScreenContent(
                     snackBarHostState.showSnackbar(state.message)
                 }
             }
+
             else -> Unit
         }
     }
@@ -148,7 +149,10 @@ fun SignUpScreenContent(
 
             SignUpScreenBottomContent(
                 redirectText = annotatedString,
-                redirectToLogInScreen = { redirectToSignInScreen() })
+                redirectToLogInScreen = {
+                    signUpViewModel.onEvent(AuthenticationUIEvent.OnScreenChanged)
+                    redirectToSignInScreen()
+                })
         }
     }
 }

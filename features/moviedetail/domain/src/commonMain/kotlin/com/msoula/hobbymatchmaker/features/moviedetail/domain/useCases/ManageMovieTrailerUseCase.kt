@@ -59,7 +59,12 @@ class ManageMovieTrailerUseCase(
                             )
                         }
 
-                        is Result.Failure -> Result.Failure(updateResult.error)
+                        is Result.Failure -> Result.Failure(
+                            FetchingTrailerError.TrailerUpdateError(
+                                updateResult.error.message
+                            )
+                        )
+
                         is Result.Loading -> Result.Loading
                     }
                 } else {

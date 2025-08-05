@@ -8,7 +8,6 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ResetPassw
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.UnifiedSignInUseCase
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.ErrorMessageProvider
-import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.di.domain.useCases.AuthFormValidationUseCase
@@ -109,6 +108,8 @@ class SignInViewModel(
                     )
                 }
 
+            AuthenticationUIEvent.OnScreenChanged -> resetForm()
+
             else -> Unit
         }
     }
@@ -169,7 +170,6 @@ class SignInViewModel(
                 )
             )
         } else {
-            Logger.e("Could not load social credentials")
             _signInState.value = SignInEvent.Error("Unable to get credentials")
             isSignIn = false
         }
@@ -201,5 +201,9 @@ class SignInViewModel(
 
     fun resetSignInState() {
         _signInState.value = SignInEvent.Idle
+    }
+
+    fun resetForm() {
+        _formDataFlow.update { SignInFormStateModel() }
     }
 }

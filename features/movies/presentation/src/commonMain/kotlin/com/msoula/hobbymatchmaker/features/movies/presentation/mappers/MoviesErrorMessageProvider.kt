@@ -10,12 +10,13 @@ import com.msoula.hobbymatchmaker.features.movies.presentation.movies_unknown_er
 import org.jetbrains.compose.resources.getString
 
 class MoviesErrorMessageProvider : ErrorMessageProvider {
-    override suspend fun getMessage(error: AppError): String {
-        return when (error) {
+    override suspend fun getMessage(error: AppError): String =
+        when (error) {
             is ObserveAllMoviesErrors.NetworkError -> getString(Res.string.movies_network_error)
             is ObserveAllMoviesErrors.ApiError -> getString(Res.string.movies_api_error)
             is ObserveAllMoviesErrors.UnknownError -> getString(Res.string.movies_unknown_error)
             else -> error.message
         }
-    }
 }
+
+

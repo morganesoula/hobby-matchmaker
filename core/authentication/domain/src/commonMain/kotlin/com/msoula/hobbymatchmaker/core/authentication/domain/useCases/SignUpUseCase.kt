@@ -6,6 +6,7 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.FlowUseCase
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.core.session.domain.errors.SessionErrors
 import com.msoula.hobbymatchmaker.core.session.domain.models.SessionUserDomainModel
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.CreateUserUseCase
 import kotlinx.coroutines.CoroutineDispatcher
@@ -26,35 +27,46 @@ class SignUpUseCase(
             send(Result.Loading)
 
             when (val result = authenticationRepository.signUp(email, parameters.secondValue)) {
-                is Result.Success -> when (val creatingUserResult = createUserUseCase(
-                    SessionUserDomainModel(uid = result.data, email = email)
-                )) {
-                    is Result.Success -> send(Result.Success(SignUpSuccess(result.data)))
-                    is Result.Failure -> send(
-                        Result.Failure(
-                            SignUpErrors.CreateUserError.SaveError(creatingUserResult.error.message)
+                is Result.Success -> {
+                    when (val creatingUserResult = createUserUseCase(
+                        SessionUserDomainModel(uid = result.data, email = email)
+                    )) {
+                        is Result.Success -> send(Result.Success(SignUpSuccess(result.data)))
+                        is Result.Failure -> send(
+                            Result.Failure(
+                                mapCreateUserError(
+                                    creatingUserResult.error
+                                )
+                            )
                         )
-                    )
 
-                    else -> Unit
+                        is Result.Loading -> Unit
+                    }
                 }
 
                 is Result.Failure -> {
-                    val error: AppError = when (val e = result.error) {
-                        is CreateUserWithEmailAndPasswordError.EmailAlreadyExists -> SignUpErrors.EmailAlreadyExists
-                        is CreateUserWithEmailAndPasswordError.UserDisabled -> SignUpErrors.UserDisabled
-                        is CreateUserWithEmailAndPasswordError.TooManyRequests -> SignUpErrors.TooManyRequests
-                        is CreateUserWithEmailAndPasswordError.InternalError -> SignUpErrors.InternalError
-                        is CreateUserWithEmailAndPasswordError.Connection -> SignUpErrors.Connection
-                        else -> SignUpErrors.UnknownError(e.message)
-                    }
-
-                    send(Result.Failure(error))
+                    send(Result.Failure(mapSignUpError(result.error)))
                 }
 
                 is Result.Loading -> Unit
             }
         }.flowOn(dispatcher)
+    }
+}
+
+private fun mapSignUpError(error: AppError): SignUpErrors = when (error) {
+    is CreateUserWithEmailAndPasswordError.EmailAlreadyExists -> SignUpErrors.EmailAlreadyExists
+    is CreateUserWithEmailAndPasswordError.UserDisabled -> SignUpErrors.UserDisabled
+    is CreateUserWithEmailAndPasswordError.TooManyRequests -> SignUpErrors.TooManyRequests
+    is CreateUserWithEmailAndPasswordError.InternalError -> SignUpErrors.InternalError
+    is CreateUserWithEmailAndPasswordError.Connection -> SignUpErrors.Connection
+    else -> SignUpErrors.UnknownError(error.message)
+}
+
+private fun mapCreateUserError(error: SessionErrors.CreateUserError): SignUpErrors {
+    return when (error) {
+        is SessionErrors.CreateUserError.SaveError ->
+            SignUpErrors.UnknownError(error.message)
     }
 }
 
@@ -67,8 +79,4 @@ sealed class SignUpErrors(override val message: String) : AppError {
     data object InternalError : SignUpErrors("")
     data object Connection : SignUpErrors("")
     data class UnknownError(override val message: String) : SignUpErrors("")
-    sealed class CreateUserError(override val message: String) : AppError {
-        data class SaveError(val saveErrorMessage: String) :
-            CreateUserError(saveErrorMessage)
-    }
 }

@@ -11,8 +11,7 @@ class FakeMovieRemoteDataSource(
     private val fetchMoviesResult: Result<List<MovieDomainModel>, MovieErrors> =
         Result.Success(emptyList())
 ) : MovieRemoteDataSource {
-    private val movies = MutableStateFlow<List<MovieDomainModel>>(emptyList())
-    val currentMovie = MutableStateFlow(MovieDomainModel())
+    private val currentMovie = MutableStateFlow(MovieDomainModel())
 
     override suspend fun fetchMovies(language: String):
         Result<List<MovieDomainModel>, MovieErrors> = fetchMoviesResult

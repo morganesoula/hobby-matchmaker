@@ -8,7 +8,6 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SignInWithEm
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SocialMediaError
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
-import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.mapError
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
@@ -26,7 +25,6 @@ class AuthenticationRepositoryImpl(
                 }
 
                 is Result.Failure -> {
-                    Logger.d("Error in Repository - ${result.error}")
                     Result.Failure(result.error)
                 }
             }
@@ -59,7 +57,7 @@ class AuthenticationRepositoryImpl(
         return remoteDataSource.signInWithEmailAndPassword(email, password)
             .mapSuccess { it }
             .mapError { error ->
-                return@mapError error as SignInWithEmailAndPasswordError
+                return@mapError error
             }
     }
 

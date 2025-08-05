@@ -15,7 +15,6 @@ class HobbyMatchMakerApplication : Application() {
         super.onCreate()
         initLogger()
         initFirebase()
-
         startKoin {
             androidContext(this@HobbyMatchMakerApplication)
             modules(

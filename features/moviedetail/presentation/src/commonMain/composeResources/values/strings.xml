@@ -10,4 +10,12 @@
     <string name="connection_issue">Problème de connexion. Veuillez vérifier votre réseau</string>
     <string name="credit_error">Aucun casting de trouvé</string>
     <string name="back">Retour</string>
+
+
+    <string name="movie_rumored">Rumeur</string>
+    <string name="movie_planned">Prévu</string>
+    <string name="movie_in_production">En production</string>
+    <string name="movie_post_production">Post-production</string>
+    <string name="movie_released">Sorti</string>
+    <string name="movie_canceled">Annulé</string>
 </resources>

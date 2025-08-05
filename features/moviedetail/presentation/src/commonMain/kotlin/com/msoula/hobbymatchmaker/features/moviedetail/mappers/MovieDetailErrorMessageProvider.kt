@@ -10,12 +10,12 @@ import com.msoula.hobbymatchmaker.features.moviedetail.presentation.no_data
 import org.jetbrains.compose.resources.getString
 
 class MovieDetailErrorMessageProvider : ErrorMessageProvider {
-    override suspend fun getMessage(error: AppError): String {
-        return when (error) {
+    override suspend fun getMessage(error: AppError): String =
+        when (error) {
             is ObserveMovieErrors.Empty -> getString(Res.string.no_data)
             is ObserveMovieErrors.CreditError -> getString(Res.string.credit_error)
             is ObserveMovieErrors.NoConnection -> getString(Res.string.connection_issue)
             else -> error.message
         }
-    }
 }
+

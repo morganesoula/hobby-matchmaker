@@ -1,7 +1,5 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.domain.repositories
 
-import com.msoula.hobbymatchmaker.core.common.AppError
-import com.msoula.hobbymatchmaker.core.common.ExternalServiceError
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.safeCall
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.dataSources.local.MovieDetailLocalDataSource
@@ -39,14 +37,19 @@ class MovieDetailRepositoryImpl(
                                 status = data.status,
                             )
                         )
-                    } ?: Result.Failure(EmptyDataError("Empty data after successful fetch"))
+                    }
+                        ?: Result.Failure(MovieDetailDomainError.EmptyDataError("Empty data after successful fetch"))
                 }
 
                 is Result.Failure -> Result.Failure(result.error)
                 Result.Loading -> Result.Loading
             }
         } catch (e: Exception) {
-            Result.Failure(ExternalServiceError(e.message ?: "Unknown error"))
+            Result.Failure(
+                MovieDetailDomainError.ExternalServiceError(
+                    e.message ?: "Unknown error"
+                )
+            )
         }
     }
 
@@ -62,11 +65,16 @@ class MovieDetailRepositoryImpl(
                 is Result.Success -> {
                     Result.Success(result.data?.cast)
                 }
+
                 is Result.Failure -> Result.Failure(result.error)
                 is Result.Loading -> Result.Loading
             }
         } catch (e: Exception) {
-            Result.Failure(ExternalServiceError(e.message ?: "Unknown error"))
+            Result.Failure(
+                MovieDetailDomainError.ExternalServiceError(
+                    e.message ?: "Unknown error"
+                )
+            )
         }
     }
 
@@ -99,5 +107,3 @@ class MovieDetailRepositoryImpl(
         return movieDetailRemoteDataSource.fetchMovieTrailer(movieId, language)
     }
 }
-
-data class EmptyDataError(override val message: String) : AppError

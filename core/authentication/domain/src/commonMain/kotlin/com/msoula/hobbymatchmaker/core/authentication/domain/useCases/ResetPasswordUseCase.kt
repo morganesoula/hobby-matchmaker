@@ -23,14 +23,13 @@ class ResetPasswordUseCase(
 
             when (val result = authenticationRepository.resetPassword(parameters.value)) {
                 is Result.Success -> send(Result.Success(ResetPasswordSuccess))
-                is Result.Failure -> {
-                    println("Into failure branch of repository with result: $result")
-                    send(Result.Failure(result.error))
-                }
+                is Result.Failure -> send(
+                    Result.Failure(
+                        ResetPasswordErrors(result.error.message)
+                    )
+                )
 
-                else -> {
-                    println("Into else branch of repository with result: $result")
-                }
+                else -> Unit
             }
         }.flowOn(dispatcher)
     }

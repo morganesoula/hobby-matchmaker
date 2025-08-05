@@ -30,13 +30,13 @@ class SignInUseCase(
                     setIsConnectedUseCase(true)
                     send(Result.Success(SignInSuccess))
                 }
-                is Result.Failure -> {
-                    send(
-                        Result.Failure(
-                            mapSignInError(result.error)
-                        )
+
+                is Result.Failure -> send(
+                    Result.Failure(
+                        mapSignInError(result.error)
                     )
-                }
+                )
+
 
                 else -> Unit
             }
@@ -53,10 +53,11 @@ sealed class SignInError(override val message: String) : AppError {
     data class Other(val customErrorMessage: String) : SignInError(customErrorMessage)
 }
 
-private fun mapSignInError(error: AppError): SignInError = when (error) {
-    is SignInWithEmailAndPasswordError.UserNotFound -> SignInError.UserNotFound
-    is SignInWithEmailAndPasswordError.WrongPassword -> SignInError.WrongPassword
-    is SignInWithEmailAndPasswordError.UserDisabled -> SignInError.UserDisabled
-    is SignInWithEmailAndPasswordError.TooManyRequests -> SignInError.TooManyRequests
-    else -> SignInError.Other(error.message)
-}
+private fun mapSignInError(error: AppError): SignInError =
+    when (error) {
+        is SignInWithEmailAndPasswordError.UserNotFound -> SignInError.UserNotFound
+        is SignInWithEmailAndPasswordError.WrongPassword -> SignInError.WrongPassword
+        is SignInWithEmailAndPasswordError.UserDisabled -> SignInError.UserDisabled
+        is SignInWithEmailAndPasswordError.TooManyRequests -> SignInError.TooManyRequests
+        else -> SignInError.Other(error.message)
+    }
