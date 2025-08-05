@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     // GENERAL
-    <string name="welcome_title">Welcome to\n\nHobbyMatchMaker</string>
-    <string name="welcome_back_title">Welcome back to\n\nHobbyMatchMaker</string>
+    <string name="welcome_title">Welcome!</string>
+    <string name="welcome_subtitle">Create your HobbyMatchMaker account</string>
+    <string name="welcome_back_title">Welcome back!</string>
+    <string name="welcome_back_subtitle">Sign in to HobbyMatchMaker</string>
 
     // ACCESSIBILITY
     <string name="facebook_alt">Facebook logo</string>
@@ -33,6 +35,8 @@
     <string name="continue_with_rs">Or continue with</string>
     <string name="show_password">Show password</string>
     <string name="hide_password">Hide password</string>
+    <string name="sign_in_with_facebook">Sign in with Facebook</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
 
     // ERROR
     <string name="login_error">Incorrect email or password</string>
@@ -46,4 +50,7 @@
     <string name="malformed_sign_in_error">Oops, please check your credentials</string>
     <string name="connection_issue">Connection issue. Please check your network</string>
     <string name="rest_password_other_error">An error occurred. Please contact the development team.</string>
+
+    // OTHER
+    <string name="continue_as_guest_title">Continue as guest</string>
 </resources>

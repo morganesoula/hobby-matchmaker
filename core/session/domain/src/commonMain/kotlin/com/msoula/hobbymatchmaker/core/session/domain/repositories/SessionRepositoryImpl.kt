@@ -17,4 +17,8 @@ class SessionRepositoryImpl(
 
     override suspend fun createUser(user: SessionUserDomainModel) =
         sessionRemoteDataSource.createUser(user)
+
+    override suspend fun setIsGuest(isGuest: Boolean) {
+        sessionLocalDataSource.setIsGuest(isGuest)
+    }
 }

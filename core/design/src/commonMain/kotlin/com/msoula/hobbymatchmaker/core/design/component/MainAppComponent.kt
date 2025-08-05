@@ -1,32 +1,53 @@
 package com.msoula.hobbymatchmaker.core.design.component
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+
+@Composable
+fun HeaderTitleTextComponent(
+    title: String,
+) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.headlineSmall,
+        color = MaterialTheme.colorScheme.onBackground
+    )
+}
+
+@Composable
+fun HeaderSubtitleTextComponent(
+    subtitle: String
+) {
+    Text(
+        text = subtitle,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onBackground
+    )
+}
 
 @Composable
 fun HeaderTextComponent(
     modifier: Modifier = Modifier,
-    text: String,
+    title: String,
+    subtitle: String? = null
 ) {
-    Spacer(modifier = modifier.height(40.dp))
-
-    Text(
-        modifier =
-        modifier
+    Column(
+        modifier = modifier
             .fillMaxWidth()
-            .padding(top = 16.dp),
-        text = text,
-        fontSize = 28.sp,
-        textAlign = TextAlign.Center,
-    )
-
-    Spacer(modifier = modifier.height(40.dp))
+            .padding(horizontal = 24.dp, vertical = 32.dp)
+    ) {
+        HeaderTitleTextComponent(title = title)
+        subtitle?.let {
+            Spacer(modifier = Modifier.height(8.dp))
+            HeaderSubtitleTextComponent(subtitle = it)
+        }
+    }
 }

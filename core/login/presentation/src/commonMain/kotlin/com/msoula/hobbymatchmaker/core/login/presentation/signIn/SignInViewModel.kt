@@ -206,4 +206,8 @@ class SignInViewModel(
     fun resetForm() {
         _formDataFlow.update { SignInFormStateModel() }
     }
+
+    fun onContinueAsGuest() {
+
+    }
 }

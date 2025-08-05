@@ -1,19 +1,22 @@
 package com.msoula.hobbymatchmaker.features.movies.presentation.components
 
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -21,6 +24,7 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,12 +38,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -138,25 +140,13 @@ fun MovieItemContent(
                 .scale(scale)
                 .zIndex(scale * 10),
             shape = RoundedCornerShape(5),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = if (scale > 1f) 12.dp else 4.dp
+            ),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
         ) {
             MovieItemContentCard(modifier, movie, onCardEvent, painter)
         }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Text(
-            modifier = Modifier
-                .width(270.dp)
-                .semantics { contentDescription = "movieTitle" },
-            text = movie.title,
-            fontSize = 20.sp,
-            color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.bodyMedium,
-            maxLines = 3,
-            overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Center
-        )
     }
 }
 
@@ -168,23 +158,34 @@ fun MovieItemContentCard(
     painter: AsyncImagePainter
 ) {
     var showBigHeart by remember { mutableStateOf(false) }
-    var pulse by remember { mutableStateOf(false) }
-    val animationDelay = 600L
+    var animateFavorite by remember { mutableStateOf(false) }
 
-    val heartScaleAnimation by animateFloatAsState(
-        targetValue = if (showBigHeart || pulse) 2f else 1f,
-        animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing), label = ""
+    val bigHeartScale by animateFloatAsState(
+        targetValue = if (showBigHeart) 2f else 0f,
+        animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing),
+        label = ""
     )
 
-    LaunchedEffect(showBigHeart, pulse) {
+    val favoriteScale by animateFloatAsState(
+        targetValue = if (animateFavorite) 1.2f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = ""
+    )
+
+    LaunchedEffect(showBigHeart) {
         if (showBigHeart) {
-            delay(animationDelay)
+            delay(600)
             showBigHeart = false
         }
+    }
 
-        if (pulse) {
-            delay(animationDelay)
-            pulse = false
+    LaunchedEffect(animateFavorite) {
+        if (animateFavorite) {
+            delay(300)
+            animateFavorite = false
         }
     }
 
@@ -195,7 +196,6 @@ fun MovieItemContentCard(
                 detectTapGestures(
                     onDoubleTap = {
                         showBigHeart = true
-                        pulse = true
                         onCardEvent(CardEventModel.OnDoubleTap(movie))
                     },
                     onTap = {
@@ -203,7 +203,6 @@ fun MovieItemContentCard(
                     }
                 )
             }
-            .testTag(movie.title + "1")
     ) {
         Image(
             painter = painter,
@@ -213,25 +212,64 @@ fun MovieItemContentCard(
                 .fillMaxSize()
         )
 
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(80.dp)
+                .align(Alignment.BottomCenter)
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Transparent,
+                            Color.Black.copy(alpha = 0.7f)
+                        )
+                    )
+                )
+        )
+
+        Text(
+            text = movie.title,
+            color = Color.White,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(start = 12.dp, bottom = 12.dp)
+        )
+
         if (showBigHeart) {
             Icon(
                 imageVector = Icons.Default.Favorite,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .scale(heartScaleAnimation)
-                    .padding(top = 10.dp, end = 10.dp),
                 contentDescription = "heart icon",
-                tint = Color.Red
+                tint = Color.Red.copy(alpha = 0.8f),
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .scale(bigHeartScale)
             )
         }
-        Icon(
-            imageVector = if (movie.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-            contentDescription = "Like",
-            tint = if (movie.isFavorite) Color.Red else Color.White,
+
+        IconButton(
+            onClick = {
+                animateFavorite = true
+                onCardEvent(CardEventModel.OnDoubleTap(movie))
+            },
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .scale(heartScaleAnimation)
-                .padding(top = 10.dp, end = 10.dp)
-        )
+                .padding(10.dp)
+                .background(
+                    color = Color.Black.copy(alpha = 0.3f),
+                    shape = CircleShape
+                )
+                .scale(favoriteScale)
+        ) {
+
+            Icon(
+                imageVector = if (movie.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                contentDescription = "Like",
+                tint = if (movie.isFavorite) Color.Red else Color.White,
+            )
+        }
     }
 }

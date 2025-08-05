@@ -32,7 +32,10 @@ fun SignInContent(
         resetSignInState = {
             signInViewModel.resetSignInState()
         },
-        facebookUIClient = facebookUIClient
+        facebookUIClient = facebookUIClient,
+        onContinueAsGuest = {
+            signInViewModel.onContinueAsGuest()
+        }
     )
 
     PlatformBackHandler()

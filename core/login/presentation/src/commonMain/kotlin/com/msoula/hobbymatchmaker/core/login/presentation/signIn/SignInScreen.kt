@@ -1,5 +1,6 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.signIn
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -16,14 +17,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -56,6 +62,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.Res
 import com.msoula.hobbymatchmaker.core.login.presentation.cancel
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.components.SocialMediaButtonListPlatformSpecificUI
+import com.msoula.hobbymatchmaker.core.login.presentation.continue_as_guest_title
 import com.msoula.hobbymatchmaker.core.login.presentation.continue_with_rs
 import com.msoula.hobbymatchmaker.core.login.presentation.email
 import com.msoula.hobbymatchmaker.core.login.presentation.forgot_password
@@ -70,6 +77,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.new_member_clickable_p
 import com.msoula.hobbymatchmaker.core.login.presentation.password
 import com.msoula.hobbymatchmaker.core.login.presentation.reset_password
 import com.msoula.hobbymatchmaker.core.login.presentation.show_password
+import com.msoula.hobbymatchmaker.core.login.presentation.welcome_back_subtitle
 import com.msoula.hobbymatchmaker.core.login.presentation.welcome_back_title
 import com.msoula.hobbymatchmaker.core.login.presentation.your_email
 import dev.gitlive.firebase.auth.AuthCredential
@@ -84,6 +92,7 @@ fun SignInScreenContent(
     redirectToMovieScreen: () -> Unit,
     redirectToSignUpScreen: () -> Unit,
     resetSignInState: () -> Unit,
+    onContinueAsGuest: () -> Unit,
     facebookUIClient: FacebookUIClient
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -163,7 +172,8 @@ fun SignInScreenContent(
                 }
 
                 HeaderTextComponent(
-                    text = stringResource(Res.string.welcome_back_title)
+                    title = stringResource(Res.string.welcome_back_title),
+                    subtitle = stringResource(Res.string.welcome_back_subtitle)
                 )
 
                 SignInScreenMainContent(
@@ -212,9 +222,33 @@ fun SignInScreenContent(
                         .align(Alignment.BottomCenter)
                         .padding(bottom = 8.dp)
             ) {
-                AnnotatedStringWithLinkAnnotation(isSystemInDarkTheme()) {
-                    signInViewModel.onEvent(AuthenticationUIEvent.OnScreenChanged)
-                    redirectToSignUpScreen()
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    AnnotatedStringWithLinkAnnotation(isSystemInDarkTheme()) {
+                        signInViewModel.onEvent(AuthenticationUIEvent.OnScreenChanged)
+                        redirectToSignUpScreen()
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    OutlinedButton(
+                        onClick = { onContinueAsGuest() },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+                    ) {
+                        Text(
+                            text = stringResource(Res.string.continue_as_guest_title),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             }
         }
@@ -282,14 +316,16 @@ fun ColumnScope.SignInScreenMainContent(
 
     HMMTextFieldAuthComponent(
         value = email,
-        placeHolderText = stringResource(Res.string.email),
+        label = stringResource(Res.string.email),
+        icon = Icons.Default.Email,
+        contentDescription = stringResource(Res.string.email),
         onValueChange = {
             onEmailChanged(it)
         },
         modifier = Modifier.fillMaxWidth()
     )
 
-    Spacer(modifier = modifier.height(16.dp))
+    Spacer(modifier = modifier.height(8.dp))
 
     HMMTextFieldPasswordComponent(
         value = password,
@@ -297,7 +333,8 @@ fun ColumnScope.SignInScreenMainContent(
             onPasswordChanged(it)
         },
         modifier = Modifier.fillMaxWidth(),
-        placeholder = stringResource(Res.string.password),
+        label = stringResource(Res.string.password),
+        leadingIcon = Icons.Default.Lock,
         showPasswordContentDescription = stringResource(Res.string.show_password),
         hidePasswordContentDescription = stringResource(Res.string.hide_password)
     )
@@ -309,7 +346,10 @@ fun ColumnScope.SignInScreenMainContent(
         onClick = {
             onForgotPasswordClicked()
         },
-        style = TextStyle(color = MaterialTheme.colorScheme.onBackground),
+        style = TextStyle(
+            color = MaterialTheme.colorScheme.onBackground,
+            textDecoration = TextDecoration.Underline
+        ),
         modifier =
             Modifier
                 .wrapContentSize()
@@ -402,7 +442,7 @@ fun ForgotPasswordAlertDialog(
                 onValueChange = {
                     authUIEvent(AuthenticationUIEvent.OnEmailResetChanged(it))
                 },
-                placeHolderText = stringResource(Res.string.your_email),
+                label = stringResource(Res.string.your_email),
                 modifier = Modifier.fillMaxWidth()
             )
         },

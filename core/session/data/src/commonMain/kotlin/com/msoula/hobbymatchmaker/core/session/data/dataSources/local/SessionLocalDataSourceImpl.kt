@@ -34,4 +34,8 @@ class SessionLocalDataSourceImpl(
         .map { preferences ->
             preferences[IS_CONNECTED_KEY] ?: false
         }
+
+    override suspend fun setIsGuest(isGuest: Boolean) {
+        TODO("Not yet implemented")
+    }
 }

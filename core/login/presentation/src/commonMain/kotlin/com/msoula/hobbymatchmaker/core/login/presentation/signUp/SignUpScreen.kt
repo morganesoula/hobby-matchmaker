@@ -15,6 +15,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -61,6 +65,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.password_hint
 import com.msoula.hobbymatchmaker.core.login.presentation.show_password
 import com.msoula.hobbymatchmaker.core.login.presentation.signUp.models.SignUpStateModel
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_up
+import com.msoula.hobbymatchmaker.core.login.presentation.welcome_subtitle
 import com.msoula.hobbymatchmaker.core.login.presentation.welcome_title
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -115,7 +120,13 @@ fun SignUpScreenContent(
         snackbarHost = { SnackbarHost(snackBarHostState) }) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
             Column {
-                HeaderTextComponent(text = stringResource(Res.string.welcome_title))
+                HeaderTextComponent(
+                    title = stringResource(Res.string.welcome_title),
+                    subtitle = stringResource(Res.string.welcome_subtitle)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 SignUpScreenMainContent(
                     paddingValues = paddingValues,
                     registrationState = registrationState,
@@ -186,11 +197,12 @@ fun SignUpScreenMainContent(
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             HMMTextFieldAuthComponent(
-                placeHolderText = stringResource(Res.string.firstname),
+                label = stringResource(Res.string.firstname),
                 value = registrationState.firstName.trimEnd(),
                 onValueChange = {
                     onNameChanged(it)
                 },
+                icon = Icons.Default.People,
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -210,7 +222,8 @@ fun SignUpScreenMainContent(
                 onValueChange = {
                     onEmailChanged(it)
                 },
-                placeHolderText = stringResource(Res.string.email)
+                icon = Icons.Default.Email,
+                label = stringResource(Res.string.email)
             )
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -229,7 +242,8 @@ fun SignUpScreenMainContent(
                 onValueChange = {
                     onPasswordChanged(it)
                 },
-                placeholder = stringResource(Res.string.password),
+                leadingIcon = Icons.Default.Lock,
+                label = stringResource(Res.string.password),
                 showPasswordContentDescription = stringResource(Res.string.show_password),
                 hidePasswordContentDescription = stringResource(Res.string.hide_password)
             )
