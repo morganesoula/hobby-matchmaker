@@ -25,6 +25,8 @@ import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
@@ -99,13 +101,12 @@ fun BoxScope.HMMHomeTopBar(onLogoutIconClick: () -> Unit) {
 fun BoxScope.HMMDetailTopBar(onNavigationIconClick: () -> Unit) {
     Box(
         modifier = Modifier
-            .padding(top = 16.dp, start = 16.dp)
-            .size(44.dp)
-            .background(
-                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
-                shape = CircleShape
-            )
-            .clickable(onClick = onNavigationIconClick)
+            .padding(top = 16.dp)
+            .size(40.dp)
+            .clip(CircleShape)
+            .background(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f))
+            .clickable { onNavigationIconClick() }
+            .shadow(elevation = 4.dp, shape = CircleShape)
             .align(Alignment.TopStart),
         contentAlignment = Alignment.Center
     ) {

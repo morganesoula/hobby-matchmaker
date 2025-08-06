@@ -3,6 +3,10 @@ package com.msoula.hobbymatchmaker.presentation.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import com.arkivanov.decompose.extensions.compose.stack.Children
+import com.arkivanov.decompose.extensions.compose.stack.animation.fade
+import com.arkivanov.decompose.extensions.compose.stack.animation.plus
+import com.arkivanov.decompose.extensions.compose.stack.animation.slide
+import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient
@@ -44,7 +48,10 @@ fun App(
             is RootComponent.RootChild.MainFlow -> {
                 val mainStack by instance.stack.subscribeAsState()
 
-                Children(stack = mainStack) { child ->
+                Children(
+                    stack = mainStack,
+                    animation = stackAnimation(fade() + slide())
+                ) { child ->
                     when (val mainScreen = child.instance) {
                         is MainRootComponent.Child.Main -> MovieContent(mainScreen.component)
                         is MainRootComponent.Child.MovieDetail -> MovieDetailContent(mainScreen.component)

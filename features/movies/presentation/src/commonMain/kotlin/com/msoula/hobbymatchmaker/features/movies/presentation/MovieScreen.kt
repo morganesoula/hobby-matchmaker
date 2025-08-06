@@ -110,7 +110,6 @@ fun MovieScreenContent(
         }
     }
 }
-
 @Composable
 fun ErrorMovieScreen(
     modifier: Modifier = Modifier,
