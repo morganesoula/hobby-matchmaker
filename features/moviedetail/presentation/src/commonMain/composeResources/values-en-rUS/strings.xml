@@ -17,4 +17,7 @@
     <string name="movie_post_production">Post Production</string>
     <string name="movie_released">Released</string>
     <string name="movie_canceled">Canceled</string>
+
+    // Accessibility
+    <string name="actor_name_content_description">Actor name</string>
 </resources>

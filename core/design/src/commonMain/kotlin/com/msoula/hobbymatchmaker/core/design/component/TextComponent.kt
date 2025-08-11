@@ -2,13 +2,13 @@ package com.msoula.hobbymatchmaker.core.design.component
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,10 +22,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -37,6 +38,7 @@ fun ExpandableTextComponent(
     showMore: String,
     shouldBeExpandable: Boolean = true
 ) {
+    val isDarkTheme = isSystemInDarkTheme()
     var expanded by remember { mutableStateOf(false) }
     var showExpandButton by remember { mutableStateOf(false) }
 
@@ -44,20 +46,10 @@ fun ExpandableTextComponent(
         Column {
             Box(
                 modifier = Modifier
-                    .then(
-                        if (shouldBeExpandable && !expanded && showExpandButton) {
-                            Modifier.height(100.dp)
-                        } else Modifier.wrapContentHeight()
-                    )
-                    .clip(RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(12.dp))
                     .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(
-                                Color.Black.copy(alpha = 0.9f),
-                                Color.Black.copy(alpha = 0.6f),
-                                Color.Transparent
-                            )
-                        )
+                        color = MaterialTheme.colorScheme.surface,
+                        shape = RoundedCornerShape(12.dp)
                     )
                     .padding(horizontal = 8.dp, vertical = 8.dp)
             ) {
@@ -73,24 +65,19 @@ fun ExpandableTextComponent(
                     lineHeight = 24.sp,
                     color = MaterialTheme.colorScheme.onBackground,
                     style = MaterialTheme.typography.bodyMedium.copy(
-                        shadow = Shadow(
-                            color = Color.Black.copy(alpha = 0.3f),
-                            offset = Offset(1f, 1f),
-                            blurRadius = 2f
-                        )
+                        shadow = if (isDarkTheme) {
+                            Shadow(
+                                color = Color.Black.copy(alpha = 0.3f),
+                                offset = Offset(1f, 1f),
+                                blurRadius = 2f
+                            )
+                        } else null
                     ),
                     textAlign = TextAlign.Start,
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+                    maxLines = if (!expanded && showExpandButton) 5 else Int.MAX_VALUE,
+                    overflow = TextOverflow.Ellipsis
                 )
-
-                if (!expanded && showExpandButton) {
-                    Box(
-                        Modifier
-                            .fillMaxWidth()
-                            .height(30.dp)
-                            .align(Alignment.BottomCenter)
-                    )
-                }
             }
 
             if (showExpandButton) {
@@ -98,7 +85,13 @@ fun ExpandableTextComponent(
                     onClick = { expanded = !expanded },
                     modifier = Modifier.align(Alignment.End)
                 ) {
-                    Text(if (expanded) showLess else showMore)
+                    Text(
+                        text = if (expanded) showLess else showMore,
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Medium
+                        )
+                    )
                 }
             } else {
                 Spacer(modifier = Modifier.height(8.dp))

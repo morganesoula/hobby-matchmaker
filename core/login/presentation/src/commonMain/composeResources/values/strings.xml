@@ -38,6 +38,7 @@
     <string name="hide_password">Cacher le mot de passe</string>
     <string name="sign_in_with_facebook">Se connecter avec Facebook</string>
     <string name="sign_in_with_google">Se connecter avec Google</string>
+    <string name="sign_in_with_apple">Se connecter avec Apple</string>
 
     // ERROR
     <string name="login_error">Identifiant ou mot de passe incorrect</string>

@@ -37,6 +37,7 @@
     <string name="hide_password">Hide password</string>
     <string name="sign_in_with_facebook">Sign in with Facebook</string>
     <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="sign_in_with_apple">Sign in with Apple</string>
 
     // ERROR
     <string name="login_error">Incorrect email or password</string>

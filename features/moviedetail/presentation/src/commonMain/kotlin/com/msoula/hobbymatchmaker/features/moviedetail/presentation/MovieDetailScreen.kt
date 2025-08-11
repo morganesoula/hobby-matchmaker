@@ -1,14 +1,19 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.presentation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -29,42 +34,48 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.msoula.hobbymatchmaker.core.common.ObserveAsEvents
 import com.msoula.hobbymatchmaker.core.design.component.ExpandableTextComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMDetailTopBar
 import com.msoula.hobbymatchmaker.core.design.component.LoadingCircularProgress
+import com.msoula.hobbymatchmaker.core.design.theme.successContainerColor
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiEventModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailViewStateModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 import okio.Path.Companion.toPath
 import org.jetbrains.compose.resources.stringResource
 
@@ -97,53 +108,67 @@ fun MovieDetailScreen(
     onPlayTrailerClicked: (event: MovieDetailUiEventModel) -> Unit,
     onMovieDetailBackPressed: () -> Unit
 ) {
+    val platformContext = LocalPlatformContext.current
     val snackBarHostState = remember { SnackbarHostState() }
 
-    Scaffold(
-        modifier = Modifier.systemBarsPadding(),
-        snackbarHost = { SnackbarHost(snackBarHostState) }
-    ) {
-        MovieDetailContentScreen(
-            movie = movie,
-            modifier = modifier.padding(it),
-            onPlayTrailerClicked = onPlayTrailerClicked,
-            oneTimeEventFlow = oneTimeEventFlow,
-            snackBarHostState = snackBarHostState,
-            onMovieDetailBackPressed = onMovieDetailBackPressed
-        )
-    }
-}
+    val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
-@Composable
-fun MovieDetailContentScreen(
-    modifier: Modifier = Modifier,
-    movie: MovieDetailUiModel,
-    oneTimeEventFlow: Flow<MovieDetailUiEventModel>,
-    onPlayTrailerClicked: (event: MovieDetailUiEventModel) -> Unit,
-    snackBarHostState: SnackbarHostState,
-    onMovieDetailBackPressed: () -> Unit
-) {
-    val coroutineScope = rememberCoroutineScope()
     val errorFetchingMovieMessage = stringResource(Res.string.no_trailer_available)
     val noConnectionMessage = stringResource(Res.string.connection_issue)
 
-    val movieVideoUri = remember { mutableStateOf(movie.videoKey) }
-    var isLoading by remember { mutableStateOf(false) }
-    var videoPlayerVisibility by remember { mutableStateOf(false) }
+    val posterModel = remember(movie.posterPath) {
+        ImageRequest.Builder(platformContext)
+            .data(movie.posterPath.toPath())
+            .crossfade(true)
+            .build()
+    }
 
-    val filteredCast = movie.cast.filterNot { it.key == "NO_CAST" }
+    val scrim = rememberLegibilityScrim()
+    val titleShadow = Shadow(
+        color = Color.Black.copy(alpha = 0.35f),
+        offset = Offset(0f, 1.5f),
+        blurRadius = 3f
+    )
+
+    var videoPlayerVisible by rememberSaveable { mutableStateOf(false) }
+    var videoId by rememberSaveable { mutableStateOf(movie.videoKey) }
+    var isLoading by rememberSaveable { mutableStateOf(false) }
+
+    val filteredCast = remember(movie.cast) { movie.cast.filterNot { it.key == "NO_CAST" } }
     val scrollState = rememberScrollState()
 
-    ObserveAsEvents(flow = oneTimeEventFlow) { event ->
-        coroutineScope.launch {
+    LaunchedEffect(movie.id) {
+        videoId = movie.videoKey
+        videoPlayerVisible = videoId.isNotEmpty()
+        isLoading = false
+    }
+
+    Scaffold(
+        modifier = Modifier.systemBarsPadding(),
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackBarHostState,
+                snackbar = { data ->
+                    Snackbar(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text(text = data.visuals.message)
+                    }
+                }
+            )
+        }
+    ) { padding ->
+        ObserveAsEvents(flow = oneTimeEventFlow) { event ->
             when (event) {
                 is MovieDetailUiEventModel.OnMovieDetailUiFetchedError ->
                     snackBarHostState.showSnackbar(event.error)
 
                 is MovieDetailUiEventModel.OnPlayMovieTrailerReady -> {
                     if (isLoading) isLoading = false
-                    movieVideoUri.value = event.movieUri
-                    videoPlayerVisibility = true
+                    videoId = event.movieUri
+                    videoPlayerVisible = true
                 }
 
                 is MovieDetailUiEventModel.ErrorFetchingTrailer -> {
@@ -160,46 +185,37 @@ fun MovieDetailContentScreen(
                 else -> Unit
             }
         }
-    }
 
-    if (isLoading) LoadingCircularProgress()
+        if (isLoading) LoadingCircularProgress()
 
-    Box(modifier = modifier.fillMaxSize().zIndex(0f)) {
-        //Background image
-        AsyncImage(
-            model = ImageRequest.Builder(LocalPlatformContext.current)
-                .data(movie.posterPath.toPath())
-                .build(),
-            contentDescription = "poster",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(500.dp)
-                .graphicsLayer {
-                    translationY = scrollState.value * 0.5f
-                    scaleX = 1f + (scrollState.value / 2000f)
-                    scaleY = 1f + (scrollState.value / 2000f)
-                },
-            contentScale = ContentScale.Crop
-        )
-        // Filter to darken background
-        BackgroundGradient(0.9f)
+        Box(modifier = modifier.fillMaxSize().padding(padding)) {
+            // Background image
+            AsyncImage(
+                model = posterModel,
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .graphicsLayer { translationY = scrollState.value * 0.2f },
+                contentScale = ContentScale.Crop
+            )
 
-        //Content on top of the image
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.4f)),
-                        startY = 300f,
-                        endY = 700f
-                    )
-                )
-        ) {
+            // Content on top of the image and below the main content
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(brush = scrim)
+            )
+
+            // Main content
             Column(
-                modifier = modifier
+                modifier = Modifier
                     .verticalScroll(scrollState)
-                    .padding(top = 400.dp, start = 16.dp, end = 16.dp)
+                    .padding(
+                        top = 200.dp,
+                        start = 16.dp,
+                        end = 16.dp,
+                        bottom = bottomInset + 24.dp
+                    )
                     .fillMaxSize()
             ) {
                 Text(
@@ -207,7 +223,7 @@ fun MovieDetailContentScreen(
                     color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier
                         .background(
-                            color = Color.Green.copy(alpha = 0.8f),
+                            color = successContainerColor(),
                             shape = RoundedCornerShape(50)
                         )
                         .padding(horizontal = 10.dp, vertical = 4.dp),
@@ -215,33 +231,39 @@ fun MovieDetailContentScreen(
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(6.dp))
-                Text(
-                    text = movie.title,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 26.sp,
-                )
+
+                MetaPill(modifier = Modifier.padding(top = 6.dp)) {
+                    Text(
+                        text = movie.title,
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            shadow = titleShadow
+                        )
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(8.dp))
-                Row {
+                MetaPill {
                     Text(
                         text = movie.releaseDate,
-                        color = Color.LightGray,
-                        fontSize = 14.sp
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
 
                     Text(
                         text = " · " + movie.genre.toString()
                             .removeSurrounding("[", "]"),
-                        color = Color.LightGray,
-                        fontSize = 14.sp
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                if (videoPlayerVisibility) {
-                    YoutubeComponent(modifier, movieVideoUri.value) {
-                        videoPlayerVisibility = false
+                if (videoPlayerVisible) {
+                    YoutubeComponent(videoId = videoId) {
+                        videoPlayerVisible = false
                     }
                 } else {
                     Button(
@@ -249,13 +271,14 @@ fun MovieDetailContentScreen(
                             onPlayTrailerClicked(
                                 MovieDetailUiEventModel.OnPlayMovieTrailerClicked(
                                     movieId = movie.id,
-                                    isVideoURIknown = movie.videoKey.isNotEmpty()
+                                    isVideoURIknown = videoId.isNotEmpty()
                                 )
                             )
                         },
+                        enabled = !isLoading,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = Color.White
+                            contentColor = MaterialTheme.colorScheme.onPrimary
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -301,27 +324,12 @@ fun MovieDetailContentScreen(
 
                 if (filteredCast.isNotEmpty()) MovieCastSection(filteredCast)
             }
-        }
 
-        HMMDetailTopBar {
-            onMovieDetailBackPressed()
+            HMMDetailTopBar {
+                onMovieDetailBackPressed()
+            }
         }
     }
-}
-
-@Composable
-fun BackgroundGradient(verticalGradientHeight: Float) {
-    val screenHeight = GetScreenHeight()
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(Color.Transparent, Color.Black),
-                    endY = screenHeight.div(verticalGradientHeight)
-                )
-            )
-    )
 }
 
 @Composable
@@ -329,6 +337,8 @@ fun MovieCastSection(
     cast: Map<String, String>,
     modifier: Modifier = Modifier
 ) {
+    val casting = cast.entries.toList()
+
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
             text = stringResource(Res.string.cast),
@@ -339,21 +349,16 @@ fun MovieCastSection(
         Spacer(modifier = Modifier.height(8.dp))
 
         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(cast.entries.toList()) { (actor, role) ->
+            items(casting, key = { it.key }) { (actor, role) ->
                 Card(
                     modifier = Modifier
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                        .width(120.dp)
-                        .height(120.dp)
-                        .shadow(
-                            elevation = 4.dp,
-                            shape = RoundedCornerShape(12.dp),
-                            clip = false
-                        ),
+                        .size(120.dp)
+                        .semantics { contentDescription = "$actor, $role" },
                     shape = RoundedCornerShape(12.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    )
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
                     Column(
                         modifier = Modifier
@@ -364,7 +369,9 @@ fun MovieCastSection(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Person,
-                            contentDescription = null,
+                            contentDescription = stringResource(
+                                Res.string.actor_name_content_description
+                            ),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(32.dp)
                         )
@@ -397,11 +404,50 @@ fun MovieCastSection(
 }
 
 @Composable
-fun ErrorMovieDetailScreen(modifier: Modifier = Modifier, error: String) {
-    Text(modifier = modifier, text = error)
+private fun MetaPill(modifier: Modifier = Modifier, content: @Composable RowScope.() -> Unit) {
+    Row(
+        modifier = modifier
+            .background(
+                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.65f),
+                shape = RoundedCornerShape(16.dp)
+            )
+            .padding(horizontal = 10.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        content = content
+    )
 }
 
 @Composable
-fun EmptyMovieDetailScreen(modifier: Modifier = Modifier) {
-    Text(modifier = modifier, text = stringResource(Res.string.no_data))
+private fun rememberLegibilityScrim(): Brush {
+    val base = if (isSystemInDarkTheme())
+        MaterialTheme.colorScheme.background
+    else MaterialTheme.colorScheme.surface
+
+    return remember(base) {
+        Brush.verticalGradient(
+            colorStops = arrayOf(
+                0f to Color.Transparent,
+                0.35f to base.copy(alpha = 0.55f),
+                0.6f to base.copy(alpha = 0.82f),
+                1f to base.copy(alpha = 0.95f)
+            )
+        )
+    }
+}
+
+@Composable
+fun ErrorMovieDetailScreen(error: String) {
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text(text = error, style = MaterialTheme.typography.bodyLarge)
+    }
+}
+
+@Composable
+fun EmptyMovieDetailScreen() {
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text(
+            text = stringResource(Res.string.no_data),
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
 }

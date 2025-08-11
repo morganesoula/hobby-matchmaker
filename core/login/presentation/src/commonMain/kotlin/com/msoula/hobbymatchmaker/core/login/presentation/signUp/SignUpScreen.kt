@@ -1,6 +1,6 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.signUp
 
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -21,27 +21,32 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -50,6 +55,7 @@ import com.msoula.hobbymatchmaker.core.design.component.HMMFormHelperText
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldPasswordComponent
 import com.msoula.hobbymatchmaker.core.design.component.HeaderTextComponent
+import com.msoula.hobbymatchmaker.core.design.component.keyboardDismissOnTap
 import com.msoula.hobbymatchmaker.core.login.presentation.Res
 import com.msoula.hobbymatchmaker.core.login.presentation.already_a_member
 import com.msoula.hobbymatchmaker.core.login.presentation.already_a_member_connect
@@ -67,7 +73,6 @@ import com.msoula.hobbymatchmaker.core.login.presentation.signUp.models.SignUpSt
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_up
 import com.msoula.hobbymatchmaker.core.login.presentation.welcome_subtitle
 import com.msoula.hobbymatchmaker.core.login.presentation.welcome_title
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -77,15 +82,11 @@ fun SignUpScreenContent(
     redirectToMovieScreen: () -> Unit,
     signUpViewModel: SignUpViewModel
 ) {
-    val coroutineScope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
 
     val registrationState by signUpViewModel.formDataFlow.collectAsState()
     val isLoading by signUpViewModel.isLoading.collectAsState()
     val signUpState by signUpViewModel.signUpState.collectAsState()
-
-    val emailTipVisibility = remember { mutableStateOf(false) }
-    val passwordTipVisibility = remember { mutableStateOf(false) }
 
     val annotatedString =
         buildAnnotatedString {
@@ -105,11 +106,8 @@ fun SignUpScreenContent(
     LaunchedEffect(signUpState) {
         when (val state = signUpState) {
             is SignUpEvent.Success -> redirectToMovieScreen()
-            is SignUpEvent.Error -> {
-                coroutineScope.launch {
-                    snackBarHostState.showSnackbar(state.message)
-                }
-            }
+            is SignUpEvent.Error ->
+                snackBarHostState.showSnackbar(state.message)
 
             else -> Unit
         }
@@ -117,9 +115,26 @@ fun SignUpScreenContent(
 
     Scaffold(
         modifier = modifier,
-        snackbarHost = { SnackbarHost(snackBarHostState) }) { paddingValues ->
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackBarHostState,
+                snackbar = { data ->
+                    Snackbar(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text(text = data.visuals.message)
+                    }
+                }
+            )
+        }
+    )
+    { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
-            Column {
+            Column(
+                modifier = Modifier.keyboardDismissOnTap()
+            ) {
                 HeaderTextComponent(
                     title = stringResource(Res.string.welcome_title),
                     subtitle = stringResource(Res.string.welcome_subtitle)
@@ -152,9 +167,7 @@ fun SignUpScreenContent(
                         )
                     },
                     onSignUpClicked = { signUpViewModel.onEvent(AuthenticationUIEvent.OnSignUp) },
-                    isLoading = isLoading,
-                    emailTipVisibility = emailTipVisibility,
-                    passwordTipVisibility = passwordTipVisibility
+                    isLoading = isLoading
                 )
             }
 
@@ -177,25 +190,20 @@ fun SignUpScreenMainContent(
     onEmailChanged: (email: String) -> Unit,
     onPasswordChanged: (password: String) -> Unit,
     onSignUpClicked: () -> Unit,
-    isLoading: Boolean = false,
-    emailTipVisibility: MutableState<Boolean> = mutableStateOf(false),
-    passwordTipVisibility: MutableState<Boolean> = mutableStateOf(false)
+    isLoading: Boolean = false
 ) {
-    val keyboardController = LocalSoftwareKeyboardController.current
+    val scrollState = rememberScrollState()
+    val emailTipVisibility = rememberSaveable { mutableStateOf(false) }
+    val passwordTipVisibility = rememberSaveable { mutableStateOf(false) }
 
     Box(
         modifier =
             Modifier
                 .wrapContentSize()
-                .padding(paddingValues)
-                .pointerInput(Unit) {
-                    detectTapGestures(onTap = {
-                        keyboardController?.hide()
-                    })
-                },
+                .padding(paddingValues),
         contentAlignment = Alignment.Center
     ) {
-        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+        Column(modifier = Modifier.verticalScroll(scrollState)) {
             HMMTextFieldAuthComponent(
                 label = stringResource(Res.string.firstname),
                 value = registrationState.firstName.trimEnd(),
@@ -203,12 +211,15 @@ fun SignUpScreenMainContent(
                     onNameChanged(it)
                 },
                 icon = Icons.Default.People,
-                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Sentences,
+                    imeAction = ImeAction.Next
+                )
             )
             Spacer(modifier = Modifier.height(8.dp))
 
             HMMFormHelperText(
-                isVisible = emailTipVisibility.value,
+                isVisible = emailTipVisibility,
                 titleHint = stringResource(Res.string.example),
                 hint = "john@test.com"
             )
@@ -223,12 +234,17 @@ fun SignUpScreenMainContent(
                     onEmailChanged(it)
                 },
                 icon = Icons.Default.Email,
-                label = stringResource(Res.string.email)
+                label = stringResource(Res.string.email),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next,
+                    autoCorrect = false
+                )
             )
             Spacer(modifier = Modifier.height(8.dp))
 
             HMMFormHelperText(
-                isVisible = passwordTipVisibility.value,
+                isVisible = passwordTipVisibility,
                 titleHint = stringResource(Res.string.at_least),
                 hint = stringResource(Res.string.password_hint)
             )
@@ -245,7 +261,8 @@ fun SignUpScreenMainContent(
                 leadingIcon = Icons.Default.Lock,
                 label = stringResource(Res.string.password),
                 showPasswordContentDescription = stringResource(Res.string.show_password),
-                hidePasswordContentDescription = stringResource(Res.string.hide_password)
+                hidePasswordContentDescription = stringResource(Res.string.hide_password),
+                onFormDoneClicked = onSignUpClicked
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -270,10 +287,15 @@ fun BoxScope.SignUpScreenBottomContent(
             .align(Alignment.BottomCenter)
             .padding(bottom = 8.dp)
     ) {
-        ClickableText(
-            modifier = Modifier.wrapContentSize(),
+        Text(
             text = redirectText,
-            onClick = { redirectToLogInScreen() },
+            modifier = Modifier
+                .wrapContentSize()
+                .semantics {
+                    role = Role.Button
+                    contentDescription = redirectText.text
+                }
+                .clickable { redirectToLogInScreen() },
             style = TextStyle(color = MaterialTheme.colorScheme.onBackground)
         )
     }

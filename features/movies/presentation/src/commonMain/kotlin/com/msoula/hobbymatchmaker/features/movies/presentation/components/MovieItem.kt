@@ -41,6 +41,8 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -91,7 +93,7 @@ fun MovieItem(
         }
     )
 
-    if (painter.state.value is AsyncImagePainter.State.Loading) {
+    if (painter.state is AsyncImagePainter.State.Loading) {
         HMMShimmerEffect(isLoading = true) {}
     } else {
         HMMShimmerEffect(isLoading = false) {
@@ -134,6 +136,12 @@ fun MovieItemContent(
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Card(
             modifier = modifier
+                .semantics(mergeDescendants = true) {
+                    contentDescription = "${movie.title}, ${
+                        if (movie.isFavorite) "favorite"
+                        else "not favorite"
+                    }"
+                }
                 .width(300.dp)
                 .height(440.dp)
                 .padding(end = 10.dp)
@@ -143,7 +151,9 @@ fun MovieItemContent(
             elevation = CardDefaults.cardElevation(
                 defaultElevation = if (scale > 1f) 12.dp else 4.dp
             ),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
         ) {
             MovieItemContentCard(modifier, movie, onCardEvent, painter)
         }
@@ -264,10 +274,9 @@ fun MovieItemContentCard(
                 )
                 .scale(favoriteScale)
         ) {
-
             Icon(
                 imageVector = if (movie.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                contentDescription = "Like",
+                contentDescription = if (movie.isFavorite) "Remove from favorites" else "Add to favorites",
                 tint = if (movie.isFavorite) Color.Red else Color.White,
             )
         }

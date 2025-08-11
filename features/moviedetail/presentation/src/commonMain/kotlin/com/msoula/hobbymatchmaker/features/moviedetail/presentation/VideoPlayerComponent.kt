@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-expect fun YoutubeComponent(modifier: Modifier, videoId: String, onClose: () -> Unit)
+expect fun YoutubeComponent(modifier: Modifier = Modifier, videoId: String, onClose: () -> Unit)
 
 @Composable
 expect fun GetScreenHeight(): Float

@@ -10,15 +10,12 @@ import kotlinx.coroutines.flow.Flow
 @Composable
 actual fun <T> observeFlowWithLifecycle(
     flow: Flow<T>,
-    onEvent: (T) -> Unit
+    onEvent: suspend (T) -> Unit
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
-
-    LaunchedEffect(lifecycleOwner.lifecycle) {
-        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            flow.collect { event ->
-                onEvent(event)
-            }
+    LaunchedEffect(flow, lifecycleOwner.lifecycle) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            flow.collect { onEvent(it) }
         }
     }
 }

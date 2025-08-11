@@ -7,9 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
@@ -45,7 +43,4 @@ actual fun YoutubeComponent(modifier: Modifier, videoId: String, onClose: () -> 
 }
 
 @Composable
-actual fun GetScreenHeight(): Float {
-    val configuration = LocalConfiguration.current
-    return configuration.screenHeightDp.dp.value
-}
+actual fun GetScreenHeight(): Float { return 0f }

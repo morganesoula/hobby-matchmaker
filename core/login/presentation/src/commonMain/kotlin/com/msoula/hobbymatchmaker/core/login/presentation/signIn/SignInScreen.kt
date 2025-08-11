@@ -2,7 +2,6 @@ package com.msoula.hobbymatchmaker.core.login.presentation.signIn
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,6 +30,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -40,11 +40,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -58,6 +61,7 @@ import com.msoula.hobbymatchmaker.core.design.component.HMMButtonAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldPasswordComponent
 import com.msoula.hobbymatchmaker.core.design.component.HeaderTextComponent
+import com.msoula.hobbymatchmaker.core.design.component.keyboardDismissOnTap
 import com.msoula.hobbymatchmaker.core.login.presentation.Res
 import com.msoula.hobbymatchmaker.core.login.presentation.cancel
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient
@@ -87,7 +91,6 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun SignInScreenContent(
-    modifier: Modifier = Modifier,
     signInViewModel: SignInViewModel,
     redirectToMovieScreen: () -> Unit,
     redirectToSignUpScreen: () -> Unit,
@@ -105,59 +108,66 @@ fun SignInScreenContent(
 
     val snackBarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(resetPasswordState) {
-        when (resetPasswordState) {
-            is ResetPasswordEvent.Error -> coroutineScope.launch {
-                snackBarHostState.showSnackbar(
-                    (resetPasswordState as ResetPasswordEvent.Error).message
-                )
+    LaunchedEffect(Unit) {
+        snapshotFlow { resetPasswordState to signInState }
+            .collect { (resetState, signIn) ->
+                when (resetState) {
+                    is ResetPasswordEvent.Error ->
+                        snackBarHostState.showSnackbar(resetState.message)
+
+                    is ResetPasswordEvent.Success -> {
+                        signInViewModel.onEvent(
+                            AuthenticationUIEvent.HideForgotPasswordDialog
+                        )
+                        snackBarHostState.showSnackbar(
+                            getString(Res.string.reset_password)
+                        )
+                    }
+
+                    else -> Unit
+                }
+
+                when (signIn) {
+                    is SignInEvent.Error -> coroutineScope.launch {
+                        snackBarHostState.showSnackbar(
+                            (signInState as SignInEvent.Error).message
+                        )
+                    }
+
+                    is SignInEvent.Success -> {
+                        redirectToMovieScreen()
+                        resetSignInState()
+                    }
+
+                    else -> Unit
+                }
             }
-
-            is ResetPasswordEvent.Success -> {
-                signInViewModel.onEvent(
-                    AuthenticationUIEvent.HideForgotPasswordDialog
-                )
-                snackBarHostState.showSnackbar(getString(Res.string.reset_password))
-            }
-
-            else -> Unit
-        }
-    }
-
-    LaunchedEffect(signInState) {
-        when (signInState) {
-            is SignInEvent.Error -> coroutineScope.launch {
-                snackBarHostState.showSnackbar(
-                    (signInState as SignInEvent.Error).message
-                )
-            }
-
-            is SignInEvent.Success -> {
-                redirectToMovieScreen()
-                resetSignInState()
-            }
-
-            else -> Unit
-        }
     }
 
     Scaffold(
-        modifier = modifier,
-        snackbarHost = { SnackbarHost(snackBarHostState) }
+        modifier = Modifier,
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackBarHostState,
+                snackbar = { data ->
+                    Snackbar(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text(text = data.visuals.message)
+                    }
+                }
+            )
+        }
     ) { paddingValues ->
-        val keyboardController = LocalSoftwareKeyboardController.current
-
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier =
                     Modifier
                         .padding(paddingValues)
                         .verticalScroll(rememberScrollState())
-                        .pointerInput(Unit) {
-                            detectTapGestures(onTap = {
-                                keyboardController?.hide()
-                            })
-                        },
+                        .keyboardDismissOnTap(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -240,7 +250,10 @@ fun SignInScreenContent(
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp, vertical = 8.dp),
                         shape = RoundedCornerShape(12.dp),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.onSurface
+                        )
                     ) {
                         Text(
                             text = stringResource(Res.string.continue_as_guest_title),
@@ -277,6 +290,9 @@ fun AnnotatedStringWithLinkAnnotation(isDarkTheme: Boolean, onClick: () -> Unit)
         style = TextStyle(color = MaterialTheme.colorScheme.onBackground),
         modifier = Modifier
             .wrapContentSize()
+            .semantics {
+                role = Role.Button
+            }
             .clickable {
                 annotatedString
                     .getStringAnnotations(
@@ -336,7 +352,8 @@ fun ColumnScope.SignInScreenMainContent(
         label = stringResource(Res.string.password),
         leadingIcon = Icons.Default.Lock,
         showPasswordContentDescription = stringResource(Res.string.show_password),
-        hidePasswordContentDescription = stringResource(Res.string.hide_password)
+        hidePasswordContentDescription = stringResource(Res.string.hide_password),
+        onFormDoneClicked = onSignInClicked
     )
 
     Spacer(modifier = Modifier.height(16.dp))

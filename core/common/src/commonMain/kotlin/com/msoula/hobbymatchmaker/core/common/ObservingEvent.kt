@@ -4,12 +4,12 @@ import androidx.compose.runtime.Composable
 import kotlinx.coroutines.flow.Flow
 
 @Composable
-expect fun <T> observeFlowWithLifecycle(
-    flow: Flow<T>,
-    onEvent: (T) -> Unit
-)
-
-@Composable
-fun <T> ObserveAsEvents(flow: Flow<T>, onEvent: (T) -> Unit) {
+fun <T> ObserveAsEvents(flow: Flow<T>, onEvent: suspend (T) -> Unit) {
     observeFlowWithLifecycle(flow, onEvent)
 }
+
+@Composable
+expect fun <T> observeFlowWithLifecycle(
+    flow: Flow<T>,
+    onEvent: suspend (T) -> Unit
+)
