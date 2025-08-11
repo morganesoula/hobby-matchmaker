@@ -16,7 +16,9 @@ fun MovieDomainModel.toMovieDB(): Movie {
         releaseDate = null,
         popularity = null,
         status = null,
-        videoKey = null
+        videoKey = null,
+        duration = null,
+        note = this.note
     )
 }
 
@@ -28,6 +30,7 @@ fun Movie.toMovieDomainModel(): MovieDomainModel {
         localCoverFilePath = this.localCoverFilePath ?: "",
         isFavorite = this.isFavorite == 1L,
         isSeen = this.isSeen == 1L,
-        overview = this.synopsis
+        overview = this.synopsis,
+        note = this.note ?: 0.0
     )
 }

@@ -26,7 +26,8 @@ fun MovieDetailDataEntity.toMovieDetailDomainModel(): MovieDetailDomainModel {
                 actor.name,
                 actor.role
             )
-        }
+        },
+        duration = this.movie.duration?.toInt()
     )
 }
 
@@ -38,7 +39,8 @@ fun MovieDetailDomainModel.toMovieUpdated(): MovieUpdatedDataEntity {
         genres = this.genre?.toJson(),
         status = this.status,
         popularity = this.popularity,
-        cast = this.cast?.map { actor -> Actor(actor.id, actor.name, actor.role) } ?: emptyList()
+        cast = this.cast?.map { actor -> Actor(actor.id, actor.name, actor.role) } ?: emptyList(),
+        duration = this.duration
     )
 }
 

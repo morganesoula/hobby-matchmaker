@@ -12,7 +12,8 @@ data class MovieDetailResponseRemoteModel(
     @SerialName("popularity") val popularity: Double = -1.0,
     @SerialName("release_date") val releaseDate: String = "",
     @SerialName("status") val status: String = "",
-    @SerialName("title") val title: String = ""
+    @SerialName("title") val title: String = "",
+    @SerialName("runtime") val duration: Int = -1
 )
 
 @Serializable

@@ -32,6 +32,7 @@ class ObserveMovieDetailUseCase(
             val job = launch {
                 movieDetailRepository.observeMovieDetail(parameters.longValue)
                     .collect { movieDetail ->
+                        Logger.d("Into DetailUseCase with movieDetail duration: ${movieDetail?.duration}")
                         when {
                             movieDetail == null -> send(Result.Failure(ObserveMovieErrors.Empty))
 
@@ -64,7 +65,7 @@ class ObserveMovieDetailUseCase(
 
                                     is Result.Failure -> {
                                         Logger.e("Error fetching cast: ${result.error.message}")
-                                        send(Result.Failure(mapCreditError(result.error as MovieDetailDomainError)))
+                                        send(Result.Failure(mapCreditError(result.error)))
                                     }
 
                                     else -> {
@@ -95,7 +96,7 @@ class ObserveMovieDetailUseCase(
         return when (detailResult) {
             is Result.Failure -> {
                 Logger.e("FetchMovieDetail error: ${detailResult.error.message}")
-                Result.Failure(mapDetailError(detailResult.error as MovieDetailDomainError))
+                Result.Failure(mapDetailError(detailResult.error))
             }
 
             is Result.Success -> {
@@ -108,6 +109,7 @@ class ObserveMovieDetailUseCase(
                     if (creditResult is Result.Success) creditResult.data else emptyList()
 
                 val updatedMovie = detailResult.data.copy(cast = safeCast)
+                Logger.d("Updated movie in UseCase with duration: ${updatedMovie.duration}")
                 movieDetailRepository.saveMovieDetail(updatedMovie)
 
                 return Result.Success(ObserveMovieSuccess.DataLoadedInDB)

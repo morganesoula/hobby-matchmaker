@@ -9,5 +9,6 @@ data class MovieUiModel(
     val isFavorite: Boolean,
     val playFavoriteAnimation: Boolean = true,
     val title: String,
-    val overview: String?
+    val overview: String?,
+    val note: Double
 )

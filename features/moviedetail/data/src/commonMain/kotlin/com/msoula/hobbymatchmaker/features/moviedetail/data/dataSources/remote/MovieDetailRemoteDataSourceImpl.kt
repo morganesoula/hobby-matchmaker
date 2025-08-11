@@ -31,6 +31,8 @@ class MovieDetailRemoteDataSourceImpl(
                     is Result.Success -> response.data.toMovieDetailDomainModel()
                     else -> MovieDetailDomainModel()
                 }
+
+                Logger.d("Inside fetchMovieDetail - DataSource - ${data.duration}")
                 Result.Success(data)
             },
             errorMapper = { throwable ->

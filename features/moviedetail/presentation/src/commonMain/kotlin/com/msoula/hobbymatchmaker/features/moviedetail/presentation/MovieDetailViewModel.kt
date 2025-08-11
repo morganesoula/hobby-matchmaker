@@ -21,10 +21,8 @@ import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.toMov
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -45,9 +43,6 @@ class MovieDetailViewModel(
     private var currentMovie: MovieDetailUiModel? = MovieDetailUiModel()
     private val language = getDeviceLocale()
 
-    private val _movieDisponibility: MutableStateFlow<String> = MutableStateFlow("")
-    var movieDisponibility = _movieDisponibility.asStateFlow()
-
     val viewState: StateFlow<MovieDetailViewStateModel> =
         observeMovieDetailUseCase(Parameters.LongStringParam(movieId, language))
             .map { result ->
@@ -56,7 +51,9 @@ class MovieDetailViewModel(
                     is Result.Success -> {
                         when (val data = result.data) {
                             is ObserveMovieSuccess.Success -> {
+                                Logger.d("Into VM with duration: ${data.data.duration}")
                                 currentMovie = data.data.toMovieDetailUiModel()
+                                Logger.d("Into VM with current movie duration ${currentMovie?.duration}")
                                 MovieDetailViewStateModel.Success(currentMovie!!)
                             }
 

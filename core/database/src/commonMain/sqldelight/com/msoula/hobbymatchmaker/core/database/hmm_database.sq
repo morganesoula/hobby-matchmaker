@@ -10,7 +10,9 @@ CREATE TABLE movie (
     isSeen INTEGER DEFAULT 0,
     popularity REAL DEFAULT 0.0,
     status TEXT,
-    videoKey TEXT
+    videoKey TEXT,
+    duration INTEGER,
+    note REAL
 );
 
 CREATE TABLE genre (
@@ -37,14 +39,14 @@ CREATE TABLE movie_actor_cross_ref (
  insertMovie:
  INSERT INTO movie (
      movieId, title, posterFileName, synopsis, releaseDate, genres, localCoverFilePath,
-     isFavorite, isSeen, popularity, status, videoKey
- ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+     isFavorite, isSeen, popularity, status, videoKey, duration, note
+ ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
  updateExistingMovie:
  UPDATE movie
  SET title = ?, posterFileName = ?, synopsis = ?, releaseDate = ?, genres = ?,
      localCoverFilePath = ?, isFavorite = ?, isSeen = ?, popularity = ?,
-     status = ?, videoKey = ?
+     status = ?, videoKey = ?, duration = ?, note = ?
  WHERE movieId = ?;
 
 insertActor:
@@ -79,7 +81,8 @@ UPDATE movie SET
     synopsis = :overview,
     status = :status,
     popularity = :popularity,
-    genres = :genres
+    genres = :genres,
+    duration = :duration
 WHERE movieId = :movieId;
 
 observeMovies:
@@ -87,7 +90,7 @@ SELECT * FROM movie;
 
 observeDetailMovie:
 SELECT m.movieId, m.title, m.genres, m.popularity, m.releaseDate, m.synopsis,
-       m.status, m.localCoverFilePath, m.videoKey,
+       m.status, m.localCoverFilePath, m.videoKey, m.duration,
        a.actorId, a.name AS actorName, a.role AS actorRole
 FROM movie m
 LEFT JOIN movie_actor_cross_ref c ON m.movieId = c.movieId

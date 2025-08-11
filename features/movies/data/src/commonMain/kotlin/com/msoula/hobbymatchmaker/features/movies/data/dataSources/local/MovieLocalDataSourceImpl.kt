@@ -59,6 +59,7 @@ class MovieLocalDataSourceImpl(private val movieDAO: MovieDAOImpl) : MovieLocalD
 
     override suspend fun upsertAll(movies: List<MovieDomainModel>) {
         try {
+            Logger.d("Into DataSource with first movie note: ${movies.first().note}")
             movieDAO.upsertMovies(movies.map { it.toMovieDB() })
         } catch (exception: CancellationException) {
             throw exception

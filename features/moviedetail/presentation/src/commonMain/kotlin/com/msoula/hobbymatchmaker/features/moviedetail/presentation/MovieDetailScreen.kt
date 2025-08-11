@@ -10,13 +10,14 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -55,6 +56,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontStyle
@@ -68,6 +70,7 @@ import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.msoula.hobbymatchmaker.core.common.ObserveAsEvents
+import com.msoula.hobbymatchmaker.core.common.toReadableDuration
 import com.msoula.hobbymatchmaker.core.design.component.ExpandableTextComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMDetailTopBar
 import com.msoula.hobbymatchmaker.core.design.component.LoadingCircularProgress
@@ -139,12 +142,11 @@ fun MovieDetailScreen(
 
     LaunchedEffect(movie.id) {
         videoId = movie.videoKey
-        videoPlayerVisible = videoId.isNotEmpty()
+        videoPlayerVisible = false
         isLoading = false
     }
 
     Scaffold(
-        modifier = Modifier.systemBarsPadding(),
         snackbarHost = {
             SnackbarHost(
                 hostState = snackBarHostState,
@@ -188,14 +190,22 @@ fun MovieDetailScreen(
 
         if (isLoading) LoadingCircularProgress()
 
-        Box(modifier = modifier.fillMaxSize().padding(padding)) {
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(
+                    start = padding.calculateStartPadding(LocalLayoutDirection.current),
+                    end = padding.calculateEndPadding(LocalLayoutDirection.current),
+                    bottom = padding.calculateBottomPadding()
+                )
+        ) {
             // Background image
             AsyncImage(
                 model = posterModel,
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxSize()
-                    .graphicsLayer { translationY = scrollState.value * 0.2f },
+                    .graphicsLayer { translationY = -scrollState.value * 0.2f },
                 contentScale = ContentScale.Crop
             )
 
@@ -211,7 +221,7 @@ fun MovieDetailScreen(
                 modifier = Modifier
                     .verticalScroll(scrollState)
                     .padding(
-                        top = 200.dp,
+                        top = 300.dp,
                         start = 16.dp,
                         end = 16.dp,
                         bottom = bottomInset + 24.dp
@@ -252,8 +262,14 @@ fun MovieDetailScreen(
                     )
 
                     Text(
-                        text = " · " + movie.genre.toString()
+                        text = " · " + movie.genre.take(3).toString()
                             .removeSurrounding("[", "]"),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+
+                    Text(
+                        text = " · " + movie.duration.toReadableDuration(),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )

@@ -9,5 +9,6 @@ data class MovieUpdatedDataEntity(
     val genres: String?,
     val status: String?,
     val popularity: Double?,
-    val cast: List<Actor>
+    val cast: List<Actor>,
+    val duration: Int?
 )

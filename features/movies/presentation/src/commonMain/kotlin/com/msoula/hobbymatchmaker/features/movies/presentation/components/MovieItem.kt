@@ -10,6 +10,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -36,11 +39,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -52,6 +55,7 @@ import coil3.compose.AsyncImagePainter
 import coil3.compose.LocalPlatformContext
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
+import com.msoula.hobbymatchmaker.core.common.formatOneDecimal
 import com.msoula.hobbymatchmaker.core.design.component.HMMShimmerEffect
 import com.msoula.hobbymatchmaker.features.movies.presentation.Res
 import com.msoula.hobbymatchmaker.features.movies.presentation.ic_movie_clapper_board
@@ -152,7 +156,7 @@ fun MovieItemContent(
                 defaultElevation = if (scale > 1f) 12.dp else 4.dp
             ),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                containerColor = Color.Transparent
             )
         ) {
             MovieItemContentCard(modifier, movie, onCardEvent, painter)
@@ -217,9 +221,8 @@ fun MovieItemContentCard(
         Image(
             painter = painter,
             contentDescription = null,
-            modifier = Modifier
-                .clip(RoundedCornerShape(5))
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
         )
 
         Box(
@@ -236,6 +239,25 @@ fun MovieItemContentCard(
                     )
                 )
         )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+                .align(Alignment.TopCenter),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            RatingChip(movie.note)
+            Spacer(Modifier.weight(1f))
+            FavoriteButton(
+                movie.isFavorite,
+                favoriteScale,
+                onClick = {
+                    animateFavorite = true
+                    onCardEvent(CardEventModel.OnDoubleTap(movie))
+                }
+            )
+        }
 
         Text(
             text = movie.title,
@@ -259,26 +281,38 @@ fun MovieItemContentCard(
                     .scale(bigHeartScale)
             )
         }
+    }
+}
 
-        IconButton(
-            onClick = {
-                animateFavorite = true
-                onCardEvent(CardEventModel.OnDoubleTap(movie))
-            },
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(10.dp)
-                .background(
-                    color = Color.Black.copy(alpha = 0.3f),
-                    shape = CircleShape
-                )
-                .scale(favoriteScale)
-        ) {
-            Icon(
-                imageVector = if (movie.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                contentDescription = if (movie.isFavorite) "Remove from favorites" else "Add to favorites",
-                tint = if (movie.isFavorite) Color.Red else Color.White,
+@Composable
+fun FavoriteButton(isFavorite: Boolean, scale: Float, onClick: () -> Unit) {
+    IconButton(
+        onClick = onClick,
+        modifier = Modifier
+            .background(color = Color.Black.copy(alpha = 0.3f), shape = CircleShape)
+            .scale(scale)
+    ) {
+        Icon(
+            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+            contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
+            tint = if (isFavorite) Color.Red else Color.White,
+        )
+    }
+}
+
+@Composable
+fun RatingChip(voteAverage: Double, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+            .background(
+                color = Color.Black.copy(alpha = 0.3f),
+                shape = RoundedCornerShape(12.dp)
             )
-        }
+            .padding(10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(Icons.Default.Star, contentDescription = null, tint = Color.White)
+        Spacer(Modifier.width(4.dp))
+        Text(voteAverage.formatOneDecimal(), style = MaterialTheme.typography.labelLarge)
     }
 }

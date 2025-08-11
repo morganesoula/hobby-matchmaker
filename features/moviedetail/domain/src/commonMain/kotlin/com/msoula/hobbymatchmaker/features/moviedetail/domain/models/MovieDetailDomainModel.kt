@@ -12,7 +12,8 @@ data class MovieDetailDomainModel(
     val status: String? = null,
     val localCoverFilePath: String? = null,
     var videoKey: String? = "",
-    val cast: List<MovieActorDomainModel>? = null
+    val cast: List<MovieActorDomainModel>? = null,
+    val duration: Int ? = null
 ) {
     companion object {
         const val DEFAULT_ID: Long = -1
@@ -22,6 +23,8 @@ data class MovieDetailDomainModel(
         const val DEFAULT_SYNOPSIS: String = ""
         const val DEFAULT_STATUS: String = ""
         const val DEFAULT_POSTER_PATH: String = ""
+        const val DEFAULT_VIDEO_KEY: String = ""
+        const val DEFAULT_DURATION: Int = 0
     }
 }
 

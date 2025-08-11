@@ -1,5 +1,6 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.domain.repositories
 
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.safeCall
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.dataSources.local.MovieDetailLocalDataSource
@@ -26,6 +27,7 @@ class MovieDetailRepositoryImpl(
 
                 is Result.Success -> {
                     result.data?.let { data ->
+                        Logger.d("Inside fetchMovieDetail - Repo - with duration: ${data.duration}")
                         Result.Success(
                             MovieDetailDomainModel(
                                 id = data.id,
@@ -35,6 +37,7 @@ class MovieDetailRepositoryImpl(
                                 releaseDate = data.releaseDate,
                                 synopsis = data.synopsis,
                                 status = data.status,
+                                duration = data.duration
                             )
                         )
                     }
