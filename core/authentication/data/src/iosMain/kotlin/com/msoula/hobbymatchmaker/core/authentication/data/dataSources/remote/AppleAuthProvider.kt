@@ -1,6 +1,7 @@
 package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote
 
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.errors.ProviderError
+import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.providers.AuthProvider
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Result
@@ -49,6 +50,9 @@ class AppleAuthProvider(
     }
 
     override fun isSignedIn(): Boolean = auth.currentUser != null
+
+    override suspend fun signInAnonymously(): Result<FirebaseUserInfoDomainModel, ProviderError> =
+        Result.Loading
 }
 
 private fun mapUserToFirebaseUserInfoDomainModel(

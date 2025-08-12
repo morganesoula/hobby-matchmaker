@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,9 +40,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -65,6 +68,7 @@ import com.msoula.hobbymatchmaker.core.design.component.keyboardDismissOnTap
 import com.msoula.hobbymatchmaker.core.login.presentation.Res
 import com.msoula.hobbymatchmaker.core.login.presentation.cancel
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient
+import com.msoula.hobbymatchmaker.core.login.presentation.components.GuestModeDialog
 import com.msoula.hobbymatchmaker.core.login.presentation.components.SocialMediaButtonListPlatformSpecificUI
 import com.msoula.hobbymatchmaker.core.login.presentation.continue_as_guest_title
 import com.msoula.hobbymatchmaker.core.login.presentation.continue_with_rs
@@ -85,7 +89,6 @@ import com.msoula.hobbymatchmaker.core.login.presentation.welcome_back_subtitle
 import com.msoula.hobbymatchmaker.core.login.presentation.welcome_back_title
 import com.msoula.hobbymatchmaker.core.login.presentation.your_email
 import dev.gitlive.firebase.auth.AuthCredential
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 
@@ -95,53 +98,49 @@ fun SignInScreenContent(
     redirectToMovieScreen: () -> Unit,
     redirectToSignUpScreen: () -> Unit,
     resetSignInState: () -> Unit,
-    onContinueAsGuest: () -> Unit,
+    shouldShowGuestWarning: Boolean,
     facebookUIClient: FacebookUIClient
 ) {
-    val coroutineScope = rememberCoroutineScope()
     val resetPasswordState by signInViewModel.resetPasswordState.collectAsState()
     val signInState by signInViewModel.signInState.collectAsState()
     val openResetDialog by signInViewModel.openResetDialog.collectAsState()
     val loginFormState by signInViewModel.formDataFlow.collectAsState()
+    val isGuestLoading by signInViewModel.isGuestLoading.collectAsState()
     val circularProgressLoading by
     signInViewModel.circularProgressLoading.collectAsState()
+    var showGuestDialog by rememberSaveable { mutableStateOf(false) }
 
     val snackBarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(Unit) {
-        snapshotFlow { resetPasswordState to signInState }
-            .collect { (resetState, signIn) ->
-                when (resetState) {
-                    is ResetPasswordEvent.Error ->
-                        snackBarHostState.showSnackbar(resetState.message)
+    LaunchedEffect(resetPasswordState) {
+        when (val state = resetPasswordState) {
+            is ResetPasswordEvent.Error ->
+                snackBarHostState.showSnackbar(state.message)
 
-                    is ResetPasswordEvent.Success -> {
-                        signInViewModel.onEvent(
-                            AuthenticationUIEvent.HideForgotPasswordDialog
-                        )
-                        snackBarHostState.showSnackbar(
-                            getString(Res.string.reset_password)
-                        )
-                    }
-
-                    else -> Unit
-                }
-
-                when (signIn) {
-                    is SignInEvent.Error -> coroutineScope.launch {
-                        snackBarHostState.showSnackbar(
-                            (signInState as SignInEvent.Error).message
-                        )
-                    }
-
-                    is SignInEvent.Success -> {
-                        redirectToMovieScreen()
-                        resetSignInState()
-                    }
-
-                    else -> Unit
-                }
+            is ResetPasswordEvent.Success -> {
+                signInViewModel.onEvent(
+                    AuthenticationUIEvent.HideForgotPasswordDialog
+                )
+                snackBarHostState.showSnackbar(
+                    getString(Res.string.reset_password)
+                )
             }
+
+            else -> Unit
+        }
+    }
+
+    LaunchedEffect(signInState) {
+        when (val state = signInState) {
+            is SignInEvent.Error -> snackBarHostState.showSnackbar(state.message)
+
+            is SignInEvent.Success -> {
+                redirectToMovieScreen()
+                resetSignInState()
+            }
+
+            else -> Unit
+        }
     }
 
     Scaffold(
@@ -245,7 +244,13 @@ fun SignInScreenContent(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     OutlinedButton(
-                        onClick = { onContinueAsGuest() },
+                        onClick = {
+                            if (shouldShowGuestWarning) showGuestDialog = true
+                            else signInViewModel.onEvent(
+                                AuthenticationUIEvent.OnContinueAsGuestDirect
+                            )
+                        },
+                        enabled = !isGuestLoading,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp, vertical = 8.dp),
@@ -255,13 +260,36 @@ fun SignInScreenContent(
                             contentColor = MaterialTheme.colorScheme.onSurface
                         )
                     ) {
-                        Text(
-                            text = stringResource(Res.string.continue_as_guest_title),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            textAlign = TextAlign.Center
-                        )
+                        if (isGuestLoading) {
+                            CircularProgressIndicator(
+                                strokeWidth = 2.dp,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(Modifier.widthIn(12.dp))
+                        } else {
+                            Text(
+                                text = stringResource(Res.string.continue_as_guest_title),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                textAlign = TextAlign.Center
+                            )
+                        }
                     }
+
+                    GuestModeDialog(
+                        show = showGuestDialog,
+                        onDismiss = { showGuestDialog = false },
+                        onContinue = { dontAskAgain ->
+                            signInViewModel.onEvent(
+                                AuthenticationUIEvent.OnContinueAsGuestConfirmed(
+                                    dontAskAgain
+                                )
+                            )
+                        },
+                        onCreateAccount = {
+                            redirectToSignUpScreen()
+                        }
+                    )
                 }
             }
         }

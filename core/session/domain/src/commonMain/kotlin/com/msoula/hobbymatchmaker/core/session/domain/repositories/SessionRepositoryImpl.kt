@@ -18,7 +18,9 @@ class SessionRepositoryImpl(
     override suspend fun createUser(user: SessionUserDomainModel) =
         sessionRemoteDataSource.createUser(user)
 
-    override suspend fun setIsGuest(isGuest: Boolean) {
-        sessionLocalDataSource.setIsGuest(isGuest)
-    }
+    override suspend fun setShouldShowGuestDialog(shouldShow: Boolean) =
+        sessionLocalDataSource.setShouldShowGuestDialog(shouldShow)
+
+    override fun observeShouldShowGuestDialog(): Flow<Boolean> =
+        sessionLocalDataSource.observeShouldShowGuestDialog()
 }

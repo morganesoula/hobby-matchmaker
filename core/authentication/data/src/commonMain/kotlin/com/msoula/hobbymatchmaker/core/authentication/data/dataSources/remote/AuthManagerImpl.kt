@@ -1,18 +1,20 @@
 package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote
 
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.errors.ProviderError
+import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.providers.AnonymousAuthProvider
+import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.providers.AuthProvider
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.common.Result
 import dev.gitlive.firebase.auth.AuthCredential
 
-class AuthManagerImpl(private val providers: List<AuthProvider>): AuthManager {
+class AuthManagerImpl(private val providers: List<AuthProvider>) : AuthManager {
 
     override suspend fun signIn(
         providerType: ProviderType,
         credential: AuthCredential
     ): Result<FirebaseUserInfoDomainModel, ProviderError> {
-        val provider = providers.find { it::class.simpleName == providerType.className }
+        val provider = findProvider(providerType)
             ?: return Result.Failure(ProviderError.NoProviderFound("Provider not found"))
 
         return provider.signIn(credential)
@@ -33,4 +35,24 @@ class AuthManagerImpl(private val providers: List<AuthProvider>): AuthManager {
             Result.Success(true)
         }
     }
+
+    override suspend fun signIn(providerType: ProviderType): Result<FirebaseUserInfoDomainModel, ProviderError> {
+        val provider = findProvider(providerType)
+            ?: return Result.Failure(
+                ProviderError.NoProviderFound(
+                    "Provider not found: ${providerType.name}"
+                )
+            )
+
+        return if (providerType == ProviderType.GUEST && provider is AnonymousAuthProvider) {
+            provider.signInAnonymously()
+        } else {
+            Result.Failure(ProviderError.AnonymousSignInError(
+                "Credential is required for $providerType")
+            )
+        }
+    }
+
+    private fun findProvider(type: ProviderType): AuthProvider? =
+        providers.find { it::class.simpleName == type.className }
 }

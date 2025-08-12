@@ -3,6 +3,7 @@ package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.mappers.safeCallTyped
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.mappers.toFirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.dataSources.AuthenticationRemoteDataSource
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ContinueAsGuestError
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.CreateUserWithEmailAndPasswordError
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutError
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ResetPasswordError
@@ -110,5 +111,18 @@ class AuthenticationRemoteDataSourceImpl(
 
     override suspend fun fetchFirebaseUserInfo(): FirebaseUserInfoDomainModel? {
         return auth.currentUser?.toFirebaseUserInfoDomainModel()
+    }
+
+    override suspend fun signInAnonymously(): Result<FirebaseUserInfoDomainModel, ContinueAsGuestError> {
+        return try {
+            when (val result = authManager.signIn(ProviderType.GUEST)) {
+                is Result.Success -> Result.Success(result.data)
+                is Result.Failure -> Result.Failure(ContinueAsGuestError.Other(result.error.message))
+                else -> Result.Loading
+            }
+        } catch (e: Exception) {
+            Logger.e("Exception caught while signing in anonymously ${e.message}")
+            Result.Failure(ContinueAsGuestError.Other("Error with anonymous: ${e.message}"))
+        }
     }
 }

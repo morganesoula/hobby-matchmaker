@@ -11,5 +11,6 @@ interface SessionRepository {
     suspend fun createUser(user: SessionUserDomainModel):
         Result<Boolean, SessionErrors.CreateUserError>
 
-    suspend fun setIsGuest(isGuest: Boolean)
+    suspend fun setShouldShowGuestDialog(shouldShow: Boolean)
+    fun observeShouldShowGuestDialog(): Flow<Boolean>
 }

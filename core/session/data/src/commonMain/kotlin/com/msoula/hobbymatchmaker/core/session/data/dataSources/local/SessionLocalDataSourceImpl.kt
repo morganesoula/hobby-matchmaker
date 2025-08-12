@@ -18,6 +18,9 @@ class SessionLocalDataSourceImpl(
     companion object {
         val IS_CONNECTED_KEY =
             booleanPreferencesKey("is_connected_key")
+
+        val SHOULD_SHOW_GUEST_DIALOG_KEY =
+            booleanPreferencesKey("should_show_guest_dialog_key")
     }
 
     override suspend fun setIsConnected(isConnected: Boolean) {
@@ -35,7 +38,13 @@ class SessionLocalDataSourceImpl(
             preferences[IS_CONNECTED_KEY] ?: false
         }
 
-    override suspend fun setIsGuest(isGuest: Boolean) {
-        TODO("Not yet implemented")
+    override suspend fun setShouldShowGuestDialog(shouldShow: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[SHOULD_SHOW_GUEST_DIALOG_KEY] = shouldShow
+        }
     }
+
+    override fun observeShouldShowGuestDialog(): Flow<Boolean> = dataStore.data
+        .catch { if (it is IOException) emit(emptyPreferences()) else throw it }
+        .map { preferences -> preferences[SHOULD_SHOW_GUEST_DIALOG_KEY] ?: true }
 }

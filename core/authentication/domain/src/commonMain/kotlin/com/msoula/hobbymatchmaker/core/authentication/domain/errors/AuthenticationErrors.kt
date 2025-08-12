@@ -46,6 +46,14 @@ sealed class ResetPasswordError : AppError {
         get() = ""
 }
 
+sealed class ContinueAsGuestError : AppError {
+    data object NoConnection : ContinueAsGuestError()
+    data class Other(override val message: String) : ContinueAsGuestError()
+
+    override val message: String
+        get() = ""
+}
+
 sealed class LogOutError(override val message: String) : AppError {
     data class FirebaseException(val firebaseErrorMessage: String) :
         LogOutError(firebaseErrorMessage)

@@ -1,4 +1,4 @@
-package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote
+package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.providers
 
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.errors.ProviderError
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.mappers.toFirebaseUserInfoDomainModel
@@ -33,4 +33,7 @@ class GoogleAuthProvider(private val auth: FirebaseAuth) : AuthProvider {
     }
 
     override fun isSignedIn(): Boolean = auth.currentUser != null
+
+    override suspend fun signInAnonymously(): Result<FirebaseUserInfoDomainModel, ProviderError> =
+        Result.Loading
 }

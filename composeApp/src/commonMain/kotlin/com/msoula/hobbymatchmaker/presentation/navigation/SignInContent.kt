@@ -1,6 +1,8 @@
 package com.msoula.hobbymatchmaker.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.design.component.PlatformBackHandler
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient
@@ -21,6 +23,10 @@ fun SignInContent(
         parametersOf(socialClients)
     }
 
+    val shouldShowGuestWarning by signInViewModel
+        .shouldShowGuestDialog
+        .collectAsState(initial = true)
+
     SignInScreenContent(
         signInViewModel = signInViewModel,
         redirectToMovieScreen = {
@@ -33,9 +39,7 @@ fun SignInContent(
             signInViewModel.resetSignInState()
         },
         facebookUIClient = facebookUIClient,
-        onContinueAsGuest = {
-            signInViewModel.onContinueAsGuest()
-        }
+        shouldShowGuestWarning = shouldShowGuestWarning
     )
 
     PlatformBackHandler()

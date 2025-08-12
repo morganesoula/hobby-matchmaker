@@ -16,8 +16,16 @@ import kotlinx.serialization.Serializable
 class AuthRootComponentImpl(
     componentContext: ComponentContext,
     private val onAuthenticated: () -> Unit,
-    private val signInComponentFactory: (ComponentContext, onSignUpRequested: () -> Unit, onAuthenticated: () -> Unit) -> SignInComponent,
-    private val signUpComponentFactory: (ComponentContext, onSignInRequested: () -> Unit, onAuthenticated: () -> Unit) -> SignUpComponent
+    private val signInComponentFactory: (
+        ComponentContext,
+        onSignUpRequested: () -> Unit,
+        onAuthenticated: () -> Unit
+    ) -> SignInComponent,
+    private val signUpComponentFactory: (
+        ComponentContext,
+        onSignInRequested: () -> Unit,
+        onAuthenticated: () -> Unit
+    ) -> SignUpComponent
 ) : AuthRootComponent, ComponentContext by componentContext {
 
     private val navigation = StackNavigation<AuthConfig>()
@@ -32,7 +40,10 @@ class AuthRootComponentImpl(
         )
 
     @OptIn(DelicateDecomposeApi::class)
-    private fun createChild(config: AuthConfig, context: ComponentContext): AuthRootComponent.Child =
+    private fun createChild(
+        config: AuthConfig,
+        context: ComponentContext
+    ): AuthRootComponent.Child =
         when (config) {
             AuthConfig.SignIn -> AuthRootComponent.Child.SignIn(
                 signInComponentFactory(

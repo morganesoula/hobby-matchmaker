@@ -7,6 +7,11 @@ import com.msoula.hobbymatchmaker.core.common.Result
 import dev.gitlive.firebase.auth.AuthCredential
 
 interface AuthManager {
-    suspend fun signIn(providerType: ProviderType, credential: AuthCredential): Result<FirebaseUserInfoDomainModel, ProviderError>
+    suspend fun signIn(
+        providerType: ProviderType,
+        credential: AuthCredential
+    ): Result<FirebaseUserInfoDomainModel, ProviderError>
+
+    suspend fun signIn(providerType: ProviderType): Result<FirebaseUserInfoDomainModel, ProviderError>
     suspend fun signOut(): Result<Boolean, ProviderError>
 }

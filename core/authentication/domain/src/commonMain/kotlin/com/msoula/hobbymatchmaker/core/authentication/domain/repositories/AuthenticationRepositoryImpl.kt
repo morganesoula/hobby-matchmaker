@@ -1,6 +1,7 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.repositories
 
 import com.msoula.hobbymatchmaker.core.authentication.domain.dataSources.AuthenticationRemoteDataSource
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ContinueAsGuestError
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.CreateUserWithEmailAndPasswordError
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutError
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ResetPasswordError
@@ -83,4 +84,7 @@ class AuthenticationRepositoryImpl(
 
     override suspend fun fetchFirebaseUserInfo() =
         remoteDataSource.fetchFirebaseUserInfo()
+
+    override suspend fun signInAnonymously(): Result<FirebaseUserInfoDomainModel, ContinueAsGuestError> =
+        remoteDataSource.signInAnonymously()
 }

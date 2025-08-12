@@ -4,6 +4,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ContinueAsGuestUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ResetPasswordUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.UnifiedSignInUseCase
 import com.msoula.hobbymatchmaker.core.common.AppError
@@ -15,18 +16,25 @@ import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationU
 import com.msoula.hobbymatchmaker.core.login.presentation.models.ResetPasswordEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.SignInEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.models.SignInFormStateModel
+import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveShouldShowGuestDialogUseCase
+import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetShouldShowGuestDialogUseCase
 import dev.gitlive.firebase.auth.AuthCredential
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SignInViewModel(
     private val authFormValidationUseCases: AuthFormValidationUseCase,
     private val resetPasswordUseCase: ResetPasswordUseCase,
+    private val continueAsGuestUseCase: ContinueAsGuestUseCase,
+    private val setShouldShowGuestDialogUseCase: SetShouldShowGuestDialogUseCase,
+    val observeShouldShowGuestDialog: ObserveShouldShowGuestDialogUseCase,
     private val unifiedSignInUseCase: UnifiedSignInUseCase,
     private val socialClients: Map<ProviderType, SocialUIClient>,
     private val ioDispatcher: CoroutineDispatcher,
@@ -51,6 +59,14 @@ class SignInViewModel(
     private val _signInState: MutableStateFlow<SignInEvent> =
         MutableStateFlow(SignInEvent.Idle)
     val signInState: StateFlow<SignInEvent> = _signInState.asStateFlow()
+
+    private val _isGuestLoading = MutableStateFlow(false)
+    val isGuestLoading: StateFlow<Boolean> = _isGuestLoading.asStateFlow()
+
+    val shouldShowGuestDialog = observeShouldShowGuestDialog().stateIn(
+        viewModelScope,
+        SharingStarted.Eagerly, true
+    )
 
     fun onEvent(event: AuthenticationUIEvent) {
         when (event) {
@@ -78,6 +94,15 @@ class SignInViewModel(
 
             AuthenticationUIEvent.HideForgotPasswordDialog ->
                 openResetDialog.update { false }
+
+            AuthenticationUIEvent.OnContinueAsGuestDirect ->
+                scope.launch(ioDispatcher) { connectAsGuest() }
+
+            is AuthenticationUIEvent.OnContinueAsGuestConfirmed ->
+                scope.launch(ioDispatcher) {
+                    setShouldShowGuestDialogUseCase(shouldShow = !event.dontAskAgain)
+                    connectAsGuest()
+                }
 
             AuthenticationUIEvent.OnGoogleButtonClicked ->
                 scope.launch(ioDispatcher) {
@@ -196,6 +221,29 @@ class SignInViewModel(
         }
     }
 
+    private suspend fun connectAsGuest() {
+        continueAsGuestUseCase(Parameters.None).collect { result ->
+            _signInState.update {
+                when (result) {
+                    is Result.Loading -> {
+                        _isGuestLoading.update { true }
+                        SignInEvent.Loading
+                    }
+
+                    is Result.Failure -> {
+                        _isGuestLoading.update { false }
+                        SignInEvent.Error(result.error.message)
+                    }
+
+                    is Result.Success -> {
+                        _isGuestLoading.update { false }
+                        SignInEvent.Success
+                    }
+                }
+            }
+        }
+    }
+
     private suspend fun handleError(error: AppError): String =
         errorMessageProvider.getMessage(error)
 
@@ -205,9 +253,5 @@ class SignInViewModel(
 
     fun resetForm() {
         _formDataFlow.update { SignInFormStateModel() }
-    }
-
-    fun onContinueAsGuest() {
-
     }
 }

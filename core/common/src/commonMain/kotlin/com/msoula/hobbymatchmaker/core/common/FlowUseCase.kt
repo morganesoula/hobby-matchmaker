@@ -9,6 +9,8 @@ sealed class Parameters {
     data class StringParam(val value: String) : Parameters()
     data class DoubleStringParam(val firstValue: String, val secondValue: String) : Parameters()
     data class LongStringParam(val longValue: Long, val stringValue: String) : Parameters()
+    data class BooleanParam(val shouldShow: Boolean) : Parameters()
+    data object None : Parameters()
 }
 
 abstract class FlowUseCase<in Parameters, Success, BusinessRuleError>(private val dispatcher: CoroutineDispatcher) {
