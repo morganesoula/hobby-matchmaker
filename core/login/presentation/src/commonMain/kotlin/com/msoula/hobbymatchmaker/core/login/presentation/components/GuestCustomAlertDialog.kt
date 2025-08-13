@@ -3,6 +3,7 @@ package com.msoula.hobbymatchmaker.core.login.presentation.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -18,6 +19,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import com.msoula.hobbymatchmaker.core.login.presentation.Res
+import com.msoula.hobbymatchmaker.core.login.presentation.continue_as_guest_create_redirect_button
+import com.msoula.hobbymatchmaker.core.login.presentation.continue_as_guest_dialog_text
+import com.msoula.hobbymatchmaker.core.login.presentation.continue_as_guest_dialog_title
+import com.msoula.hobbymatchmaker.core.login.presentation.continue_as_guest_dont_ask_again
+import com.msoula.hobbymatchmaker.core.login.presentation.continue_as_guest_validation_button
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun GuestModeDialog(
@@ -31,13 +39,17 @@ fun GuestModeDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("") },
+        title = { Text(stringResource(Res.string.continue_as_guest_dialog_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Vous pouvez utiliser l'app sans compte blablabla")
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(Res.string.continue_as_guest_dialog_text))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Checkbox(checked = dontAskAgain, onCheckedChange = { dontAskAgain = it })
-                    Text("Ne plus me demander")
+                    Text(stringResource(Res.string.continue_as_guest_dont_ask_again))
                 }
             }
         },
@@ -46,7 +58,7 @@ fun GuestModeDialog(
                 onDismiss()
                 onContinue(dontAskAgain)
             }) {
-                Text("Continuer quand même")
+                Text(stringResource(Res.string.continue_as_guest_validation_button))
             }
         },
         dismissButton = {
@@ -54,7 +66,11 @@ fun GuestModeDialog(
                 onDismiss()
                 onCreateAccount()
             }) {
-                Text("Créer un compte")
+                Text(
+                    stringResource(
+                        Res.string.continue_as_guest_create_redirect_button
+                    )
+                )
             }
         },
         properties = DialogProperties(

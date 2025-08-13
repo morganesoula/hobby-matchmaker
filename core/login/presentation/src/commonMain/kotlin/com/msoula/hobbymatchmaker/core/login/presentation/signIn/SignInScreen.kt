@@ -70,7 +70,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.cancel
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.components.GuestModeDialog
 import com.msoula.hobbymatchmaker.core.login.presentation.components.SocialMediaButtonListPlatformSpecificUI
-import com.msoula.hobbymatchmaker.core.login.presentation.continue_as_guest_title
+import com.msoula.hobbymatchmaker.core.login.presentation.continue_as_guest_button_title
 import com.msoula.hobbymatchmaker.core.login.presentation.continue_with_rs
 import com.msoula.hobbymatchmaker.core.login.presentation.email
 import com.msoula.hobbymatchmaker.core.login.presentation.forgot_password
@@ -268,7 +268,9 @@ fun SignInScreenContent(
                             Spacer(Modifier.widthIn(12.dp))
                         } else {
                             Text(
-                                text = stringResource(Res.string.continue_as_guest_title),
+                                text = stringResource(
+                                    Res.string.continue_as_guest_button_title
+                                ),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurface,
                                 textAlign = TextAlign.Center

@@ -53,5 +53,10 @@
     <string name="connection_issue">Problème de connexion. Veuillez vérifier votre réseau</string>
 
     // OTHER
-    <string name="continue_as_guest_title">Continuer en tant qu'invité</string>
+    <string name="continue_as_guest_button_title">Continuer en tant qu'invité</string>
+    <string name="continue_as_guest_dialog_title">Essayer en tant qu'invité</string>
+    <string name="continue_as_guest_dialog_text">Commencez sans compte: certaines fonctions sont restreintes (synchro, récupération).Vous pourrez créer un compte plus tard pour garder vos données.</string>
+    <string name="continue_as_guest_dont_ask_again">Ne plus demander</string>
+    <string name="continue_as_guest_create_redirect_button">Créer un compte</string>
+    <string name="continue_as_guest_validation_button">Continuer</string>
 </resources>
