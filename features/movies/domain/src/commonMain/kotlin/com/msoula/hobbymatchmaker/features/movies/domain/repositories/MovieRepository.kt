@@ -8,11 +8,8 @@ import kotlinx.coroutines.flow.Flow
 interface MovieRepository {
     fun observeMovies(): Flow<List<MovieDomainModel>>
 
-    suspend fun updateMovieWithFavoriteValue(
-        uuidUser: String,
-        id: Long,
-        isFavorite: Boolean
-    )
+    suspend fun updateMovieFavoriteLocal(id: Long, isFavorite: Boolean)
+    suspend fun updateMovieFavoriteRemote(uid: String, id: Long, isFavorite: Boolean)
 
     suspend fun updateMovieWithLocalCoverFilePath(
         coverFileName: String,
@@ -23,4 +20,7 @@ interface MovieRepository {
     suspend fun fetchMovies(language: String): Result<Unit, MovieErrors>
 
     suspend fun isSynopsisMovieAvailable(movieId: Long): Boolean
+    suspend fun getFavoriteLocalMovieIds(): List<Long>
+
+    suspend fun syncUserFavoritesRemote(uid: String, localIds: List<Long>)
 }

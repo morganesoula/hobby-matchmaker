@@ -21,7 +21,6 @@ val coreModuleSignInViewModel = module {
         SignInViewModel(
             authFormValidationUseCases = get(),
             resetPasswordUseCase = get(),
-            continueAsGuestUseCase = get(),
             observeShouldShowGuestDialog = get(),
             setShouldShowGuestDialogUseCase = get(),
             unifiedSignInUseCase = get(),

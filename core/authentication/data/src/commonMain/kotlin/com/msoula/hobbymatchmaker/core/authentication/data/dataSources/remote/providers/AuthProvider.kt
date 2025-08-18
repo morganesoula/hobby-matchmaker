@@ -7,7 +7,6 @@ import dev.gitlive.firebase.auth.AuthCredential
 
 interface AuthProvider {
     suspend fun signIn(credentials: AuthCredential): Result<FirebaseUserInfoDomainModel, ProviderError>
-    suspend fun signInAnonymously(): Result<FirebaseUserInfoDomainModel, ProviderError>
     suspend fun signOut(): Result<Boolean, ProviderError>
     fun isSignedIn(): Boolean
 }

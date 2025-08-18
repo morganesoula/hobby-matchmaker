@@ -246,4 +246,8 @@ class MovieDAOImpl(private val database: HMMDatabase) : MovieDAO {
     override suspend fun isMovieSynopsisAvailable(movieId: Long): Boolean {
         return database.hmm_databaseQueries.isMovieSynopsisAvailable(movieId).executeAsOne()
     }
+
+    override suspend fun getFavoriteLocalMovieIds(): List<Long> {
+        return database.hmm_databaseQueries.getFavoriteIds().executeAsList()
+    }
 }

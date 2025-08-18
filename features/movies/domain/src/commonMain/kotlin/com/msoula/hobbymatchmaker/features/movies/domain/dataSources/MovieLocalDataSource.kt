@@ -17,4 +17,5 @@ interface MovieLocalDataSource {
     )
     suspend fun upsertAll(movies: List<MovieDomainModel>)
     suspend fun isMovieSynopsisAvailable(movieId: Long): Boolean
+    suspend fun getFavoriteLocalMovieIds(): List<Long>
 }

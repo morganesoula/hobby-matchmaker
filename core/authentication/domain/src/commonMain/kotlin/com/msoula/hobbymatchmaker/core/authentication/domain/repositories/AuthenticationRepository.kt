@@ -1,6 +1,5 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.repositories
 
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ContinueAsGuestError
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.CreateUserWithEmailAndPasswordError
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutError
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ResetPasswordError
@@ -35,6 +34,4 @@ interface AuthenticationRepository {
 
     suspend fun isFirstSignIn(uid: String): Boolean
     suspend fun fetchFirebaseUserInfo(): FirebaseUserInfoDomainModel?
-
-    suspend fun signInAnonymously(): Result<FirebaseUserInfoDomainModel, ContinueAsGuestError>
 }

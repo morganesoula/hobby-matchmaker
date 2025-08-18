@@ -1,12 +1,13 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.useCases
 
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.toSignInError
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
+import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetIsConnectedUseCase
 import dev.gitlive.firebase.auth.AuthCredential
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
 
@@ -16,46 +17,40 @@ class UnifiedSignInUseCase(
     private val signInWithCredentialUseCase: SignInWithCredentialUseCase,
     private val setIsConnectedUseCase: SetIsConnectedUseCase
 ) {
-
     sealed interface Params {
         data class EmailPassword(val email: String, val password: String) : Params
         data class SocialMedia(val credential: AuthCredential, val providerType: ProviderType) :
             Params
     }
 
-    fun signIn(params: Params): Flow<Result<SignInSuccess, SignInError>> = when (params) {
-        is Params.EmailPassword ->
-            signInUseCase(Parameters.DoubleStringParam(params.email, params.password))
+    fun signIn(params: Params) =
+        when (params) {
+            is Params.EmailPassword ->
+                signInUseCase(Parameters.DoubleStringParam(params.email, params.password))
 
-        is Params.SocialMedia ->
-            socialMediaFlow(params)
-    }
+            is Params.SocialMedia ->
+                socialMediaSignIn(params.credential, params.providerType)
+        }
 
-    private fun socialMediaFlow(params: Params.SocialMedia) = channelFlow {
-        try {
-            send(Result.Loading)
+    private fun socialMediaSignIn(credential: AuthCredential, providerType: ProviderType) =
+        authenticationAction {
+            signInWithCredentialUseCase(credential, providerType)
+        }
 
-            when (val result = signInWithCredentialUseCase(
-                params.credential, params.providerType
-            )) {
-
-                is Result.Success -> {
-                    setIsConnectedUseCase(true)
-                    send(Result.Success(SignInSuccess))
-                }
-
-                is Result.Failure -> send(
-                    Result.Failure(
-                        SignInError.Other(
-                            result.error.message
-                                .ifBlank { "Apple Sign-In failed" })
-                    )
-                )
-
-                else -> Unit
+    private fun <Error : AppError> authenticationAction(
+        call: suspend () -> Result<*, Error>
+    ) = channelFlow<Result<SignInSuccess, SignInError>> {
+        send(Result.Loading)
+        when (val result = call()) {
+            is Result.Success -> {
+                setIsConnectedUseCase(true)
+                send(Result.Success(SignInSuccess))
             }
-        } catch (e: Exception) {
-            send(Result.Failure(SignInError.Other("Crash: ${e.message}")))
+
+            is Result.Failure ->
+                send(Result.Failure(result.error.toSignInError()))
+
+            else -> Unit
         }
     }.flowOn(dispatcher)
 }

@@ -50,9 +50,6 @@ class AppleAuthProvider(
     }
 
     override fun isSignedIn(): Boolean = auth.currentUser != null
-
-    override suspend fun signInAnonymously(): Result<FirebaseUserInfoDomainModel, ProviderError> =
-        Result.Loading
 }
 
 private fun mapUserToFirebaseUserInfoDomainModel(

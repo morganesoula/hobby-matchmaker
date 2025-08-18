@@ -246,9 +246,12 @@ fun SignInScreenContent(
                     OutlinedButton(
                         onClick = {
                             if (shouldShowGuestWarning) showGuestDialog = true
-                            else signInViewModel.onEvent(
-                                AuthenticationUIEvent.OnContinueAsGuestDirect
-                            )
+                            else {
+                                signInViewModel.onEvent(
+                                    AuthenticationUIEvent.OnContinueAsGuestConfirmed(true)
+                                )
+                                redirectToMovieScreen()
+                            }
                         },
                         enabled = !isGuestLoading,
                         modifier = Modifier
@@ -287,6 +290,7 @@ fun SignInScreenContent(
                                     dontAskAgain
                                 )
                             )
+                            redirectToMovieScreen()
                         },
                         onCreateAccount = {
                             redirectToSignUpScreen()

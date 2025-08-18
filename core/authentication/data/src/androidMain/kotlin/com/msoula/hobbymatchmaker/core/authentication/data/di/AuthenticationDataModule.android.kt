@@ -3,7 +3,6 @@ package com.msoula.hobbymatchmaker.core.authentication.data.di
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.AuthManager
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.AuthManagerImpl
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.FacebookAuthProvider
-import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.providers.AnonymousAuthProvider
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.providers.GoogleAuthProvider
 import org.koin.dsl.module
 
@@ -12,8 +11,7 @@ actual val coreModuleAuthenticationDataPlatformSpecific = module {
         AuthManagerImpl(
             listOf(
                 GoogleAuthProvider(get()),
-                FacebookAuthProvider(get()),
-                AnonymousAuthProvider(get())
+                FacebookAuthProvider(get())
             )
         )
     }

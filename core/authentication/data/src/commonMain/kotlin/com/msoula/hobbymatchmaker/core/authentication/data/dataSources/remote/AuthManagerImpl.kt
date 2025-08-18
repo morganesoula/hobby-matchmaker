@@ -1,7 +1,6 @@
 package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote
 
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.errors.ProviderError
-import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.providers.AnonymousAuthProvider
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.providers.AuthProvider
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
@@ -33,23 +32,6 @@ class AuthManagerImpl(private val providers: List<AuthProvider>) : AuthManager {
             )
         ) else {
             Result.Success(true)
-        }
-    }
-
-    override suspend fun signIn(providerType: ProviderType): Result<FirebaseUserInfoDomainModel, ProviderError> {
-        val provider = findProvider(providerType)
-            ?: return Result.Failure(
-                ProviderError.NoProviderFound(
-                    "Provider not found: ${providerType.name}"
-                )
-            )
-
-        return if (providerType == ProviderType.GUEST && provider is AnonymousAuthProvider) {
-            provider.signInAnonymously()
-        } else {
-            Result.Failure(ProviderError.AnonymousSignInError(
-                "Credential is required for $providerType")
-            )
         }
     }
 

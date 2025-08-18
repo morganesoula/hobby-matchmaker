@@ -6,6 +6,7 @@ import com.msoula.hobbymatchmaker.features.movies.domain.useCases.CheckMovieSyno
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.FetchMoviesUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.SetMovieFavoriteUseCase
+import com.msoula.hobbymatchmaker.features.movies.domain.useCases.SyncLocalFavoritesToCloudUseCase
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -17,4 +18,5 @@ val featuresModuleMovieDomain = module {
     factoryOf(::FetchMoviesUseCase)
     factoryOf(::ObserveAllMoviesUseCase)
     factoryOf(::CheckMovieSynopsisValueUseCase)
+    factoryOf(::SyncLocalFavoritesToCloudUseCase)
 }

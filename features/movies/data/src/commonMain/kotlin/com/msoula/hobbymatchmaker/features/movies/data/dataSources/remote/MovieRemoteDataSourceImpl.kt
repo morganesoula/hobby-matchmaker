@@ -52,6 +52,11 @@ class MovieRemoteDataSourceImpl(
         }
     }
 
+    override suspend fun setUserFavoriteMovies(uid: String, ids: List<Long>) {
+        firestore.collection("users").document(uid)
+            .set(mapOf("movies" to ids), merge = true)
+    }
+
     private suspend fun fetchMoviesByPage(
         language: String,
         page: Int

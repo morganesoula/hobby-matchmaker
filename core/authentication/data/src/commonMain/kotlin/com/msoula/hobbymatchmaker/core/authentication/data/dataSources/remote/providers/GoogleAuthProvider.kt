@@ -33,7 +33,4 @@ class GoogleAuthProvider(private val auth: FirebaseAuth) : AuthProvider {
     }
 
     override fun isSignedIn(): Boolean = auth.currentUser != null
-
-    override suspend fun signInAnonymously(): Result<FirebaseUserInfoDomainModel, ProviderError> =
-        Result.Loading
 }

@@ -1,12 +1,17 @@
 package com.msoula.hobbymatchmaker.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
+import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.navigation.domain.RootComponent
 import com.msoula.hobbymatchmaker.core.navigation.domain.SignInComponent
 import com.msoula.hobbymatchmaker.core.navigation.domain.SignUpComponent
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveIsConnectedUseCase
+import com.msoula.hobbymatchmaker.features.movies.domain.useCases.SyncLocalFavoritesToCloudUseCase
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import org.koin.compose.getKoin
 import presentation.AuthRootComponentImpl
 import presentation.MainRootComponentImpl
@@ -17,7 +22,12 @@ import presentation.SplashRootComponentImpl
 
 @Composable
 fun getRootComponent(): RootComponent {
-    val observeIsConnectedUseCase: ObserveIsConnectedUseCase = getKoin().get<ObserveIsConnectedUseCase>()
+    val observeIsConnectedUseCase: ObserveIsConnectedUseCase =
+        getKoin().get<ObserveIsConnectedUseCase>()
+    val syncLocalFavoritesToCloudUseCase: SyncLocalFavoritesToCloudUseCase =
+        getKoin().get<SyncLocalFavoritesToCloudUseCase>()
+
+    val appScope = rememberCoroutineScope()
 
     return RootComponentImpl(
         componentContext = DefaultComponentContext(lifecycle = LifecycleRegistry()),
@@ -36,7 +46,13 @@ fun getRootComponent(): RootComponent {
                         override fun onAuthenticated() = onAuth()
                     }
                 },
-                onAuthenticated = onAuthenticated
+                onAuthenticated = {
+                    appScope.launch {
+                        syncLocalFavoritesToCloudUseCase(Parameters.None).collect()
+                    }
+
+                    onAuthenticated()
+                }
             )
         },
         mainComponentFactory = { context, _, logOut ->
@@ -55,7 +71,14 @@ fun getRootComponent(): RootComponent {
             SplashRootComponentImpl(
                 context,
                 observeIsConnectedUseCase = observeIsConnectedUseCase,
-                onFinished = onFinished
+                onFinished = { isConnected ->
+                    if (isConnected) {
+                        appScope.launch {
+                            syncLocalFavoritesToCloudUseCase(Parameters.None).collect()
+                        }
+                    }
+                    onFinished(isConnected)
+                }
             )
         }
     )

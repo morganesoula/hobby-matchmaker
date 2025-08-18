@@ -11,7 +11,5 @@ interface AuthManager {
         providerType: ProviderType,
         credential: AuthCredential
     ): Result<FirebaseUserInfoDomainModel, ProviderError>
-
-    suspend fun signIn(providerType: ProviderType): Result<FirebaseUserInfoDomainModel, ProviderError>
     suspend fun signOut(): Result<Boolean, ProviderError>
 }

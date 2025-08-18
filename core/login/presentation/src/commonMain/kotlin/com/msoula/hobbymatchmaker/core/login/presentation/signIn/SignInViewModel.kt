@@ -4,7 +4,6 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
-import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ContinueAsGuestUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ResetPasswordUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.UnifiedSignInUseCase
 import com.msoula.hobbymatchmaker.core.common.AppError
@@ -32,7 +31,6 @@ import kotlinx.coroutines.launch
 class SignInViewModel(
     private val authFormValidationUseCases: AuthFormValidationUseCase,
     private val resetPasswordUseCase: ResetPasswordUseCase,
-    private val continueAsGuestUseCase: ContinueAsGuestUseCase,
     private val setShouldShowGuestDialogUseCase: SetShouldShowGuestDialogUseCase,
     val observeShouldShowGuestDialog: ObserveShouldShowGuestDialogUseCase,
     private val unifiedSignInUseCase: UnifiedSignInUseCase,
@@ -95,13 +93,9 @@ class SignInViewModel(
             AuthenticationUIEvent.HideForgotPasswordDialog ->
                 openResetDialog.update { false }
 
-            AuthenticationUIEvent.OnContinueAsGuestDirect ->
-                scope.launch(ioDispatcher) { connectAsGuest() }
-
             is AuthenticationUIEvent.OnContinueAsGuestConfirmed ->
                 scope.launch(ioDispatcher) {
                     setShouldShowGuestDialogUseCase(shouldShow = !event.dontAskAgain)
-                    connectAsGuest()
                 }
 
             AuthenticationUIEvent.OnGoogleButtonClicked ->
@@ -163,6 +157,11 @@ class SignInViewModel(
                     is Result.Success -> {
                         circularProgressLoading.value = false
                         isSignIn = false
+
+                        viewModelScope.launch {
+
+                        }
+
                         SignInEvent.Success
                     }
 
@@ -215,29 +214,6 @@ class SignInViewModel(
                             val errorMessage = handleError(result.error)
                             ResetPasswordEvent.Error(errorMessage)
                         }
-                    }
-                }
-            }
-        }
-    }
-
-    private suspend fun connectAsGuest() {
-        continueAsGuestUseCase(Parameters.None).collect { result ->
-            _signInState.update {
-                when (result) {
-                    is Result.Loading -> {
-                        _isGuestLoading.update { true }
-                        SignInEvent.Loading
-                    }
-
-                    is Result.Failure -> {
-                        _isGuestLoading.update { false }
-                        SignInEvent.Error(result.error.message)
-                    }
-
-                    is Result.Success -> {
-                        _isGuestLoading.update { false }
-                        SignInEvent.Success
                     }
                 }
             }

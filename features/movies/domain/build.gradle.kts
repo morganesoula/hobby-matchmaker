@@ -9,6 +9,7 @@ kotlin {
         commonMain {
             dependencies {
                 // Modules
+                implementation(project(Modules.AUTHENTICATION_DOMAIN))
                 implementation(project(Modules.COMMON))
             }
         }

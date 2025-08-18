@@ -50,6 +50,9 @@ sealed class SignInError(override val message: String) : AppError {
     data object UserNotFound : SignInError("")
     data object UserDisabled : SignInError("")
     data object TooManyRequests : SignInError("")
+    data class AccountAlreadyExists(val customErrorMessage: String) :
+        SignInError(customErrorMessage)
+    data class LinkError(val customErrorMessage: String) : SignInError(customErrorMessage)
     data class Other(val customErrorMessage: String) : SignInError(customErrorMessage)
 }
 

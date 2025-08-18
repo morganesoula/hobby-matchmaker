@@ -118,3 +118,10 @@ isMovieSynopsisAvailable:
 SELECT synopsis IS NOT NULL AND TRIM(synopsis) != '' AS hasSynopsis
 FROM movie
 WHERE movieId = :movieId;
+
+getFavoriteIds:
+SELECT movieId
+FROM movie
+WHERE isFavorite = 1;
+
+CREATE INDEX IF NOT EXISTS movie_is_favorite ON movie(isFavorite);

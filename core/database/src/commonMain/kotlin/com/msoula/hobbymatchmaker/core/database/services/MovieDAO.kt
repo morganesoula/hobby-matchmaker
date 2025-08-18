@@ -38,4 +38,5 @@ interface MovieDAO {
     fun getActorById(actorId: Long): Actor?
 
     suspend fun isMovieSynopsisAvailable(movieId: Long): Boolean
+    suspend fun getFavoriteLocalMovieIds(): List<Long>?
 }

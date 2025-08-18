@@ -78,4 +78,15 @@ class MovieLocalDataSourceImpl(private val movieDAO: MovieDAOImpl) : MovieLocalD
             return false
         }
     }
+
+    override suspend fun getFavoriteLocalMovieIds(): List<Long> {
+        try {
+            return movieDAO.getFavoriteLocalMovieIds()
+        } catch (exception: CancellationException) {
+            throw exception
+        } catch (e: Exception) {
+            Logger.e("Error finding local movie ids", e)
+            return emptyList()
+        }
+    }
 }
