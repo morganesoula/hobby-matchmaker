@@ -1,8 +1,8 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.useCases
 
 import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepository
-import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.FlowUseCase
+import com.msoula.hobbymatchmaker.core.common.HMMAppError
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import kotlinx.coroutines.CoroutineDispatcher
@@ -36,4 +36,4 @@ class ResetPasswordUseCase(
 }
 
 data object ResetPasswordSuccess
-data class ResetPasswordErrors(override val message: String) : AppError
+data class ResetPasswordErrors(override val message: String) : HMMAppError

@@ -1,6 +1,6 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.signUp
 
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.CreateUserWithEmailAndPasswordError
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.CreateUserWithEmailAndPasswordErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepositoryImpl
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignUpUseCase
 import com.msoula.hobbymatchmaker.core.common.Result
@@ -76,7 +76,7 @@ class SignUpIntegrationTest : FunSpec({
         runTest {
             fakeAuthenticationRemoteDataSource = FakeAuthenticationRemoteDataSource(
                 createUserWithEmailAndPasswordResult = Result.Failure(
-                    CreateUserWithEmailAndPasswordError.EmailAlreadyExists
+                    CreateUserWithEmailAndPasswordErrorHMM.EmailAlreadyExists
                 )
             )
 

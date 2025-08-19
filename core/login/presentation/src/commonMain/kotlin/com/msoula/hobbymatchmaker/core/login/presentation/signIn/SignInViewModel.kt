@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ResetPasswordUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.UnifiedSignInUseCase
-import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.ErrorMessageProvider
+import com.msoula.hobbymatchmaker.core.common.HMMAppError
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.di.domain.useCases.AuthFormValidationUseCase
@@ -220,7 +220,7 @@ class SignInViewModel(
         }
     }
 
-    private suspend fun handleError(error: AppError): String =
+    private suspend fun handleError(error: HMMAppError): String =
         errorMessageProvider.getMessage(error)
 
     fun resetSignInState() {

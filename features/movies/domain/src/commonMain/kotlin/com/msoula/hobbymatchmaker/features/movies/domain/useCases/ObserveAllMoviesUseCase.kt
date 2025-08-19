@@ -1,7 +1,7 @@
 package com.msoula.hobbymatchmaker.features.movies.domain.useCases
 
-import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.FlowUseCase
+import com.msoula.hobbymatchmaker.core.common.HMMAppError
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.features.movies.domain.errors.MovieErrors
@@ -32,15 +32,15 @@ class ObserveAllMoviesUseCase(
                             is Result.Success -> send(Result.Success(ObserveAllMoviesSuccess.DataLoadedInDB))
                             is Result.Failure -> {
                                 val error = when (fetchStatus.error) {
-                                    is MovieErrors.NetworkError -> ObserveAllMoviesErrors.NetworkError(
+                                    is MovieErrors.NetworkErrorHMM -> ObserveAllMoviesErrors.NetworkErrorHMM(
                                         fetchStatus.error.message
                                     )
 
-                                    is MovieErrors.ApiError -> ObserveAllMoviesErrors.ApiError(
+                                    is MovieErrors.ApiErrorHMM -> ObserveAllMoviesErrors.ApiErrorHMM(
                                         fetchStatus.error.message
                                     )
 
-                                    else -> ObserveAllMoviesErrors.UnknownError(fetchStatus.error.message)
+                                    else -> ObserveAllMoviesErrors.UnknownErrorHMM(fetchStatus.error.message)
                                 }
                                 send(Result.Failure(error))
                             }
@@ -64,12 +64,12 @@ sealed class ObserveAllMoviesSuccess {
     data object DataLoadedInDB : ObserveAllMoviesSuccess()
 }
 
-sealed class ObserveAllMoviesErrors(override val message: String) : AppError {
+sealed class ObserveAllMoviesErrors(override val message: String) : HMMAppError {
     data object Empty : ObserveAllMoviesErrors("")
-    data class NetworkError(val networkErrorMessage: String) :
+    data class NetworkErrorHMM(val networkErrorMessage: String) :
         ObserveAllMoviesErrors(networkErrorMessage)
 
-    data class ApiError(val apiErrorMessage: String) : ObserveAllMoviesErrors(apiErrorMessage)
-    data class UnknownError(val unknownErrorMessage: String) :
+    data class ApiErrorHMM(val apiErrorMessage: String) : ObserveAllMoviesErrors(apiErrorMessage)
+    data class UnknownErrorHMM(val unknownErrorMessage: String) :
         ObserveAllMoviesErrors(unknownErrorMessage)
 }

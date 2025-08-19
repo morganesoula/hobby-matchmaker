@@ -6,9 +6,9 @@ import com.msoula.hobbymatchmaker.core.session.domain.errors.SessionErrors
 import com.msoula.hobbymatchmaker.core.session.domain.models.SessionUserDomainModel
 
 class FakeSessionRemoteDataSource(
-    private val createUserResult: Result<Boolean, SessionErrors.CreateUserError> =
+    private val createUserResult: Result<Boolean, SessionErrors.CreateUserErrorHMM> =
         Result.Success(true)
 ) : SessionRemoteDataSource {
     override suspend fun createUser(user: SessionUserDomainModel):
-        Result<Boolean, SessionErrors.CreateUserError> = createUserResult
+        Result<Boolean, SessionErrors.CreateUserErrorHMM> = createUserResult
 }

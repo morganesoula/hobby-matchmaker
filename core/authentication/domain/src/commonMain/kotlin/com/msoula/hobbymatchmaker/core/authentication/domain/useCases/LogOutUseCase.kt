@@ -1,6 +1,6 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.useCases
 
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutError
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepository
 import com.msoula.hobbymatchmaker.core.common.FlowUseCase
 import com.msoula.hobbymatchmaker.core.common.Parameters
@@ -18,9 +18,9 @@ class LogOutUseCase(
     private val authenticationRepository: AuthenticationRepository,
     private val setIsConnectedUseCase: SetIsConnectedUseCase,
     private val observeIsConnectedUseCase: ObserveIsConnectedUseCase
-) : FlowUseCase<Parameters, LogOutSuccess, LogOutError>(dispatcher) {
+) : FlowUseCase<Parameters, LogOutSuccess, LogOutErrorHMM>(dispatcher) {
 
-    override fun execute(parameters: Parameters): Flow<Result<LogOutSuccess, LogOutError>> {
+    override fun execute(parameters: Parameters): Flow<Result<LogOutSuccess, LogOutErrorHMM>> {
         return flow {
             emit(Result.Loading)
 

@@ -1,61 +1,61 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.signIn.fakes
 
 import com.msoula.hobbymatchmaker.core.authentication.domain.dataSources.AuthenticationRemoteDataSource
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.CreateUserWithEmailAndPasswordError
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutError
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ResetPasswordError
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SignInWithEmailAndPasswordError
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SocialMediaError
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.CreateUserWithEmailAndPasswordErrorHMM
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutErrorHMM
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ResetPasswordErrorHMM
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SignInWithEmailAndPasswordErrorHMM
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SocialMediaErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.common.Result
 import dev.gitlive.firebase.auth.AuthCredential
 
 class FakeAuthenticationRemoteDataSource(
-    private val authenticationSignOutResult: Result<Boolean, LogOutError> =
+    private val authenticationSignOutResult: Result<Boolean, LogOutErrorHMM> =
         Result.Success(true),
-    private val signInWithCredentialResult: Result<FirebaseUserInfoDomainModel, SocialMediaError> =
+    private val signInWithCredentialResult: Result<FirebaseUserInfoDomainModel, SocialMediaErrorHMM> =
         Result.Success(
             FirebaseUserInfoDomainModel(
                 "test-uid", "test-email", emptyList()
             )
         ),
-    private val linkWithCredentialResult: Result<FirebaseUserInfoDomainModel, SocialMediaError> =
+    private val linkWithCredentialResult: Result<FirebaseUserInfoDomainModel, SocialMediaErrorHMM> =
         Result.Success(
             FirebaseUserInfoDomainModel(
                 "test-uid", "test-email", emptyList()
             )
         ),
     private val createUserWithEmailAndPasswordResult:
-    Result<String, CreateUserWithEmailAndPasswordError> = Result.Success("test-uid"),
-    private val signInWithEmailAndPasswordResult: Result<String, SignInWithEmailAndPasswordError> =
+    Result<String, CreateUserWithEmailAndPasswordErrorHMM> = Result.Success("test-uid"),
+    private val signInWithEmailAndPasswordResult: Result<String, SignInWithEmailAndPasswordErrorHMM> =
         Result.Success("test-uid"),
-    private val resetPasswordResult: Result<Boolean, ResetPasswordError> =
+    private val resetPasswordResult: Result<Boolean, ResetPasswordErrorHMM> =
         Result.Success(true),
     private val isFirstSignValue: Boolean = true
 ) : AuthenticationRemoteDataSource {
-    override suspend fun authenticationSignOut(): Result<Boolean, LogOutError> =
+    override suspend fun authenticationSignOut(): Result<Boolean, LogOutErrorHMM> =
         authenticationSignOutResult
 
     override suspend fun signInWithCredentials(
         credential: AuthCredential,
         providerType: ProviderType
-    ): Result<FirebaseUserInfoDomainModel, SocialMediaError> = signInWithCredentialResult
+    ): Result<FirebaseUserInfoDomainModel, SocialMediaErrorHMM> = signInWithCredentialResult
 
     override suspend fun linkWithCredential(credential: AuthCredential):
-        Result<FirebaseUserInfoDomainModel, SocialMediaError> = linkWithCredentialResult
+        Result<FirebaseUserInfoDomainModel, SocialMediaErrorHMM> = linkWithCredentialResult
 
     override suspend fun createUserWithEmailAndPassword(
         email: String,
         password: String
-    ): Result<String, CreateUserWithEmailAndPasswordError> = createUserWithEmailAndPasswordResult
+    ): Result<String, CreateUserWithEmailAndPasswordErrorHMM> = createUserWithEmailAndPasswordResult
 
     override suspend fun signInWithEmailAndPassword(
         email: String,
         password: String
-    ): Result<String, SignInWithEmailAndPasswordError> = signInWithEmailAndPasswordResult
+    ): Result<String, SignInWithEmailAndPasswordErrorHMM> = signInWithEmailAndPasswordResult
 
-    override suspend fun resetPassword(email: String): Result<Boolean, ResetPasswordError> =
+    override suspend fun resetPassword(email: String): Result<Boolean, ResetPasswordErrorHMM> =
         resetPasswordResult
 
     override suspend fun getUserUid(): String = "test-uid"

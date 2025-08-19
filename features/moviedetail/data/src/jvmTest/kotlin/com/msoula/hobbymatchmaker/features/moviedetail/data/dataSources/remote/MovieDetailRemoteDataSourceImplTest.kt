@@ -3,15 +3,15 @@ package com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.fakes.FakeMovieDetailKtorService
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.fakes.FakeMovieVideosKtorService
-import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.errors.MovieDetailDataError
+import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.errors.MovieDetailDataErrorHMM
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.CastResponseRemoteModel
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.MovieDetailResponseRemoteModel
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.MovieVideosResponseRemoteModel
-import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.services.MovieCreditsKtorError
-import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.services.MovieDetailKtorError
+import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.services.MovieCreditsKtorErrorHMM
+import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.services.MovieDetailKtorErrorHMM
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.services.MovieDetailKtorService
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.services.MovieVideosKtorService
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainError
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainErrorHMM
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieActorDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieCastDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
@@ -50,14 +50,14 @@ class MovieDetailRemoteDataSourceImplTest : FunSpec({
                 override suspend fun fetchMovieDetail(
                     movieId: Long,
                     language: String
-                ): Result<MovieDetailResponseRemoteModel, MovieDetailKtorError> {
+                ): Result<MovieDetailResponseRemoteModel, MovieDetailKtorErrorHMM> {
                     throw IOException("No network")
                 }
 
                 override suspend fun fetchMovieCredits(
                     movieId: Long,
                     language: String
-                ): Result<CastResponseRemoteModel, MovieCreditsKtorError> =
+                ): Result<CastResponseRemoteModel, MovieCreditsKtorErrorHMM> =
                     error("Not used")
             }
 
@@ -70,7 +70,7 @@ class MovieDetailRemoteDataSourceImplTest : FunSpec({
             runTest(dispatcher) {
                 val result = dataSource.fetchMovieDetail(1L, "en")
 
-                result shouldBe Result.Failure(MovieDetailDomainError.NoConnection("No network"))
+                result shouldBe Result.Failure(MovieDetailDomainErrorHMM.NoConnection("No network"))
             }
         }
 
@@ -79,14 +79,14 @@ class MovieDetailRemoteDataSourceImplTest : FunSpec({
                 override suspend fun fetchMovieDetail(
                     movieId: Long,
                     language: String
-                ): Result<MovieDetailResponseRemoteModel, MovieDetailKtorError> {
+                ): Result<MovieDetailResponseRemoteModel, MovieDetailKtorErrorHMM> {
                     throw IllegalStateException("Unexpected error")
                 }
 
                 override suspend fun fetchMovieCredits(
                     movieId: Long,
                     language: String
-                ): Result<CastResponseRemoteModel, MovieCreditsKtorError> =
+                ): Result<CastResponseRemoteModel, MovieCreditsKtorErrorHMM> =
                     error("Not used")
             }
 
@@ -100,7 +100,7 @@ class MovieDetailRemoteDataSourceImplTest : FunSpec({
                 val result = dataSource.fetchMovieDetail(1L, "en")
 
                 result shouldBe Result.Failure(
-                    MovieDetailDomainError.MovieDetailError("Unexpected error")
+                    MovieDetailDomainErrorHMM.MovieDetailErrorHMM("Unexpected error")
                 )
             }
         }
@@ -135,13 +135,13 @@ class MovieDetailRemoteDataSourceImplTest : FunSpec({
                 override suspend fun fetchMovieDetail(
                     movieId: Long,
                     language: String
-                ): Result<MovieDetailResponseRemoteModel, MovieDetailKtorError> =
+                ): Result<MovieDetailResponseRemoteModel, MovieDetailKtorErrorHMM> =
                     error("Not used")
 
                 override suspend fun fetchMovieCredits(
                     movieId: Long,
                     language: String
-                ): Result<CastResponseRemoteModel, MovieCreditsKtorError> {
+                ): Result<CastResponseRemoteModel, MovieCreditsKtorErrorHMM> {
                     throw IOException("No network found")
                 }
             }
@@ -155,7 +155,7 @@ class MovieDetailRemoteDataSourceImplTest : FunSpec({
                 val result = dataSource.fetchMovieCredit(1L, "en")
 
                 result shouldBe Result.Failure(
-                    MovieDetailDomainError.NoConnection("No network found")
+                    MovieDetailDomainErrorHMM.NoConnection("No network found")
                 )
             }
         }
@@ -165,14 +165,14 @@ class MovieDetailRemoteDataSourceImplTest : FunSpec({
                 override suspend fun fetchMovieDetail(
                     movieId: Long,
                     language: String
-                ): Result<MovieDetailResponseRemoteModel, MovieDetailKtorError> =
+                ): Result<MovieDetailResponseRemoteModel, MovieDetailKtorErrorHMM> =
                     error("Not used")
 
                 override suspend fun fetchMovieCredits(
                     movieId: Long,
                     language: String
-                ): Result<CastResponseRemoteModel, MovieCreditsKtorError> =
-                    Result.Failure(MovieCreditsKtorError("Error while fetching credits"))
+                ): Result<CastResponseRemoteModel, MovieCreditsKtorErrorHMM> =
+                    Result.Failure(MovieCreditsKtorErrorHMM("Error while fetching credits"))
             }
             val fakeMovieVideosService = FakeMovieVideosKtorService()
 
@@ -184,7 +184,7 @@ class MovieDetailRemoteDataSourceImplTest : FunSpec({
                 val result = dataSource.fetchMovieCredit(-1L, "en")
 
                 result shouldBe Result.Failure(
-                    MovieDetailDomainError.CreditError("Error while fetching credits")
+                    MovieDetailDomainErrorHMM.CreditErrorHMM("Error while fetching credits")
                 )
             }
         }
@@ -216,7 +216,7 @@ class MovieDetailRemoteDataSourceImplTest : FunSpec({
                 override suspend fun fetchMovieVideos(
                     movie: Long,
                     language: String
-                ): Result<MovieVideosResponseRemoteModel, MovieDetailDataError> {
+                ): Result<MovieVideosResponseRemoteModel, MovieDetailDataErrorHMM> {
                     throw IOException("No network found dear")
                 }
             }
@@ -229,7 +229,7 @@ class MovieDetailRemoteDataSourceImplTest : FunSpec({
                 val result = dataSource.fetchMovieTrailer(1L, "en")
 
                 result shouldBe Result.Failure(
-                    MovieDetailDomainError.NoConnection(
+                    MovieDetailDomainErrorHMM.NoConnection(
                         "No network found dear"
                     )
                 )
@@ -242,7 +242,7 @@ class MovieDetailRemoteDataSourceImplTest : FunSpec({
                 override suspend fun fetchMovieVideos(
                     movie: Long,
                     language: String
-                ): Result<MovieVideosResponseRemoteModel, MovieDetailDataError> {
+                ): Result<MovieVideosResponseRemoteModel, MovieDetailDataErrorHMM> {
                     throw IllegalStateException("Oopsie, something went wrong")
                 }
             }
@@ -255,7 +255,7 @@ class MovieDetailRemoteDataSourceImplTest : FunSpec({
                 val result = dataSource.fetchMovieTrailer(1L, "en")
 
                 result shouldBe Result.Failure(
-                    MovieDetailDomainError.TrailerError(
+                    MovieDetailDomainErrorHMM.TrailerErrorHMM(
                         "Oopsie, something went wrong"
                     )
                 )

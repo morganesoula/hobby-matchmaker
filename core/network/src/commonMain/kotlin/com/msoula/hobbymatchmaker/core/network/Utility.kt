@@ -1,6 +1,6 @@
 package com.msoula.hobbymatchmaker.core.network
 
-import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.HMMAppError
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Result
 import kotlinx.io.IOException
@@ -12,7 +12,7 @@ expect class Utility {
     }
 }
 
-suspend inline fun <T, E : AppError> safeKtorCall(
+suspend inline fun <T, E : HMMAppError> safeKtorCall(
     crossinline block: suspend () -> Result<T, E>,
     crossinline errorMapper: (Throwable) -> E
 ): Result<T, E> {

@@ -1,15 +1,15 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.domain.errors
 
-import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.HMMAppError
 
-sealed class MovieDetailDomainError(override val message: String) : AppError {
-    data class TrailerError(val reason: String) : MovieDetailDomainError(reason)
-    data class CreditError(val reason: String) : MovieDetailDomainError(reason)
-    data class MovieDetailError(val reason: String) : MovieDetailDomainError(reason)
-    data class Other(val reason: String) : MovieDetailDomainError(reason)
-    data class NoConnection(val reason: String) : MovieDetailDomainError(reason)
-    data class ExternalServiceError(val reason: String) : MovieDetailDomainError(reason)
-    data class EmptyDataError(val reason: String) : MovieDetailDomainError(reason)
+sealed class MovieDetailDomainErrorHMM(override val message: String) : HMMAppError {
+    data class TrailerErrorHMM(val reason: String) : MovieDetailDomainErrorHMM(reason)
+    data class CreditErrorHMM(val reason: String) : MovieDetailDomainErrorHMM(reason)
+    data class MovieDetailErrorHMM(val reason: String) : MovieDetailDomainErrorHMM(reason)
+    data class Other(val reason: String) : MovieDetailDomainErrorHMM(reason)
+    data class NoConnection(val reason: String) : MovieDetailDomainErrorHMM(reason)
+    data class ExternalServiceErrorHMM(val reason: String) : MovieDetailDomainErrorHMM(reason)
+    data class EmptyDataErrorHMM(val reason: String) : MovieDetailDomainErrorHMM(reason)
 }
 
-class UpdateMovieTrailerLocalError(override val message: String) : AppError
+class UpdateMovieTrailerLocalErrorHMM(override val message: String) : HMMAppError

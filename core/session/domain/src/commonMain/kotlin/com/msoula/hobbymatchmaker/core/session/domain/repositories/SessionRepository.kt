@@ -9,7 +9,7 @@ interface SessionRepository {
     suspend fun setIsConnected(isConnected: Boolean)
     fun observeIsConnected(): Flow<Boolean>
     suspend fun createUser(user: SessionUserDomainModel):
-        Result<Boolean, SessionErrors.CreateUserError>
+        Result<Boolean, SessionErrors.CreateUserErrorHMM>
 
     suspend fun setShouldShowGuestDialog(shouldShow: Boolean)
     fun observeShouldShowGuestDialog(): Flow<Boolean>

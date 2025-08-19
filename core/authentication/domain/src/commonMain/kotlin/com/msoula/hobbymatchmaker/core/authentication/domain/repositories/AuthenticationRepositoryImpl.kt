@@ -1,11 +1,11 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.repositories
 
 import com.msoula.hobbymatchmaker.core.authentication.domain.dataSources.AuthenticationRemoteDataSource
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.CreateUserWithEmailAndPasswordError
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutError
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ResetPasswordError
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SignInWithEmailAndPasswordError
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SocialMediaError
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.CreateUserWithEmailAndPasswordErrorHMM
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutErrorHMM
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ResetPasswordErrorHMM
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SignInWithEmailAndPasswordErrorHMM
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SocialMediaErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.common.Result
@@ -17,7 +17,7 @@ import kotlinx.coroutines.CancellationException
 class AuthenticationRepositoryImpl(
     private val remoteDataSource: AuthenticationRemoteDataSource
 ) : AuthenticationRepository {
-    override suspend fun logOut(): Result<Boolean, LogOutError> {
+    override suspend fun logOut(): Result<Boolean, LogOutErrorHMM> {
         return try {
             when (val result = remoteDataSource.authenticationSignOut()) {
                 is Result.Success, Result.Loading -> {
@@ -29,21 +29,21 @@ class AuthenticationRepositoryImpl(
                 }
             }
         } catch (exception: Exception) {
-            Result.Failure(LogOutError.UnknownError(exception.message ?: ""))
+            Result.Failure(LogOutErrorHMM.UnknownErrorHMM(exception.message ?: ""))
         }
     }
 
     override suspend fun signUp(
         email: String,
         password: String,
-    ): Result<String, CreateUserWithEmailAndPasswordError> {
+    ): Result<String, CreateUserWithEmailAndPasswordErrorHMM> {
         return try {
             remoteDataSource.createUserWithEmailAndPassword(email, password)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             Result.Failure(
-                CreateUserWithEmailAndPasswordError.Other(
+                CreateUserWithEmailAndPasswordErrorHMM.Other(
                     msg = e.message ?: "Error while creating user"
                 )
             )
@@ -53,7 +53,7 @@ class AuthenticationRepositoryImpl(
     override suspend fun signInWithEmailAndPassword(
         email: String,
         password: String,
-    ): Result<String, SignInWithEmailAndPasswordError> {
+    ): Result<String, SignInWithEmailAndPasswordErrorHMM> {
         return remoteDataSource.signInWithEmailAndPassword(email, password)
             .mapSuccess { it }
             .mapError { error ->
@@ -61,19 +61,19 @@ class AuthenticationRepositoryImpl(
             }
     }
 
-    override suspend fun resetPassword(email: String): Result<Boolean, ResetPasswordError> =
+    override suspend fun resetPassword(email: String): Result<Boolean, ResetPasswordErrorHMM> =
         remoteDataSource.resetPassword(email)
 
     override suspend fun signInWithCredential(
         authCredential: AuthCredential,
         providerType: ProviderType
-    ): Result<FirebaseUserInfoDomainModel, SocialMediaError> {
+    ): Result<FirebaseUserInfoDomainModel, SocialMediaErrorHMM> {
         return remoteDataSource.signInWithCredentials(authCredential, providerType)
     }
 
     override suspend fun linkInWithCredential(
         authCredential: AuthCredential
-    ): Result<FirebaseUserInfoDomainModel, SocialMediaError> {
+    ): Result<FirebaseUserInfoDomainModel, SocialMediaErrorHMM> {
         return remoteDataSource.linkWithCredential(credential = authCredential)
     }
 

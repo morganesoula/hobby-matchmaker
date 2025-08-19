@@ -4,7 +4,7 @@ import app.cash.turbine.test
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.FetchingTrailerError
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.FetchingTrailerErrorHMM
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ManageMovieTrailerUseCase
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.MovieTrailerReady
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieDetailUseCase
@@ -88,7 +88,7 @@ class MovieDetailViewModelTest : FunSpec({
 
     context("viewState - Failure") {
         test("should emit Error when observeMovieDetail returns failure") {
-            val failureResult = flowOf(Result.Failure(ObserveMovieErrors.MovieDetailError))
+            val failureResult = flowOf(Result.Failure(ObserveMovieErrors.MovieDetailErrorHMM))
 
             coEvery { observeMovieDetailUseCase(any()) } returns failureResult
 
@@ -189,7 +189,7 @@ class MovieDetailViewModelTest : FunSpec({
 
         test("should emit NoConnection when manageMovieTrailer fails with no network") {
             val failureResult = flowOf(
-                Result.Failure(FetchingTrailerError.NoConnectionError("No network!"))
+                Result.Failure(FetchingTrailerErrorHMM.NoConnectionErrorHMM("No network!"))
             )
 
             coEvery { manageMovieTrailerUseCase(any()) } returns failureResult
@@ -214,7 +214,7 @@ class MovieDetailViewModelTest : FunSpec({
 
         test("should emit ErrorFetchingTrailer when manageMovieTrailer fails") {
             val failureResult = flowOf(
-                Result.Failure(FetchingTrailerError.NoTrailerFoundError("Error fetching"))
+                Result.Failure(FetchingTrailerErrorHMM.NoTrailerFoundErrorHMM("Error fetching"))
             )
 
             coEvery { manageMovieTrailerUseCase(any()) } returns failureResult

@@ -1,76 +1,76 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.errors
 
-import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInError
-import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInErrorHMM
+import com.msoula.hobbymatchmaker.core.common.HMMAppError
 
-sealed class SocialMediaError(override val message: String) : AppError {
-    data class CredentialAlreadyInUse(val msg: String) : SocialMediaError(msg)
-    data class LinkSocialMediaError(val msg: String) : SocialMediaError(msg)
-    data class AccountExistsWithDifferentCredential(val msg: String) : SocialMediaError(msg)
-    data class InvalidCredential(val msg: String) : SocialMediaError(msg)
-    data class UserDisabled(val msg: String = "") : SocialMediaError(msg)
-    data class OperationNotAllowed(val msg: String) : SocialMediaError(msg)
-    data class TooManyRequests(val msg: String = "") : SocialMediaError(msg)
-    data class Network(val msg: String) : SocialMediaError(msg)
-    data class Canceled(val msg: String = "") : SocialMediaError(msg)
-    data class Other(val msg: String) : SocialMediaError(msg)
+sealed class SocialMediaErrorHMM(override val message: String) : HMMAppError {
+    data class CredentialAlreadyInUse(val msg: String) : SocialMediaErrorHMM(msg)
+    data class LinkSocialMediaErrorHMM(val msg: String) : SocialMediaErrorHMM(msg)
+    data class AccountExistsWithDifferentCredential(val msg: String) : SocialMediaErrorHMM(msg)
+    data class InvalidCredential(val msg: String) : SocialMediaErrorHMM(msg)
+    data class UserDisabled(val msg: String = "") : SocialMediaErrorHMM(msg)
+    data class OperationNotAllowed(val msg: String) : SocialMediaErrorHMM(msg)
+    data class TooManyRequests(val msg: String = "") : SocialMediaErrorHMM(msg)
+    data class Network(val msg: String) : SocialMediaErrorHMM(msg)
+    data class Canceled(val msg: String = "") : SocialMediaErrorHMM(msg)
+    data class Other(val msg: String) : SocialMediaErrorHMM(msg)
 }
 
-sealed class CreateUserWithEmailAndPasswordError(override val message: String) : AppError {
-    data object EmailAlreadyExists : CreateUserWithEmailAndPasswordError("")
-    data object UserDisabled : CreateUserWithEmailAndPasswordError("")
-    data object TooManyRequests : CreateUserWithEmailAndPasswordError("")
-    data object InternalError : CreateUserWithEmailAndPasswordError("")
-    data object Connection : CreateUserWithEmailAndPasswordError("")
-    data class Other(val msg: String) : CreateUserWithEmailAndPasswordError(msg)
+sealed class CreateUserWithEmailAndPasswordErrorHMM(override val message: String) : HMMAppError {
+    data object EmailAlreadyExists : CreateUserWithEmailAndPasswordErrorHMM("")
+    data object UserDisabled : CreateUserWithEmailAndPasswordErrorHMM("")
+    data object TooManyRequests : CreateUserWithEmailAndPasswordErrorHMM("")
+    data object InternalErrorHMM : CreateUserWithEmailAndPasswordErrorHMM("")
+    data object Connection : CreateUserWithEmailAndPasswordErrorHMM("")
+    data class Other(val msg: String) : CreateUserWithEmailAndPasswordErrorHMM(msg)
 }
 
-sealed class SignInWithEmailAndPasswordError(override val message: String) : AppError {
-    data object UserDisabled : SignInWithEmailAndPasswordError("")
-    data object UserNotFound : SignInWithEmailAndPasswordError("")
-    data object WrongPassword : SignInWithEmailAndPasswordError("")
-    data object TooManyRequests : SignInWithEmailAndPasswordError("")
-    data object Connection : SignInWithEmailAndPasswordError("")
-    data class Other(val msg: String) : SignInWithEmailAndPasswordError(msg)
+sealed class SignInWithEmailAndPasswordErrorHMM(override val message: String) : HMMAppError {
+    data object UserDisabled : SignInWithEmailAndPasswordErrorHMM("")
+    data object UserNotFound : SignInWithEmailAndPasswordErrorHMM("")
+    data object WrongPassword : SignInWithEmailAndPasswordErrorHMM("")
+    data object TooManyRequests : SignInWithEmailAndPasswordErrorHMM("")
+    data object Connection : SignInWithEmailAndPasswordErrorHMM("")
+    data class Other(val msg: String) : SignInWithEmailAndPasswordErrorHMM(msg)
 }
 
-sealed class ResetPasswordError(override val message: String) : AppError {
-    data object TooManyRequests : ResetPasswordError("")
-    data object Other : ResetPasswordError("")
-    data object Connection : ResetPasswordError("")
+sealed class ResetPasswordErrorHMM(override val message: String) : HMMAppError {
+    data object TooManyRequests : ResetPasswordErrorHMM("")
+    data object Other : ResetPasswordErrorHMM("")
+    data object Connection : ResetPasswordErrorHMM("")
 }
 
-sealed class LogOutError(override val message: String) : AppError {
+sealed class LogOutErrorHMM(override val message: String) : HMMAppError {
     data class FirebaseException(val firebaseErrorMessage: String) :
-        LogOutError(firebaseErrorMessage)
-    data class UnknownError(val unknownError: String) : LogOutError(unknownError)
+        LogOutErrorHMM(firebaseErrorMessage)
+    data class UnknownErrorHMM(val unknownError: String) : LogOutErrorHMM(unknownError)
 }
 
 data class InvalidCredentialError(override val message: String) : RuntimeException(message)
 
-fun AppError.toSignInError(): SignInError {
+fun HMMAppError.toSignInError(): SignInErrorHMM {
     val msg = message.takeIf { it.isNotBlank() } ?: "Error happened"
 
     return when (this) {
-        is SignInWithEmailAndPasswordError.UserNotFound -> SignInError.UserNotFound
-        is SignInWithEmailAndPasswordError.WrongPassword -> SignInError.WrongPassword
-        is SignInWithEmailAndPasswordError.UserDisabled -> SignInError.UserDisabled
-        is SignInWithEmailAndPasswordError.TooManyRequests -> SignInError.TooManyRequests
+        is SignInWithEmailAndPasswordErrorHMM.UserNotFound -> SignInErrorHMM.UserNotFound
+        is SignInWithEmailAndPasswordErrorHMM.WrongPassword -> SignInErrorHMM.WrongPassword
+        is SignInWithEmailAndPasswordErrorHMM.UserDisabled -> SignInErrorHMM.UserDisabled
+        is SignInWithEmailAndPasswordErrorHMM.TooManyRequests -> SignInErrorHMM.TooManyRequests
 
-        is SocialMediaError.CredentialAlreadyInUse,
-        is SocialMediaError.AccountExistsWithDifferentCredential ->
-            SignInError.AccountAlreadyExists(msg)
+        is SocialMediaErrorHMM.CredentialAlreadyInUse,
+        is SocialMediaErrorHMM.AccountExistsWithDifferentCredential ->
+            SignInErrorHMM.AccountAlreadyExists(msg)
 
-        is SocialMediaError.UserDisabled -> SignInError.UserDisabled
+        is SocialMediaErrorHMM.UserDisabled -> SignInErrorHMM.UserDisabled
 
-        is SocialMediaError.InvalidCredential,
-        is SocialMediaError.OperationNotAllowed,
-        is SocialMediaError.TooManyRequests,
-        is SocialMediaError.Network,
-        is SocialMediaError.Canceled,
-        is SocialMediaError.LinkSocialMediaError,
-        is SocialMediaError.Other -> SignInError.Other(msg)
+        is SocialMediaErrorHMM.InvalidCredential,
+        is SocialMediaErrorHMM.OperationNotAllowed,
+        is SocialMediaErrorHMM.TooManyRequests,
+        is SocialMediaErrorHMM.Network,
+        is SocialMediaErrorHMM.Canceled,
+        is SocialMediaErrorHMM.LinkSocialMediaErrorHMM,
+        is SocialMediaErrorHMM.Other -> SignInErrorHMM.Other(msg)
 
-        else -> SignInError.Other(msg)
+        else -> SignInErrorHMM.Other(msg)
     }
 }

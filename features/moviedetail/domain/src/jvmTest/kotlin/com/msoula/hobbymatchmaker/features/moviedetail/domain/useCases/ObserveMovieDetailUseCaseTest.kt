@@ -2,7 +2,7 @@ package com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases
 
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainError
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainErrorHMM
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.fakes.FakeMovieDetailRepository
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieActorDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
@@ -133,7 +133,7 @@ class ObserveMovieDetailUseCaseTest : FunSpec({
             val fakeMovieDetailRepository = FakeMovieDetailRepository(
                 movieDetailFlow = flowOf(dummyEmptyMovie),
                 fetchDetailResult = Result.Failure(
-                    MovieDetailDomainError.MovieDetailError("Something went wrong")
+                    MovieDetailDomainErrorHMM.MovieDetailErrorHMM("Something went wrong")
                 )
             )
 
@@ -150,7 +150,7 @@ class ObserveMovieDetailUseCaseTest : FunSpec({
 
                 result shouldBe listOf(
                     Result.Loading,
-                    Result.Failure(ObserveMovieErrors.MovieDetailError)
+                    Result.Failure(ObserveMovieErrors.MovieDetailErrorHMM)
                 )
             }
         }
@@ -167,7 +167,7 @@ class ObserveMovieDetailUseCaseTest : FunSpec({
             val fakeMovieDetailRepository = FakeMovieDetailRepository(
                 movieDetailFlow = flowOf(dummyMovieWithoutCast),
                 fetchCreditResult = Result.Failure(
-                    MovieDetailDomainError.CreditError("No cast available")
+                    MovieDetailDomainErrorHMM.CreditErrorHMM("No cast available")
                 )
             )
 
@@ -184,7 +184,7 @@ class ObserveMovieDetailUseCaseTest : FunSpec({
 
                 result shouldBe listOf(
                     Result.Loading,
-                    Result.Failure(ObserveMovieErrors.CreditError)
+                    Result.Failure(ObserveMovieErrors.CreditErrorHMM)
                 )
             }
         }

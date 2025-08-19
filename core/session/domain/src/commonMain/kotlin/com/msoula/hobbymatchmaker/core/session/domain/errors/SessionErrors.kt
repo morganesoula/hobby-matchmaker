@@ -1,10 +1,10 @@
 package com.msoula.hobbymatchmaker.core.session.domain.errors
 
-import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.HMMAppError
 
 sealed class SessionErrors {
-    sealed class CreateUserError(override val message: String) : AppError {
-        data class SaveError(val saveErrorMessage: String) :
-            CreateUserError("Error while saving user in firestore")
+    sealed class CreateUserErrorHMM(override val message: String) : HMMAppError {
+        data class SaveErrorHMM(val saveErrorMessage: String) :
+            CreateUserErrorHMM("Error while saving user in firestore")
     }
 }

@@ -21,7 +21,7 @@ abstract class FlowUseCase<in Parameters, Success, BusinessRuleError>(private va
                 @Suppress("UNCHECKED_CAST")
                 emit(
                     Result.Failure(
-                        FlowUseCaseError(
+                        FlowUseCaseErrorHMM(
                             e.message ?: "An error occurred while executing the use case"
                         ) as BusinessRuleError
                     )
@@ -33,4 +33,4 @@ abstract class FlowUseCase<in Parameters, Success, BusinessRuleError>(private va
     abstract fun execute(parameters: Parameters): Flow<Result<Success, BusinessRuleError>>
 }
 
-class FlowUseCaseError(override val message: String) : AppError
+class FlowUseCaseErrorHMM(override val message: String) : HMMAppError

@@ -1,6 +1,6 @@
 package com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.services
 
-import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.HMMAppError
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.MovieResponseRemoteModel
 import io.ktor.client.HttpClient
@@ -17,14 +17,14 @@ interface TMDBKtorService {
     suspend fun getMoviesByPopularityDesc(
         language: String,
         page: Int
-    ): Result<MovieResponseRemoteModel, TMDBKtorError>
+    ): Result<MovieResponseRemoteModel, TMDBKtorErrorHMM>
 }
 
 class TMDBKtorServiceImpl(private val client: HttpClient) : TMDBKtorService {
     override suspend fun getMoviesByPopularityDesc(
         language: String,
         page: Int
-    ): Result<MovieResponseRemoteModel, TMDBKtorError> {
+    ): Result<MovieResponseRemoteModel, TMDBKtorErrorHMM> {
         return try {
             val response = client.request {
                 url("movie/popular")
@@ -35,10 +35,10 @@ class TMDBKtorServiceImpl(private val client: HttpClient) : TMDBKtorService {
 
             Result.Success(response)
         } catch (e: Exception) {
-            Result.Failure(TMDBKtorError(e.message ?: "Error while fetching movies online"))
+            Result.Failure(TMDBKtorErrorHMM(e.message ?: "Error while fetching movies online"))
         }
     }
 
 }
 
-class TMDBKtorError(override val message: String) : AppError
+class TMDBKtorErrorHMM(override val message: String) : HMMAppError

@@ -5,8 +5,8 @@ import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.m
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.CastResponseRemoteModel
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.GenreResponseRemoteModel
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.MovieDetailResponseRemoteModel
-import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.services.MovieCreditsKtorError
-import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.services.MovieDetailKtorError
+import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.services.MovieCreditsKtorErrorHMM
+import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.services.MovieDetailKtorErrorHMM
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.services.MovieDetailKtorService
 
 class FakeMovieDetailKtorService : MovieDetailKtorService {
@@ -14,7 +14,7 @@ class FakeMovieDetailKtorService : MovieDetailKtorService {
     override suspend fun fetchMovieDetail(
         movieId: Long,
         language: String
-    ): Result<MovieDetailResponseRemoteModel, MovieDetailKtorError> {
+    ): Result<MovieDetailResponseRemoteModel, MovieDetailKtorErrorHMM> {
         return Result.Success(
             MovieDetailResponseRemoteModel(
                 id = 1,
@@ -32,7 +32,7 @@ class FakeMovieDetailKtorService : MovieDetailKtorService {
     override suspend fun fetchMovieCredits(
         movieId: Long,
         language: String
-    ): Result<CastResponseRemoteModel, MovieCreditsKtorError> =
+    ): Result<CastResponseRemoteModel, MovieCreditsKtorErrorHMM> =
         Result.Success(
             CastResponseRemoteModel(
                 cast = listOf(

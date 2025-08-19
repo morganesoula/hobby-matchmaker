@@ -2,7 +2,7 @@ package com.msoula.hobbymatchmaker.features.moviedetail.presentation
 
 import app.cash.turbine.test
 import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainError
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainErrorHMM
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieActorDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieVideoDomainModel
@@ -142,7 +142,7 @@ class MovieDetailIntegrationTest : FunSpec({
         val remoteDataSource =
             FakeRemoteDataSource(
                 fetchMovieDetailResult =
-                    Result.Failure(MovieDetailDomainError.NoConnection(""))
+                    Result.Failure(MovieDetailDomainErrorHMM.NoConnection(""))
             )
 
         val repository =

@@ -63,7 +63,7 @@ class SignUpUseCaseTest : StringSpec({
 
             results shouldBe listOf(
                 Result.Loading,
-                Result.Failure(SignUpErrors.InternalError)
+                Result.Failure(SignUpErrors.InternalErrorHMM)
             )
         }
     }
@@ -105,7 +105,7 @@ class SignUpUseCaseTest : StringSpec({
 
             results shouldBe listOf(
                 Result.Loading,
-                Result.Failure(SignUpErrors.UnknownError("Weird error message"))
+                Result.Failure(SignUpErrors.UnknownErrorHMM("Weird error message"))
             )
         }
     }

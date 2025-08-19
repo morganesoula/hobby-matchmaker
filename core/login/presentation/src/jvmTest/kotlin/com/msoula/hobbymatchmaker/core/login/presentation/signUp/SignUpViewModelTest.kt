@@ -117,7 +117,7 @@ class SignUpViewModelTest : FunSpec({
                 every { validateNameUseCase(any()) } returns ValidationResult(true)
                 every { signUpUseCase(any()) } returns flowOf(
                     Result.Failure(
-                        SignUpErrors.UnknownError(
+                        SignUpErrors.UnknownErrorHMM(
                             "Unknown error oopsie"
                         )
                     )

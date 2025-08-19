@@ -5,5 +5,5 @@ import com.msoula.hobbymatchmaker.core.session.domain.errors.SessionErrors
 import com.msoula.hobbymatchmaker.core.session.domain.models.SessionUserDomainModel
 
 interface SessionRemoteDataSource {
-    suspend fun createUser(user: SessionUserDomainModel): Result<Boolean, SessionErrors.CreateUserError>
+    suspend fun createUser(user: SessionUserDomainModel): Result<Boolean, SessionErrors.CreateUserErrorHMM>
 }

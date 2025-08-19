@@ -19,11 +19,11 @@ class FakeSessionRepository : SessionRepository {
 
     override fun observeIsConnected(): Flow<Boolean> = isConnectedFlow.asStateFlow()
 
-    override suspend fun createUser(user: SessionUserDomainModel): Result<Boolean, SessionErrors.CreateUserError> {
+    override suspend fun createUser(user: SessionUserDomainModel): Result<Boolean, SessionErrors.CreateUserErrorHMM> {
         return if (shouldCreateUserSucceed) {
             Result.Success(true)
         } else {
-            Result.Failure(SessionErrors.CreateUserError.SaveError("Failed to create user"))
+            Result.Failure(SessionErrors.CreateUserErrorHMM.SaveErrorHMM("Failed to create user"))
         }
     }
 }

@@ -2,19 +2,19 @@ package com.msoula.hobbymatchmaker.features.moviedetail.domain.fakes
 
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.dataSources.remote.MovieDetailRemoteDataSource
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainError
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainErrorHMM
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieCastDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieVideoDomainModel
 
 class FakeMovieDetailRemoteDataSource(
-    private val fetchMovieDetailResult: Result<MovieDetailDomainModel?, MovieDetailDomainError> = Result.Success(
+    private val fetchMovieDetailResult: Result<MovieDetailDomainModel?, MovieDetailDomainErrorHMM> = Result.Success(
         MovieDetailDomainModel()
     ),
-    private val fetchMovieDetailCreditResult: Result<MovieCastDomainModel?, MovieDetailDomainError> = Result.Success(
+    private val fetchMovieDetailCreditResult: Result<MovieCastDomainModel?, MovieDetailDomainErrorHMM> = Result.Success(
         MovieCastDomainModel()
     ),
-    private val fetchMovieTrailerResult: Result<MovieVideoDomainModel?, MovieDetailDomainError> = Result.Success(
+    private val fetchMovieTrailerResult: Result<MovieVideoDomainModel?, MovieDetailDomainErrorHMM> = Result.Success(
         MovieVideoDomainModel(
             key = "abc123",
             type = "",
@@ -26,15 +26,15 @@ class FakeMovieDetailRemoteDataSource(
     override suspend fun fetchMovieDetail(
         movieId: Long,
         language: String
-    ): Result<MovieDetailDomainModel?, MovieDetailDomainError> = fetchMovieDetailResult
+    ): Result<MovieDetailDomainModel?, MovieDetailDomainErrorHMM> = fetchMovieDetailResult
 
     override suspend fun fetchMovieCredit(
         movieId: Long,
         language: String
-    ): Result<MovieCastDomainModel?, MovieDetailDomainError> = fetchMovieDetailCreditResult
+    ): Result<MovieCastDomainModel?, MovieDetailDomainErrorHMM> = fetchMovieDetailCreditResult
 
     override suspend fun fetchMovieTrailer(
         movieId: Long,
         language: String
-    ): Result<MovieVideoDomainModel?, MovieDetailDomainError> = fetchMovieTrailerResult
+    ): Result<MovieVideoDomainModel?, MovieDetailDomainErrorHMM> = fetchMovieTrailerResult
 }

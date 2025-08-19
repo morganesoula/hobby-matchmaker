@@ -1,6 +1,6 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.useCases
 
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutError
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.fakes.FakeAuthenticationRepository
 import com.msoula.hobbymatchmaker.core.authentication.domain.fakes.FakeSessionRepository
 import com.msoula.hobbymatchmaker.core.common.Parameters
@@ -56,7 +56,7 @@ class LogOutUseCaseTest : StringSpec({
 
             results shouldBe listOf(
                 Result.Loading,
-                Result.Failure(LogOutError.UnknownError("weird error message"))
+                Result.Failure(LogOutErrorHMM.UnknownErrorHMM("weird error message"))
             )
         }
     }

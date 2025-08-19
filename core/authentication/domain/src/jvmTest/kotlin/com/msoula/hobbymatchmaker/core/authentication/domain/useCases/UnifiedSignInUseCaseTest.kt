@@ -56,7 +56,7 @@ class UnifiedSignInUseCaseTest : StringSpec({
 
             results shouldBe listOf(
                 Result.Loading,
-                Result.Failure(SignInError.WrongPassword)
+                Result.Failure(SignInErrorHMM.WrongPassword)
             )
         }
     }

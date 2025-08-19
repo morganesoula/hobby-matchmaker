@@ -4,8 +4,8 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignUpUseCase
-import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.ErrorMessageProvider
+import com.msoula.hobbymatchmaker.core.common.HMMAppError
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.login.domain.useCases.LoginValidateFormUseCase
@@ -123,7 +123,7 @@ class SignUpViewModel(
         }
     }
 
-    private suspend fun handleSignUpError(error: AppError): String =
+    private suspend fun handleSignUpError(error: HMMAppError): String =
         errorMessageProvider.getMessage(error)
 
     private fun resetForm() {

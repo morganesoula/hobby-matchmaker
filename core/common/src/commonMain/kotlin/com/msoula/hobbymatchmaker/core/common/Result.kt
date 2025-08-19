@@ -10,16 +10,16 @@ sealed class Result<out D, out E> {
     data object Loading : Result<Nothing, Nothing>()
 }
 
-interface AppError {
+interface HMMAppError {
     val message: String
 }
 
-sealed class NetworkError(override val message: String) : AppError {
-    data class Connection(val reason: String) : NetworkError(reason)
+sealed class NetworkErrorHMM(override val message: String) : HMMAppError {
+    data class Connection(val reason: String) : NetworkErrorHMM(reason)
 }
 
-class ExternalServiceError(override val message: String = "External service error occurred") :
-    AppError
+class ExternalServiceErrorHMM(override val message: String = "External service error occurred") :
+    HMMAppError
 
 suspend fun <Data, Out, Error> Result<Data, Error>.mapSuccess(
     transform: suspend (value: Data) -> Out

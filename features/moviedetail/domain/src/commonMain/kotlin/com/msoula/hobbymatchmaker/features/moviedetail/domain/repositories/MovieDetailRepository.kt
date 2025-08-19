@@ -1,8 +1,7 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.domain.repositories
 
-import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainError
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.UpdateMovieTrailerLocalError
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.R
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieActorDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieVideoDomainModel
@@ -13,12 +12,12 @@ interface MovieDetailRepository {
     suspend fun fetchMovieDetail(
         movieId: Long,
         language: String
-    ): Result<MovieDetailDomainModel, MovieDetailDomainError>
+    ): R<MovieDetailDomainModel?, AppError>
 
     suspend fun fetchMovieCredit(
         movieId: Long,
         language: String
-    ): Result<List<MovieActorDomainModel>?, MovieDetailDomainError>
+    ): R<List<MovieActorDomainModel>?, AppError>
 
     suspend fun observeMovieDetail(movieId: Long): Flow<MovieDetailDomainModel?>
 
@@ -27,10 +26,10 @@ interface MovieDetailRepository {
     suspend fun updateMovieVideoURI(
         movieId: Long,
         videoURI: String
-    ): Result<Boolean, UpdateMovieTrailerLocalError>
+    ): R<Boolean, AppError>
 
     suspend fun fetchMovieTrailer(
         movieId: Long,
         language: String
-    ): Result<MovieVideoDomainModel?, MovieDetailDomainError>
+    ): R<MovieVideoDomainModel?, AppError>
 }

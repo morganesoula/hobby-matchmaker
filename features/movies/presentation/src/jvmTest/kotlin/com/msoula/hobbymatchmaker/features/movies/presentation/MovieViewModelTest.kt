@@ -1,7 +1,7 @@
 package com.msoula.hobbymatchmaker.features.movies.presentation
 
 import app.cash.turbine.test
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutError
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfo
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutSuccess
@@ -100,7 +100,7 @@ class MovieViewModelTest : FunSpec({
     context("MovieState - Failure") {
         test("should emit Error when observeAllMoviesUseCase returns failure") {
             val errorResult = Result.Failure(
-                ObserveAllMoviesErrors.UnknownError("Unknown error dear")
+                ObserveAllMoviesErrors.UnknownErrorHMM("Unknown error dear")
             )
 
             runTest(dispatcher) {
@@ -159,7 +159,7 @@ class MovieViewModelTest : FunSpec({
         test("should return Error when logOut fails") {
             val errorResult = flowOf(
                 Result.Failure(
-                    LogOutError.UnknownError("Error dear while logging out")
+                    LogOutErrorHMM.UnknownErrorHMM("Error dear while logging out")
                 )
             )
 

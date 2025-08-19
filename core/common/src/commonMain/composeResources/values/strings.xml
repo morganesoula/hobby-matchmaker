@@ -1,0 +1,19 @@
+<resources>
+    <string name="network_timeout">Request timed out. Merci de ré-essayer.</string>
+    <string name="network_unreachable">Pas de connexion internet</string>
+    <string name="http_error_code">Erreur serveur (%1$d).</string>
+    <string name="request_canceled">Requête annulée</string>
+    <string name="serialization_error">Réponse invalide du serveur</string>
+    <string name="unknown_error">Une erreur s'est produite...</string>
+
+    <string name="validation_error">%1$s</string>
+    <string name="unauthorized">Vous devez vous identifier</string>
+    <string name="forbidden">Vous n'êtes pas autorisé</string>
+    <string name="not_found">Ressource introuvable</string>
+
+    <string name="external_service_error">Erreur externe du service: %1$s</string>
+
+    <string name="storage_write_failed">Impossible d’enregistrer vos données</string>
+    <string name="storage_read_failed">Impossible de charger vos données</string>
+    <string name="storage_corrupted">Les données locales semblent corrompues</string>
+</resources>

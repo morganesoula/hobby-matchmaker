@@ -14,7 +14,7 @@ class SessionRemoteDataSourceImpl(
     private val firestore: FirebaseFirestore
 ) : SessionRemoteDataSource {
 
-    override suspend fun createUser(user: SessionUserDomainModel): Result<Boolean, SessionErrors.CreateUserError> {
+    override suspend fun createUser(user: SessionUserDomainModel): Result<Boolean, SessionErrors.CreateUserErrorHMM> {
         val document = firestore.collection("users").document(user.uid).get()
 
         if (document.exists) {
@@ -31,7 +31,7 @@ class SessionRemoteDataSourceImpl(
             return try {
                 saveFireStoreUser(firestoreUser.uid, firestoreUserMap)
             } catch (e: FirebaseFirestoreException) {
-                Result.Failure(SessionErrors.CreateUserError.SaveError(e.message ?: ""))
+                Result.Failure(SessionErrors.CreateUserErrorHMM.SaveErrorHMM(e.message ?: ""))
             }
         }
     }
@@ -39,10 +39,10 @@ class SessionRemoteDataSourceImpl(
     private suspend fun saveFireStoreUser(
         uid: String,
         userFireStoreModel: HashMap<String, String>
-    ): Result<Boolean, SessionErrors.CreateUserError> {
+    ): Result<Boolean, SessionErrors.CreateUserErrorHMM> {
         return safeCall(appError = { errorMessage ->
             Logger.e("Error while saving firestore user online: $errorMessage")
-            SessionErrors.CreateUserError.SaveError(errorMessage)
+            SessionErrors.CreateUserErrorHMM.SaveErrorHMM(errorMessage)
         }) {
             firestore.collection("users").document(uid).set(userFireStoreModel)
             true

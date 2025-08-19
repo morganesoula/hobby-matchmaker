@@ -53,7 +53,7 @@ class SignInUseCaseTest : FunSpec({
 
             results shouldBe listOf(
                 Result.Loading,
-                Result.Failure(SignInError.WrongPassword)
+                Result.Failure(SignInErrorHMM.WrongPassword)
             )
         }
     }
@@ -67,7 +67,7 @@ class SignInUseCaseTest : FunSpec({
 
             results shouldBe listOf(
                 Result.Loading,
-                Result.Failure(SignInError.UserNotFound)
+                Result.Failure(SignInErrorHMM.UserNotFound)
             )
         }
     }
@@ -81,7 +81,7 @@ class SignInUseCaseTest : FunSpec({
 
             results shouldBe listOf(
                 Result.Loading,
-                Result.Failure(SignInError.UserDisabled)
+                Result.Failure(SignInErrorHMM.UserDisabled)
             )
         }
     }
@@ -95,7 +95,7 @@ class SignInUseCaseTest : FunSpec({
 
             results shouldBe listOf(
                 Result.Loading,
-                Result.Failure(SignInError.Other("Weird error message"))
+                Result.Failure(SignInErrorHMM.Other("Weird error message"))
             )
         }
     }

@@ -2,8 +2,8 @@ package com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases
 
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainError
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.UpdateMovieTrailerLocalError
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainErrorHMM
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.UpdateMovieTrailerLocalErrorHMM
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.fakes.FakeMovieDetailRepository
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieVideoDomainModel
 import io.kotest.core.spec.style.FunSpec
@@ -57,7 +57,7 @@ class ManageMovieTrailerUseCaseTest : FunSpec({
         test("Returns NoConnectionError when no connection") {
             val fakeRepository = FakeMovieDetailRepository(
                 fetchTrailerResult = Result.Failure(
-                    MovieDetailDomainError.NoConnection("No internet connexion")
+                    MovieDetailDomainErrorHMM.NoConnection("No internet connexion")
                 )
             )
 
@@ -75,7 +75,7 @@ class ManageMovieTrailerUseCaseTest : FunSpec({
 
                 result shouldBe listOf(
                     Result.Loading,
-                    Result.Failure(FetchingTrailerError.NoConnectionError("No internet connexion"))
+                    Result.Failure(FetchingTrailerErrorHMM.NoConnectionErrorHMM("No internet connexion"))
                 )
             }
         }
@@ -83,7 +83,7 @@ class ManageMovieTrailerUseCaseTest : FunSpec({
         test("Returns no TrailerFound when no trailer is found") {
             val fakeRepository = FakeMovieDetailRepository(
                 fetchTrailerResult = Result.Failure(
-                    FetchingTrailerError.NoTrailerFoundError(
+                    FetchingTrailerErrorHMM.NoTrailerFoundErrorHMM(
                         "No trailer found"
                     )
                 )
@@ -103,7 +103,7 @@ class ManageMovieTrailerUseCaseTest : FunSpec({
 
                 result shouldBe listOf(
                     Result.Loading,
-                    Result.Failure(FetchingTrailerError.NoTrailerFoundError("No trailer found"))
+                    Result.Failure(FetchingTrailerErrorHMM.NoTrailerFoundErrorHMM("No trailer found"))
                 )
             }
         }
@@ -111,7 +111,7 @@ class ManageMovieTrailerUseCaseTest : FunSpec({
         test("Returns TrailerUpdateError when update fails") {
             val fakeRepository = FakeMovieDetailRepository(
                 updateTrailerResult = Result.Failure(
-                    UpdateMovieTrailerLocalError("error updating trailer")
+                    UpdateMovieTrailerLocalErrorHMM("error updating trailer")
                 )
             )
 
@@ -130,7 +130,7 @@ class ManageMovieTrailerUseCaseTest : FunSpec({
                 result shouldBe listOf(
                     Result.Loading,
                     Result.Failure(
-                        FetchingTrailerError.TrailerUpdateError("Empty uri")
+                        FetchingTrailerErrorHMM.TrailerUpdateErrorHMM("Empty uri")
                     )
                 )
             }

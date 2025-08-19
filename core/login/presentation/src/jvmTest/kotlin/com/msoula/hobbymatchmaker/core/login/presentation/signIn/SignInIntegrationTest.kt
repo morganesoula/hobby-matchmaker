@@ -1,8 +1,8 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.signIn
 
 import app.cash.turbine.test
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ResetPasswordError
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SignInWithEmailAndPasswordError
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ResetPasswordErrorHMM
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SignInWithEmailAndPasswordErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepositoryImpl
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ResetPasswordUseCase
@@ -91,7 +91,7 @@ class SignInIntegrationTest : FunSpec({
     test("should emit SignInEvent.Error when password is wrong") {
         runTest {
             val authRemoteDataSource = FakeAuthenticationRemoteDataSource(
-                signInWithEmailAndPasswordResult = Result.Failure(SignInWithEmailAndPasswordError.WrongPassword)
+                signInWithEmailAndPasswordResult = Result.Failure(SignInWithEmailAndPasswordErrorHMM.WrongPassword)
             )
 
             val authRepository = AuthenticationRepositoryImpl(authRemoteDataSource)
@@ -131,7 +131,7 @@ class SignInIntegrationTest : FunSpec({
     test("should emit SignInEvent.Error when user is not found") {
         runTest {
             val authRemoteDataSource = FakeAuthenticationRemoteDataSource(
-                signInWithEmailAndPasswordResult = Result.Failure(SignInWithEmailAndPasswordError.UserNotFound)
+                signInWithEmailAndPasswordResult = Result.Failure(SignInWithEmailAndPasswordErrorHMM.UserNotFound)
             )
 
             val authRepository = AuthenticationRepositoryImpl(authRemoteDataSource)
@@ -170,7 +170,7 @@ class SignInIntegrationTest : FunSpec({
     test("should emit ResetPasswordEvent.Error when reset fails") {
         runTest {
             val fakeDataSource = FakeAuthenticationRemoteDataSource(
-                resetPasswordResult = Result.Failure(ResetPasswordError.Other)
+                resetPasswordResult = Result.Failure(ResetPasswordErrorHMM.Other)
             )
 
             val repo = AuthenticationRepositoryImpl(fakeDataSource)

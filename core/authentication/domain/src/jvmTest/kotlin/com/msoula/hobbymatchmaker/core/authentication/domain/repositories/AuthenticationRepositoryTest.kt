@@ -1,7 +1,7 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.repositories
 
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.CreateUserWithEmailAndPasswordError
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutError
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.CreateUserWithEmailAndPasswordErrorHMM
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.fakes.FakeAuthenticationRemoteDataSource
 import com.msoula.hobbymatchmaker.core.common.Result
 import io.kotest.core.spec.style.FunSpec
@@ -24,11 +24,11 @@ class AuthenticationRepositoryTest: FunSpec({
 
         test("should emit Failure when remoteDataSource returns Failure") {
             fakeRemoteDataSource.authenticationSignOutResult =
-                Result.Failure(LogOutError.UnknownError("Test error"))
+                Result.Failure(LogOutErrorHMM.UnknownErrorHMM("Test error"))
 
             val result = repository.logOut()
 
-            result shouldBe Result.Failure(LogOutError.UnknownError("Test error"))
+            result shouldBe Result.Failure(LogOutErrorHMM.UnknownErrorHMM("Test error"))
         }
     }
 
@@ -43,32 +43,32 @@ class AuthenticationRepositoryTest: FunSpec({
         test("should emit Failure when email and password are empty") {
             val result = repository.signUp("", "")
 
-            result shouldBe Result.Failure(CreateUserWithEmailAndPasswordError.UserDisabled)
+            result shouldBe Result.Failure(CreateUserWithEmailAndPasswordErrorHMM.UserDisabled)
         }
 
         test("should emit Failure when email is empty") {
             val result = repository.signUp("", "pass")
 
-            result shouldBe Result.Failure(CreateUserWithEmailAndPasswordError.TooManyRequests)
+            result shouldBe Result.Failure(CreateUserWithEmailAndPasswordErrorHMM.TooManyRequests)
         }
 
         test("should emit Failure when password is empty") {
             val result = repository.signUp("mail@test.com", "")
 
-            result shouldBe Result.Failure(CreateUserWithEmailAndPasswordError.InternalError)
+            result shouldBe Result.Failure(CreateUserWithEmailAndPasswordErrorHMM.InternalErrorHMM)
         }
 
         test("should emit Failure when email equals password") {
             val result = repository.signUp("same", "same")
 
-            result shouldBe Result.Failure(CreateUserWithEmailAndPasswordError.EmailAlreadyExists)
+            result shouldBe Result.Failure(CreateUserWithEmailAndPasswordErrorHMM.EmailAlreadyExists)
         }
 
         test("should emit Other error when email is 'unknown error'") {
             val result = repository.signUp("unknown error", "whatever")
 
             result shouldBe Result.Failure(
-                CreateUserWithEmailAndPasswordError.Other("Weird error message")
+                CreateUserWithEmailAndPasswordErrorHMM.Other("Weird error message")
             )
         }
     }

@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfo
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutUseCase
-import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.ErrorMessageProvider
+import com.msoula.hobbymatchmaker.core.common.HMMAppError
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.getDeviceLocale
@@ -93,7 +93,7 @@ class MovieViewModel(
         }
     }
 
-    private suspend fun handleError(error: AppError): String =
+    private suspend fun handleError(error: HMMAppError): String =
         errorMessageProvider.getMessage(error)
 
     fun onCardEvent(event: CardEventModel) {

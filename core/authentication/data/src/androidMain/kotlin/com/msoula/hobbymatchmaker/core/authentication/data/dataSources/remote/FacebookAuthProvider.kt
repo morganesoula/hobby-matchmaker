@@ -1,7 +1,7 @@
 package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote
 
 import com.facebook.login.LoginManager
-import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.errors.ProviderError
+import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.errors.ProviderErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.mappers.toFirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.providers.AuthProvider
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
@@ -13,27 +13,27 @@ class FacebookAuthProvider(
     private val auth: FirebaseAuth
 ) : AuthProvider {
 
-    override suspend fun signIn(credentials: AuthCredential): Result<FirebaseUserInfoDomainModel, ProviderError> {
+    override suspend fun signIn(credentials: AuthCredential): Result<FirebaseUserInfoDomainModel, ProviderErrorHMM> {
         return try {
             val authResult = auth.signInWithCredential(credentials)
 
             authResult.user?.let {
                 Result.Success(it.toFirebaseUserInfoDomainModel())
             } ?: run {
-                Result.Failure(ProviderError.FacebookSignInError("Error while sign in with Facebook"))
+                Result.Failure(ProviderErrorHMM.FacebookSignInErrorHMM("Error while sign in with Facebook"))
             }
         } catch (e: Exception) {
-            Result.Failure(ProviderError.FacebookSignInError("Error while sign in with Facebook + ${e.message}"))
+            Result.Failure(ProviderErrorHMM.FacebookSignInErrorHMM("Error while sign in with Facebook + ${e.message}"))
         }
     }
 
-    override suspend fun signOut(): Result<Boolean, ProviderError> {
+    override suspend fun signOut(): Result<Boolean, ProviderErrorHMM> {
         return try {
             LoginManager.getInstance().logOut()
             auth.signOut()
             Result.Success(true)
         } catch (e: Exception) {
-            Result.Failure(ProviderError.ProviderLogOutError("Error while sign out with Facebook + ${e.message}"))
+            Result.Failure(ProviderErrorHMM.ProviderLogOutErrorHMM("Error while sign out with Facebook + ${e.message}"))
         }
     }
 

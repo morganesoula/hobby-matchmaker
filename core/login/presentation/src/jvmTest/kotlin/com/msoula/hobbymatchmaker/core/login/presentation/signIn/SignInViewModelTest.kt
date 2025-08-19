@@ -1,10 +1,10 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.signIn
 
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ResetPasswordError
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ResetPasswordErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ResetPasswordSuccess
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ResetPasswordUseCase
-import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInError
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInSuccess
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.UnifiedSignInUseCase
 import com.msoula.hobbymatchmaker.core.common.Result
@@ -177,7 +177,7 @@ class SignInViewModelTest : FunSpec({
                     ValidationResult(true)
 
                 every { unifiedSignInUseCase.signIn(emailPasswordParam) } returns flowOf(
-                    Result.Failure(SignInError.WrongPassword)
+                    Result.Failure(SignInErrorHMM.WrongPassword)
                 )
 
                 try {
@@ -219,7 +219,7 @@ class SignInViewModelTest : FunSpec({
                     ValidationResult(true)
                 every { resetPasswordUseCase(any()) } returns flowOf(
                     Result.Failure(
-                        ResetPasswordError.Other
+                        ResetPasswordErrorHMM.Other
                     )
                 )
 

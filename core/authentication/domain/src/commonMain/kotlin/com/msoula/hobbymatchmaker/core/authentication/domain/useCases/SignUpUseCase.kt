@@ -1,9 +1,9 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.useCases
 
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.CreateUserWithEmailAndPasswordError
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.CreateUserWithEmailAndPasswordErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepository
-import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.FlowUseCase
+import com.msoula.hobbymatchmaker.core.common.HMMAppError
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.session.domain.errors.SessionErrors
@@ -54,29 +54,29 @@ class SignUpUseCase(
     }
 }
 
-private fun mapSignUpError(error: AppError): SignUpErrors = when (error) {
-    is CreateUserWithEmailAndPasswordError.EmailAlreadyExists -> SignUpErrors.EmailAlreadyExists
-    is CreateUserWithEmailAndPasswordError.UserDisabled -> SignUpErrors.UserDisabled
-    is CreateUserWithEmailAndPasswordError.TooManyRequests -> SignUpErrors.TooManyRequests
-    is CreateUserWithEmailAndPasswordError.InternalError -> SignUpErrors.InternalError
-    is CreateUserWithEmailAndPasswordError.Connection -> SignUpErrors.Connection
-    else -> SignUpErrors.UnknownError(error.message)
+private fun mapSignUpError(error: HMMAppError): SignUpErrors = when (error) {
+    is CreateUserWithEmailAndPasswordErrorHMM.EmailAlreadyExists -> SignUpErrors.EmailAlreadyExists
+    is CreateUserWithEmailAndPasswordErrorHMM.UserDisabled -> SignUpErrors.UserDisabled
+    is CreateUserWithEmailAndPasswordErrorHMM.TooManyRequests -> SignUpErrors.TooManyRequests
+    is CreateUserWithEmailAndPasswordErrorHMM.InternalErrorHMM -> SignUpErrors.InternalErrorHMM
+    is CreateUserWithEmailAndPasswordErrorHMM.Connection -> SignUpErrors.Connection
+    else -> SignUpErrors.UnknownErrorHMM(error.message)
 }
 
-private fun mapCreateUserError(error: SessionErrors.CreateUserError): SignUpErrors {
+private fun mapCreateUserError(error: SessionErrors.CreateUserErrorHMM): SignUpErrors {
     return when (error) {
-        is SessionErrors.CreateUserError.SaveError ->
-            SignUpErrors.UnknownError(error.message)
+        is SessionErrors.CreateUserErrorHMM.SaveErrorHMM ->
+            SignUpErrors.UnknownErrorHMM(error.message)
     }
 }
 
 data class SignUpSuccess(val uid: String)
 
-sealed class SignUpErrors(override val message: String) : AppError {
+sealed class SignUpErrors(override val message: String) : HMMAppError {
     data object EmailAlreadyExists : SignUpErrors("")
     data object UserDisabled : SignUpErrors("")
     data object TooManyRequests : SignUpErrors("")
-    data object InternalError : SignUpErrors("")
+    data object InternalErrorHMM : SignUpErrors("")
     data object Connection : SignUpErrors("")
-    data class UnknownError(override val message: String) : SignUpErrors("")
+    data class UnknownErrorHMM(override val message: String) : SignUpErrors("")
 }

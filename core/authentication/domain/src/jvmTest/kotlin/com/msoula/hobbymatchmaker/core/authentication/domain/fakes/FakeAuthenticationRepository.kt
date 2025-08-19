@@ -1,10 +1,10 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.fakes
 
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.CreateUserWithEmailAndPasswordError
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutError
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ResetPasswordError
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SignInWithEmailAndPasswordError
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SocialMediaError
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.CreateUserWithEmailAndPasswordErrorHMM
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutErrorHMM
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ResetPasswordErrorHMM
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SignInWithEmailAndPasswordErrorHMM
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SocialMediaErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepository
@@ -15,7 +15,7 @@ class FakeAuthenticationRepository(
     private val fakeSessionRepository: FakeSessionRepository
 ) : AuthenticationRepository {
 
-    var signInWithCredentialResult: Result<FirebaseUserInfoDomainModel, SocialMediaError> =
+    var signInWithCredentialResult: Result<FirebaseUserInfoDomainModel, SocialMediaErrorHMM> =
         Result.Success(
             FirebaseUserInfoDomainModel(
                 uid = "fakeUid",
@@ -23,7 +23,7 @@ class FakeAuthenticationRepository(
                 providers = emptyList()
             )
         )
-    var linkInWithCredentialResult: Result<FirebaseUserInfoDomainModel, SocialMediaError> =
+    var linkInWithCredentialResult: Result<FirebaseUserInfoDomainModel, SocialMediaErrorHMM> =
         Result.Success(
             FirebaseUserInfoDomainModel(
                 uid = "linkedUid",
@@ -39,27 +39,27 @@ class FakeAuthenticationRepository(
             providers = emptyList()
         )
 
-    override suspend fun logOut(): Result<Boolean, LogOutError> {
+    override suspend fun logOut(): Result<Boolean, LogOutErrorHMM> {
         return if (fakeSessionRepository.isConnectedFlow.value) {
             Result.Success(true)
         } else {
-            Result.Failure(LogOutError.UnknownError("weird error message"))
+            Result.Failure(LogOutErrorHMM.UnknownErrorHMM("weird error message"))
         }
     }
 
     override suspend fun signUp(
         email: String,
         password: String
-    ): Result<String, CreateUserWithEmailAndPasswordError> {
+    ): Result<String, CreateUserWithEmailAndPasswordErrorHMM> {
         return when {
             email.isEmpty() && password.isEmpty() -> Result.Failure(
-                CreateUserWithEmailAndPasswordError.UserDisabled
+                CreateUserWithEmailAndPasswordErrorHMM.UserDisabled
             )
 
-            password.isEmpty() -> Result.Failure(CreateUserWithEmailAndPasswordError.InternalError)
-            email.isEmpty() -> Result.Failure(CreateUserWithEmailAndPasswordError.TooManyRequests)
-            email == password -> Result.Failure(CreateUserWithEmailAndPasswordError.EmailAlreadyExists)
-            email == "unknown error" -> Result.Failure(CreateUserWithEmailAndPasswordError.Other("Weird error message"))
+            password.isEmpty() -> Result.Failure(CreateUserWithEmailAndPasswordErrorHMM.InternalErrorHMM)
+            email.isEmpty() -> Result.Failure(CreateUserWithEmailAndPasswordErrorHMM.TooManyRequests)
+            email == password -> Result.Failure(CreateUserWithEmailAndPasswordErrorHMM.EmailAlreadyExists)
+            email == "unknown error" -> Result.Failure(CreateUserWithEmailAndPasswordErrorHMM.Other("Weird error message"))
             else -> Result.Success("fakeUid")
         }
     }
@@ -67,21 +67,21 @@ class FakeAuthenticationRepository(
     override suspend fun signInWithEmailAndPassword(
         email: String,
         password: String
-    ): Result<String, SignInWithEmailAndPasswordError> {
+    ): Result<String, SignInWithEmailAndPasswordErrorHMM> {
         return when {
-            email.isEmpty() && password.isEmpty() -> Result.Failure(SignInWithEmailAndPasswordError.UserDisabled)
-            password.isEmpty() -> Result.Failure(SignInWithEmailAndPasswordError.WrongPassword)
-            email.isEmpty() -> Result.Failure(SignInWithEmailAndPasswordError.UserNotFound)
-            email == "unknown error" -> Result.Failure(SignInWithEmailAndPasswordError.Other("Weird error message"))
+            email.isEmpty() && password.isEmpty() -> Result.Failure(SignInWithEmailAndPasswordErrorHMM.UserDisabled)
+            password.isEmpty() -> Result.Failure(SignInWithEmailAndPasswordErrorHMM.WrongPassword)
+            email.isEmpty() -> Result.Failure(SignInWithEmailAndPasswordErrorHMM.UserNotFound)
+            email == "unknown error" -> Result.Failure(SignInWithEmailAndPasswordErrorHMM.Other("Weird error message"))
             else -> Result.Success("fakeUUID")
         }
     }
 
-    override suspend fun resetPassword(email: String): Result<Boolean, ResetPasswordError> {
+    override suspend fun resetPassword(email: String): Result<Boolean, ResetPasswordErrorHMM> {
         return when {
-            email.isEmpty() -> Result.Failure(ResetPasswordError.Other)
-            email == "too many requests" -> Result.Failure(ResetPasswordError.TooManyRequests)
-            email == "connection issue" -> Result.Failure(ResetPasswordError.Connection)
+            email.isEmpty() -> Result.Failure(ResetPasswordErrorHMM.Other)
+            email == "too many requests" -> Result.Failure(ResetPasswordErrorHMM.TooManyRequests)
+            email == "connection issue" -> Result.Failure(ResetPasswordErrorHMM.Connection)
             else -> Result.Success(true)
         }
     }
@@ -89,11 +89,11 @@ class FakeAuthenticationRepository(
     override suspend fun signInWithCredential(
         authCredential: AuthCredential,
         providerType: ProviderType
-    ): Result<FirebaseUserInfoDomainModel, SocialMediaError> {
+    ): Result<FirebaseUserInfoDomainModel, SocialMediaErrorHMM> {
         return signInWithCredentialResult
     }
 
-    override suspend fun linkInWithCredential(authCredential: AuthCredential): Result<FirebaseUserInfoDomainModel, SocialMediaError> {
+    override suspend fun linkInWithCredential(authCredential: AuthCredential): Result<FirebaseUserInfoDomainModel, SocialMediaErrorHMM> {
         return linkInWithCredentialResult
     }
 

@@ -6,7 +6,7 @@ import com.msoula.hobbymatchmaker.features.movies.data.dataSources.fakes.FakeTMD
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.mappers.toMovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.MovieRemoteModel
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.MovieResponseRemoteModel
-import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.services.TMDBKtorError
+import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.services.TMDBKtorErrorHMM
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.services.TMDBKtorService
 import com.msoula.hobbymatchmaker.features.movies.domain.errors.MovieErrors
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.ImageRepository
@@ -63,7 +63,7 @@ class MovieRemoteSourceImplTest : FunSpec({
         test("FetchMovies should return failure if first page fails") {
             val fakeTMDBKtorService = FakeTMDBKtorService(
                 mapOf(
-                    1 to Result.Failure(TMDBKtorError("TMDB Error on page 1"))
+                    1 to Result.Failure(TMDBKtorErrorHMM("TMDB Error on page 1"))
                 )
             )
 
@@ -79,7 +79,7 @@ class MovieRemoteSourceImplTest : FunSpec({
             runTest(dispatcher) {
                 val result = dataSource.fetchMovies("en")
 
-                result shouldBe Result.Failure(MovieErrors.FetchMovieByPageError("TMDB Error on page 1"))
+                result shouldBe Result.Failure(MovieErrors.FetchMovieByPageErrorHMM("TMDB Error on page 1"))
             }
         }
 
@@ -87,7 +87,7 @@ class MovieRemoteSourceImplTest : FunSpec({
             val fakeTMDBKtorService = FakeTMDBKtorService(
                 mapOf(
                     1 to Result.Success(MovieResponseRemoteModel(listOf(dummyMovie))),
-                    2 to Result.Failure(TMDBKtorError("TMDB Error on page 2"))
+                    2 to Result.Failure(TMDBKtorErrorHMM("TMDB Error on page 2"))
                 )
             )
 
@@ -104,7 +104,7 @@ class MovieRemoteSourceImplTest : FunSpec({
                 val result = dataSource.fetchMovies("en")
 
                 result shouldBe
-                    Result.Failure(MovieErrors.FetchMovieByPageError("TMDB Error on page 2"))
+                    Result.Failure(MovieErrors.FetchMovieByPageErrorHMM("TMDB Error on page 2"))
             }
         }
 
@@ -113,7 +113,7 @@ class MovieRemoteSourceImplTest : FunSpec({
                 mapOf(
                     1 to Result.Success(MovieResponseRemoteModel(listOf(dummyMovie))),
                     1 to Result.Success(MovieResponseRemoteModel(emptyList())),
-                    2 to Result.Failure(TMDBKtorError("TMDB Error on page 3"))
+                    2 to Result.Failure(TMDBKtorErrorHMM("TMDB Error on page 3"))
                 )
             )
 
@@ -130,7 +130,7 @@ class MovieRemoteSourceImplTest : FunSpec({
                 val result = dataSource.fetchMovies("en")
 
                 result shouldBe
-                    Result.Failure(MovieErrors.FetchMovieByPageError("TMDB Error on page 3"))
+                    Result.Failure(MovieErrors.FetchMovieByPageErrorHMM("TMDB Error on page 3"))
             }
         }
 
@@ -139,7 +139,7 @@ class MovieRemoteSourceImplTest : FunSpec({
                 override suspend fun getMoviesByPopularityDesc(
                     language: String,
                     page: Int
-                ): Result<MovieResponseRemoteModel, TMDBKtorError> {
+                ): Result<MovieResponseRemoteModel, TMDBKtorErrorHMM> {
                     throw IOException("Network failure")
                 }
             }
@@ -156,7 +156,7 @@ class MovieRemoteSourceImplTest : FunSpec({
             runTest(dispatcher) {
                 val result = dataSource.fetchMovies("en")
 
-                result shouldBe Result.Failure(MovieErrors.NetworkError("Network failure"))
+                result shouldBe Result.Failure(MovieErrors.NetworkErrorHMM("Network failure"))
             }
         }
 
@@ -165,7 +165,7 @@ class MovieRemoteSourceImplTest : FunSpec({
                 override suspend fun getMoviesByPopularityDesc(
                     language: String,
                     page: Int
-                ): Result<MovieResponseRemoteModel, TMDBKtorError> {
+                ): Result<MovieResponseRemoteModel, TMDBKtorErrorHMM> {
                     throw RuntimeException("Unexpected failure")
                 }
             }
@@ -182,7 +182,7 @@ class MovieRemoteSourceImplTest : FunSpec({
             runTest(dispatcher) {
                 val result = dataSource.fetchMovies("en")
 
-                result shouldBe Result.Failure(MovieErrors.UnknownError("Unexpected failure"))
+                result shouldBe Result.Failure(MovieErrors.UnknownErrorHMM("Unexpected failure"))
             }
         }
 

@@ -1,9 +1,9 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.useCases
 
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SignInWithEmailAndPasswordError
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SignInWithEmailAndPasswordErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepository
-import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.FlowUseCase
+import com.msoula.hobbymatchmaker.core.common.HMMAppError
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetIsConnectedUseCase
@@ -16,9 +16,9 @@ class SignInUseCase(
     private val dispatcher: CoroutineDispatcher,
     private val authenticationRepository: AuthenticationRepository,
     private val setIsConnectedUseCase: SetIsConnectedUseCase
-) : FlowUseCase<Parameters.DoubleStringParam, SignInSuccess, SignInError>(dispatcher) {
+) : FlowUseCase<Parameters.DoubleStringParam, SignInSuccess, SignInErrorHMM>(dispatcher) {
 
-    override fun execute(parameters: Parameters.DoubleStringParam): Flow<Result<SignInSuccess, SignInError>> {
+    override fun execute(parameters: Parameters.DoubleStringParam): Flow<Result<SignInSuccess, SignInErrorHMM>> {
         return channelFlow {
             send(Result.Loading)
 
@@ -45,22 +45,22 @@ class SignInUseCase(
 }
 
 data object SignInSuccess
-sealed class SignInError(override val message: String) : AppError {
-    data object WrongPassword : SignInError("")
-    data object UserNotFound : SignInError("")
-    data object UserDisabled : SignInError("")
-    data object TooManyRequests : SignInError("")
+sealed class SignInErrorHMM(override val message: String) : HMMAppError {
+    data object WrongPassword : SignInErrorHMM("")
+    data object UserNotFound : SignInErrorHMM("")
+    data object UserDisabled : SignInErrorHMM("")
+    data object TooManyRequests : SignInErrorHMM("")
     data class AccountAlreadyExists(val customErrorMessage: String) :
-        SignInError(customErrorMessage)
-    data class LinkError(val customErrorMessage: String) : SignInError(customErrorMessage)
-    data class Other(val customErrorMessage: String) : SignInError(customErrorMessage)
+        SignInErrorHMM(customErrorMessage)
+    data class LinkErrorHMM(val customErrorMessage: String) : SignInErrorHMM(customErrorMessage)
+    data class Other(val customErrorMessage: String) : SignInErrorHMM(customErrorMessage)
 }
 
-private fun mapSignInError(error: AppError): SignInError =
+private fun mapSignInError(error: HMMAppError): SignInErrorHMM =
     when (error) {
-        is SignInWithEmailAndPasswordError.UserNotFound -> SignInError.UserNotFound
-        is SignInWithEmailAndPasswordError.WrongPassword -> SignInError.WrongPassword
-        is SignInWithEmailAndPasswordError.UserDisabled -> SignInError.UserDisabled
-        is SignInWithEmailAndPasswordError.TooManyRequests -> SignInError.TooManyRequests
-        else -> SignInError.Other(error.message)
+        is SignInWithEmailAndPasswordErrorHMM.UserNotFound -> SignInErrorHMM.UserNotFound
+        is SignInWithEmailAndPasswordErrorHMM.WrongPassword -> SignInErrorHMM.WrongPassword
+        is SignInWithEmailAndPasswordErrorHMM.UserDisabled -> SignInErrorHMM.UserDisabled
+        is SignInWithEmailAndPasswordErrorHMM.TooManyRequests -> SignInErrorHMM.TooManyRequests
+        else -> SignInErrorHMM.Other(error.message)
     }

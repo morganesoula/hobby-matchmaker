@@ -1,11 +1,8 @@
 package com.msoula.hobbymatchmaker.core.common
 
-import androidx.compose.runtime.Composable
-import kotlinx.coroutines.flow.Flow
-
-@Composable
+@androidx.compose.runtime.Composable
 actual fun <T> observeFlowWithLifecycle(
-    flow: Flow<T>,
-    onEvent: (T) -> Unit
+    flow: kotlinx.coroutines.flow.Flow<T>,
+    onEvent: suspend (T) -> Unit
 ) {
 }

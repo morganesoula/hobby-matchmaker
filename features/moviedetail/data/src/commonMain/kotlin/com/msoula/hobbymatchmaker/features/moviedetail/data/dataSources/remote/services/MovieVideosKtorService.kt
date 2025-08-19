@@ -1,10 +1,13 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.services
 
-import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.errors.MovieDetailDataError
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.Logger
+import com.msoula.hobbymatchmaker.core.common.R
+import com.msoula.hobbymatchmaker.core.common.safeCall
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.MovieVideosResponseRemoteModel
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.parameter
 import io.ktor.client.request.request
 import io.ktor.http.HttpMethod
 import io.ktor.http.encodedPath
@@ -14,7 +17,7 @@ interface MovieVideosKtorService {
     suspend fun fetchMovieVideos(
         movie: Long,
         language: String
-    ): Result<MovieVideosResponseRemoteModel, MovieDetailDataError>
+    ): R<MovieVideosResponseRemoteModel, AppError>
 }
 
 class MovieVideosKtorServiceImpl(private val client: HttpClient) : MovieVideosKtorService {
@@ -22,20 +25,15 @@ class MovieVideosKtorServiceImpl(private val client: HttpClient) : MovieVideosKt
     override suspend fun fetchMovieVideos(
         movie: Long,
         language: String
-    ): Result<MovieVideosResponseRemoteModel, MovieDetailDataError> {
-        return try {
-            val response = client.request {
-                url {
-                    encodedPath = "movie/$movie/videos"
-                    parameters.append("language", language)
-                }
-                method = HttpMethod.Get
-            }.body<MovieVideosResponseRemoteModel>()
-
-            Result.Success(response)
-        } catch (e: Exception) {
-            Result.Failure(MovieDetailDataError.TrailerError(e.message.toString()))
-        }
+    ): R<MovieVideosResponseRemoteModel, AppError> = safeCall {
+        client.request {
+            method = HttpMethod.Get
+            url { encodedPath = "movie/$movie/videos" }
+            parameter("language", language)
+        }.body<MovieVideosResponseRemoteModel>()
+            .also {
+                Logger.d("MovieVideos: id=$movie lang=$language")
+            }
     }
 }
 

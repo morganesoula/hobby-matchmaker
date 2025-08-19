@@ -2,7 +2,7 @@ package com.msoula.hobbymatchmaker.core.authentication.domain.useCases
 
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.toSignInError
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
-import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.HMMAppError
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetIsConnectedUseCase
@@ -37,9 +37,9 @@ class UnifiedSignInUseCase(
             signInWithCredentialUseCase(credential, providerType)
         }
 
-    private fun <Error : AppError> authenticationAction(
+    private fun <Error : HMMAppError> authenticationAction(
         call: suspend () -> Result<*, Error>
-    ) = channelFlow<Result<SignInSuccess, SignInError>> {
+    ) = channelFlow<Result<SignInSuccess, SignInErrorHMM>> {
         send(Result.Loading)
         when (val result = call()) {
             is Result.Success -> {

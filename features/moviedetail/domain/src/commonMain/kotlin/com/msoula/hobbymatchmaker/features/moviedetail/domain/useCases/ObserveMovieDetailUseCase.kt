@@ -1,11 +1,8 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases
 
 import com.msoula.hobbymatchmaker.core.common.AppError
-import com.msoula.hobbymatchmaker.core.common.FlowUseCase
 import com.msoula.hobbymatchmaker.core.common.Logger
-import com.msoula.hobbymatchmaker.core.common.Parameters
-import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainError
+import com.msoula.hobbymatchmaker.core.common.R
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieActorDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.repositories.MovieDetailRepository
@@ -16,138 +13,73 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 
+sealed class ObserveMovieSuccess {
+    data class Success(val data: MovieDetailDomainModel) : ObserveMovieSuccess()
+    data object DataLoadedInDB : ObserveMovieSuccess()
+}
+
 class ObserveMovieDetailUseCase(
     private val movieDetailRepository: MovieDetailRepository,
     private val dispatcher: CoroutineDispatcher
-) :
-    FlowUseCase<Parameters.LongStringParam, ObserveMovieSuccess, ObserveMovieErrors>(
-        dispatcher
-    ) {
-    override fun execute(parameters: Parameters.LongStringParam):
-        Flow<Result<ObserveMovieSuccess, ObserveMovieErrors>> {
-
-        return channelFlow {
-            send(Result.Loading)
-
+) {
+    operator fun invoke(movieId: Long, language: String): Flow<R<ObserveMovieSuccess, AppError>> =
+        channelFlow {
             val job = launch {
-                movieDetailRepository.observeMovieDetail(parameters.longValue)
-                    .collect { movieDetail ->
-                        Logger.d("Into DetailUseCase with movieDetail duration: ${movieDetail?.duration}")
+                movieDetailRepository.observeMovieDetail(movieId)
+                    .collect { detail ->
+                        Logger.d("DetailUseCase: observed title: ${detail?.title}")
+
                         when {
-                            movieDetail == null -> send(Result.Failure(ObserveMovieErrors.Empty))
+                            detail == null -> send(R.Failure(AppError.Domain.NotFound))
 
-                            movieDetail.synopsis.isNullOrBlank() ->
-                                send(
-                                    fetchAndSaveMovieData(
-                                        parameters.longValue,
-                                        parameters.stringValue
-                                    )
-                                )
+                            detail.synopsis.isNullOrBlank() -> {
+                                when (val detailResult =
+                                    movieDetailRepository.fetchMovieDetail(movieId, language)) {
+                                    is R.Failure -> send(R.Failure(detailResult.error))
+                                    is R.Success -> {
+                                        val creditResult = movieDetailRepository.fetchMovieCredit(
+                                            movieId,
+                                            language
+                                        )
+                                        val safeCast: List<MovieActorDomainModel> =
+                                            (creditResult as? R.Success)?.data?.takeIf { it.isNotEmpty() }
+                                                ?: emptyList()
 
-                            movieDetail.cast.isNullOrEmpty() -> {
-                                when (val result = movieDetailRepository.fetchMovieCredit(
-                                    parameters.longValue,
-                                    parameters.stringValue
-                                )) {
-                                    is Result.Success -> {
-                                        val cast = result.data?.takeIf { it.isNotEmpty() }
-                                            ?: listOf(
+                                        val updated = detailResult.data?.copy(cast = safeCast)
+                                        updated?.let {
+                                            movieDetailRepository.saveMovieDetail(it)
+                                        }
+
+                                        send(R.Success(ObserveMovieSuccess.DataLoadedInDB))
+                                    }
+                                }
+                            }
+
+                            detail.cast.isNullOrEmpty() -> {
+                                when (val creditResult =
+                                    movieDetailRepository.fetchMovieCredit(movieId, language)) {
+                                    is R.Failure -> send(R.Failure(creditResult.error))
+                                    is R.Success -> {
+                                        val cast =
+                                            creditResult.data?.takeIf { it.isNotEmpty() } ?: listOf(
                                                 MovieActorDomainModel(
                                                     name = "NO_CAST",
                                                     role = "MARKER"
                                                 )
                                             )
 
-                                        val updated = movieDetail.copy(cast = cast)
+                                        val updated = detail.copy(cast = cast)
                                         movieDetailRepository.saveMovieDetail(updated)
-                                        send(Result.Success(ObserveMovieSuccess.DataLoadedInDB))
-                                    }
-
-                                    is Result.Failure -> {
-                                        Logger.e("Error fetching cast: ${result.error.message}")
-                                        send(Result.Failure(mapCreditError(result.error)))
-                                    }
-
-                                    else -> {
-                                        Logger.e("Unexpected error while fetching cast")
-                                        send(Result.Failure(ObserveMovieErrors.Error("Unexpected error")))
+                                        send(R.Success(ObserveMovieSuccess.DataLoadedInDB))
                                     }
                                 }
                             }
 
-                            else -> send(Result.Success(ObserveMovieSuccess.Success(movieDetail)))
+                            else -> send(R.Success(ObserveMovieSuccess.Success(detail)))
                         }
                     }
             }
 
             awaitClose { job.cancel() }
         }.flowOn(dispatcher)
-    }
-
-    private suspend fun fetchAndSaveMovieData(
-        movieId: Long,
-        language: String
-    ): Result<ObserveMovieSuccess, ObserveMovieErrors> {
-        val detailResult = movieDetailRepository.fetchMovieDetail(
-            movieId = movieId,
-            language = language
-        )
-
-        return when (detailResult) {
-            is Result.Failure -> {
-                Logger.e("FetchMovieDetail error: ${detailResult.error.message}")
-                Result.Failure(mapDetailError(detailResult.error))
-            }
-
-            is Result.Success -> {
-                val creditResult = movieDetailRepository.fetchMovieCredit(
-                    movieId = movieId,
-                    language = language
-                )
-
-                val safeCast =
-                    if (creditResult is Result.Success) creditResult.data else emptyList()
-
-                val updatedMovie = detailResult.data.copy(cast = safeCast)
-                Logger.d("Updated movie in UseCase with duration: ${updatedMovie.duration}")
-                movieDetailRepository.saveMovieDetail(updatedMovie)
-
-                return Result.Success(ObserveMovieSuccess.DataLoadedInDB)
-            }
-
-            else -> {
-                Logger.e("Unknown error")
-                Result.Failure(ObserveMovieErrors.Error("Unknown error"))
-            }
-        }
-    }
 }
-
-sealed class ObserveMovieSuccess {
-    data class Success(val data: MovieDetailDomainModel) : ObserveMovieSuccess()
-    data object DataLoadedInDB : ObserveMovieSuccess()
-}
-
-sealed class ObserveMovieErrors(override val message: String) : AppError {
-    data object Empty : ObserveMovieErrors("")
-    data object NoConnection : ObserveMovieErrors("")
-    data object CreditError : ObserveMovieErrors("")
-    data object MovieDetailError : ObserveMovieErrors("")
-    data class Error(val error: String) : ObserveMovieErrors(error)
-}
-
-private fun mapDetailError(error: MovieDetailDomainError): ObserveMovieErrors =
-    when (error) {
-        is MovieDetailDomainError.NoConnection -> ObserveMovieErrors.NoConnection
-        is MovieDetailDomainError.MovieDetailError -> ObserveMovieErrors.MovieDetailError
-        else -> ObserveMovieErrors.Error(error.message)
-    }
-
-private fun mapCreditError(error: MovieDetailDomainError): ObserveMovieErrors =
-    when (error) {
-        is MovieDetailDomainError.NoConnection -> ObserveMovieErrors.NoConnection
-        is MovieDetailDomainError.CreditError -> ObserveMovieErrors.CreditError
-        else -> ObserveMovieErrors.Error(error.message)
-    }
-
-

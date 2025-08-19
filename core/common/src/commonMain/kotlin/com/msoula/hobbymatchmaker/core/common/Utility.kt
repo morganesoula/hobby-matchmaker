@@ -6,7 +6,7 @@ import kotlin.coroutines.cancellation.CancellationException
 expect fun getDeviceLocale(): String
 expect fun isIosPlatform(): Boolean
 
-suspend fun <Data, ErrorType : AppError> safeCall(
+suspend fun <Data, ErrorType : HMMAppError> safeCall(
     appError: (String) -> ErrorType,
     action: suspend () -> Data
 ): Result<Data, ErrorType> {

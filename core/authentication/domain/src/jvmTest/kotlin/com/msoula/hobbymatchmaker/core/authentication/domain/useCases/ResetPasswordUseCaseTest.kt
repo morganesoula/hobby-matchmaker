@@ -1,6 +1,6 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.useCases
 
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ResetPasswordError
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ResetPasswordErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.fakes.FakeAuthenticationRepository
 import com.msoula.hobbymatchmaker.core.authentication.domain.fakes.FakeSessionRepository
 import com.msoula.hobbymatchmaker.core.common.Parameters
@@ -41,7 +41,7 @@ class ResetPasswordUseCaseTest : StringSpec({
 
             results shouldBe listOf(
                 Result.Loading,
-                Result.Failure(ResetPasswordError.Other)
+                Result.Failure(ResetPasswordErrorHMM.Other)
             )
         }
     }
@@ -54,7 +54,7 @@ class ResetPasswordUseCaseTest : StringSpec({
 
             results shouldBe listOf(
                 Result.Loading,
-                Result.Failure(ResetPasswordError.TooManyRequests)
+                Result.Failure(ResetPasswordErrorHMM.TooManyRequests)
             )
         }
     }
@@ -67,7 +67,7 @@ class ResetPasswordUseCaseTest : StringSpec({
 
             results shouldBe listOf(
                 Result.Loading,
-                Result.Failure(ResetPasswordError.Connection)
+                Result.Failure(ResetPasswordErrorHMM.Connection)
             )
         }
     }

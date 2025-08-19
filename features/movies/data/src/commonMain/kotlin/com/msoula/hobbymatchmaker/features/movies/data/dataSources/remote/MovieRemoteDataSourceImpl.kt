@@ -71,17 +71,17 @@ class MovieRemoteDataSourceImpl(
 
                 is Result.Failure -> {
                     Logger.e("Returning failure from fetchMoviesByPage: ${response.error}")
-                    Result.Failure(MovieErrors.FetchMovieByPageError(response.error.message))
+                    Result.Failure(MovieErrors.FetchMovieByPageErrorHMM(response.error.message))
                 }
 
                 else -> Result.Success(emptyList())
             }
         } catch (e: IOException) {
             Logger.e("Error fetching movies by page: $e")
-            Result.Failure(MovieErrors.NetworkError(e.message ?: ""))
+            Result.Failure(MovieErrors.NetworkErrorHMM(e.message ?: ""))
         } catch (e: Exception) {
             Logger.e("Error fetching movies by page: $e")
-            Result.Failure(MovieErrors.UnknownError(e.message ?: ""))
+            Result.Failure(MovieErrors.UnknownErrorHMM(e.message ?: ""))
         }
     }
 

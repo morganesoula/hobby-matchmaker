@@ -1,6 +1,6 @@
 package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote
 
-import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.errors.ProviderError
+import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.errors.ProviderErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.providers.AuthProvider
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.common.Logger
@@ -13,7 +13,7 @@ class AppleAuthProvider(
     private val auth: FirebaseAuth
 ) : AuthProvider {
 
-    override suspend fun signIn(credentials: AuthCredential): Result<FirebaseUserInfoDomainModel, ProviderError> {
+    override suspend fun signIn(credentials: AuthCredential): Result<FirebaseUserInfoDomainModel, ProviderErrorHMM> {
         return try {
             val result = auth.signInWithCredential(credentials)
             val user = result.user
@@ -27,22 +27,22 @@ class AppleAuthProvider(
                     )
                 )
             } else {
-                Result.Failure(ProviderError.AppleSignInError("User is null"))
+                Result.Failure(ProviderErrorHMM.AppleSignInErrorHMM("User is null"))
             }
         } catch (e: Exception) {
             Logger.e("❌ Apple sign-in exception: ${e::class.simpleName} - ${e.message}")
             e.printStackTrace()
-            Result.Failure(ProviderError.AppleSignInError("Firebase sign-in failed: ${e.message ?: "Unknown error"}"))
+            Result.Failure(ProviderErrorHMM.AppleSignInErrorHMM("Firebase sign-in failed: ${e.message ?: "Unknown error"}"))
         }
     }
 
-    override suspend fun signOut(): Result<Boolean, ProviderError> {
+    override suspend fun signOut(): Result<Boolean, ProviderErrorHMM> {
         return try {
             auth.signOut()
             Result.Success(true)
         } catch (e: Exception) {
             Result.Failure(
-                ProviderError.ProviderLogOutError(
+                ProviderErrorHMM.ProviderLogOutErrorHMM(
                     "Error while sign out with Apple + ${e.message}"
                 )
             )

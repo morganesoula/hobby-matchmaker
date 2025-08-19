@@ -1,11 +1,10 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.domain.repositories
 
-import com.msoula.hobbymatchmaker.core.common.ExternalServiceError
-import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.core.common.ExternalServiceErrorHMM
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.dataSources.local.MovieDetailLocalDataSource
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.dataSources.remote.MovieDetailRemoteDataSource
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainError
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.UpdateMovieTrailerLocalError
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainErrorHMM
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.UpdateMovieTrailerLocalErrorHMM
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.fakes.FakeMovieDetailLocalDataSource
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.fakes.FakeMovieDetailRemoteDataSource
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieActorDomainModel
@@ -14,11 +13,12 @@ import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetail
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieVideoDomainModel
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.fail
+import com.msoula.hobbymatchmaker.core.common.Result as AppResult
 
 class MovieDetailRepositoryImplTest : FunSpec({
     val dispatcher = StandardTestDispatcher()
@@ -37,7 +37,7 @@ class MovieDetailRepositoryImplTest : FunSpec({
                 val result = repository
                     .fetchMovieDetail(1L, "en")
 
-                result shouldBe Result.Success(MovieDetailDomainModel())
+                result shouldBe AppResult.Success(MovieDetailDomainModel())
             }
         }
     }
@@ -46,8 +46,8 @@ class MovieDetailRepositoryImplTest : FunSpec({
         test("returns Failure with EmptyDataError when remote returns null data") {
             val fakeLocalDataSource = FakeMovieDetailLocalDataSource()
             val fakeRemoteDataSource = FakeMovieDetailRemoteDataSource(
-                fetchMovieDetailResult = Result.Failure(
-                    MovieDetailDomainError.MovieDetailError("No data found")
+                fetchMovieDetailResult = AppResult.Failure(
+                    MovieDetailDomainErrorHMM.MovieDetailErrorHMM("No data found")
                 )
             )
 
@@ -59,8 +59,8 @@ class MovieDetailRepositoryImplTest : FunSpec({
             runTest(dispatcher) {
                 val result = repository.fetchMovieDetail(1L, "en")
 
-                result shouldBe Result.Failure(
-                    MovieDetailDomainError.MovieDetailError(
+                result shouldBe AppResult.Failure(
+                    MovieDetailDomainErrorHMM.MovieDetailErrorHMM(
                         "No data found"
                     )
                 )
@@ -73,20 +73,20 @@ class MovieDetailRepositoryImplTest : FunSpec({
                 override suspend fun fetchMovieCredit(
                     movieId: Long,
                     language: String
-                ): Result<MovieCastDomainModel?, MovieDetailDomainError> {
+                ): Result<MovieCastDomainModel?, MovieDetailDomainErrorHMM> {
                     throw RuntimeException("Remote error")
                 }
 
                 override suspend fun fetchMovieDetail(
                     movieId: Long,
                     language: String
-                ): Result<MovieDetailDomainModel?, MovieDetailDomainError> =
+                ): Result<MovieDetailDomainModel?, MovieDetailDomainErrorHMM> =
                     Result.Success(null)
 
                 override suspend fun fetchMovieTrailer(
                     movieId: Long,
                     language: String
-                ): Result<MovieVideoDomainModel?, MovieDetailDomainError> =
+                ): Result<MovieVideoDomainModel?, MovieDetailDomainErrorHMM> =
                     Result.Success(null)
             }
 
@@ -98,11 +98,13 @@ class MovieDetailRepositoryImplTest : FunSpec({
             runTest(dispatcher) {
                 val result = repository.fetchMovieCredit(1L, "en")
 
-                result.shouldBeInstanceOf<Result.Failure>()
-                val error = result.error
+                when (result) {
+                    is AppResult.Failure -> {
+                        result.error shouldBe ExternalServiceErrorHMM(message = "Remote error")
+                    }
 
-                error.shouldBeInstanceOf<ExternalServiceError>()
-                error.message shouldBe "Remote error"
+                    is AppResult.Success -> fail("Expected Failure, got Success")
+                }
             }
         }
     }
@@ -139,7 +141,7 @@ class MovieDetailRepositoryImplTest : FunSpec({
             val fakeLocalDataSource = FakeMovieDetailLocalDataSource()
             val fakeRemoteDataSource = FakeMovieDetailRemoteDataSource(
                 fetchMovieDetailCreditResult = Result.Failure(
-                    MovieDetailDomainError.CreditError("Error with credit")
+                    MovieDetailDomainErrorHMM.CreditErrorHMM("Error with credit")
                 )
             )
 
@@ -151,7 +153,7 @@ class MovieDetailRepositoryImplTest : FunSpec({
             runTest(dispatcher) {
                 val result = repository.fetchMovieCredit(1L, "en")
 
-                result shouldBe Result.Failure(MovieDetailDomainError.CreditError("Error with credit"))
+                result shouldBe Result.Failure(MovieDetailDomainErrorHMM.CreditErrorHMM("Error with credit"))
             }
         }
 
@@ -161,21 +163,21 @@ class MovieDetailRepositoryImplTest : FunSpec({
                 override suspend fun fetchMovieCredit(
                     movieId: Long,
                     language: String
-                ): Result<MovieCastDomainModel?, MovieDetailDomainError> {
+                ): Result<MovieCastDomainModel?, MovieDetailDomainErrorHMM> {
                     throw RuntimeException("Error on runtime")
                 }
 
                 override suspend fun fetchMovieDetail(
                     movieId: Long,
                     language: String
-                ): Result<MovieDetailDomainModel?, MovieDetailDomainError> = Result.Success(
+                ): Result<MovieDetailDomainModel?, MovieDetailDomainErrorHMM> = Result.Success(
                     MovieDetailDomainModel()
                 )
 
                 override suspend fun fetchMovieTrailer(
                     movieId: Long,
                     language: String
-                ): Result<MovieVideoDomainModel?, MovieDetailDomainError> =
+                ): Result<MovieVideoDomainModel?, MovieDetailDomainErrorHMM> =
                     Result.Success(MovieVideoDomainModel("abc123", "", "YouTube"))
             }
 
@@ -186,8 +188,13 @@ class MovieDetailRepositoryImplTest : FunSpec({
             runTest(dispatcher) {
                 val result = repository.fetchMovieCredit(1L, "en")
 
-                result.shouldBeInstanceOf<Result.Failure>()
-                result.error.message shouldBe "Error on runtime"
+                when (result) {
+                    is AppResult.Failure -> {
+                        result.error.message shouldBe "Error on runtime"
+                    }
+
+                    is AppResult.Success -> fail("Should be Failure")
+                }
             }
         }
     }
@@ -234,9 +241,13 @@ class MovieDetailRepositoryImplTest : FunSpec({
             runTest(dispatcher) {
                 val result = repository.updateMovieVideoURI(1L, "fakeVideoURI")
 
-                result.shouldBeInstanceOf<Result.Failure>()
-                result.error.shouldBeInstanceOf<UpdateMovieTrailerLocalError>()
-                result.error.message shouldBe "Error while updating movie trailer in DB + Database failure"
+                when (result) {
+                    is AppResult.Failure -> {
+                        result.error shouldBe UpdateMovieTrailerLocalErrorHMM(
+                            "Error while updating movie trailer in DB + Database failure"
+                        )
+                    }
+                }
             }
         }
     }

@@ -1,8 +1,8 @@
 package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote
 
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.fakes.FakeAuthManager
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutError
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SocialMediaError
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutErrorHMM
+import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SocialMediaErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.common.Result
@@ -40,7 +40,7 @@ class AuthenticationRemoteDataSourceImplTest : FunSpec({
             runTest(dispatcher) {
                 authManager.shouldThrow = true
                 val result = dataSource.authenticationSignOut()
-                result shouldBe Result.Failure(LogOutError.UnknownError("Some unexpected exception"))
+                result shouldBe Result.Failure(LogOutErrorHMM.UnknownErrorHMM("Some unexpected exception"))
             }
         }
     }
@@ -99,7 +99,7 @@ class AuthenticationRemoteDataSourceImplTest : FunSpec({
                 coEvery { auth.currentUser?.linkWithCredential(credential) } returns authResult
 
                 val result = dataSource.linkWithCredential(credential)
-                result shouldBe Result.Failure(SocialMediaError.LinkWithCredentialsError)
+                result shouldBe Result.Failure(SocialMediaErrorHMM.LinkWithCredentialsError)
             }
         }
 
@@ -109,7 +109,7 @@ class AuthenticationRemoteDataSourceImplTest : FunSpec({
                 coEvery { auth.currentUser?.linkWithCredential(credential) } throws Exception("fail")
 
                 val result = dataSource.linkWithCredential(credential)
-                result shouldBe Result.Failure(SocialMediaError.LinkWithCredentialsError)
+                result shouldBe Result.Failure(SocialMediaErrorHMM.LinkWithCredentialsError)
             }
         }
     }

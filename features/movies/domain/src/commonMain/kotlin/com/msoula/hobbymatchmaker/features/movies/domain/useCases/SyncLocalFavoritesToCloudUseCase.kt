@@ -1,8 +1,8 @@
 package com.msoula.hobbymatchmaker.features.movies.domain.useCases
 
 import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepository
-import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.FlowUseCase
+import com.msoula.hobbymatchmaker.core.common.HMMAppError
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.Result
@@ -24,7 +24,7 @@ class SyncLocalFavoritesToCloudUseCase(
             send(Result.Loading)
 
             val uid = authenticationRepository.fetchFirebaseUserInfo()?.uid ?: return@channelFlow
-            send(Result.Failure(SyncLocalErrors.NoUIDFoundError))
+            send(Result.Failure(SyncLocalErrors.NoUIDFoundErrorHMM))
 
             val localIds = movieRepository.getFavoriteLocalMovieIds()
 
@@ -35,12 +35,12 @@ class SyncLocalFavoritesToCloudUseCase(
                 throw e
             } catch (e: Exception) {
                 Logger.e("Sync local movie favorites failed: ${e.message}")
-                send(Result.Failure(SyncLocalErrors.SyncLocalFavoriteError))
+                send(Result.Failure(SyncLocalErrors.SyncLocalFavoriteErrorHMM))
             }
         }.flowOn(dispatcher)
 }
 
-sealed class SyncLocalErrors(override val message: String) : AppError {
-    data object NoUIDFoundError : SyncLocalErrors("")
-    data object SyncLocalFavoriteError : SyncLocalErrors("")
+sealed class SyncLocalErrors(override val message: String) : HMMAppError {
+    data object NoUIDFoundErrorHMM : SyncLocalErrors("")
+    data object SyncLocalFavoriteErrorHMM : SyncLocalErrors("")
 }

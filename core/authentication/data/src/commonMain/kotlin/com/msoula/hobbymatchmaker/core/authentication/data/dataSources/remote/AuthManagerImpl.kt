@@ -1,6 +1,6 @@
 package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote
 
-import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.errors.ProviderError
+import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.errors.ProviderErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.providers.AuthProvider
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
@@ -12,14 +12,14 @@ class AuthManagerImpl(private val providers: List<AuthProvider>) : AuthManager {
     override suspend fun signIn(
         providerType: ProviderType,
         credential: AuthCredential
-    ): Result<FirebaseUserInfoDomainModel, ProviderError> {
+    ): Result<FirebaseUserInfoDomainModel, ProviderErrorHMM> {
         val provider = findProvider(providerType)
-            ?: return Result.Failure(ProviderError.NoProviderFound("Provider not found"))
+            ?: return Result.Failure(ProviderErrorHMM.NoProviderFound("Provider not found"))
 
         return provider.signIn(credential)
     }
 
-    override suspend fun signOut(): Result<Boolean, ProviderError> {
+    override suspend fun signOut(): Result<Boolean, ProviderErrorHMM> {
         var hasError = false
         providers.forEach { provider ->
             val result = provider.signOut()
@@ -27,7 +27,7 @@ class AuthManagerImpl(private val providers: List<AuthProvider>) : AuthManager {
         }
 
         return if (hasError) Result.Failure(
-            ProviderError.ProviderLogOutError(
+            ProviderErrorHMM.ProviderLogOutErrorHMM(
                 "Some providers failed to log out"
             )
         ) else {

@@ -8,6 +8,6 @@ import com.msoula.hobbymatchmaker.core.session.domain.repositories.SessionReposi
 class CreateUserUseCase(private val sessionRepository: SessionRepository) {
 
     suspend operator fun invoke(userDomainModel: SessionUserDomainModel):
-        Result<Boolean, SessionErrors.CreateUserError> =
+        Result<Boolean, SessionErrors.CreateUserErrorHMM> =
         sessionRepository.createUser(userDomainModel)
 }

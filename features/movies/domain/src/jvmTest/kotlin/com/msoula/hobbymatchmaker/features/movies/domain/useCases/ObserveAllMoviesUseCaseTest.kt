@@ -67,7 +67,7 @@ class ObserveAllMoviesUseCaseTest : FunSpec({
 
     test("should emit Loading then Failure when DB is empty and fetch fails") {
         val fakeMovieRepository = FakeMovieRepository(emptyList())
-        fakeMovieRepository.setFetchResult(Result.Failure(MovieErrors.NetworkError("No connection")))
+        fakeMovieRepository.setFetchResult(Result.Failure(MovieErrors.NetworkErrorHMM("No connection")))
 
         val fetchMovieUseCase = FetchMoviesUseCase(fakeMovieRepository)
         val observeAllMoviesUseCase =
@@ -81,7 +81,7 @@ class ObserveAllMoviesUseCaseTest : FunSpec({
                 val result = awaitItem()
 
                 result.shouldBeInstanceOf<Result.Failure>()
-                (result.error as? ObserveAllMoviesErrors.NetworkError)?.networkErrorMessage shouldBe "No connection"
+                (result.error as? ObserveAllMoviesErrors.NetworkErrorHMM)?.networkErrorMessage shouldBe "No connection"
                 cancelAndIgnoreRemainingEvents()
             }
         }

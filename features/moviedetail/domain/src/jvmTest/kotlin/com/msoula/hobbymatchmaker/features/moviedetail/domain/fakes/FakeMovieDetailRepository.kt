@@ -1,8 +1,8 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.domain.fakes
 
 import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainError
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.UpdateMovieTrailerLocalError
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainErrorHMM
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.UpdateMovieTrailerLocalErrorHMM
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieActorDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieVideoDomainModel
@@ -12,16 +12,16 @@ import kotlinx.coroutines.flow.emptyFlow
 
 class FakeMovieDetailRepository(
     private val movieDetailFlow: Flow<MovieDetailDomainModel?> = emptyFlow(),
-    private val fetchDetailResult: Result<MovieDetailDomainModel, MovieDetailDomainError> = Result.Failure(
-        MovieDetailDomainError.MovieDetailError("Default")
+    private val fetchDetailResult: Result<MovieDetailDomainModel, MovieDetailDomainErrorHMM> = Result.Failure(
+        MovieDetailDomainErrorHMM.MovieDetailErrorHMM("Default")
     ),
-    private val fetchCreditResult: Result<List<MovieActorDomainModel>?, MovieDetailDomainError> = Result.Success(
+    private val fetchCreditResult: Result<List<MovieActorDomainModel>?, MovieDetailDomainErrorHMM> = Result.Success(
         emptyList()
     ),
-    private val fetchTrailerResult: Result<MovieVideoDomainModel?, MovieDetailDomainError> = Result.Success(
+    private val fetchTrailerResult: Result<MovieVideoDomainModel?, MovieDetailDomainErrorHMM> = Result.Success(
         null
     ),
-    private val updateTrailerResult: Result<Boolean, UpdateMovieTrailerLocalError> = Result.Success(
+    private val updateTrailerResult: Result<Boolean, UpdateMovieTrailerLocalErrorHMM> = Result.Success(
         true
     )
 ) : MovieDetailRepository {
@@ -32,12 +32,12 @@ class FakeMovieDetailRepository(
     override suspend fun fetchMovieDetail(
         movieId: Long,
         language: String
-    ): Result<MovieDetailDomainModel, MovieDetailDomainError> = fetchDetailResult
+    ): Result<MovieDetailDomainModel, MovieDetailDomainErrorHMM> = fetchDetailResult
 
     override suspend fun fetchMovieCredit(
         movieId: Long,
         language: String
-    ): Result<List<MovieActorDomainModel>?, MovieDetailDomainError> = fetchCreditResult
+    ): Result<List<MovieActorDomainModel>?, MovieDetailDomainErrorHMM> = fetchCreditResult
 
     override suspend fun observeMovieDetail(movieId: Long): Flow<MovieDetailDomainModel?> =
         movieDetailFlow
@@ -49,7 +49,7 @@ class FakeMovieDetailRepository(
     override suspend fun updateMovieVideoURI(
         movieId: Long,
         videoURI: String
-    ): Result<Boolean, UpdateMovieTrailerLocalError> {
+    ): Result<Boolean, UpdateMovieTrailerLocalErrorHMM> {
         updatedVideoURI = videoURI
         return updateTrailerResult
     }
@@ -57,5 +57,5 @@ class FakeMovieDetailRepository(
     override suspend fun fetchMovieTrailer(
         movieId: Long,
         language: String
-    ): Result<MovieVideoDomainModel?, MovieDetailDomainError> = fetchTrailerResult
+    ): Result<MovieVideoDomainModel?, MovieDetailDomainErrorHMM> = fetchTrailerResult
 }

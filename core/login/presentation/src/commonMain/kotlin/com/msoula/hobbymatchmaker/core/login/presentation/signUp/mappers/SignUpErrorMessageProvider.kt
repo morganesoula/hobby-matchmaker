@@ -1,8 +1,8 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.signUp.mappers
 
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignUpErrors
-import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.ErrorMessageProvider
+import com.msoula.hobbymatchmaker.core.common.HMMAppError
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.login.presentation.Res
 import com.msoula.hobbymatchmaker.core.login.presentation.connection_issue
@@ -13,7 +13,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.user_disabled_error
 import org.jetbrains.compose.resources.getString
 
 class SignUpErrorMessageProvider : ErrorMessageProvider {
-    override suspend fun getMessage(error: AppError): String {
+    override suspend fun getMessage(error: HMMAppError): String {
         Logger.e("Into SignUpEMP with error: $error")
         return when (error) {
             is SignUpErrors.EmailAlreadyExists ->
@@ -25,7 +25,7 @@ class SignUpErrorMessageProvider : ErrorMessageProvider {
             is SignUpErrors.TooManyRequests ->
                 getString(Res.string.too_many_requests_error)
 
-            is SignUpErrors.InternalError ->
+            is SignUpErrors.InternalErrorHMM ->
                 getString(Res.string.internal_error)
 
             is SignUpErrors.Connection ->
