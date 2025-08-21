@@ -6,7 +6,9 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
-import com.msoula.hobbymatchmaker.core.session.domain.dataSources.SessionLocalDataSource
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.R
+import com.msoula.hobbymatchmaker.core.session.data.dataSources.local.helpers.safeLocalWrite
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -23,10 +25,8 @@ class SessionLocalDataSourceImpl(
             booleanPreferencesKey("should_show_guest_dialog_key")
     }
 
-    override suspend fun setIsConnected(isConnected: Boolean) {
-        dataStore.edit { preferences ->
-            preferences[IS_CONNECTED_KEY] = isConnected
-        }
+    override suspend fun setIsConnected(isConnected: Boolean): R<Unit, AppError> = safeLocalWrite {
+        dataStore.edit { it[IS_CONNECTED_KEY] = isConnected }
     }
 
     override fun observeIsConnected(): Flow<Boolean> = dataStore.data
@@ -38,11 +38,10 @@ class SessionLocalDataSourceImpl(
             preferences[IS_CONNECTED_KEY] ?: false
         }
 
-    override suspend fun setShouldShowGuestDialog(shouldShow: Boolean) {
-        dataStore.edit { preferences ->
-            preferences[SHOULD_SHOW_GUEST_DIALOG_KEY] = shouldShow
+    override suspend fun setShouldShowGuestDialog(shouldShow: Boolean): R<Unit, AppError> =
+        safeLocalWrite {
+            dataStore.edit { it[SHOULD_SHOW_GUEST_DIALOG_KEY] = shouldShow }
         }
-    }
 
     override fun observeShouldShowGuestDialog(): Flow<Boolean> = dataStore.data
         .catch { if (it is IOException) emit(emptyPreferences()) else throw it }

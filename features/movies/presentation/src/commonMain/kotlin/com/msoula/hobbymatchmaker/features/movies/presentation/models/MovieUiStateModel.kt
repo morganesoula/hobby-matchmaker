@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.features.movies.presentation.models
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import com.msoula.hobbymatchmaker.core.common.UIText
 
 @Stable
 sealed interface MovieUiStateModel {
@@ -13,5 +14,5 @@ sealed interface MovieUiStateModel {
     data class Success(val list: List<MovieUiModel>) : MovieUiStateModel
 
     @Immutable
-    data class Error(val errorMessage: String) : MovieUiStateModel
+    data class Error(val errorMessage: UIText) : MovieUiStateModel
 }

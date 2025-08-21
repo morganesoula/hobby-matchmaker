@@ -4,9 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfo
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutUseCase
-import com.msoula.hobbymatchmaker.core.common.ErrorMessageProvider
-import com.msoula.hobbymatchmaker.core.common.HMMAppError
+import com.msoula.hobbymatchmaker.core.common.ErrorMessageMapper
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Parameters
+import com.msoula.hobbymatchmaker.core.common.R
 import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.getDeviceLocale
 import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
@@ -39,7 +40,7 @@ class MovieViewModel(
     private val checkMovieSynopsisValueUseCase: CheckMovieSynopsisValueUseCase,
     private val connectivityCheck: NetworkConnectivityChecker,
     private val ioDispatcher: CoroutineDispatcher,
-    private val errorMessageProvider: ErrorMessageProvider,
+    private val defaultMessageMapper: ErrorMessageMapper,
     externalScope: CoroutineScope? = null
 ) : ViewModel() {
     private val scope = externalScope ?: viewModelScope
@@ -50,24 +51,26 @@ class MovieViewModel(
     private val language = getDeviceLocale()
 
     val movieState: StateFlow<MovieUiStateModel> =
-        observeAllMoviesUseCase(Parameters.StringParam(language)).mapLatest { result ->
+        observeAllMoviesUseCase(language).mapLatest { result ->
             when (result) {
-                is Result.Success -> {
-                    when (val movies = result.data) {
-                        is ObserveAllMoviesSuccess.Loading -> MovieUiStateModel.Loading
-                        is ObserveAllMoviesSuccess.Success ->
-                            MovieUiStateModel.Success(movies.movies.map { it.toMovieUiModel() })
+                is R.Success -> {
+                    when (val payload = result.data) {
+                        is ObserveAllMoviesSuccess.Success -> {
+                            Logger.d("MovieVM: movies:${payload.movies.size}")
+                            MovieUiStateModel.Success(
+                                payload.movies.map { it.toMovieUiModel() }
+                            )
+                        }
 
-                        is ObserveAllMoviesSuccess.DataLoadedInDB -> MovieUiStateModel.Empty
+                        is ObserveAllMoviesSuccess.DataLoadedInDB -> MovieUiStateModel.Loading
                     }
                 }
 
-                is Result.Failure -> {
-                    val errorMessage = handleError(result.error)
-                    MovieUiStateModel.Error(errorMessage)
+                is R.Failure -> {
+                    MovieUiStateModel.Error(
+                        defaultMessageMapper.toUIText(result.error)
+                    )
                 }
-
-                else -> MovieUiStateModel.Loading
             }
         }
             .stateIn(
@@ -80,7 +83,10 @@ class MovieViewModel(
         scope.launch(ioDispatcher) {
             logOutUseCase(Parameters.StringParam("")).collect { result ->
                 when (result) {
-                    is Result.Success -> _oneTimeEventChannel.trySend(MovieUiEventModel.OnLogOutSuccess)
+                    is Result.Success -> _oneTimeEventChannel.trySend(
+                        MovieUiEventModel.OnLogOutSuccess
+                    )
+
                     is Result.Failure -> _oneTimeEventChannel.trySend(
                         MovieUiEventModel.OnLogOutFailure(
                             result.error.message
@@ -92,9 +98,6 @@ class MovieViewModel(
             }
         }
     }
-
-    private suspend fun handleError(error: HMMAppError): String =
-        errorMessageProvider.getMessage(error)
 
     fun onCardEvent(event: CardEventModel) {
         when (event) {
@@ -112,19 +115,29 @@ class MovieViewModel(
     }
 
     internal suspend fun handleSingleTap(movieId: Long): MovieUiEventModel {
-        val localData = checkMovieSynopsisValueUseCase(movieId)
+        val localResult = checkMovieSynopsisValueUseCase(movieId)
         val hasConnectivity = connectivityCheck.hasActiveConnection()
 
+        val hasLocal = when (localResult) {
+            is R.Success -> localResult.data
+            is R.Failure -> false
+        }
+
         return when {
-            localData -> MovieUiEventModel.OnMovieDetailClicked(movieId)
-            hasConnectivity -> MovieUiEventModel.OnMovieDetailClicked(movieId)
+            hasLocal || hasConnectivity -> MovieUiEventModel.OnMovieDetailClicked(movieId)
             else -> MovieUiEventModel.NoFetchingDetailPossible
         }
     }
 
     private suspend fun toggleFavorite(movieId: Long, isFavorite: Boolean) {
-        val uuid = getUserInfo()?.uid
-        setMovieFavoriteUseCase(uuid ?: "", movieId, isFavorite)
+        val uuid = getUserInfo()?.uid.orEmpty()
+        when (val result = setMovieFavoriteUseCase(uuid, movieId, isFavorite)) {
+            is R.Success -> Unit
+            is R.Failure -> {
+                val message = defaultMessageMapper.toUIText(result.error)
+                _oneTimeEventChannel.trySend(MovieUiEventModel.ShowError(message))
+            }
+        }
     }
 
     @OptIn(DelicateCoroutinesApi::class)

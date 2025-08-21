@@ -4,8 +4,6 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.common.ErrorMessageMapper
-import com.msoula.hobbymatchmaker.core.common.ErrorMessageProvider
-import com.msoula.hobbymatchmaker.core.common.HMMAppError
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.R
 import com.msoula.hobbymatchmaker.core.common.getDeviceLocale
@@ -34,7 +32,6 @@ class MovieDetailViewModel(
     observeMovieDetailUseCase: ObserveMovieDetailUseCase,
     private val manageMovieTrailerUseCase: ManageMovieTrailerUseCase,
     private val connectivityCheck: NetworkConnectivityChecker,
-    private val errorMessageProvider: ErrorMessageProvider,
     private val defaultErrorMessageMapper: ErrorMessageMapper
 ) : ViewModel() {
 
@@ -141,7 +138,4 @@ class MovieDetailViewModel(
             _oneTimeEventChannel.send(event)
         }
     }
-
-    private suspend fun handleError(error: HMMAppError): String =
-        errorMessageProvider.getMessage(error)
 }

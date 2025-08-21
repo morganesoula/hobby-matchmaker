@@ -15,7 +15,7 @@ inline fun <S, E> R<S, E>.onFailure(block: (E) -> Unit): R<S, E> {
     return this
 }
 
-inline fun <Entry, Out, Error> R<Entry, Error>.map(transform: (Entry) -> Out): R<Out, Error> =
+inline fun <Entry, Out, Error> R<Entry, Error>.mapSuccess(transform: (Entry) -> Out): R<Out, Error> =
     when (this) {
         is R.Success -> R.Success(transform(data))
         is R.Failure -> this
@@ -27,7 +27,8 @@ inline fun <Entry, Error, Out> R<Entry, Error>.mapError(transform: (Error) -> Ou
         is R.Failure -> R.Failure(transform(error))
     }
 
-inline fun <Entry, Error> R<Entry, Error>.flatMap(transform: (Entry) -> R<*, Error>): R<*, Error> =
+inline fun <Entry, Error, Output> R<Entry, Error>.flatMap(transform: (Entry) -> R<Output, Error>)
+    : R<Output, Error> =
     when (this) {
         is R.Success -> transform(data)
         is R.Failure -> this

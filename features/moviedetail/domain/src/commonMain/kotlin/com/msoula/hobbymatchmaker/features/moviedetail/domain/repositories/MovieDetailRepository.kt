@@ -19,14 +19,14 @@ interface MovieDetailRepository {
         language: String
     ): R<List<MovieActorDomainModel>?, AppError>
 
-    suspend fun observeMovieDetail(movieId: Long): Flow<MovieDetailDomainModel?>
+    fun observeMovieDetail(movieId: Long): Flow<MovieDetailDomainModel?>
 
-    suspend fun saveMovieDetail(movieDetailDomainModel: MovieDetailDomainModel)
+    suspend fun saveMovieDetail(movieDetailDomainModel: MovieDetailDomainModel): R<Unit, AppError>
 
     suspend fun updateMovieVideoURI(
         movieId: Long,
         videoURI: String
-    ): R<Boolean, AppError>
+    ): R<Unit, AppError>
 
     suspend fun fetchMovieTrailer(
         movieId: Long,

@@ -7,7 +7,7 @@ sealed interface AppError {
         data object Canceled : Network
         data object Serialization : Network
         data class Http(val code: Int, val body: String? = null) : Network
-        data class Unknown(val causeMessage: String? = null) : Network
+        data class Unknown(val cause: Throwable? = null) : Network
     }
 
     sealed interface Domain : AppError {
@@ -21,6 +21,11 @@ sealed interface AppError {
         data object WriteFailed : Storage
         data object ReadFailed : Storage
         data object Corrupted : Storage
+    }
+
+    sealed interface Authentication : AppError {
+        data object AlreadyExists : Authentication
+        data object Unknown : Authentication
     }
 
     sealed interface External : AppError {

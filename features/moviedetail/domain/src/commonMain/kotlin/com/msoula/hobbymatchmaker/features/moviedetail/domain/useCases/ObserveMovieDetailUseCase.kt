@@ -3,12 +3,14 @@ package com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.R
+import com.msoula.hobbymatchmaker.core.common.toStorageError
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieActorDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.repositories.MovieDetailRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
@@ -26,6 +28,7 @@ class ObserveMovieDetailUseCase(
         channelFlow {
             val job = launch {
                 movieDetailRepository.observeMovieDetail(movieId)
+                    .catch { e -> send(R.Failure(e.toStorageError())) }
                     .collect { detail ->
                         Logger.d("DetailUseCase: observed title: ${detail?.title}")
 
@@ -48,6 +51,9 @@ class ObserveMovieDetailUseCase(
                                         val updated = detailResult.data?.copy(cast = safeCast)
                                         updated?.let {
                                             movieDetailRepository.saveMovieDetail(it)
+                                                .let { result ->
+                                                    if (result is R.Failure) send(R.Failure(result.error))
+                                                }
                                         }
 
                                         send(R.Success(ObserveMovieSuccess.DataLoadedInDB))

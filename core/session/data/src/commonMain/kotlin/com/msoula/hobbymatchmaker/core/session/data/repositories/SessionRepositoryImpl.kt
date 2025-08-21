@@ -1,8 +1,10 @@
-package com.msoula.hobbymatchmaker.core.session.domain.repositories
+package com.msoula.hobbymatchmaker.core.session.data.repositories
 
-import com.msoula.hobbymatchmaker.core.session.domain.dataSources.SessionLocalDataSource
-import com.msoula.hobbymatchmaker.core.session.domain.dataSources.SessionRemoteDataSource
+import com.msoula.hobbymatchmaker.core.session.data.dataSources.local.SessionLocalDataSource
+import com.msoula.hobbymatchmaker.core.session.data.dataSources.remote.SessionRemoteDataSource
+import com.msoula.hobbymatchmaker.core.session.data.dataSources.remote.mappers.toUserFireStoreModel
 import com.msoula.hobbymatchmaker.core.session.domain.models.SessionUserDomainModel
+import com.msoula.hobbymatchmaker.core.session.domain.repositories.SessionRepository
 import kotlinx.coroutines.flow.Flow
 
 class SessionRepositoryImpl(
@@ -16,7 +18,7 @@ class SessionRepositoryImpl(
         sessionLocalDataSource.observeIsConnected()
 
     override suspend fun createUser(user: SessionUserDomainModel) =
-        sessionRemoteDataSource.createUser(user)
+        sessionRemoteDataSource.createUser(user.toUserFireStoreModel())
 
     override suspend fun setShouldShowGuestDialog(shouldShow: Boolean) =
         sessionLocalDataSource.setShouldShowGuestDialog(shouldShow)

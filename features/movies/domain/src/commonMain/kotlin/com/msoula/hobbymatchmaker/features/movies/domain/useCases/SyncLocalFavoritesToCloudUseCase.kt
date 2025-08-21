@@ -1,46 +1,30 @@
 package com.msoula.hobbymatchmaker.features.movies.domain.useCases
 
 import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepository
-import com.msoula.hobbymatchmaker.core.common.FlowUseCase
-import com.msoula.hobbymatchmaker.core.common.HMMAppError
 import com.msoula.hobbymatchmaker.core.common.Logger
-import com.msoula.hobbymatchmaker.core.common.Parameters
-import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.core.common.R
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.MovieRepository
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.flowOn
+import kotlin.coroutines.cancellation.CancellationException
 
 class SyncLocalFavoritesToCloudUseCase(
-    private val dispatcher: CoroutineDispatcher,
     private val movieRepository: MovieRepository,
     private val authenticationRepository: AuthenticationRepository
-) : FlowUseCase<Parameters.None, Unit, SyncLocalErrors>(dispatcher) {
+) {
+    suspend operator fun invoke() {
+        val uid = authenticationRepository.fetchFirebaseUserInfo()?.uid ?: return
 
-    override fun execute(parameters: Parameters.None): Flow<Result<Unit, SyncLocalErrors>> =
-        channelFlow {
-            send(Result.Loading)
-
-            val uid = authenticationRepository.fetchFirebaseUserInfo()?.uid ?: return@channelFlow
-            send(Result.Failure(SyncLocalErrors.NoUIDFoundErrorHMM))
-
-            val localIds = movieRepository.getFavoriteLocalMovieIds()
-
-            try {
-                movieRepository.syncUserFavoritesRemote(uid, localIds)
-                send(Result.Success(Unit))
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                Logger.e("Sync local movie favorites failed: ${e.message}")
-                send(Result.Failure(SyncLocalErrors.SyncLocalFavoriteErrorHMM))
+        when (val localIds = movieRepository.getFavoriteLocalMovieIds()) {
+            is R.Success -> {
+                try {
+                    movieRepository.syncUserFavoritesRemote(uid, localIds.data)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Logger.w("Favorite remote movie push failed, will sync later — ${e.message}")
+                }
             }
-        }.flowOn(dispatcher)
-}
 
-sealed class SyncLocalErrors(override val message: String) : HMMAppError {
-    data object NoUIDFoundErrorHMM : SyncLocalErrors("")
-    data object SyncLocalFavoriteErrorHMM : SyncLocalErrors("")
+            is R.Failure -> Logger.w("Skip sync favorites: ${localIds.error}")
+        }
+    }
 }
