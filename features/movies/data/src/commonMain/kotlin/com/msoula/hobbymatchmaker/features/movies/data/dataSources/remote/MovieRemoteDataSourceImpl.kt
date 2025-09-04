@@ -1,8 +1,8 @@
 package com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote
 
 import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Logger
-import com.msoula.hobbymatchmaker.core.common.R
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.common.safeFirebaseCall
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.MovieRemoteModel
@@ -20,26 +20,26 @@ class MovieRemoteDataSourceImpl(
     private val tmdbKtorService: TMDBKtorService
 ) : MovieRemoteDataSource {
 
-    override suspend fun fetchMovies(language: String): R<List<MovieRemoteModel>, AppError> {
+    override suspend fun fetchMovies(language: String): AppResult<List<MovieRemoteModel>, AppError> {
         val pages = listOf(1, 2, 3)
         val movies = mutableListOf<MovieRemoteModel>()
 
         for (page in pages) {
             when (val result = fetchMoviesByPage(language, page)) {
-                is R.Success -> movies.addAll(result.data)
-                is R.Failure -> return result
+                is AppResult.Success -> movies.addAll(result.data)
+                is AppResult.Failure -> return result
             }
         }
 
         val updatedList = updateLocalPosterPath(movies)
-        return R.Success(updatedList)
+        return AppResult.Success(updatedList)
     }
 
     override suspend fun updateUserFavoriteMovieList(
         uuidUser: String,
         movieId: Long,
         isFavorite: Boolean
-    ): R<Unit, AppError> = safeFirebaseCall {
+    ): AppResult<Unit, AppError> = safeFirebaseCall {
         if (isFavorite) {
             firestore.collection("users").document(uuidUser)
                 .set(mapOf("movies" to FieldValue.arrayUnion(movieId)), merge = true)
@@ -49,7 +49,7 @@ class MovieRemoteDataSourceImpl(
         }
     }
 
-    override suspend fun setUserFavoriteMovies(uid: String, ids: List<Long>): R<Unit, AppError> =
+    override suspend fun setUserFavoriteMovies(uid: String, ids: List<Long>): AppResult<Unit, AppError> =
         safeFirebaseCall {
             firestore.collection("users").document(uid)
                 .set(mapOf("movies" to ids), merge = true)
@@ -58,7 +58,7 @@ class MovieRemoteDataSourceImpl(
     private suspend fun fetchMoviesByPage(
         language: String,
         page: Int
-    ): R<List<MovieRemoteModel>, AppError> =
+    ): AppResult<List<MovieRemoteModel>, AppError> =
         tmdbKtorService.getMoviesByPopularityDesc(language, page)
             .mapSuccess { response -> response.results ?: emptyList() }
 

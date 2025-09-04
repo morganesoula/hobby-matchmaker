@@ -4,7 +4,6 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ResetPasswor
 import com.msoula.hobbymatchmaker.core.authentication.domain.fakes.FakeAuthenticationRepository
 import com.msoula.hobbymatchmaker.core.authentication.domain.fakes.FakeSessionRepository
 import com.msoula.hobbymatchmaker.core.common.Parameters
-import com.msoula.hobbymatchmaker.core.common.Result
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.ExperimentalCoroutinesApi

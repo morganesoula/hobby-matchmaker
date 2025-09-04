@@ -1,63 +1,25 @@
 package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote
 
-import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.errors.ProviderErrorHMM
+import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.mappers.toAuthFirebaseUserSignedInWith
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.providers.AuthProvider
-import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
-import com.msoula.hobbymatchmaker.core.common.Logger
-import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.core.authentication.data.models.AuthFirebaseUser
+import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.core.common.safeFirebaseCall
 import dev.gitlive.firebase.auth.AuthCredential
 import dev.gitlive.firebase.auth.FirebaseAuth
-import platform.AuthenticationServices.ASAuthorizationAppleIDCredential
 
 class AppleAuthProvider(
     private val auth: FirebaseAuth
 ) : AuthProvider {
-
-    override suspend fun signIn(credentials: AuthCredential): Result<FirebaseUserInfoDomainModel, ProviderErrorHMM> {
-        return try {
-            val result = auth.signInWithCredential(credentials)
-            val user = result.user
-
-            if (user != null) {
-                Result.Success(
-                    FirebaseUserInfoDomainModel(
-                        uid = user.uid,
-                        email = user.email ?: "",
-                        providers = user.providerData.map { it.providerId }
-                    )
-                )
-            } else {
-                Result.Failure(ProviderErrorHMM.AppleSignInErrorHMM("User is null"))
-            }
-        } catch (e: Exception) {
-            Logger.e("❌ Apple sign-in exception: ${e::class.simpleName} - ${e.message}")
-            e.printStackTrace()
-            Result.Failure(ProviderErrorHMM.AppleSignInErrorHMM("Firebase sign-in failed: ${e.message ?: "Unknown error"}"))
+    override val type: ProviderType = ProviderType.APPLE
+    override suspend fun signIn(credentials: AuthCredential): AppResult<AuthFirebaseUser?, AppError> =
+        safeFirebaseCall {
+            auth.signInWithCredential(credentials)
+                .user?.toAuthFirebaseUserSignedInWith(type.id)
         }
-    }
 
-    override suspend fun signOut(): Result<Boolean, ProviderErrorHMM> {
-        return try {
-            auth.signOut()
-            Result.Success(true)
-        } catch (e: Exception) {
-            Result.Failure(
-                ProviderErrorHMM.ProviderLogOutErrorHMM(
-                    "Error while sign out with Apple + ${e.message}"
-                )
-            )
-        }
-    }
-
+    override suspend fun signOut(): AppResult<Unit, AppError> = safeFirebaseCall { auth.signOut() }
     override fun isSignedIn(): Boolean = auth.currentUser != null
-}
-
-private fun mapUserToFirebaseUserInfoDomainModel(
-    credential: ASAuthorizationAppleIDCredential
-): FirebaseUserInfoDomainModel {
-    return FirebaseUserInfoDomainModel(
-        uid = credential.user,
-        email = credential.email ?: "",
-        providers = listOf("apple.com")
-    )
 }

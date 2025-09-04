@@ -12,7 +12,6 @@ import com.msoula.hobbymatchmaker.features.movies.domain.useCases.SetMovieFavori
 import com.msoula.hobbymatchmaker.features.movies.presentation.fakes.FakeConnectivityChecker
 import com.msoula.hobbymatchmaker.features.movies.presentation.fakes.FakeMovieLocalDataSource
 import com.msoula.hobbymatchmaker.features.movies.presentation.fakes.FakeMovieRemoteDataSource
-import com.msoula.hobbymatchmaker.features.movies.presentation.mappers.MoviesErrorMessageProvider
 import com.msoula.hobbymatchmaker.features.movies.presentation.mappers.toMovieUiModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiEventModel

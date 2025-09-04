@@ -6,8 +6,6 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUser
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfo
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutSuccess
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutUseCase
-import com.msoula.hobbymatchmaker.core.common.ErrorMessageProvider
-import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.CheckMovieSynopsisValueUseCase

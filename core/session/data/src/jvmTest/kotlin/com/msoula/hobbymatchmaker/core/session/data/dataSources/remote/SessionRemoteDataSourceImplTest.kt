@@ -1,6 +1,5 @@
 package com.msoula.hobbymatchmaker.core.session.data.dataSources.remote
 
-import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.session.domain.models.SessionUserDomainModel
 import dev.gitlive.firebase.firestore.CollectionReference
 import dev.gitlive.firebase.firestore.DocumentReference

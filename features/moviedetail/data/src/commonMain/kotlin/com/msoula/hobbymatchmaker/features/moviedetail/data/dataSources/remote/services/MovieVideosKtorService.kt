@@ -1,8 +1,8 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.services
 
 import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Logger
-import com.msoula.hobbymatchmaker.core.common.R
 import com.msoula.hobbymatchmaker.core.common.safeCall
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.MovieVideosResponseRemoteModel
 import io.ktor.client.HttpClient
@@ -17,7 +17,7 @@ interface MovieVideosKtorService {
     suspend fun fetchMovieVideos(
         movie: Long,
         language: String
-    ): R<MovieVideosResponseRemoteModel, AppError>
+    ): AppResult<MovieVideosResponseRemoteModel, AppError>
 }
 
 class MovieVideosKtorServiceImpl(private val client: HttpClient) : MovieVideosKtorService {
@@ -25,7 +25,7 @@ class MovieVideosKtorServiceImpl(private val client: HttpClient) : MovieVideosKt
     override suspend fun fetchMovieVideos(
         movie: Long,
         language: String
-    ): R<MovieVideosResponseRemoteModel, AppError> = safeCall {
+    ): AppResult<MovieVideosResponseRemoteModel, AppError> = safeCall {
         client.request {
             method = HttpMethod.Get
             url { encodedPath = "movie/$movie/videos" }

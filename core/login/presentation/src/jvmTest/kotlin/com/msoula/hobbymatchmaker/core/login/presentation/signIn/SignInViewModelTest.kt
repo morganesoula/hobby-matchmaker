@@ -7,7 +7,6 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ResetPassw
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInSuccess
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.UnifiedSignInUseCase
-import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.di.data.ValidationResult
 import com.msoula.hobbymatchmaker.core.di.domain.useCases.AuthFormValidationUseCase
 import com.msoula.hobbymatchmaker.core.di.domain.useCases.ValidateEmailUseCase

@@ -1,6 +1,5 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.domain.fakes
 
-import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainErrorHMM
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.UpdateMovieTrailerLocalErrorHMM
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieActorDomainModel

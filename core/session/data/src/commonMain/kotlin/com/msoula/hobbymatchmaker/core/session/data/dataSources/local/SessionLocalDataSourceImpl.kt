@@ -7,7 +7,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import com.msoula.hobbymatchmaker.core.common.AppError
-import com.msoula.hobbymatchmaker.core.common.R
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.session.data.dataSources.local.helpers.safeLocalWrite
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -25,7 +25,7 @@ class SessionLocalDataSourceImpl(
             booleanPreferencesKey("should_show_guest_dialog_key")
     }
 
-    override suspend fun setIsConnected(isConnected: Boolean): R<Unit, AppError> = safeLocalWrite {
+    override suspend fun setIsConnected(isConnected: Boolean): AppResult<Unit, AppError> = safeLocalWrite {
         dataStore.edit { it[IS_CONNECTED_KEY] = isConnected }
     }
 
@@ -38,7 +38,7 @@ class SessionLocalDataSourceImpl(
             preferences[IS_CONNECTED_KEY] ?: false
         }
 
-    override suspend fun setShouldShowGuestDialog(shouldShow: Boolean): R<Unit, AppError> =
+    override suspend fun setShouldShowGuestDialog(shouldShow: Boolean): AppResult<Unit, AppError> =
         safeLocalWrite {
             dataStore.edit { it[SHOULD_SHOW_GUEST_DIALOG_KEY] = shouldShow }
         }

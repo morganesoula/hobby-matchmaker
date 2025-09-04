@@ -9,11 +9,10 @@ actual val featuresModuleMovieDetailPresentationPlatformSpecific = module {
     viewModel { (movieId: Long) ->
         MovieDetailViewModel(
             movieId = movieId,
-            get(),
-            get(),
-            get(),
+            observeMovieDetailUseCase = get(),
+            manageMovieTrailerUseCase = get(),
             connectivityCheck = IOSNetworkConnectivityChecker(),
-            get()
+            defaultErrorMessageMapper = get()
         )
     }
 }

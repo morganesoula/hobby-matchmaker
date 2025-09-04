@@ -26,7 +26,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,11 +49,15 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.msoula.hobbymatchmaker.core.common.CallOnceEffect
+import com.msoula.hobbymatchmaker.core.common.ObserveEvents
+import com.msoula.hobbymatchmaker.core.common.SnackEffect
 import com.msoula.hobbymatchmaker.core.design.component.HMMButtonAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMFormHelperText
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldPasswordComponent
 import com.msoula.hobbymatchmaker.core.design.component.HeaderTextComponent
+import com.msoula.hobbymatchmaker.core.design.component.LoadingOverlay
 import com.msoula.hobbymatchmaker.core.design.component.keyboardDismissOnTap
 import com.msoula.hobbymatchmaker.core.login.presentation.Res
 import com.msoula.hobbymatchmaker.core.login.presentation.already_a_member
@@ -64,6 +67,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.email
 import com.msoula.hobbymatchmaker.core.login.presentation.example
 import com.msoula.hobbymatchmaker.core.login.presentation.firstname
 import com.msoula.hobbymatchmaker.core.login.presentation.hide_password
+import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthUiEventModel
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.SignUpEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.password
@@ -73,11 +77,13 @@ import com.msoula.hobbymatchmaker.core.login.presentation.signUp.models.SignUpSt
 import com.msoula.hobbymatchmaker.core.login.presentation.sign_up
 import com.msoula.hobbymatchmaker.core.login.presentation.welcome_subtitle
 import com.msoula.hobbymatchmaker.core.login.presentation.welcome_title
+import kotlinx.coroutines.flow.Flow
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun SignUpScreenContent(
     modifier: Modifier = Modifier,
+    oneTimeEventChannelFlow: Flow<AuthUiEventModel>,
     redirectToSignInScreen: () -> Unit,
     redirectToMovieScreen: () -> Unit,
     signUpViewModel: SignUpViewModel
@@ -85,7 +91,6 @@ fun SignUpScreenContent(
     val snackBarHostState = remember { SnackbarHostState() }
 
     val registrationState by signUpViewModel.formDataFlow.collectAsState()
-    val isLoading by signUpViewModel.isLoading.collectAsState()
     val signUpState by signUpViewModel.signUpState.collectAsState()
 
     val annotatedString =
@@ -103,11 +108,15 @@ fun SignUpScreenContent(
             }
         }
 
-    LaunchedEffect(signUpState) {
-        when (val state = signUpState) {
-            is SignUpEvent.Success -> redirectToMovieScreen()
-            is SignUpEvent.Error ->
-                snackBarHostState.showSnackbar(state.message)
+    ObserveEvents(oneTimeEventChannelFlow) { event ->
+        when (event) {
+            is AuthUiEventModel.ShowError ->
+                SnackEffect(snackBarHostState, event.error, event)
+
+            is AuthUiEventModel.OnSignUpSuccess ->
+                CallOnceEffect(event) {
+                    redirectToMovieScreen()
+                }
 
             else -> Unit
         }
@@ -167,7 +176,7 @@ fun SignUpScreenContent(
                         )
                     },
                     onSignUpClicked = { signUpViewModel.onEvent(AuthenticationUIEvent.OnSignUp) },
-                    isLoading = isLoading
+                    signUpState = signUpState
                 )
             }
 
@@ -178,6 +187,8 @@ fun SignUpScreenContent(
                     redirectToSignInScreen()
                 })
         }
+
+        LoadingOverlay(visible = signUpState == SignUpEvent.Loading)
     }
 }
 
@@ -190,7 +201,7 @@ fun SignUpScreenMainContent(
     onEmailChanged: (email: String) -> Unit,
     onPasswordChanged: (password: String) -> Unit,
     onSignUpClicked: () -> Unit,
-    isLoading: Boolean = false
+    signUpState: SignUpEvent
 ) {
     val scrollState = rememberScrollState()
     val emailTipVisibility = rememberSaveable { mutableStateOf(false) }
@@ -270,7 +281,7 @@ fun SignUpScreenMainContent(
                 onClick = { onSignUpClicked() },
                 enabled = registrationState.submit,
                 text = stringResource(Res.string.sign_up),
-                loading = isLoading
+                loading = signUpState == SignUpEvent.Loading
             )
         }
     }

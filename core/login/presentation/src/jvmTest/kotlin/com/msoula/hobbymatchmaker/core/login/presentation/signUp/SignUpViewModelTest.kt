@@ -3,7 +3,6 @@ package com.msoula.hobbymatchmaker.core.login.presentation.signUp
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignUpErrors
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignUpSuccess
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignUpUseCase
-import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.common.data.ValidationResult
 import com.msoula.hobbymatchmaker.core.login.domain.useCases.LoginValidateFormUseCase
 import com.msoula.hobbymatchmaker.core.login.domain.useCases.ValidateEmailUseCase

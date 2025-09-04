@@ -8,7 +8,6 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SocialMediaE
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepository
-import com.msoula.hobbymatchmaker.core.common.Result
 import dev.gitlive.firebase.auth.AuthCredential
 
 class FakeAuthenticationRepository(

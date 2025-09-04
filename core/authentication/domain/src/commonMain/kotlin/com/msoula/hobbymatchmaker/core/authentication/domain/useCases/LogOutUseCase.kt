@@ -1,44 +1,25 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.useCases
 
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepository
-import com.msoula.hobbymatchmaker.core.common.FlowUseCase
-import com.msoula.hobbymatchmaker.core.common.Parameters
-import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.core.common.flatMapSuspend
+import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveIsConnectedUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetIsConnectedUseCase
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 
+data object LogOutSuccess
 class LogOutUseCase(
-    private val dispatcher: CoroutineDispatcher,
     private val authenticationRepository: AuthenticationRepository,
     private val setIsConnectedUseCase: SetIsConnectedUseCase,
     private val observeIsConnectedUseCase: ObserveIsConnectedUseCase
-) : FlowUseCase<Parameters, LogOutSuccess, LogOutErrorHMM>(dispatcher) {
-
-    override fun execute(parameters: Parameters): Flow<Result<LogOutSuccess, LogOutErrorHMM>> {
-        return flow {
-            emit(Result.Loading)
-
-            when (val result = authenticationRepository.logOut()) {
-                is Result.Success -> {
-                    setIsConnectedUseCase(false)
-
-                    observeIsConnectedUseCase()
-                        .first { it == false }
-
-                    emit(Result.Success(LogOutSuccess))
-                }
-
-                is Result.Failure -> emit(Result.Failure(result.error))
-                else -> Unit
+) {
+    suspend operator fun invoke(): AppResult<LogOutSuccess, AppError> =
+        authenticationRepository.logOut()
+            .flatMapSuspend { setIsConnectedUseCase(false) }
+            .mapSuccess {
+                observeIsConnectedUseCase().first { connected -> !connected }
+                LogOutSuccess
             }
-        }.flowOn(dispatcher)
-    }
 }
-
-data object LogOutSuccess

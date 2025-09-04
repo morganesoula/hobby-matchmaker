@@ -1,7 +1,5 @@
 package com.msoula.hobbymatchmaker.features.movies.domain.fakes
 
-import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.features.movies.domain.errors.MovieErrors
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.MovieRepository
 import kotlinx.coroutines.flow.Flow

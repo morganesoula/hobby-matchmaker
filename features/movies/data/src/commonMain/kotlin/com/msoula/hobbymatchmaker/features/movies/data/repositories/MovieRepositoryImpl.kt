@@ -1,8 +1,7 @@
 package com.msoula.hobbymatchmaker.features.movies.data.repositories
 
 import com.msoula.hobbymatchmaker.core.common.AppError
-import com.msoula.hobbymatchmaker.core.common.Logger
-import com.msoula.hobbymatchmaker.core.common.R
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.flatMap
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.MovieLocalDataSource
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.mappers.toMovieDB
@@ -36,7 +35,7 @@ class MovieRepositoryImpl(
             movieId
         )
 
-    override suspend fun fetchMovies(language: String): R<Unit, AppError> =
+    override suspend fun fetchMovies(language: String): AppResult<Unit, AppError> =
         movieRemoteDataSource.fetchMovies(language)
             .flatMap { movies ->
                 movieLocalDataSource.upsertAll(movies.map { it.toMovieDB() })
@@ -49,24 +48,17 @@ class MovieRepositoryImpl(
         uid: String,
         id: Long,
         isFavorite: Boolean
-    ): R<Unit, AppError> =
+    ): AppResult<Unit, AppError> =
         movieRemoteDataSource.updateUserFavoriteMovieList(uid, id, isFavorite)
 
-    override suspend fun isSynopsisMovieAvailable(movieId: Long): R<Boolean, AppError> =
+    override suspend fun isSynopsisMovieAvailable(movieId: Long): AppResult<Boolean, AppError> =
         movieLocalDataSource.isMovieSynopsisAvailable(movieId)
 
-    override suspend fun getFavoriteLocalMovieIds(): R<List<Long>, AppError> =
+    override suspend fun getFavoriteLocalMovieIds(): AppResult<List<Long>, AppError> =
         movieLocalDataSource.getFavoriteLocalMovieIds()
 
-    override suspend fun syncUserFavoritesRemote(uid: String, localIds: List<Long>) {
-        when (val result = movieRemoteDataSource.setUserFavoriteMovies(uid, localIds)) {
-            is R.Success -> Unit
-            is R.Failure -> Logger.w(
-                "Favorite remote movie push failed, will sync at next login - ${
-                    result
-                        .error
-                }"
-            )
-        }
-    }
+    override suspend fun syncUserFavoritesRemote(
+        uid: String,
+        localIds: List<Long>
+    ): AppResult<Unit, AppError> = movieRemoteDataSource.setUserFavoriteMovies(uid, localIds)
 }

@@ -1,6 +1,5 @@
 package com.msoula.hobbymatchmaker.features.movies.data.dataSources.fakes
 
-import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.MovieResponseRemoteModel
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.services.TMDBKtorErrorHMM
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.services.TMDBKtorService

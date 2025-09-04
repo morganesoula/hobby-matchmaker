@@ -1,15 +1,14 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.signIn
 
 import app.cash.turbine.test
+import com.msoula.hobbymatchmaker.core.authentication.data.repositories.AuthenticationRepositoryImpl
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ResetPasswordErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SignInWithEmailAndPasswordErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
-import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepositoryImpl
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ResetPasswordUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInWithCredentialUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.UnifiedSignInUseCase
-import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.di.domain.useCases.AuthFormValidationUseCase
 import com.msoula.hobbymatchmaker.core.di.domain.useCases.ValidateEmailUseCase
 import com.msoula.hobbymatchmaker.core.di.domain.useCases.ValidateNameUseCase

@@ -4,22 +4,25 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignUpUseCase
-import com.msoula.hobbymatchmaker.core.common.ErrorMessageProvider
-import com.msoula.hobbymatchmaker.core.common.HMMAppError
+import com.msoula.hobbymatchmaker.core.common.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.common.Parameters
-import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.core.common.onFailure
+import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.core.login.domain.useCases.LoginValidateFormUseCase
+import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthUiEventModel
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.SignUpEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.signUp.models.SignUpStateModel
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
@@ -28,18 +31,15 @@ import kotlin.time.Duration.Companion.milliseconds
 class SignUpViewModel(
     private val loginValidateFormUseCase: LoginValidateFormUseCase,
     private val signUpUseCase: SignUpUseCase,
-    private val errorMessageProvider: ErrorMessageProvider,
-    private val ioDispatcher: CoroutineDispatcher,
+    private val defaultErrorMessageMapper: ErrorMessageMapper,
     externalScope: CoroutineScope? = null
 ) : ViewModel() {
     private val scope = externalScope ?: viewModelScope
 
     private val _formDataFlow = MutableStateFlow(SignUpStateModel())
     val formDataFlow = _formDataFlow.asStateFlow()
-
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading = _isLoading.asStateFlow()
-
+    private val _oneTimeEventChannel = Channel<AuthUiEventModel>()
+    val oneTimeEventChannelFlow = _oneTimeEventChannel.receiveAsFlow()
     private val _signUpState: MutableStateFlow<SignUpEvent> = MutableStateFlow(SignUpEvent.Idle)
     val signUpState: StateFlow<SignUpEvent> = _signUpState.asStateFlow()
 
@@ -65,12 +65,7 @@ class SignUpViewModel(
             is AuthenticationUIEvent.OnPasswordChanged ->
                 _formDataFlow.update { it.copy(password = event.password.trim()) }
 
-            AuthenticationUIEvent.OnSignUp -> {
-                scope.launch(ioDispatcher) {
-                    createFirebaseAccount()
-                }
-            }
-
+            AuthenticationUIEvent.OnSignUp -> createFirebaseAccount()
             AuthenticationUIEvent.OnScreenChanged -> resetForm()
 
             else -> Unit
@@ -97,36 +92,33 @@ class SignUpViewModel(
     }
 
     @VisibleForTesting
-    internal suspend fun createFirebaseAccount() {
+    internal fun createFirebaseAccount() = scope.launch {
+        _signUpState.update { SignUpEvent.Loading }
+
         signUpUseCase(
             Parameters.DoubleStringParam(
                 formDataFlow.value.email,
                 formDataFlow.value.password
             )
-        ).collect { result ->
-            _signUpState.update {
-                when (result) {
-                    is Result.Success -> SignUpEvent.Success
-
-                    is Result.Loading -> {
-                        _isLoading.update { true }
-                        SignUpEvent.Loading
-                    }
-
-                    is Result.Failure -> {
-                        _isLoading.update { false }
-                        val errorMessage = handleSignUpError(result.error)
-                        SignUpEvent.Error(errorMessage)
-                    }
-                }
+        )
+            .onFailure { error ->
+                resetSignUpState()
+                val error = defaultErrorMessageMapper.toUIText(error)
+                sendOnce(AuthUiEventModel.ShowError(error))
             }
-        }
+            .onSuccess {
+                resetSignUpState()
+                sendOnce(AuthUiEventModel.OnSignUpSuccess)
+            }
     }
 
-    private suspend fun handleSignUpError(error: HMMAppError): String =
-        errorMessageProvider.getMessage(error)
+    private fun resetForm() = _formDataFlow.update { SignUpStateModel() }
+    private fun resetSignUpState() = _signUpState.update { SignUpEvent.Idle }
 
-    private fun resetForm() {
-        _formDataFlow.update { SignUpStateModel() }
+    @OptIn(DelicateCoroutinesApi::class)
+    private suspend fun sendOnce(event: AuthUiEventModel) {
+        if (!_oneTimeEventChannel.isClosedForSend) {
+            _oneTimeEventChannel.send(event)
+        }
     }
 }

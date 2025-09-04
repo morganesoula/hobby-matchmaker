@@ -2,7 +2,6 @@ package com.msoula.hobbymatchmaker.core.login.presentation.signIn.fakes
 
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ResetPasswordErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInErrorHMM
-import com.msoula.hobbymatchmaker.core.common.ErrorMessageProvider
 import com.msoula.hobbymatchmaker.core.common.HMMAppError
 
 class FakeSignInErrorMessageProvider : ErrorMessageProvider {

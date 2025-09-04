@@ -4,7 +4,6 @@ import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.Au
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.errors.ProviderErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
-import com.msoula.hobbymatchmaker.core.common.Result
 import dev.gitlive.firebase.auth.AuthCredential
 
 class FakeAuthManager: AuthManager {

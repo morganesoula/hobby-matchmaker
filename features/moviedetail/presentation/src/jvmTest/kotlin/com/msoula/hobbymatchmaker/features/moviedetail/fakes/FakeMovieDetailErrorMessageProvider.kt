@@ -1,6 +1,5 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.fakes
 
-import com.msoula.hobbymatchmaker.core.common.ErrorMessageProvider
 import com.msoula.hobbymatchmaker.core.common.HMMAppError
 
 class FakeMovieDetailErrorMessageProvider : ErrorMessageProvider {

@@ -3,10 +3,12 @@ package com.msoula.hobbymatchmaker.features.moviedetail.presentation
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.common.Logger
-import com.msoula.hobbymatchmaker.core.common.R
 import com.msoula.hobbymatchmaker.core.common.getDeviceLocale
+import com.msoula.hobbymatchmaker.core.common.onFailure
+import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.core.common.route
 import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ManageMovieTrailerUseCase
@@ -16,7 +18,7 @@ import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.Movie
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailViewStateModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.toMovieDetailUiModel
-import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
@@ -28,16 +30,15 @@ import kotlinx.coroutines.launch
 
 class MovieDetailViewModel(
     movieId: Long,
-    private val ioDispatcher: CoroutineDispatcher,
     observeMovieDetailUseCase: ObserveMovieDetailUseCase,
     private val manageMovieTrailerUseCase: ManageMovieTrailerUseCase,
     private val connectivityCheck: NetworkConnectivityChecker,
-    private val defaultErrorMessageMapper: ErrorMessageMapper
+    private val defaultErrorMessageMapper: ErrorMessageMapper,
+    externalScope: CoroutineScope? = null
 ) : ViewModel() {
-
+    val scope = externalScope ?: viewModelScope
     private val _oneTimeEventChannel = Channel<MovieDetailUiEventModel>()
     val oneTimeEventChannelFlow = _oneTimeEventChannel.receiveAsFlow()
-
     private var currentMovie: MovieDetailUiModel? = MovieDetailUiModel()
     private val language = getDeviceLocale()
 
@@ -45,7 +46,7 @@ class MovieDetailViewModel(
         observeMovieDetailUseCase(movieId, language)
             .map { result ->
                 when (result) {
-                    is R.Success -> {
+                    is AppResult.Success -> {
                         when (val success = result.data) {
                             is ObserveMovieSuccess.Success -> {
                                 Logger.d("DetailVM: title=${success.data.title}")
@@ -57,7 +58,7 @@ class MovieDetailViewModel(
                         }
                     }
 
-                    is R.Failure -> {
+                    is AppResult.Failure -> {
                         val event = result.error.route(
                             onConnectivity = {
                                 MovieDetailViewStateModel.Error(
@@ -80,7 +81,7 @@ class MovieDetailViewModel(
                 }
             }
             .stateIn(
-                scope = viewModelScope,
+                scope = scope,
                 started = SharingStarted.WhileSubscribed(5000),
                 initialValue = MovieDetailViewStateModel.Loading
             )
@@ -88,7 +89,7 @@ class MovieDetailViewModel(
     fun onEvent(event: MovieDetailUiEventModel) {
         when (event) {
             is MovieDetailUiEventModel.OnPlayMovieTrailerClicked -> {
-                viewModelScope.launch(ioDispatcher) {
+                scope.launch {
                     onPlayTrailerClicked(
                         event.movieId,
                         event.isVideoURIknown
@@ -115,21 +116,23 @@ class MovieDetailViewModel(
 
         sendOnce(MovieDetailUiEventModel.LoadingTrailer)
 
-        when (val result = manageMovieTrailerUseCase(movieId, language)) {
-            is R.Success -> sendOnce(
-                MovieDetailUiEventModel.OnPlayMovieTrailerReady(
-                    result.data.videoURI
+        manageMovieTrailerUseCase(movieId, language)
+            .onFailure {
+                sendOnce(
+                    it.route(
+                        onConnectivity = { MovieDetailUiEventModel.NoConnection },
+                        onUserActionRequired = { MovieDetailUiEventModel.ErrorFetchingTrailer },
+                        onOther = { MovieDetailUiEventModel.ErrorFetchingTrailer }
+                    )
                 )
-            )
-
-            is R.Failure -> sendOnce(
-                result.error.route(
-                    onConnectivity = { MovieDetailUiEventModel.NoConnection },
-                    onUserActionRequired = { MovieDetailUiEventModel.ErrorFetchingTrailer },
-                    onOther = { MovieDetailUiEventModel.ErrorFetchingTrailer }
+            }
+            .onSuccess {
+                sendOnce(
+                    MovieDetailUiEventModel.OnPlayMovieTrailerReady(
+                        it.videoURI
+                    )
                 )
-            )
-        }
+            }
     }
 
     @OptIn(DelicateCoroutinesApi::class)

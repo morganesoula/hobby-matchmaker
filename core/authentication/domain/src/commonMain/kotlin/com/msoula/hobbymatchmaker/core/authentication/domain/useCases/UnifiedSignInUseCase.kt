@@ -1,18 +1,15 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.useCases
 
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.toSignInError
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
-import com.msoula.hobbymatchmaker.core.common.HMMAppError
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Parameters
-import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.core.common.flatMapSuspend
+import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetIsConnectedUseCase
 import dev.gitlive.firebase.auth.AuthCredential
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.flowOn
 
 class UnifiedSignInUseCase(
-    private val dispatcher: CoroutineDispatcher,
     private val signInUseCase: SignInUseCase,
     private val signInWithCredentialUseCase: SignInWithCredentialUseCase,
     private val setIsConnectedUseCase: SetIsConnectedUseCase
@@ -23,34 +20,14 @@ class UnifiedSignInUseCase(
             Params
     }
 
-    fun signIn(params: Params) =
+    suspend operator fun invoke(params: Params): AppResult<SignInSuccess, AppError> =
         when (params) {
             is Params.EmailPassword ->
                 signInUseCase(Parameters.DoubleStringParam(params.email, params.password))
 
             is Params.SocialMedia ->
-                socialMediaSignIn(params.credential, params.providerType)
+                signInWithCredentialUseCase(params.credential, params.providerType)
         }
-
-    private fun socialMediaSignIn(credential: AuthCredential, providerType: ProviderType) =
-        authenticationAction {
-            signInWithCredentialUseCase(credential, providerType)
-        }
-
-    private fun <Error : HMMAppError> authenticationAction(
-        call: suspend () -> Result<*, Error>
-    ) = channelFlow<Result<SignInSuccess, SignInErrorHMM>> {
-        send(Result.Loading)
-        when (val result = call()) {
-            is Result.Success -> {
-                setIsConnectedUseCase(true)
-                send(Result.Success(SignInSuccess))
-            }
-
-            is Result.Failure ->
-                send(Result.Failure(result.error.toSignInError()))
-
-            else -> Unit
-        }
-    }.flowOn(dispatcher)
+            .flatMapSuspend { setIsConnectedUseCase(true) }
+            .mapSuccess { SignInSuccess }
 }

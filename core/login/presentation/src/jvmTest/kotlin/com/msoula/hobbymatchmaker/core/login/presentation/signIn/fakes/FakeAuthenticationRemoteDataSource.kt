@@ -1,6 +1,6 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.signIn.fakes
 
-import com.msoula.hobbymatchmaker.core.authentication.domain.dataSources.AuthenticationRemoteDataSource
+import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.AuthenticationRemoteDataSource
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.CreateUserWithEmailAndPasswordErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ResetPasswordErrorHMM
@@ -8,7 +8,6 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SignInWithEm
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SocialMediaErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
-import com.msoula.hobbymatchmaker.core.common.Result
 import dev.gitlive.firebase.auth.AuthCredential
 
 class FakeAuthenticationRemoteDataSource(

@@ -37,7 +37,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,10 +59,15 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.msoula.hobbymatchmaker.core.common.CallOnceEffect
+import com.msoula.hobbymatchmaker.core.common.ObserveEvents
+import com.msoula.hobbymatchmaker.core.common.SnackEffect
+import com.msoula.hobbymatchmaker.core.common.UIText
 import com.msoula.hobbymatchmaker.core.design.component.HMMButtonAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldPasswordComponent
 import com.msoula.hobbymatchmaker.core.design.component.HeaderTextComponent
+import com.msoula.hobbymatchmaker.core.design.component.LoadingOverlay
 import com.msoula.hobbymatchmaker.core.design.component.keyboardDismissOnTap
 import com.msoula.hobbymatchmaker.core.login.presentation.Res
 import com.msoula.hobbymatchmaker.core.login.presentation.cancel
@@ -77,6 +81,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.forgot_password
 import com.msoula.hobbymatchmaker.core.login.presentation.forgot_password_title
 import com.msoula.hobbymatchmaker.core.login.presentation.hide_password
 import com.msoula.hobbymatchmaker.core.login.presentation.log_in
+import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthUiEventModel
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.ResetPasswordEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.SignInEvent
@@ -89,7 +94,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.welcome_back_subtitle
 import com.msoula.hobbymatchmaker.core.login.presentation.welcome_back_title
 import com.msoula.hobbymatchmaker.core.login.presentation.your_email
 import dev.gitlive.firebase.auth.AuthCredential
-import org.jetbrains.compose.resources.getString
+import kotlinx.coroutines.flow.Flow
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -98,6 +103,7 @@ fun SignInScreenContent(
     redirectToMovieScreen: () -> Unit,
     redirectToSignUpScreen: () -> Unit,
     resetSignInState: () -> Unit,
+    oneTimeEventChannelFlow: Flow<AuthUiEventModel>,
     shouldShowGuestWarning: Boolean,
     facebookUIClient: FacebookUIClient
 ) {
@@ -106,37 +112,28 @@ fun SignInScreenContent(
     val openResetDialog by signInViewModel.openResetDialog.collectAsState()
     val loginFormState by signInViewModel.formDataFlow.collectAsState()
     val isGuestLoading by signInViewModel.isGuestLoading.collectAsState()
-    val circularProgressLoading by
-    signInViewModel.circularProgressLoading.collectAsState()
     var showGuestDialog by rememberSaveable { mutableStateOf(false) }
 
     val snackBarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(resetPasswordState) {
-        when (val state = resetPasswordState) {
-            is ResetPasswordEvent.Error ->
-                snackBarHostState.showSnackbar(state.message)
+    ObserveEvents(oneTimeEventChannelFlow) { event ->
+        when (event) {
+            is AuthUiEventModel.ShowError ->
+                SnackEffect(snackBarHostState, event.error, event)
 
-            is ResetPasswordEvent.Success -> {
-                signInViewModel.onEvent(
-                    AuthenticationUIEvent.HideForgotPasswordDialog
+            is AuthUiEventModel.OnSignInSuccess ->
+                CallOnceEffect(event) {
+                    redirectToMovieScreen()
+                    resetSignInState()
+                }
+
+            is AuthUiEventModel.OnResetPasswordSuccess -> {
+                signInViewModel.onEvent(AuthenticationUIEvent.HideForgotPasswordDialog)
+                SnackEffect(
+                    snackBarHostState,
+                    UIText.Resource(Res.string.reset_password),
+                    event
                 )
-                snackBarHostState.showSnackbar(
-                    getString(Res.string.reset_password)
-                )
-            }
-
-            else -> Unit
-        }
-    }
-
-    LaunchedEffect(signInState) {
-        when (val state = signInState) {
-            is SignInEvent.Error -> snackBarHostState.showSnackbar(state.message)
-
-            is SignInEvent.Success -> {
-                redirectToMovieScreen()
-                resetSignInState()
             }
 
             else -> Unit
@@ -160,11 +157,10 @@ fun SignInScreenContent(
             )
         }
     ) { paddingValues ->
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
             Column(
                 modifier =
                     Modifier
-                        .padding(paddingValues)
                         .verticalScroll(rememberScrollState())
                         .keyboardDismissOnTap(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -205,7 +201,7 @@ fun SignInScreenContent(
                         signInViewModel.onEvent(AuthenticationUIEvent.OnSignIn)
                     },
                     canSubmit = loginFormState.submit,
-                    circularProgressLoading = circularProgressLoading,
+                    signInState = signInState,
                     dividerConnectText = stringResource(Res.string.continue_with_rs),
                     onGoogleButtonClicked = {
                         signInViewModel.onEvent(AuthenticationUIEvent.OnGoogleButtonClicked)
@@ -220,8 +216,7 @@ fun SignInScreenContent(
                             )
                         )
                     },
-                    facebookUIClient = facebookUIClient,
-                    signInState = signInState
+                    facebookUIClient = facebookUIClient
                 )
             }
 
@@ -298,6 +293,8 @@ fun SignInScreenContent(
                     )
                 }
             }
+
+            LoadingOverlay(visible = signInState == SignInEvent.Loading)
         }
     }
 }
@@ -354,13 +351,12 @@ fun ColumnScope.SignInScreenMainContent(
     onForgotPasswordClicked: () -> Unit = {},
     onSignInClicked: () -> Unit,
     canSubmit: Boolean = false,
-    circularProgressLoading: Boolean = false,
+    signInState: SignInEvent = SignInEvent.Idle,
     dividerConnectText: String = "",
     onGoogleButtonClicked: () -> Unit,
     onAppleButtonClicked: () -> Unit,
     onFacebookButtonClicked: (credential: AuthCredential) -> Unit,
-    facebookUIClient: FacebookUIClient,
-    signInState: SignInEvent
+    facebookUIClient: FacebookUIClient
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -417,7 +413,7 @@ fun ColumnScope.SignInScreenMainContent(
         },
         text = stringResource(Res.string.log_in),
         enabled = canSubmit,
-        loading = circularProgressLoading
+        loading = signInState == SignInEvent.Loading
     )
 
     Spacer(modifier = Modifier.height(40.dp))
@@ -428,7 +424,6 @@ fun ColumnScope.SignInScreenMainContent(
 
     SocialMediaButtonListPlatformSpecificUI(
         modifier = modifier,
-        signInState = signInState,
         onFacebookButtonClicked = onFacebookButtonClicked,
         onAppleButtonClicked = onAppleButtonClicked,
         onGoogleButtonClicked = onGoogleButtonClicked,

@@ -11,6 +11,7 @@ fun SignUpContent(component: SignUpComponent) {
     val signUpViewModel = koinViewModel<SignUpViewModel>()
 
     SignUpScreenContent(
+        oneTimeEventChannelFlow = signUpViewModel.oneTimeEventChannelFlow,
         redirectToSignInScreen = {
             component.onSignInClicked()
         },

@@ -3,7 +3,6 @@ package com.msoula.hobbymatchmaker.core.authentication.domain.repositories
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.CreateUserWithEmailAndPasswordErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.fakes.FakeAuthenticationRemoteDataSource
-import com.msoula.hobbymatchmaker.core.common.Result
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 

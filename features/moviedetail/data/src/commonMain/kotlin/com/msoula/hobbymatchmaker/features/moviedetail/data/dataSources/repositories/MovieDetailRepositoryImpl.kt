@@ -1,8 +1,8 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.repositories
 
 import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Logger
-import com.msoula.hobbymatchmaker.core.common.R
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.local.MovieDetailLocalDataSource
@@ -27,7 +27,7 @@ class MovieDetailRepositoryImpl(
     override suspend fun fetchMovieDetail(
         movieId: Long,
         language: String
-    ): R<MovieDetailDomainModel?, AppError> =
+    ): AppResult<MovieDetailDomainModel?, AppError> =
         movieDetailRemoteDataSource
             .fetchMovieDetail(movieId, language)
             .onSuccess { detail ->
@@ -40,14 +40,14 @@ class MovieDetailRepositoryImpl(
     override suspend fun fetchMovieCredit(
         movieId: Long,
         language: String
-    ): R<List<MovieActorDomainModel>?, AppError> =
+    ): AppResult<List<MovieActorDomainModel>?, AppError> =
         movieDetailRemoteDataSource
             .fetchMovieCredit(movieId, language)
             .mapSuccess {
                 it?.toMovieActorDomainModel()?.cast ?: emptyList()
             }
 
-    override suspend fun saveMovieDetail(movieDetailDomainModel: MovieDetailDomainModel): R<Unit, AppError> =
+    override suspend fun saveMovieDetail(movieDetailDomainModel: MovieDetailDomainModel): AppResult<Unit, AppError> =
         movieDetailLocalDataSource.saveMovieDetail(movieDetailDomainModel.toMovieUpdated())
 
     override fun observeMovieDetail(movieId: Long): Flow<MovieDetailDomainModel?> =
@@ -58,13 +58,13 @@ class MovieDetailRepositoryImpl(
     override suspend fun updateMovieVideoURI(
         movieId: Long,
         videoURI: String
-    ): R<Unit, AppError> =
+    ): AppResult<Unit, AppError> =
         movieDetailLocalDataSource.updateMovieVideoUri(movieId, videoURI)
 
     override suspend fun fetchMovieTrailer(
         movieId: Long,
         language: String
-    ): R<MovieVideoDomainModel?, AppError> =
+    ): AppResult<MovieVideoDomainModel?, AppError> =
         movieDetailRemoteDataSource.fetchMovieTrailer(movieId, language)
             .mapSuccess {
                 it?.toMovieVideoDomainModel()

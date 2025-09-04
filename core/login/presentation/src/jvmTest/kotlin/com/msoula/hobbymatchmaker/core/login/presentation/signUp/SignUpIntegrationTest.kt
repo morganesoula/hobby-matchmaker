@@ -1,9 +1,8 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.signUp
 
+import com.msoula.hobbymatchmaker.core.authentication.data.repositories.AuthenticationRepositoryImpl
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.CreateUserWithEmailAndPasswordErrorHMM
-import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepositoryImpl
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignUpUseCase
-import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.login.domain.useCases.LoginValidateFormUseCase
 import com.msoula.hobbymatchmaker.core.login.domain.useCases.ValidateEmailUseCase
 import com.msoula.hobbymatchmaker.core.login.domain.useCases.ValidateNameUseCase

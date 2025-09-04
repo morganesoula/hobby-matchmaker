@@ -27,6 +27,8 @@ fun SignInContent(
         .shouldShowGuestDialog
         .collectAsState(initial = true)
 
+    val oneTimeEventChannelFlow = signInViewModel.oneTimeEventChannelFlow
+
     SignInScreenContent(
         signInViewModel = signInViewModel,
         redirectToMovieScreen = {
@@ -38,6 +40,7 @@ fun SignInContent(
         resetSignInState = {
             signInViewModel.resetSignInState()
         },
+        oneTimeEventChannelFlow = oneTimeEventChannelFlow,
         facebookUIClient = facebookUIClient,
         shouldShowGuestWarning = shouldShowGuestWarning
     )

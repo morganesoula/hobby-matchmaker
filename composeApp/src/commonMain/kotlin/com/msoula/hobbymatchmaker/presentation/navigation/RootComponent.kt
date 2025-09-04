@@ -4,13 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
-import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.navigation.domain.RootComponent
 import com.msoula.hobbymatchmaker.core.navigation.domain.SignInComponent
 import com.msoula.hobbymatchmaker.core.navigation.domain.SignUpComponent
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveIsConnectedUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.SyncLocalFavoritesToCloudUseCase
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.koin.compose.getKoin
 import presentation.AuthRootComponentImpl
@@ -48,7 +46,7 @@ fun getRootComponent(): RootComponent {
                 },
                 onAuthenticated = {
                     appScope.launch {
-                        syncLocalFavoritesToCloudUseCase(Parameters.None).collect()
+                        syncLocalFavoritesToCloudUseCase()
                     }
 
                     onAuthenticated()
@@ -74,7 +72,7 @@ fun getRootComponent(): RootComponent {
                 onFinished = { isConnected ->
                     if (isConnected) {
                         appScope.launch {
-                            syncLocalFavoritesToCloudUseCase(Parameters.None).collect()
+                            syncLocalFavoritesToCloudUseCase()
                         }
                     }
                     onFinished(isConnected)

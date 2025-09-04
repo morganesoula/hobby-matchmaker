@@ -69,11 +69,16 @@ import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import com.msoula.hobbymatchmaker.core.common.ObserveAsEvents
+import com.msoula.hobbymatchmaker.core.common.CallOnceEffect
+import com.msoula.hobbymatchmaker.core.common.ObserveEvents
+import com.msoula.hobbymatchmaker.core.common.SnackEffect
+import com.msoula.hobbymatchmaker.core.common.UIText
+import com.msoula.hobbymatchmaker.core.common.asString
 import com.msoula.hobbymatchmaker.core.common.toReadableDuration
 import com.msoula.hobbymatchmaker.core.design.component.ExpandableTextComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMDetailTopBar
 import com.msoula.hobbymatchmaker.core.design.component.LoadingCircularProgress
+import com.msoula.hobbymatchmaker.core.design.component.LoadingOverlay
 import com.msoula.hobbymatchmaker.core.design.theme.successContainerColor
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiEventModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
@@ -116,9 +121,6 @@ fun MovieDetailScreen(
 
     val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
-    val errorFetchingMovieMessage = stringResource(Res.string.no_trailer_available)
-    val noConnectionMessage = stringResource(Res.string.connection_issue)
-
     val posterModel = remember(movie.posterPath) {
         ImageRequest.Builder(platformContext)
             .data(movie.posterPath.toPath())
@@ -146,6 +148,39 @@ fun MovieDetailScreen(
         isLoading = false
     }
 
+    ObserveEvents(oneTimeEventFlow) { event ->
+        when (event) {
+            is MovieDetailUiEventModel.OnMovieDetailUiFetchedError ->
+                SnackEffect(snackBarHostState, event.error, event)
+
+            is MovieDetailUiEventModel.OnPlayMovieTrailerReady ->
+                CallOnceEffect(event) {
+                    if (isLoading) isLoading = false
+                    videoId = event.movieUri
+                    videoPlayerVisible = true
+                }
+
+            is MovieDetailUiEventModel.ErrorFetchingTrailer -> {
+                if (isLoading) isLoading = false
+                SnackEffect(
+                    snackBarHostState,
+                    UIText.Resource(Res.string.no_trailer_available),
+                    event
+                )
+            }
+
+            is MovieDetailUiEventModel.NoConnection ->
+                SnackEffect(
+                    snackBarHostState,
+                    UIText.Resource(Res.string.connection_issue),
+                    event
+                )
+
+            is MovieDetailUiEventModel.LoadingTrailer -> isLoading = true
+            else -> Unit
+        }
+    }
+
     Scaffold(
         snackbarHost = {
             SnackbarHost(
@@ -162,34 +197,6 @@ fun MovieDetailScreen(
             )
         }
     ) { padding ->
-        ObserveAsEvents(flow = oneTimeEventFlow) { event ->
-            when (event) {
-                is MovieDetailUiEventModel.OnMovieDetailUiFetchedError ->
-                    snackBarHostState.showSnackbar(event.error)
-
-                is MovieDetailUiEventModel.OnPlayMovieTrailerReady -> {
-                    if (isLoading) isLoading = false
-                    videoId = event.movieUri
-                    videoPlayerVisible = true
-                }
-
-                is MovieDetailUiEventModel.ErrorFetchingTrailer -> {
-                    if (isLoading) isLoading = false
-                    snackBarHostState.showSnackbar(errorFetchingMovieMessage)
-                }
-
-                is MovieDetailUiEventModel.NoConnection ->
-                    snackBarHostState.showSnackbar(noConnectionMessage)
-
-                is MovieDetailUiEventModel.LoadingTrailer ->
-                    isLoading = true
-
-                else -> Unit
-            }
-        }
-
-        if (isLoading) LoadingCircularProgress()
-
         Box(
             modifier = modifier
                 .fillMaxSize()
@@ -344,6 +351,8 @@ fun MovieDetailScreen(
             HMMDetailTopBar {
                 onMovieDetailBackPressed()
             }
+
+            LoadingOverlay(isLoading)
         }
     }
 }
@@ -452,9 +461,9 @@ private fun rememberLegibilityScrim(): Brush {
 }
 
 @Composable
-fun ErrorMovieDetailScreen(error: String) {
+fun ErrorMovieDetailScreen(error: UIText) {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = error, style = MaterialTheme.typography.bodyLarge)
+        Text(text = error.asString(), style = MaterialTheme.typography.bodyLarge)
     }
 }
 

@@ -1,8 +1,6 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.signIn.fakes
 
-import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.session.domain.dataSources.SessionRemoteDataSource
-import com.msoula.hobbymatchmaker.core.session.domain.errors.SessionErrors
 import com.msoula.hobbymatchmaker.core.session.domain.models.SessionUserDomainModel
 
 class FakeSessionRemoteDataSource(

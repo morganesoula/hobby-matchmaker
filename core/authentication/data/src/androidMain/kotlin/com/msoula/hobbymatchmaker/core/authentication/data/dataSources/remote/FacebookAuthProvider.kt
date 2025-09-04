@@ -1,11 +1,13 @@
 package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote
 
 import com.facebook.login.LoginManager
-import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.errors.ProviderErrorHMM
-import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.mappers.toFirebaseUserInfoDomainModel
+import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.mappers.toAuthFirebaseUserSignedInWith
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.providers.AuthProvider
-import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
-import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.core.authentication.data.models.AuthFirebaseUser
+import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.core.common.safeFirebaseCall
 import dev.gitlive.firebase.auth.AuthCredential
 import dev.gitlive.firebase.auth.FirebaseAuth
 
@@ -13,28 +15,17 @@ class FacebookAuthProvider(
     private val auth: FirebaseAuth
 ) : AuthProvider {
 
-    override suspend fun signIn(credentials: AuthCredential): Result<FirebaseUserInfoDomainModel, ProviderErrorHMM> {
-        return try {
-            val authResult = auth.signInWithCredential(credentials)
+    override val type: ProviderType = ProviderType.FACEBOOK
 
-            authResult.user?.let {
-                Result.Success(it.toFirebaseUserInfoDomainModel())
-            } ?: run {
-                Result.Failure(ProviderErrorHMM.FacebookSignInErrorHMM("Error while sign in with Facebook"))
-            }
-        } catch (e: Exception) {
-            Result.Failure(ProviderErrorHMM.FacebookSignInErrorHMM("Error while sign in with Facebook + ${e.message}"))
+    override suspend fun signIn(credentials: AuthCredential): AppResult<AuthFirebaseUser?, AppError> =
+        safeFirebaseCall {
+            auth.signInWithCredential(credentials)
+                .user?.toAuthFirebaseUserSignedInWith(type.id)
         }
-    }
 
-    override suspend fun signOut(): Result<Boolean, ProviderErrorHMM> {
-        return try {
-            LoginManager.getInstance().logOut()
-            auth.signOut()
-            Result.Success(true)
-        } catch (e: Exception) {
-            Result.Failure(ProviderErrorHMM.ProviderLogOutErrorHMM("Error while sign out with Facebook + ${e.message}"))
-        }
+    override suspend fun signOut(): AppResult<Unit, AppError> = safeFirebaseCall {
+        LoginManager.getInstance().logOut()
+        auth.signOut()
     }
 
     override fun isSignedIn(): Boolean = auth.currentUser != null

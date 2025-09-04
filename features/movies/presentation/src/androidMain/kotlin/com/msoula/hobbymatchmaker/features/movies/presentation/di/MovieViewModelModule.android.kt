@@ -9,11 +9,10 @@ actual val featuresModuleMovieViewModelPresentationPlatformSpecific = module {
         MovieViewModel(
             setMovieFavoriteUseCase = get(),
             observeAllMoviesUseCase = get(),
-            getUserInfo = get(),
+            fetchFirebaseUserInfo = get(),
             logOutUseCase = get(),
             checkMovieSynopsisValueUseCase = get(),
             connectivityCheck = AndroidNetworkConnectivityChecker(get()),
-            ioDispatcher = get(),
             defaultMessageMapper = get()
         )
     }

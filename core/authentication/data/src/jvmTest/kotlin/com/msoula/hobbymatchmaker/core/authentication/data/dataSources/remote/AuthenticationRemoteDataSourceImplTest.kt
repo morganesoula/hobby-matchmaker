@@ -5,7 +5,6 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutErrorH
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SocialMediaErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
-import com.msoula.hobbymatchmaker.core.common.Result
 import dev.gitlive.firebase.auth.AuthCredential
 import dev.gitlive.firebase.auth.AuthResult
 import dev.gitlive.firebase.auth.FirebaseAuth

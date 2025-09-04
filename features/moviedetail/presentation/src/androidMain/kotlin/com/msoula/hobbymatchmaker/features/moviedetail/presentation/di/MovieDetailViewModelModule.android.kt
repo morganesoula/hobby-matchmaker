@@ -9,7 +9,6 @@ actual val featuresModuleMovieDetailPresentationPlatformSpecific = module {
     viewModel { (movieId: Long) ->
         MovieDetailViewModel(
             movieId = movieId,
-            ioDispatcher = get(),
             observeMovieDetailUseCase = get(),
             manageMovieTrailerUseCase = get(),
             connectivityCheck = AndroidNetworkConnectivityChecker(get()),

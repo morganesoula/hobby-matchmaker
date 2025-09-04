@@ -1,6 +1,6 @@
 package com.msoula.hobbymatchmaker.core.common
 
-import com.msoula.hobbymatchmaker.core.common.UIText.*
+import com.msoula.hobbymatchmaker.core.common.UIText.Resource
 import org.jetbrains.compose.resources.StringResource
 
 sealed interface UIText {
@@ -40,7 +40,7 @@ object DefaultErrorMessageMapper : ErrorMessageMapper {
         AppError.Storage.ReadFailed -> Resource(Res.string.storage_read_failed)
         AppError.Storage.Corrupted -> Resource(Res.string.storage_corrupted)
 
-        AppError.Authentication.AlreadyExists -> Plain("")
-        AppError.Authentication.Unknown -> Plain("")
+        AppError.Authentication.AlreadyExists -> Resource(Res.string.authentication_already_exists)
+        AppError.Authentication.Unknown -> Resource(Res.string.authentication_unknown)
     }
 }

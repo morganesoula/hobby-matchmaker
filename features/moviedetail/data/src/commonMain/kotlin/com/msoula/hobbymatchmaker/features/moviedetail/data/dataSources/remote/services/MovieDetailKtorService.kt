@@ -1,8 +1,8 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.services
 
 import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Logger
-import com.msoula.hobbymatchmaker.core.common.R
 import com.msoula.hobbymatchmaker.core.common.safeCall
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.CastResponseRemoteModel
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.MovieDetailResponseRemoteModel
@@ -19,12 +19,12 @@ interface MovieDetailKtorService {
     suspend fun fetchMovieDetail(
         movieId: Long,
         language: String
-    ): R<MovieDetailResponseRemoteModel, AppError>
+    ): AppResult<MovieDetailResponseRemoteModel, AppError>
 
     suspend fun fetchMovieCredits(
         movieId: Long,
         language: String
-    ): R<CastResponseRemoteModel, AppError>
+    ): AppResult<CastResponseRemoteModel, AppError>
 }
 
 class MovieDetailKtorServiceImpl(private val client: HttpClient) : MovieDetailKtorService {
@@ -32,7 +32,7 @@ class MovieDetailKtorServiceImpl(private val client: HttpClient) : MovieDetailKt
     override suspend fun fetchMovieDetail(
         movieId: Long,
         language: String
-    ): R<MovieDetailResponseRemoteModel, AppError> = safeCall {
+    ): AppResult<MovieDetailResponseRemoteModel, AppError> = safeCall {
         client.request {
             method = HttpMethod.Get
             url { encodedPath = "movie/$movieId" }
@@ -46,7 +46,7 @@ class MovieDetailKtorServiceImpl(private val client: HttpClient) : MovieDetailKt
     override suspend fun fetchMovieCredits(
         movieId: Long,
         language: String
-    ): R<CastResponseRemoteModel, AppError> = safeCall {
+    ): AppResult<CastResponseRemoteModel, AppError> = safeCall {
         client.request {
             method = HttpMethod.Get
             url { encodedPath = "movie/$movieId/credits" }

@@ -1,8 +1,8 @@
 package com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.services
 
 import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Logger
-import com.msoula.hobbymatchmaker.core.common.R
 import com.msoula.hobbymatchmaker.core.common.safeCall
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.MovieResponseRemoteModel
 import io.ktor.client.HttpClient
@@ -19,14 +19,14 @@ interface TMDBKtorService {
     suspend fun getMoviesByPopularityDesc(
         language: String,
         page: Int
-    ): R<MovieResponseRemoteModel, AppError>
+    ): AppResult<MovieResponseRemoteModel, AppError>
 }
 
 class TMDBKtorServiceImpl(private val client: HttpClient) : TMDBKtorService {
     override suspend fun getMoviesByPopularityDesc(
         language: String,
         page: Int
-    ): R<MovieResponseRemoteModel, AppError> = safeCall {
+    ): AppResult<MovieResponseRemoteModel, AppError> = safeCall {
         client.request {
             method = HttpMethod.Get
             url { encodedPath = "movie/popular" }

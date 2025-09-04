@@ -4,7 +4,6 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutErrorH
 import com.msoula.hobbymatchmaker.core.authentication.domain.fakes.FakeAuthenticationRepository
 import com.msoula.hobbymatchmaker.core.authentication.domain.fakes.FakeSessionRepository
 import com.msoula.hobbymatchmaker.core.common.Parameters
-import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveIsConnectedUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetIsConnectedUseCase
 import io.kotest.core.spec.style.StringSpec

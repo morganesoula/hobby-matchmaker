@@ -1,40 +1,35 @@
 package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote
 
-import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.errors.ProviderErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.providers.AuthProvider
-import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
+import com.msoula.hobbymatchmaker.core.authentication.data.models.AuthFirebaseUser
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
-import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import dev.gitlive.firebase.auth.AuthCredential
 
-class AuthManagerImpl(private val providers: List<AuthProvider>) : AuthManager {
+class AuthManagerImpl(providers: List<AuthProvider>) : AuthManager {
+
+    private val map = providers.associateBy { it.type }
 
     override suspend fun signIn(
         providerType: ProviderType,
         credential: AuthCredential
-    ): Result<FirebaseUserInfoDomainModel, ProviderErrorHMM> {
-        val provider = findProvider(providerType)
-            ?: return Result.Failure(ProviderErrorHMM.NoProviderFound("Provider not found"))
-
-        return provider.signIn(credential)
-    }
-
-    override suspend fun signOut(): Result<Boolean, ProviderErrorHMM> {
-        var hasError = false
-        providers.forEach { provider ->
-            val result = provider.signOut()
-            if (result is Result.Failure) hasError = true
-        }
-
-        return if (hasError) Result.Failure(
-            ProviderErrorHMM.ProviderLogOutErrorHMM(
-                "Some providers failed to log out"
+    ): AppResult<AuthFirebaseUser?, AppError> =
+        map[providerType]?.signIn(credential)
+            ?: AppResult.Failure(
+                AppError.External.Service(
+                    providerType.id, "provider_not_found"
+                )
             )
-        ) else {
-            Result.Success(true)
-        }
-    }
 
-    private fun findProvider(type: ProviderType): AuthProvider? =
-        providers.find { it::class.simpleName == type.className }
+    override suspend fun signOut(): AppResult<Unit, AppError> {
+        var firstError: AppError? = null
+        for (provider in map.values) {
+            when (val res = provider.signOut()) {
+                is AppResult.Success -> Unit
+                is AppResult.Failure -> if (firstError == null) firstError = res.error
+            }
+        }
+        return firstError?.let { AppResult.Failure(it) } ?: AppResult.Success(Unit)
+    }
 }

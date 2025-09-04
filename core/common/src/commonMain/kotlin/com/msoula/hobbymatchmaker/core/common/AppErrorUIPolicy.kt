@@ -29,6 +29,9 @@ fun AppError.hint(): UIErrorHint = when (this) {
     is AppError.Storage.ReadFailed -> UIErrorHint(RetryPolicy.Never, false)
     is AppError.Storage.WriteFailed -> UIErrorHint(RetryPolicy.WithBackoff, true)
     is AppError.Storage.Corrupted -> UIErrorHint(RetryPolicy.Never, false)
+
+    AppError.Authentication.AlreadyExists -> UIErrorHint(RetryPolicy.Never, true)
+    AppError.Authentication.Unknown -> UIErrorHint(RetryPolicy.Never, true)
 }
 
 inline fun <Event> AppError.route(

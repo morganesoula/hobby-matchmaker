@@ -1,6 +1,5 @@
 package com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote
 
-import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.fakes.FakeImageRepository
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.fakes.FakeTMDBKtorService
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.mappers.toMovieDomainModel
@@ -8,7 +7,6 @@ import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.MovieResponseRemoteModel
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.services.TMDBKtorErrorHMM
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.services.TMDBKtorService
-import com.msoula.hobbymatchmaker.features.movies.domain.errors.MovieErrors
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.ImageRepository
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import io.kotest.core.spec.style.FunSpec

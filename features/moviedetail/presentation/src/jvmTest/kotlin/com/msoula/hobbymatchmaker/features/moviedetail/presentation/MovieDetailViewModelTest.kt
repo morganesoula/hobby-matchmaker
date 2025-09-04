@@ -1,7 +1,6 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.presentation
 
 import app.cash.turbine.test
-import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.FetchingTrailerErrorHMM

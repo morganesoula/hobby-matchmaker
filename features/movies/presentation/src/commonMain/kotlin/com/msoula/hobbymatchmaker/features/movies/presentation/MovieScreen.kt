@@ -19,7 +19,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -27,7 +26,10 @@ import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import com.msoula.hobbymatchmaker.core.common.ObserveAsEvents
+import com.msoula.hobbymatchmaker.core.common.CallOnceEffect
+import com.msoula.hobbymatchmaker.core.common.ObserveEvents
+import com.msoula.hobbymatchmaker.core.common.SnackEffect
+import com.msoula.hobbymatchmaker.core.common.UIText
 import com.msoula.hobbymatchmaker.core.common.isIosPlatform
 import com.msoula.hobbymatchmaker.core.design.component.HMMHomeTopBar
 import com.msoula.hobbymatchmaker.features.movies.presentation.components.MovieItem
@@ -35,8 +37,6 @@ import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventM
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun MovieScreenContent(
@@ -49,28 +49,35 @@ fun MovieScreenContent(
     redirectToAuth: () -> Unit
 ) {
     val listState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
 
-    val noFetchingDetailPossibleMessage = stringResource(Res.string.no_fetching_detail_possible)
-
-    ObserveAsEvents(flow = oneTimeEventChannelFlow) { event ->
-        coroutineScope.launch {
-            when (event) {
-                is MovieUiEventModel.OnMovieDetailClicked ->
+    ObserveEvents(oneTimeEventChannelFlow) { event ->
+        when (event) {
+            is MovieUiEventModel.OnMovieDetailClicked ->
+                CallOnceEffect(event) {
                     redirectToMovieDetail(event.movieId)
+                }
 
-                is MovieUiEventModel.OnMovieUiFetchedError ->
-                    snackBarHostState.showSnackbar(message = event.error)
+            is MovieUiEventModel.OnLogOutSuccess ->
+                CallOnceEffect(event) {
+                    redirectToAuth()
+                }
 
-                is MovieUiEventModel.OnLogOutFailure ->
-                    snackBarHostState.showSnackbar(message = event.error)
+            is MovieUiEventModel.OnMovieUiFetchedError ->
+                SnackEffect(snackBarHostState, event.error, event)
 
-                is MovieUiEventModel.OnLogOutSuccess -> redirectToAuth()
+            is MovieUiEventModel.OnLogOutFailure ->
+                SnackEffect(snackBarHostState, event.error, event)
 
-                is MovieUiEventModel.NoFetchingDetailPossible ->
-                    snackBarHostState.showSnackbar(noFetchingDetailPossibleMessage)
-            }
+            is MovieUiEventModel.ShowError ->
+                SnackEffect(snackBarHostState, event.error, event)
+
+            is MovieUiEventModel.NoFetchingDetailPossible ->
+                SnackEffect(
+                    snackBarHostState,
+                    UIText.Resource(Res.string.no_fetching_detail_possible),
+                    event
+                )
         }
     }
 

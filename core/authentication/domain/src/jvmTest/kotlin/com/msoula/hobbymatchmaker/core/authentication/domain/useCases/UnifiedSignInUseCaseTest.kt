@@ -2,7 +2,6 @@ package com.msoula.hobbymatchmaker.core.authentication.domain.useCases
 
 import com.msoula.hobbymatchmaker.core.authentication.domain.fakes.FakeAuthenticationRepository
 import com.msoula.hobbymatchmaker.core.authentication.domain.fakes.FakeSessionRepository
-import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetIsConnectedUseCase
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe

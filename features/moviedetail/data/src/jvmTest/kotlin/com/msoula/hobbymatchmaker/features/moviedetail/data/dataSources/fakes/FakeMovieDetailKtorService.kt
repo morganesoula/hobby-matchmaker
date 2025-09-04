@@ -1,6 +1,5 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.fakes
 
-import com.msoula.hobbymatchmaker.core.common.Result
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.ActorResponseRemoteModel
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.CastResponseRemoteModel
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.GenreResponseRemoteModel
