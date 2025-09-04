@@ -1,6 +1,6 @@
 package com.msoula.hobbymatchmaker.core.common
 
-enum class RetryPolicy { Never, Immediate, WithBackoff }
+enum class RetryPolicy { Never, WithBackoff }
 
 data class UIErrorHint(
     val retry: RetryPolicy = RetryPolicy.Never,
