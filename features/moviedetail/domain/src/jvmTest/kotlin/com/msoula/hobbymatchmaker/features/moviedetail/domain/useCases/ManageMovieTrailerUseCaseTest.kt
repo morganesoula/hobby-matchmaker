@@ -1,138 +1,144 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases
 
-import com.msoula.hobbymatchmaker.core.common.Parameters
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainErrorHMM
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.UpdateMovieTrailerLocalErrorHMM
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.fakes.FakeMovieDetailRepository
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieVideoDomainModel
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.test.StandardTestDispatcher
+import io.kotest.matchers.types.shouldBeInstanceOf
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.slot
 import kotlinx.coroutines.test.runTest
 
 class ManageMovieTrailerUseCaseTest : FunSpec({
-    val dispatcher = StandardTestDispatcher()
+    lateinit var fakeRepo: FakeMovieDetailRepository
+    lateinit var updateMock: UpdateMovieVideoURIUseCase
+    lateinit var useCase: ManageMovieTrailerUseCase
 
-    context("ManageMovieTrailer - Success") {
-        test("returns Success when trailer is fetched and update succeeds") {
-            val fakeTrailer = MovieVideoDomainModel(
-                key = "abc123",
-                type = "",
-                site = "YouTube"
-            )
+    beforeTest {
+        MockKAnnotations.init(this)
+        fakeRepo = FakeMovieDetailRepository()
+        updateMock = mockk(relaxed = true) // on mock le UseCase
+        useCase = ManageMovieTrailerUseCase(
+            movieDetailRepository = fakeRepo,
+            updateMovieVideoURIUseCase = updateMock
+        )
+    }
 
-            val fakeMovieDetailRepository = FakeMovieDetailRepository(
-                fetchTrailerResult = Result.Success(fakeTrailer),
-                updateTrailerResult = Result.Success(true)
-            )
+    test("propagates Failure when fetchMovieTrailer fails") {
+        runTest {
+            val expectedErr: AppError = AppError.Network.Timeout
+            fakeRepo.fetchTrailerResult = AppResult.Failure(expectedErr)
 
-            val updateMovieVideoURIUSeCase = UpdateMovieVideoURIUseCase(fakeMovieDetailRepository)
+            val res = useCase(movieId = 10L, language = "fr-FR")
 
-            val useCase = ManageMovieTrailerUseCase(
-                movieDetailRepository = fakeMovieDetailRepository,
-                updateMovieVideoURIUseCase = updateMovieVideoURIUSeCase,
-                dispatcher = dispatcher
-            )
-
-            runTest(dispatcher) {
-                val result = useCase
-                    .execute(Parameters.LongStringParam(1L, "en"))
-                    .take(2)
-                    .toList()
-
-                result shouldBe listOf(
-                    Result.Loading,
-                    Result.Success(MovieTrailerReady("abc123"))
-                )
-
-                fakeMovieDetailRepository.updatedVideoURI shouldBe "abc123"
-            }
+            res.shouldBeInstanceOf<AppResult.Failure<AppError>>()
+            res.error shouldBe expectedErr
         }
     }
 
-    context("ManageMovieTrailer - Failure") {
-        test("Returns NoConnectionError when no connection") {
-            val fakeRepository = FakeMovieDetailRepository(
-                fetchTrailerResult = Result.Failure(
-                    MovieDetailDomainErrorHMM.NoConnection("No internet connexion")
-                )
-            )
 
-            val useCase = ManageMovieTrailerUseCase(
-                movieDetailRepository = fakeRepository,
-                updateMovieVideoURIUseCase = UpdateMovieVideoURIUseCase(fakeRepository),
-                dispatcher = dispatcher
-            )
+    test("returns NotFound when trailer data is null") {
+        runTest {
+            fakeRepo.fetchTrailerResult = AppResult.Success(null)
 
-            runTest(dispatcher) {
-                val result = useCase
-                    .execute(Parameters.LongStringParam(1L, "en"))
-                    .take(2)
-                    .toList()
+            val res = useCase(movieId = 10L, language = "fr-FR")
 
-                result shouldBe listOf(
-                    Result.Loading,
-                    Result.Failure(FetchingTrailerErrorHMM.NoConnectionErrorHMM("No internet connexion"))
-                )
-            }
+            res.shouldBeInstanceOf<AppResult.Failure<AppError>>()
+            res.error shouldBe AppError.Domain.NotFound
         }
+    }
 
-        test("Returns no TrailerFound when no trailer is found") {
-            val fakeRepository = FakeMovieDetailRepository(
-                fetchTrailerResult = Result.Failure(
-                    FetchingTrailerErrorHMM.NoTrailerFoundErrorHMM(
-                        "No trailer found"
-                    )
+    test("YouTube (case-insensitive) → uri == key; update success → Success(MovieTrailerReady)") {
+        runTest {
+            val video = stubVideo(site = "youTUbe", key = "abc123")
+            fakeRepo.fetchTrailerResult = AppResult.Success(video)
+
+            val movieId = 42L
+            val uriSlot = slot<String>()
+            val idSlot = slot<Long>()
+            coEvery {
+                updateMock(
+                    capture(idSlot),
+                    capture(uriSlot)
                 )
-            )
+            } returns AppResult.Success(Unit)
 
-            val useCase = ManageMovieTrailerUseCase(
-                movieDetailRepository = fakeRepository,
-                updateMovieVideoURIUseCase = UpdateMovieVideoURIUseCase(fakeRepository),
-                dispatcher = dispatcher
-            )
+            val res = useCase(movieId = movieId, language = "en-US")
 
-            runTest(dispatcher) {
-                val result = useCase
-                    .execute(Parameters.LongStringParam(1L, "en"))
-                    .take(2)
-                    .toList()
+            coVerify(exactly = 1) { updateMock.invoke(any(), any()) }
+            idSlot.captured shouldBe movieId
+            uriSlot.captured shouldBe "abc123"
 
-                result shouldBe listOf(
-                    Result.Loading,
-                    Result.Failure(FetchingTrailerErrorHMM.NoTrailerFoundErrorHMM("No trailer found"))
-                )
-            }
+            res.shouldBeInstanceOf<AppResult.Success<MovieTrailerReady>>()
+            res.data.videoURI shouldBe "abc123"
         }
+    }
 
-        test("Returns TrailerUpdateError when update fails") {
-            val fakeRepository = FakeMovieDetailRepository(
-                updateTrailerResult = Result.Failure(
-                    UpdateMovieTrailerLocalErrorHMM("error updating trailer")
+    test("non-YouTube → uri == https://vimeo.com/{key}; update success → Success") {
+        runTest {
+            val video = stubVideo(site = "Vimeo", key = "k9")
+            fakeRepo.fetchTrailerResult = AppResult.Success(video)
+
+            val movieId = 7L
+            val uriSlot = slot<String>()
+            val idSlot = slot<Long>()
+            coEvery {
+                updateMock.invoke(
+                    capture(idSlot),
+                    capture(uriSlot)
                 )
-            )
+            } returns AppResult.Success(Unit)
 
-            val useCase = ManageMovieTrailerUseCase(
-                movieDetailRepository = fakeRepository,
-                updateMovieVideoURIUseCase = UpdateMovieVideoURIUseCase(fakeRepository),
-                dispatcher = dispatcher
-            )
+            val res = useCase(movieId = movieId, language = "fr")
 
-            runTest(dispatcher) {
-                val result = useCase
-                    .execute(Parameters.LongStringParam(1L, "en"))
-                    .take(2)
-                    .toList()
+            coVerify(exactly = 1) { updateMock.invoke(any(), any()) }
+            idSlot.captured shouldBe movieId
+            uriSlot.captured shouldBe "https://vimeo.com/k9"
 
-                result shouldBe listOf(
-                    Result.Loading,
-                    Result.Failure(
-                        FetchingTrailerErrorHMM.TrailerUpdateErrorHMM("Empty uri")
-                    )
-                )
-            }
+            res.shouldBeInstanceOf<AppResult.Success<MovieTrailerReady>>()
+            res.data.videoURI shouldBe "https://vimeo.com/k9"
+        }
+    }
+
+
+    test("YouTube with empty key → NotFound") {
+        runTest {
+            val video = stubVideo(site = "YouTube", key = "")
+            fakeRepo.fetchTrailerResult = AppResult.Success(video)
+
+            val res = useCase(movieId = 99L, language = "fr-FR")
+
+            res.shouldBeInstanceOf<AppResult.Failure<AppError>>()
+            res.error shouldBe AppError.Domain.NotFound
+        }
+    }
+
+    test("updateMovieVideoURIUseCase failure is propagated") {
+        runTest {
+            val video = stubVideo(site = "YouTube", key = "zyx")
+            fakeRepo.fetchTrailerResult = AppResult.Success(video)
+
+            val writeErr: AppError = AppError.Storage.WriteFailed
+            coEvery { updateMock.invoke(any(), any()) } returns AppResult.Failure(writeErr)
+
+            val res = useCase(movieId = 12L, language = "en")
+
+            coVerify(exactly = 1) { updateMock.invoke(12L, "zyx") }
+            res.shouldBeInstanceOf<AppResult.Failure<AppError>>()
+            res.error shouldBe writeErr
         }
     }
 })
+
+private fun stubVideo(site: String, key: String): MovieVideoDomainModel {
+    val video = mockk<MovieVideoDomainModel>(relaxed = true)
+    every { video.site } returns site
+    every { video.key } returns key
+    return video
+}

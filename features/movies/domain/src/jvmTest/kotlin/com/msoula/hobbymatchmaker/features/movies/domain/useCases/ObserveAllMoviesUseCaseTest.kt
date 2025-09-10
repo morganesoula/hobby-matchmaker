@@ -1,88 +1,153 @@
 package com.msoula.hobbymatchmaker.features.movies.domain.useCases
 
 import app.cash.turbine.test
-import com.msoula.hobbymatchmaker.core.common.Parameters
-import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.features.movies.domain.fakes.FakeMovieRepository
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import kotlinx.coroutines.launch
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ObserveAllMoviesUseCaseTest : FunSpec({
     val dispatcher = StandardTestDispatcher()
 
-    val dummyMovie = MovieDomainModel(
-        id = 1,
-        title = "Test movie",
-        overview = "",
-        isFavorite = false,
-        localCoverFilePath = "",
-        coverFileName = "",
-        isSeen = false
-    )
+    context("emptyList") {
+        test("fetchMoviesUseCase OK -> emit DataLoadedInDB") {
+            runTest(dispatcher) {
+                val repository = FakeMovieRepository()
+                val fetchMoviesUseCase = mockk<FetchMoviesUseCase>()
 
-    test("should emit Success when repository already has movies") {
-        val fakeMovieRepository = FakeMovieRepository(listOf(dummyMovie))
-        val fetchMovieUseCase = FetchMoviesUseCase(fakeMovieRepository)
-        val observeAllMoviesUseCase =
-            ObserveAllMoviesUseCase(fakeMovieRepository, fetchMovieUseCase, dispatcher)
+                coEvery { fetchMoviesUseCase("fr-FR") } returns AppResult.Success(Unit)
 
-        runTest(dispatcher) {
-            launch { fakeMovieRepository.emitMovies(listOf(dummyMovie)) }
+                val result = ObserveAllMoviesUseCase(repository, fetchMoviesUseCase, dispatcher)
+                val flow = result(language = "fr-FR")
 
-            observeAllMoviesUseCase(Parameters.StringParam("fr")).test {
-                awaitItem() shouldBe Result.Success(
-                    ObserveAllMoviesSuccess.Success(
-                        listOf(
-                            dummyMovie
-                        )
-                    )
-                )
-                cancelAndIgnoreRemainingEvents()
+                flow.test {
+                    repository.tryEmit(emptyList())
+                    advanceUntilIdle()
+
+                    val item = awaitItem()
+                    item.shouldBeInstanceOf<AppResult.Success<ObserveAllMoviesSuccess>>()
+                    item.data shouldBe ObserveAllMoviesSuccess.DataLoadedInDB
+
+                    coVerify(exactly = 1) { fetchMoviesUseCase("fr-FR") }
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+        }
+
+        test("fetchMoviesUseCase KO -> emit Failure") {
+            runTest(dispatcher) {
+                val repository = FakeMovieRepository()
+                val fetchMoviesUseCase = mockk<FetchMoviesUseCase>()
+
+                coEvery { fetchMoviesUseCase("fr-FR") } returns AppResult.Failure(AppError.Network.Timeout)
+
+                val result = ObserveAllMoviesUseCase(repository, fetchMoviesUseCase, dispatcher)
+                val flow = result(language = "fr-FR")
+
+                flow.test {
+                    repository.tryEmit(emptyList())
+                    advanceUntilIdle()
+
+                    val item = awaitItem()
+                    item.shouldBeInstanceOf<AppResult.Failure<Any>>()
+                    item.error shouldBe AppError.Network.Timeout
+
+                    cancelAndIgnoreRemainingEvents()
+                }
             }
         }
     }
 
-    test("should emit Loading then DataLoadedInDB when DB is empty and fetch succeeds") {
-        val fakeMovieRepository = FakeMovieRepository(emptyList())
-        val fetchMovieUseCase = FetchMoviesUseCase(fakeMovieRepository)
-        val observeAllMoviesUseCase =
-            ObserveAllMoviesUseCase(fakeMovieRepository, fetchMovieUseCase, dispatcher)
+    context("with data") {
+        test("emit Success(movies) -> fetch not called") {
+            runTest(dispatcher) {
+                val repository = FakeMovieRepository()
+                val fetchMoviesUseCase = mockk<FetchMoviesUseCase>(relaxed = true)
 
-        runTest(dispatcher) {
-            launch { fakeMovieRepository.emitMovies(emptyList()) }
+                val result = ObserveAllMoviesUseCase(repository, fetchMoviesUseCase, dispatcher)
+                val flow = result(language = "fr-FR")
 
-            observeAllMoviesUseCase(Parameters.StringParam("en")).test {
-                awaitItem() shouldBe Result.Success(ObserveAllMoviesSuccess.Loading)
-                awaitItem() shouldBe Result.Success(ObserveAllMoviesSuccess.DataLoadedInDB)
-                cancelAndIgnoreRemainingEvents()
+                val mockOne = mockk<MovieDomainModel>(relaxed = true)
+                val mockTwo = mockk<MovieDomainModel>(relaxed = true)
+                val movies = listOf(mockOne, mockTwo)
+
+                flow.test {
+                    repository.tryEmit(movies)
+                    advanceUntilIdle()
+
+                    val item = awaitItem()
+                    item.shouldBeInstanceOf<AppResult.Success<ObserveAllMoviesSuccess>>()
+                    item.data shouldBe ObserveAllMoviesSuccess.Success(movies)
+
+                    coVerify(exactly = 0) { fetchMoviesUseCase(any()) }
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+        }
+
+        test("distinctUntilChanged -> same non empty-list emitted twice -> one Success and no fetch") {
+            runTest(dispatcher) {
+                val repository = FakeMovieRepository()
+                val fetchMoviesUseCase = mockk<FetchMoviesUseCase>(relaxed = true)
+
+                val result = ObserveAllMoviesUseCase(repository, fetchMoviesUseCase, dispatcher)
+                val flow = result(language = "fr-FR")
+
+                val mockOne = mockk<MovieDomainModel>(relaxed = true)
+                val movies = listOf(mockOne)
+
+                flow.test {
+                    repository.tryEmit(movies)
+                    advanceUntilIdle()
+
+                    val firstItem = awaitItem()
+                    firstItem shouldBe AppResult.Success(ObserveAllMoviesSuccess.Success(movies))
+
+                    repository.tryEmit(movies)
+                    advanceUntilIdle()
+
+                    expectNoEvents()
+
+                    coVerify(exactly = 0) { fetchMoviesUseCase(any()) }
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+        }
+
+        test("distinctUntilChanged: two consecutive empty lists -> fetch called once only") {
+            runTest(dispatcher) {
+                val repository = FakeMovieRepository()
+                val fetchMoviesUseCase = mockk<FetchMoviesUseCase>()
+                coEvery { fetchMoviesUseCase("fr-FR") } returns AppResult.Success(Unit)
+
+                val result = ObserveAllMoviesUseCase(repository, fetchMoviesUseCase, dispatcher)
+                val flow = result(language = "fr-FR")
+
+                flow.test {
+                    repository.tryEmit(emptyList())
+                    advanceUntilIdle()
+                    awaitItem() shouldBe AppResult.Success(ObserveAllMoviesSuccess.DataLoadedInDB)
+
+                    repository.tryEmit(emptyList())
+                    advanceUntilIdle()
+                    expectNoEvents()
+
+                    coVerify(exactly = 1) { fetchMoviesUseCase("fr-FR") }
+                    cancelAndIgnoreRemainingEvents()
+                }
             }
         }
     }
 
-    test("should emit Loading then Failure when DB is empty and fetch fails") {
-        val fakeMovieRepository = FakeMovieRepository(emptyList())
-        fakeMovieRepository.setFetchResult(Result.Failure(MovieErrors.NetworkErrorHMM("No connection")))
-
-        val fetchMovieUseCase = FetchMoviesUseCase(fakeMovieRepository)
-        val observeAllMoviesUseCase =
-            ObserveAllMoviesUseCase(fakeMovieRepository, fetchMovieUseCase, dispatcher)
-
-        runTest(dispatcher) {
-            launch { fakeMovieRepository.emitMovies(emptyList()) }
-
-            observeAllMoviesUseCase(Parameters.StringParam("en")).test {
-                awaitItem() shouldBe Result.Success(ObserveAllMoviesSuccess.Loading)
-                val result = awaitItem()
-
-                result.shouldBeInstanceOf<Result.Failure>()
-                (result.error as? ObserveAllMoviesErrors.NetworkErrorHMM)?.networkErrorMessage shouldBe "No connection"
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
-    }
 })
