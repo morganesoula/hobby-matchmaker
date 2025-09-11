@@ -1,225 +1,290 @@
 package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote
 
-import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.fakes.FakeAuthManager
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.LogOutErrorHMM
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SocialMediaErrorHMM
-import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
+import com.msoula.hobbymatchmaker.core.authentication.data.models.AuthFirebaseUser
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import dev.gitlive.firebase.auth.AuthCredential
 import dev.gitlive.firebase.auth.AuthResult
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.FirebaseUser
+import dev.gitlive.firebase.auth.UserInfo
+import dev.gitlive.firebase.firestore.CollectionReference
+import dev.gitlive.firebase.firestore.DocumentReference
+import dev.gitlive.firebase.firestore.DocumentSnapshot
 import dev.gitlive.firebase.firestore.FirebaseFirestore
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
+import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import java.io.IOException
 
 class AuthenticationRemoteDataSourceImplTest : FunSpec({
-    val dispatcher = StandardTestDispatcher()
-    val auth = mockk<FirebaseAuth>(relaxed = true)
-    val firestore = mockk<FirebaseFirestore>()
-    val authManager = FakeAuthManager()
-    val dataSource = AuthenticationRemoteDataSourceImpl(auth, firestore, authManager)
+    var auth: FirebaseAuth = mockk(relaxed = true)
+    var firestore: FirebaseFirestore = mockk(relaxed = true)
+    var authManager: AuthManager = mockk(relaxed = true)
+    lateinit var dataSource: AuthenticationRemoteDataSource
 
-    context("signOut") {
-        test("authenticationSignOut should return success") {
-            runTest(dispatcher) {
-                authManager.signOutResult = Result.Success(true)
-                val result = dataSource.authenticationSignOut()
-                result shouldBe Result.Success(true)
-            }
-        }
+    var collection: CollectionReference = mockk(relaxed = true)
+    var document: DocumentReference = mockk(relaxed = true)
+    var snapshot: DocumentSnapshot = mockk(relaxed = true)
 
-        test("authenticationSignOut should handle exception") {
-            runTest(dispatcher) {
-                authManager.shouldThrow = true
-                val result = dataSource.authenticationSignOut()
-                result shouldBe Result.Failure(LogOutErrorHMM.UnknownErrorHMM("Some unexpected exception"))
-            }
+    var user: FirebaseUser = mockk(relaxed = true)
+    var user2: FirebaseUser = mockk(relaxed = true)
+    var authResult: AuthResult = mockk(relaxed = true)
+    var credential: AuthCredential = mockk(relaxed = true)
+
+    beforeTest {
+        MockKAnnotations.init(this)
+
+        dataSource = AuthenticationRemoteDataSourceImpl(
+            auth, firestore, authManager
+        )
+    }
+
+    test("authenticationSignOut forwards to AuthManager and returns its result") {
+        runTest {
+            coEvery { authManager.signOut() } returns AppResult.Success(Unit)
+
+            val res = dataSource.authenticationSignOut()
+
+            res.shouldBeInstanceOf<AppResult.Success<Unit>>()
+            coVerify(exactly = 1) { authManager.signOut() }
         }
     }
 
-    context("signIn") {
-        test("signInWithCredentials should return success") {
-            runTest(dispatcher) {
-                val result = dataSource.signInWithCredentials(mockk(), ProviderType.GOOGLE)
-                result shouldBe Result.Success(
-                    FirebaseUserInfoDomainModel(
-                        "uid",
-                        "email@fake.com",
-                        listOf("google.com")
-                    )
+    test("signInWithCredentials forwards to AuthManager.signIn(provider, credential)") {
+        runTest {
+            val expected = AuthFirebaseUser(
+                uid = "u123",
+                email = "e@acme.io",
+                providers = listOf("google.com")
+            )
+            coEvery {
+                authManager.signIn(
+                    ProviderType.GOOGLE,
+                    credential
                 )
-            }
+            } returns AppResult.Success(expected)
+
+            val res = dataSource.signInWithCredentials(credential, ProviderType.GOOGLE)
+
+            res.shouldBeInstanceOf<AppResult.Success<AuthFirebaseUser?>>()
+            res.data shouldBe expected
+            coVerify(exactly = 1) { authManager.signIn(ProviderType.GOOGLE, credential) }
         }
     }
 
-    context("linkWithCredential") {
-        test("linkWithCredential should return success") {
-            runTest(dispatcher) {
-                val credential = mockk<AuthCredential>()
-                val user = mockk<FirebaseUser> {
-                    every { uid } returns "123"
-                    every { email } returns "user@example.com"
-                    every { providerData } returns emptyList()
-                }
+    test("linkWithCredential returns Unauthorized when currentUser is null") {
+        runTest {
+            every { auth.currentUser } returns null
 
-                val authResult = mockk<AuthResult>()
-                every { authResult.user } returns user
+            val res = dataSource.linkWithCredential(credential)
 
-                val currentUser = mockk<FirebaseUser> {
-                    coEvery { linkWithCredential(credential) } returns authResult
-                }
-
-                every { auth.currentUser } returns currentUser
-
-                val result = dataSource.linkWithCredential(credential)
-                result shouldBe Result.Success(
-                    FirebaseUserInfoDomainModel(
-                        "123",
-                        "user@example.com",
-                        emptyList()
-                    )
-                )
-            }
-        }
-
-        test("linkWithCredential should return failure when user is null") {
-            runTest(dispatcher) {
-                val credential = mockk<AuthCredential>()
-                val authResult = mockk<AuthResult> {
-                    every { user } returns null
-                }
-                coEvery { auth.currentUser?.linkWithCredential(credential) } returns authResult
-
-                val result = dataSource.linkWithCredential(credential)
-                result shouldBe Result.Failure(SocialMediaErrorHMM.LinkWithCredentialsError)
-            }
-        }
-
-        test("linkWithCredential should return failure on exception") {
-            runTest(dispatcher) {
-                val credential = mockk<AuthCredential>()
-                coEvery { auth.currentUser?.linkWithCredential(credential) } throws Exception("fail")
-
-                val result = dataSource.linkWithCredential(credential)
-                result shouldBe Result.Failure(SocialMediaErrorHMM.LinkWithCredentialsError)
-            }
+            res.shouldBeInstanceOf<AppResult.Failure<AppError>>()
+            res.error shouldBe AppError.Domain.Unauthorized
+            coVerify(exactly = 0) { user.linkWithCredential(any()) }
         }
     }
 
-    context("createUserWithEmailAndPassword") {
-        test("createUserWithEmailAndPassword should return success") {
-            runTest(dispatcher) {
-                val mockAuthResult = mockk<AuthResult>()
-                val mockFirebaseUser = mockk<FirebaseUser>()
+    test("linkWithCredential links on current user and maps to AuthFirebaseUser") {
+        runTest {
+            every { auth.currentUser } returns user
+            coEvery { user.linkWithCredential(credential) } returns authResult
+            every { authResult.user } returns user2
+            every { user2.uid } returns "u42"
+            every { user2.email } returns "x@acme.io"
+            val infoGoogle = mockk<UserInfo> { every { providerId } returns "google.com" }
+            val infoFirebase = mockk<UserInfo> { every { providerId } returns "firebase" } // filtré
+            every { user2.providerData } returns listOf(infoFirebase, infoGoogle)
 
-                coEvery {
-                    auth.createUserWithEmailAndPassword(
-                        "test@example.com",
-                        "password"
-                    )
-                } returns mockAuthResult
+            val res = dataSource.linkWithCredential(credential)
 
-                every { auth.currentUser } returns mockFirebaseUser
-                every { mockFirebaseUser.uid } returns "uid123"
-
-                val result =
-                    dataSource.createUserWithEmailAndPassword("test@example.com", "password")
-                result shouldBe Result.Success("uid123")
-            }
+            res.shouldBeInstanceOf<AppResult.Success<AuthFirebaseUser?>>()
+            val data = res.data!!
+            data.uid shouldBe "u42"
+            data.email shouldBe "x@acme.io"
+            data.providers.shouldContainExactly(listOf("google.com")) // "firebase" filtré
+            coVerify(exactly = 1) { user.linkWithCredential(credential) }
         }
     }
 
+    test("createUserWithEmailAndPassword returns Success(uid) when user present") {
+        runTest {
+            coEvery { auth.createUserWithEmailAndPassword("a@b.com", "pwd") } returns authResult
+            every { authResult.user } returns user
+            every { user.uid } returns "uid-1"
 
-    context("signInWithEmailAndPassword") {
-        test("signInWithEmailAndPassword should return success") {
-            runTest(dispatcher) {
-                val user = mockk<FirebaseUser>()
-                every { user.uid } returns "uid456"
+            val res = dataSource.createUserWithEmailAndPassword("a@b.com", "pwd")
 
-                val resultAuth = mockk<AuthResult>()
-                every { resultAuth.user } returns user
-
-                coEvery {
-                    auth.signInWithEmailAndPassword(
-                        "test@example.com",
-                        "password"
-                    )
-                } returns resultAuth
-
-                val result = dataSource.signInWithEmailAndPassword("test@example.com", "password")
-                result shouldBe Result.Success("uid456")
-            }
-        }
-
-        test("signInWithEmailAndPassword should throw if user is null") {
-            runTest(dispatcher) {
-                val resultAuth = mockk<AuthResult> {
-                    every { user } returns null
-                }
-                coEvery {
-                    auth.signInWithEmailAndPassword(
-                        "test@example.com",
-                        "password"
-                    )
-                } returns resultAuth
-
-                shouldThrow<Error> {
-                    dataSource.signInWithEmailAndPassword("test@example.com", "password")
-                }
-            }
+            res.shouldBeInstanceOf<AppResult.Success<String>>()
+            res.data shouldBe "uid-1"
         }
     }
 
-    context("resetPassword") {
-        test("resetPassword should return success") {
-            runTest(dispatcher) {
-                coEvery { auth.sendPasswordResetEmail("test@example.com") } returns Unit
+    test("createUserWithEmailAndPassword with missing user maps IllegalStateException to Authentication.Unknown") {
+        runTest {
+            coEvery { auth.createUserWithEmailAndPassword(any(), any()) } returns authResult
+            every { authResult.user } returns null
 
-                val result = dataSource.resetPassword("test@example.com")
-                result shouldBe Result.Success(true)
-            }
+            val res = dataSource.createUserWithEmailAndPassword("a@b.com", "pwd")
+
+            res.shouldBeInstanceOf<AppResult.Failure<AppError>>()
+            res.error shouldBe AppError.Authentication.Unknown
         }
     }
 
-    context("getUserUid") {
-        test("getUserUid should return uid") {
-            runTest(dispatcher) {
-                every { auth.currentUser?.uid } returns "uid789"
-                val result = dataSource.getUserUid()
-                result shouldBe "uid789"
-            }
+    test("signInWithEmailAndPassword returns Success(uid) when user present") {
+        runTest {
+            coEvery { auth.signInWithEmailAndPassword("a@b.com", "pwd") } returns authResult
+            every { authResult.user } returns user
+            every { user.uid } returns "uid-2"
+
+            val res = dataSource.signInWithEmailAndPassword("a@b.com", "pwd")
+
+            res.shouldBeInstanceOf<AppResult.Success<String>>()
+            res.data shouldBe "uid-2"
         }
     }
 
-    context("isFirstSignIn") {
-        test("isFirstSignIn should return true when uid is empty") {
-            runTest(dispatcher) {
-                val result = dataSource.isFirstSignIn("")
-                result shouldBe true
-            }
+    test("signInWithEmailAndPassword with missing user maps IllegalStateException to Authentication.Unknown") {
+        runTest {
+            coEvery { auth.signInWithEmailAndPassword(any(), any()) } returns authResult
+            every { authResult.user } returns null
+
+            val res = dataSource.signInWithEmailAndPassword("a@b.com", "pwd")
+
+            res.shouldBeInstanceOf<AppResult.Failure<AppError>>()
+            res.error shouldBe AppError.Authentication.Unknown
         }
     }
 
-    context("fetchFirebaseUserInfo") {
-        test("fetchFirebaseUserInfo should return domain model") {
-            runTest(dispatcher) {
-                val user = mockk<FirebaseUser> {
-                    every { uid } returns "123"
-                    every { email } returns "email@fake.com"
-                    every { providerData } returns emptyList()
-                }
-                every { auth.currentUser } returns user
+    test("resetPassword success returns Success(Unit)") {
+        runTest {
+            coEvery { auth.sendPasswordResetEmail("u@acme.io") } returns Unit
 
-                val result = dataSource.fetchFirebaseUserInfo()
-                result shouldBe FirebaseUserInfoDomainModel("123", "email@fake.com", emptyList())
-            }
+            val res = dataSource.resetPassword("u@acme.io")
+
+            res.shouldBeInstanceOf<AppResult.Success<Unit>>()
+        }
+    }
+
+    test("resetPassword IOException maps to Network.Unreachable") {
+        runTest {
+            coEvery { auth.sendPasswordResetEmail(any()) } throws IOException("net")
+
+            val res = dataSource.resetPassword("x@y.z")
+
+            res.shouldBeInstanceOf<AppResult.Failure<AppError>>()
+            res.error shouldBe AppError.Network.Unreachable
+        }
+    }
+
+    test("getUserUid returns null when no currentUser") {
+        runTest {
+            every { auth.currentUser } returns null
+
+            val uid = dataSource.getUserUid()
+
+            uid.shouldBeNull()
+        }
+    }
+
+    test("getUserUid returns currentUser.uid when present") {
+        runTest {
+            every { auth.currentUser } returns user
+            every { user.uid } returns "u-777"
+
+            val uid = dataSource.getUserUid()
+
+            uid shouldBe "u-777"
+        }
+    }
+
+    test("isFirstSignIn returns Success(true) when uid is blank") {
+        runTest {
+            val res = dataSource.isFirstSignIn("")
+
+            res.shouldBeInstanceOf<AppResult.Success<Boolean>>()
+            res.data shouldBe true
+        }
+    }
+
+    test("isFirstSignIn checks Firestore: exists=false => true") {
+        runTest {
+            every { firestore.collection("users") } returns collection
+            every { collection.document("u1") } returns document
+            coEvery { document.get() } returns snapshot
+            every { snapshot.exists } returns false
+
+            val res = dataSource.isFirstSignIn("u1")
+
+            res.shouldBeInstanceOf<AppResult.Success<Boolean>>()
+            res.data shouldBe true
+        }
+    }
+
+    test("isFirstSignIn checks Firestore: exists=true => false") {
+        runTest {
+            every { firestore.collection("users") } returns collection
+            every { collection.document("u2") } returns document
+            coEvery { document.get() } returns snapshot
+            every { snapshot.exists } returns true
+
+            val res = dataSource.isFirstSignIn("u2")
+
+            res.shouldBeInstanceOf<AppResult.Success<Boolean>>()
+            res.data shouldBe false
+        }
+    }
+
+    test("isFirstSignIn maps Firestore get() IOException to Network.Unreachable") {
+        runTest {
+            every { firestore.collection("users") } returns collection
+            every { collection.document("u3") } returns document
+            coEvery { document.get() } throws IOException("io")
+
+            val res = dataSource.isFirstSignIn("u3")
+
+            res.shouldBeInstanceOf<AppResult.Failure<AppError>>()
+            res.error shouldBe AppError.Network.Unreachable
+        }
+    }
+
+    test("fetchFirebaseUserInfo returns Success(null) when no current user") {
+        runTest {
+            every { auth.currentUser } returns null
+
+            val res = dataSource.fetchFirebaseUserInfo()
+
+            res.shouldBeInstanceOf<AppResult.Success<AuthFirebaseUser?>>()
+            res.data shouldBe null
+        }
+    }
+
+    test("fetchFirebaseUserInfo returns mapped AuthFirebaseUser when current user present") {
+        runTest {
+            every { auth.currentUser } returns user
+            every { user.uid } returns "U9"
+            every { user.email } returns "u9@acme.io"
+            val infoEmail = mockk<UserInfo> { every { providerId } returns "password" }
+            val infoFirebase = mockk<UserInfo> { every { providerId } returns "firebase" }
+            every { user.providerData } returns listOf(infoFirebase, infoEmail)
+
+            val res = dataSource.fetchFirebaseUserInfo()
+
+            res.shouldBeInstanceOf<AppResult.Success<AuthFirebaseUser?>>()
+            val data = res.data!!
+            data.uid shouldBe "U9"
+            data.email shouldBe "u9@acme.io"
+            data.providers.shouldContainExactly(listOf("password"))
         }
     }
 })

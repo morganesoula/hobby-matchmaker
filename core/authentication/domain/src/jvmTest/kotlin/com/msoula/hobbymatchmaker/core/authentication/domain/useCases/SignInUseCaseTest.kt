@@ -1,101 +1,86 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.useCases
 
-import com.msoula.hobbymatchmaker.core.authentication.domain.fakes.FakeAuthenticationRepository
-import com.msoula.hobbymatchmaker.core.authentication.domain.fakes.FakeSessionRepository
+import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepository
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetIsConnectedUseCase
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import io.mockk.Runs
+import io.kotest.matchers.types.shouldBeInstanceOf
+import io.mockk.MockKAnnotations
 import io.mockk.coEvery
-import io.mockk.just
+import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SignInUseCaseTest : FunSpec({
+    lateinit var repo: AuthenticationRepository
+    lateinit var setIsConnected: SetIsConnectedUseCase
+    lateinit var useCase: SignInUseCase
 
-    val dispatcher = StandardTestDispatcher()
-    val testEmail = "john.doe@example.com"
-    val testPassword = "password123"
+    beforeTest {
+        MockKAnnotations.init(this)
+        repo = mockk()
+        setIsConnected = mockk()
+        useCase = SignInUseCase(
+            authenticationRepository = repo,
+            setIsConnectedUseCase = setIsConnected
+        )
+    }
 
-    val fakeSessionRepository = FakeSessionRepository()
-    val fakeAuthenticationRepository = FakeAuthenticationRepository(fakeSessionRepository)
-    val fakeSetIsConnectedUseCase = mockk<SetIsConnectedUseCase>()
-    val useCase = SignInUseCase(dispatcher, fakeAuthenticationRepository, fakeSetIsConnectedUseCase)
+    test("repository Failure -> propagates error; setIsConnected not called") {
+        runTest {
+            coEvery {
+                repo.signInWithEmailAndPassword(
+                    "u@acme.io",
+                    "bad"
+                )
+            } returns AppResult.Failure(AppError.Domain.Unauthorized)
 
-    test("should emit Success when sign-in is successful") {
-        runTest(dispatcher) {
-            coEvery { fakeSetIsConnectedUseCase(any()) } just Runs
-            val results =
-                useCase.execute(Parameters.DoubleStringParam(testEmail, testPassword)).toList()
+            val res = useCase(Parameters.DoubleStringParam("u@acme.io", "bad"))
 
-            advanceUntilIdle()
-
-            results shouldBe listOf(
-                Result.Loading,
-                Result.Success(SignInSuccess)
-            )
+            res.shouldBeInstanceOf<AppResult.Failure<AppError>>()
+            res.error shouldBe AppError.Domain.Unauthorized
+            coVerify(exactly = 0) { setIsConnected(true) }
         }
     }
 
-    test("should emit Failure.WrongPassword when password is empty") {
-        runTest(dispatcher) {
-            val results =
-                useCase.execute(Parameters.DoubleStringParam(testEmail, "")).toList()
+    test("repository Success then setIsConnected Failure -> propagates set error") {
+        runTest {
+            coEvery {
+                repo.signInWithEmailAndPassword("u@acme.io", "pwd")
+            } returns
+                AppResult.Success("UID-1")
 
-            advanceUntilIdle()
+            coEvery {
+                setIsConnected(true)
+            } returns
+                AppResult.Failure(AppError.Storage.WriteFailed)
 
-            results shouldBe listOf(
-                Result.Loading,
-                Result.Failure(SignInErrorHMM.WrongPassword)
-            )
+            val res = useCase(Parameters.DoubleStringParam("u@acme.io", "pwd"))
+
+            res.shouldBeInstanceOf<AppResult.Failure<AppError>>()
+            res.error shouldBe AppError.Storage.WriteFailed
+            coVerify(exactly = 1) { setIsConnected(true) }
         }
     }
 
-    test("should emit Failure.UserNotFound when email is empty") {
-        runTest(dispatcher) {
-            val results =
-                useCase.execute(Parameters.DoubleStringParam("", testPassword)).toList()
+    test("repository Success and setIsConnected Success -> Success(SignInSuccess)") {
+        runTest {
+            coEvery {
+                repo.signInWithEmailAndPassword("u@acme.io", "pwd")
+            } returns AppResult.Success("UID-2")
 
-            advanceUntilIdle()
+            coEvery { setIsConnected(true) } returns AppResult.Success(Unit)
 
-            results shouldBe listOf(
-                Result.Loading,
-                Result.Failure(SignInErrorHMM.UserNotFound)
-            )
-        }
-    }
+            val res = useCase(Parameters.DoubleStringParam("u@acme.io", "pwd"))
 
-    test("should emit Failure.UserDisabled when email && password are empty") {
-        runTest(dispatcher) {
-            val results =
-                useCase.execute(Parameters.DoubleStringParam("", "")).toList()
-
-            advanceUntilIdle()
-
-            results shouldBe listOf(
-                Result.Loading,
-                Result.Failure(SignInErrorHMM.UserDisabled)
-            )
-        }
-    }
-
-    test("should emit Failure.Other when email is unknown error") {
-        runTest(dispatcher) {
-            val results =
-                useCase.execute(Parameters.DoubleStringParam("unknown error", testPassword)).toList()
-
-            advanceUntilIdle()
-
-            results shouldBe listOf(
-                Result.Loading,
-                Result.Failure(SignInErrorHMM.Other("Weird error message"))
-            )
+            res.shouldBeInstanceOf<AppResult.Success<SignInSuccess>>()
+            res.data shouldBe SignInSuccess
+            coVerify(exactly = 1) { setIsConnected(true) }
         }
     }
 })

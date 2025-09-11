@@ -1,111 +1,96 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.useCases
 
-import com.msoula.hobbymatchmaker.core.authentication.domain.fakes.FakeAuthenticationRepository
-import com.msoula.hobbymatchmaker.core.authentication.domain.fakes.FakeSessionRepository
+import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepository
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Parameters
+import com.msoula.hobbymatchmaker.core.session.domain.models.SessionUserDomainModel
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.CreateUserUseCase
-import io.kotest.core.spec.style.StringSpec
+import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SignUpUseCaseTest : StringSpec({
+class SignUpUseCaseTest : FunSpec({
+    lateinit var repo: AuthenticationRepository
+    lateinit var createUser: CreateUserUseCase
+    lateinit var useCase: SignUpUseCase
 
-    val testEmail = "john.doe@example.com"
-    val testPassword = "password123"
+    beforeTest {
+        MockKAnnotations.init(this)
+        repo = mockk()
+        createUser = mockk()
+        useCase = SignUpUseCase(
+            authenticationRepository = repo,
+            createUserUseCase = createUser
+        )
+    }
 
-    val dispatcher = StandardTestDispatcher()
-    val fakeSessionRepository = FakeSessionRepository()
-    val fakeAuthenticationRepository = FakeAuthenticationRepository(fakeSessionRepository)
+    test("repository signUp Failure -> propagates error; createUser not called") {
+        runTest {
+            coEvery { repo.signUp("user@acme.io", "pwd") } returns
+                AppResult.Failure(AppError.Domain.Validation("Weak password"))
 
-    val createUserUseCase = CreateUserUseCase(fakeSessionRepository)
-    val useCase = SignUpUseCase(fakeAuthenticationRepository, createUserUseCase, dispatcher)
+            val res = useCase(Parameters.DoubleStringParam("user@acme.io", "pwd"))
 
-    "should emit Success when sign up is successful" {
-        runTest(dispatcher) {
-            val results =
-                useCase.execute(Parameters.DoubleStringParam(testEmail, testPassword)).toList()
-
-            advanceUntilIdle()
-
-            results shouldBe listOf(
-                Result.Loading,
-                Result.Success(SignUpSuccess("fakeUid"))
-            )
+            res.shouldBeInstanceOf<AppResult.Failure<AppError>>()
+            res.error shouldBe AppError.Domain.Validation("Weak password")
+            coVerify(exactly = 0) { createUser.invoke(any()) }
         }
     }
 
-    "should emit Failure.UserDisabled when email && password are empty" {
-        runTest(dispatcher) {
-            val results =
-                useCase.execute(Parameters.DoubleStringParam("", "")).toList()
+    test("repository Success then createUser Failure -> propagates createUser error") {
+        runTest {
+            coEvery { repo.signUp("user@acme.io", "pwd") } returns
+                AppResult.Success("U1")
+            coEvery {
+                createUser.invoke(
+                    SessionUserDomainModel(
+                        uid = "U1",
+                        email = "user@acme.io"
+                    )
+                )
+            } returns
+                AppResult.Failure(AppError.Storage.WriteFailed)
 
-            advanceUntilIdle()
+            val res = useCase(Parameters.DoubleStringParam("user@acme.io", "pwd"))
 
-            results shouldBe listOf(
-                Result.Loading,
-                Result.Failure(SignUpErrors.UserDisabled)
-            )
+            res.shouldBeInstanceOf<AppResult.Failure<AppError>>()
+            res.error shouldBe AppError.Storage.WriteFailed
+            coVerify(exactly = 1) {
+                createUser.invoke(SessionUserDomainModel(uid = "U1", email = "user@acme.io"))
+            }
         }
     }
 
-    "should emit Failure.InternalError when password only is empty" {
-        runTest(dispatcher) {
-            val results =
-                useCase.execute(Parameters.DoubleStringParam(testEmail, "")).toList()
+    test("repository Success and createUser Success -> Success(SignUpSuccess)") {
+        runTest {
+            coEvery { repo.signUp("user@acme.io", "pwd") } returns
+                AppResult.Success("U2")
+            coEvery {
+                createUser.invoke(
+                    SessionUserDomainModel(
+                        uid = "U2",
+                        email = "user@acme.io"
+                    )
+                )
+            } returns
+                AppResult.Success(Unit)
 
-            advanceUntilIdle()
+            val res = useCase(Parameters.DoubleStringParam("user@acme.io", "pwd"))
 
-            results shouldBe listOf(
-                Result.Loading,
-                Result.Failure(SignUpErrors.InternalErrorHMM)
-            )
+            res.shouldBeInstanceOf<AppResult.Success<SignUpSuccess>>()
+            res.data shouldBe SignUpSuccess
+            coVerify(exactly = 1) {
+                createUser.invoke(SessionUserDomainModel(uid = "U2", email = "user@acme.io"))
+            }
         }
     }
 
-    "should emit Failure.TooManyRequests when email only is empty" {
-        runTest(dispatcher) {
-            val results =
-                useCase.execute(Parameters.DoubleStringParam("", testPassword)).toList()
-
-            advanceUntilIdle()
-
-            results shouldBe listOf(
-                Result.Loading,
-                Result.Failure(SignUpErrors.TooManyRequests)
-            )
-        }
-    }
-
-    "should emit Failure.EmailAlreadyExists when email == password" {
-        runTest(dispatcher) {
-            val results =
-                useCase.execute(Parameters.DoubleStringParam(testEmail, testEmail)).toList()
-
-            advanceUntilIdle()
-
-            results shouldBe listOf(
-                Result.Loading,
-                Result.Failure(SignUpErrors.EmailAlreadyExists)
-            )
-        }
-    }
-
-    "should emit Failure.UnknownError when email == unknown error" {
-        runTest(dispatcher) {
-            val results =
-                useCase.execute(Parameters.DoubleStringParam("unknown error", testEmail)).toList()
-
-            advanceUntilIdle()
-
-            results shouldBe listOf(
-                Result.Loading,
-                Result.Failure(SignUpErrors.UnknownErrorHMM("Weird error message"))
-            )
-        }
-    }
 })

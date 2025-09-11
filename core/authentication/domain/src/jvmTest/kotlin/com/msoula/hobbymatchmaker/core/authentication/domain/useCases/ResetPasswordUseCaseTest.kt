@@ -1,73 +1,87 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.useCases
 
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ResetPasswordErrorHMM
-import com.msoula.hobbymatchmaker.core.authentication.domain.fakes.FakeAuthenticationRepository
-import com.msoula.hobbymatchmaker.core.authentication.domain.fakes.FakeSessionRepository
+import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepository
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Parameters
-import io.kotest.core.spec.style.StringSpec
+import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.confirmVerified
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class ResetPasswordUseCaseTest : StringSpec({
-    val dispatcher = StandardTestDispatcher()
-    val fakeSessionRepository = FakeSessionRepository()
-    val fakeAuthenticationRepository = FakeAuthenticationRepository(fakeSessionRepository)
-    val useCase = ResetPasswordUseCase(fakeAuthenticationRepository, dispatcher)
+class ResetPasswordUseCaseTest : FunSpec({
 
-    "should emit Success when reset password is successful" {
-        runTest(dispatcher) {
-            val results = useCase.execute(Parameters.StringParam("john.doe@example.com")).toList()
+    lateinit var repo: AuthenticationRepository
+    lateinit var useCase: ResetPasswordUseCase
 
-            advanceUntilIdle()
+    beforeTest {
+        MockKAnnotations.init(this)
+        repo = mockk()
+        useCase = ResetPasswordUseCase(authenticationRepository = repo)
+    }
 
-            results shouldBe listOf(
-                Result.Loading,
-                Result.Success(ResetPasswordSuccess)
-            )
+    test("blank email -> Failure(Validation('Email is required')) and repo not called") {
+        runTest {
+            val res = useCase(Parameters.StringParam("   "))
+
+            res.shouldBeInstanceOf<AppResult.Failure<AppError>>()
+            res.error shouldBe AppError.Domain.Validation("Email is required")
+            coVerify(exactly = 0) { repo.resetPassword(any()) }
+            confirmVerified(repo)
         }
     }
 
-    "should emit Failure.Other when email is empty" {
-        runTest(dispatcher) {
-            val results = useCase.execute(Parameters.StringParam("")).toList()
+    test("trims email then forwards to repository -> Success(Unit)") {
+        runTest {
+            coEvery { repo.resetPassword("user@acme.io") } returns AppResult.Success(Unit)
 
-            advanceUntilIdle()
+            val res = useCase(Parameters.StringParam("  user@acme.io  "))
 
-            results shouldBe listOf(
-                Result.Loading,
-                Result.Failure(ResetPasswordErrorHMM.Other)
-            )
+            res.shouldBeInstanceOf<AppResult.Success<Unit>>()
+            coVerify(exactly = 1) { repo.resetPassword("user@acme.io") }
         }
     }
 
-    "should emit Failure.TooManyRequests when email == too many requests" {
-        runTest(dispatcher) {
-            val results = useCase.execute(Parameters.StringParam("too many requests")).toList()
+    test("repo Failure(Unauthorized) -> maps to Success(Unit)") {
+        runTest {
+            coEvery { repo.resetPassword("u@acme.io") } returns AppResult.Failure(AppError.Domain.Unauthorized)
 
-            advanceUntilIdle()
+            val res = useCase(Parameters.StringParam("u@acme.io"))
 
-            results shouldBe listOf(
-                Result.Loading,
-                Result.Failure(ResetPasswordErrorHMM.TooManyRequests)
-            )
+            res.shouldBeInstanceOf<AppResult.Success<Unit>>()
+            coVerify(exactly = 1) { repo.resetPassword("u@acme.io") }
         }
     }
 
-    "should emit Failure.Connection when email == connection issue" {
-        runTest(dispatcher) {
-            val results = useCase.execute(Parameters.StringParam("connection issue")).toList()
+    test("repo Failure(Timeout) -> propagates Failure(Timeout)") {
+        runTest {
+            coEvery { repo.resetPassword("u@acme.io") } returns AppResult.Failure(AppError.Network.Timeout)
 
-            advanceUntilIdle()
+            val res = useCase(Parameters.StringParam("u@acme.io"))
 
-            results shouldBe listOf(
-                Result.Loading,
-                Result.Failure(ResetPasswordErrorHMM.Connection)
-            )
+            res.shouldBeInstanceOf<AppResult.Failure<AppError>>()
+            res.error shouldBe AppError.Network.Timeout
+            coVerify(exactly = 1) { repo.resetPassword("u@acme.io") }
+        }
+    }
+
+    test("repo Failure(Validation) -> propagates same Failure") {
+        runTest {
+            val err = AppError.Domain.Validation("Invalid email")
+            coEvery { repo.resetPassword("bad") } returns AppResult.Failure(err)
+
+            val res = useCase(Parameters.StringParam("bad"))
+
+            res.shouldBeInstanceOf<AppResult.Failure<AppError>>()
+            res.error shouldBe err
+            coVerify(exactly = 1) { repo.resetPassword("bad") }
         }
     }
 })
