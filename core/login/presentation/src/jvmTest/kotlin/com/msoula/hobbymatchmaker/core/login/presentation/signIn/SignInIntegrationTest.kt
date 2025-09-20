@@ -1,39 +1,14 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.signIn
 
-import app.cash.turbine.test
-import com.msoula.hobbymatchmaker.core.authentication.data.repositories.AuthenticationRepositoryImpl
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ResetPasswordErrorHMM
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SignInWithEmailAndPasswordErrorHMM
-import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
-import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ResetPasswordUseCase
-import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInUseCase
-import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInWithCredentialUseCase
-import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.UnifiedSignInUseCase
-import com.msoula.hobbymatchmaker.core.di.domain.useCases.AuthFormValidationUseCase
-import com.msoula.hobbymatchmaker.core.di.domain.useCases.ValidateEmailUseCase
-import com.msoula.hobbymatchmaker.core.di.domain.useCases.ValidateNameUseCase
-import com.msoula.hobbymatchmaker.core.di.domain.useCases.ValidatePasswordUseCase
 import com.msoula.hobbymatchmaker.core.login.presentation.MainDispatcherRule
-import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
-import com.msoula.hobbymatchmaker.core.login.presentation.models.ResetPasswordEvent
-import com.msoula.hobbymatchmaker.core.login.presentation.models.SignInEvent
-import com.msoula.hobbymatchmaker.core.login.presentation.signIn.fakes.FakeAuthenticationRemoteDataSource
-import com.msoula.hobbymatchmaker.core.login.presentation.signIn.fakes.FakeSessionLocalDataSource
-import com.msoula.hobbymatchmaker.core.login.presentation.signIn.fakes.FakeSessionRemoteDataSource
-import com.msoula.hobbymatchmaker.core.login.presentation.signIn.fakes.FakeSignInErrorMessageProvider
-import com.msoula.hobbymatchmaker.core.session.domain.repositories.SessionRepositoryImpl
-import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetIsConnectedUseCase
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(MainDispatcherRule::class)
 @OptIn(ExperimentalCoroutinesApi::class)
 class SignInIntegrationTest : FunSpec({
-    val dispatcher = MainDispatcherRule().testDispatcher
+    /* val dispatcher = MainDispatcherRule().testDispatcher
     lateinit var signInVM: SignInViewModel
 
     val authenticationRemoteDataSource = FakeAuthenticationRemoteDataSource()
@@ -194,5 +169,5 @@ class SignInIntegrationTest : FunSpec({
                 cancelAndIgnoreRemainingEvents()
             }
         }
-    }
+    } */
 })

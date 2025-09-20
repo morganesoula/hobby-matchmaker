@@ -1,433 +1,384 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.signIn
 
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.ResetPasswordErrorHMM
+import app.cash.turbine.test
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
-import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ResetPasswordSuccess
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ResetPasswordUseCase
-import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInErrorHMM
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInSuccess
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.UnifiedSignInUseCase
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.core.common.ErrorMessageMapper
+import com.msoula.hobbymatchmaker.core.common.Parameters
+import com.msoula.hobbymatchmaker.core.common.UIText
 import com.msoula.hobbymatchmaker.core.di.data.ValidationResult
 import com.msoula.hobbymatchmaker.core.di.domain.useCases.AuthFormValidationUseCase
-import com.msoula.hobbymatchmaker.core.di.domain.useCases.ValidateEmailUseCase
-import com.msoula.hobbymatchmaker.core.di.domain.useCases.ValidateNameUseCase
 import com.msoula.hobbymatchmaker.core.di.domain.useCases.ValidatePasswordUseCase
+import com.msoula.hobbymatchmaker.core.login.domain.useCases.ValidateEmailUseCase
+import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthUiEventModel
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.ResetPasswordEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.SignInEvent
-import com.msoula.hobbymatchmaker.core.login.presentation.signIn.fakes.FakeSignInErrorMessageProvider
+import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveShouldShowGuestDialogUseCase
+import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetShouldShowGuestDialogUseCase
+import dev.gitlive.firebase.auth.AuthCredential
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.booleans.shouldBeFalse
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.unmockkAll
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.TestCoroutineScheduler
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SignInViewModelTest : FunSpec({
-    val dispatcher = StandardTestDispatcher()
+    val scheduler = TestCoroutineScheduler()
+    val dispatcher = StandardTestDispatcher(scheduler)
+    val testScope = TestScope(dispatcher + Job())
 
-    val validatePasswordUseCase = mockk<ValidatePasswordUseCase>()
-    val validateEmailUseCase = mockk<ValidateEmailUseCase>()
-    val validateNameUseCase = mockk<ValidateNameUseCase>()
-    val authFormValidationUseCase = AuthFormValidationUseCase(
-        validateEmailUseCase = validateEmailUseCase,
-        validatePasswordUseCase = validatePasswordUseCase,
-        validateFirstNameUseCase = validateNameUseCase,
-        validateLastNameUseCase = validateNameUseCase
-    )
+    lateinit var authValidationUC: AuthFormValidationUseCase
+    val emailValidator = ValidateEmailUseCase()
+    val pwdValidator = ValidatePasswordUseCase()
+    lateinit var resetPasswordUC: ResetPasswordUseCase
+    lateinit var setGuestDialogUC: SetShouldShowGuestDialogUseCase
+    lateinit var observeGuestDialogUC: ObserveShouldShowGuestDialogUseCase
+    lateinit var unifiedSignInUC: UnifiedSignInUseCase
+    lateinit var googleClient: SocialUIClient
+    lateinit var appleClient: SocialUIClient
+    lateinit var facebookClient: SocialUIClient
+    lateinit var socialClients: Map<ProviderType, SocialUIClient>
+    lateinit var guestFlagFlow: MutableStateFlow<Boolean>
 
-    val resetPasswordUseCase = mockk<ResetPasswordUseCase>()
-    val unifiedSignInUseCase = mockk<UnifiedSignInUseCase>()
-    val socialClients = mapOf<ProviderType, SocialUIClient>()
-
-    afterTest {
-        clearAllMocks()
-    }
-
-    context("onEvent") {
-        test("should update email with new value") {
-            val signInVM = SignInViewModel(
-                authFormValidationUseCase, resetPasswordUseCase,
-                unifiedSignInUseCase, socialClients, dispatcher,
-                FakeSignInErrorMessageProvider()
-            )
-
-            every { validateEmailUseCase(any()) } returns ValidationResult(true)
-            every { validatePasswordUseCase.validateLoginPassword(any()) } returns ValidationResult(
-                true
-            )
-
-            signInVM.formDataFlow.value.email shouldBe ""
-            signInVM.onEvent(AuthenticationUIEvent.OnEmailChanged("test@test.fr"))
-            signInVM.formDataFlow.value.email shouldBe "test@test.fr"
-            signInVM.formDataFlow.value.submit shouldBe true
-        }
-
-        test("should update password with new value") {
-            val signInVM = SignInViewModel(
-                authFormValidationUseCase, resetPasswordUseCase,
-                unifiedSignInUseCase, socialClients, dispatcher,
-                FakeSignInErrorMessageProvider()
-            )
-
-            every { validateEmailUseCase(any()) } returns ValidationResult(true)
-            every { validatePasswordUseCase.validateLoginPassword(any()) } returns ValidationResult(
-                true
-            )
-
-            signInVM.formDataFlow.value.password shouldBe ""
-            signInVM.onEvent(AuthenticationUIEvent.OnPasswordChanged("newPassword"))
-            signInVM.formDataFlow.value.password shouldBe "newPassword"
-            signInVM.formDataFlow.value.submit shouldBe true
-        }
-
-        test("should reset email with new value") {
-            val signInVM = SignInViewModel(
-                authFormValidationUseCase, resetPasswordUseCase,
-                unifiedSignInUseCase, socialClients, dispatcher,
-                FakeSignInErrorMessageProvider()
-            )
-
-            every { validateEmailUseCase(any()) } returns ValidationResult(true)
-
-            signInVM.formDataFlow.value.emailReset shouldBe ""
-            signInVM.onEvent(AuthenticationUIEvent.OnEmailResetChanged("resetTest@test.fr"))
-            signInVM.formDataFlow.value.emailReset shouldBe "resetTest@test.fr"
-            signInVM.formDataFlow.value.submitEmailReset shouldBe true
-        }
-
-        test("should set openResetDialog value to reverse value") {
-            val signInVM = SignInViewModel(
-                authFormValidationUseCase, resetPasswordUseCase,
-                unifiedSignInUseCase, socialClients, dispatcher,
-                FakeSignInErrorMessageProvider()
-            )
-
-            signInVM.openResetDialog.value shouldBe false
-            signInVM.onEvent(AuthenticationUIEvent.OnForgotPasswordClicked)
-            signInVM.openResetDialog.value shouldBe true
-            signInVM.onEvent(AuthenticationUIEvent.HideForgotPasswordDialog)
-            signInVM.openResetDialog.value shouldBe false
-        }
-
-        test("should reset password with new value") {
-            runTest {
-                val testDispatcher = UnconfinedTestDispatcher(testScheduler)
-                Dispatchers.setMain(testDispatcher)
-
-                val signInVM = SignInViewModel(
-                    authFormValidationUseCase, resetPasswordUseCase,
-                    unifiedSignInUseCase, socialClients, testDispatcher,
-                    FakeSignInErrorMessageProvider()
-                )
-
-                every { validateEmailUseCase(any()) } returns
-                    ValidationResult(true)
-
-                every { resetPasswordUseCase(any()) } returns flowOf(
-                    Result.Success(ResetPasswordSuccess)
-                )
-
-                try {
-                    signInVM.onEvent(AuthenticationUIEvent.OnEmailResetChanged("test@test.fr"))
-                    signInVM.formDataFlow.value.emailReset shouldBe "test@test.fr"
-
-                    signInVM.onEvent(AuthenticationUIEvent.OnResetPasswordConfirmed)
-                    signInVM.formDataFlow.value.emailReset shouldBe ""
-                    signInVM.resetPasswordState.value shouldBe ResetPasswordEvent.Success
-                } finally {
-                    Dispatchers.resetMain()
-                }
-            }
+    val errorMapper = object : ErrorMessageMapper {
+        override fun toUIText(error: AppError): UIText {
+            return UIText.Plain("err")
         }
     }
 
-    context("resetSignInState") {
-        test("should reset signInState to Idle") {
-            val emailPasswordParam = UnifiedSignInUseCase.Params.EmailPassword(
-                "test@test.fr",
-                "123456"
-            )
+    fun pump() = scheduler.runCurrent()
+    fun elapse(ms: Long) {
+        scheduler.advanceTimeBy(ms)
+        scheduler.runCurrent()
+    }
 
-            runTest {
-                val testDispatcher = UnconfinedTestDispatcher(testScheduler)
-                Dispatchers.setMain(testDispatcher)
+    fun buildVM(): SignInViewModel {
+        authValidationUC = mockk(relaxed = true)
+        resetPasswordUC = mockk(relaxed = true)
+        setGuestDialogUC = mockk(relaxed = true)
 
-                val signInVM = SignInViewModel(
-                    authFormValidationUseCase, resetPasswordUseCase,
-                    unifiedSignInUseCase, socialClients, testDispatcher,
-                    FakeSignInErrorMessageProvider()
+        guestFlagFlow = MutableStateFlow(true)
+        observeGuestDialogUC = mockk {
+            every { this@mockk() } returns guestFlagFlow
+        }
+
+        unifiedSignInUC = mockk(relaxed = true)
+
+        googleClient = mockk(relaxed = true)
+        appleClient = mockk(relaxed = true)
+        facebookClient = mockk(relaxed = true)
+        socialClients = mapOf(
+            ProviderType.GOOGLE to googleClient,
+            ProviderType.APPLE to appleClient,
+            ProviderType.FACEBOOK to facebookClient
+        )
+
+        return SignInViewModel(
+            authFormValidationUseCases = authValidationUC,
+            resetPasswordUseCase = resetPasswordUC,
+            setShouldShowGuestDialogUseCase = setGuestDialogUC,
+            observeShouldShowGuestDialog = observeGuestDialogUC,
+            unifiedSignInUseCase = unifiedSignInUC,
+            socialClients = socialClients,
+            defaultErrorMessageMapper = errorMapper,
+            externalScope = testScope
+        )
+    }
+
+    beforeSpec { Dispatchers.setMain(dispatcher) }
+    afterSpec { Dispatchers.resetMain(); unmockkAll() }
+    beforeTest { clearAllMocks() }
+
+    test("initial states: signIn=Idle, reset=Idle, shouldShowGuestDialog=true") {
+        val vm = buildVM()
+        vm.signInState.value shouldBe SignInEvent.Idle
+        vm.resetPasswordState.value shouldBe ResetPasswordEvent.Idle
+        vm.shouldShowGuestDialog.value shouldBe true
+    }
+
+    test("validateInput sets submit=true when email & password valid") {
+        val vm = buildVM()
+
+        every { authValidationUC.validateEmailUseCase("mail@example.com") } returns ValidationResult(
+            true,
+            null
+        )
+
+        every { authValidationUC.validatePasswordUseCase.validateLoginPassword("Secret123") } returns ValidationResult(
+            true,
+            null
+        )
+
+        vm.onEvent(AuthenticationUIEvent.OnEmailChanged("mail@example.com  "))
+        vm.onEvent(AuthenticationUIEvent.OnPasswordChanged("Secret123  "))
+        pump()
+
+        vm.formDataFlow.value.submit.shouldBeTrue()
+        vm.formDataFlow.value.email shouldBe "mail@example.com"
+        vm.formDataFlow.value.password shouldBe "Secret123"
+    }
+
+    test("validateInput sets submit=false when password invalid") {
+        val vm = buildVM()
+
+        vm.onEvent(AuthenticationUIEvent.OnEmailChanged("mail@example.com"))
+        vm.onEvent(AuthenticationUIEvent.OnPasswordChanged("bad"))
+        pump()
+
+        vm.formDataFlow.value.submit.shouldBeFalse()
+    }
+
+    test("OnSignIn success -> emits OnSignInSuccess, state back to Idle; args are trimEnd-ed") {
+        val vm = buildVM()
+
+        coEvery { unifiedSignInUC.invoke(any()) } coAnswers {
+            delay(1)
+            AppResult.Success(SignInSuccess)
+        }
+
+        vm.onEvent(AuthenticationUIEvent.OnEmailChanged("mail@example.com  "))
+        vm.onEvent(AuthenticationUIEvent.OnPasswordChanged("Secret123  "))
+        pump()
+
+        vm.oneTimeEventChannelFlow.test {
+            vm.onEvent(AuthenticationUIEvent.OnSignIn)
+            pump()
+
+            vm.signInState.value shouldBe SignInEvent.Loading
+            scheduler.advanceTimeBy(1)
+            pump()
+
+            awaitItem() shouldBe AuthUiEventModel.OnSignInSuccess
+            vm.signInState.value shouldBe SignInEvent.Idle
+
+            coVerify(exactly = 1) {
+                unifiedSignInUC.invoke(
+                    UnifiedSignInUseCase.Params.EmailPassword("mail@example.com", "Secret123")
                 )
-
-                every { validateEmailUseCase(any()) } returns
-                    ValidationResult(true)
-
-                every { validatePasswordUseCase.validateLoginPassword(any()) } returns
-                    ValidationResult(true)
-
-                every { unifiedSignInUseCase.signIn(emailPasswordParam) } returns flowOf(
-                    Result.Failure(SignInErrorHMM.WrongPassword)
-                )
-
-                try {
-                    signInVM.signInState.value shouldBe SignInEvent.Idle
-
-                    signInVM.onEvent(AuthenticationUIEvent.OnEmailChanged("test@test.fr"))
-                    signInVM.onEvent(AuthenticationUIEvent.OnPasswordChanged("123456"))
-                    advanceUntilIdle()
-
-                    signInVM.onEvent(AuthenticationUIEvent.OnSignIn)
-                    advanceUntilIdle()
-
-                    signInVM.signInState.value shouldBe SignInEvent.Error("wrong password error")
-                    signInVM.circularProgressLoading.value shouldBe false
-                    signInVM.isSignIn shouldBe false
-
-                    signInVM.resetSignInState()
-                    signInVM.signInState.value shouldBe SignInEvent.Idle
-                } finally {
-                    Dispatchers.resetMain()
-                }
             }
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
-    context("resetPassword") {
-        test("should emit Error when resetPasswordUseCase fails") {
-            runTest {
-                val testDispatcher = UnconfinedTestDispatcher(testScheduler)
-                Dispatchers.setMain(testDispatcher)
+    test("OnSignIn failure -> emits ShowError(err), state back to Idle") {
+        val vm = buildVM()
 
-                val signInVM = SignInViewModel(
-                    authFormValidationUseCase, resetPasswordUseCase,
-                    unifiedSignInUseCase, socialClients, testDispatcher,
-                    FakeSignInErrorMessageProvider()
-                )
-
-                every { validateEmailUseCase("test@test.fr") } returns
-                    ValidationResult(true)
-                every { resetPasswordUseCase(any()) } returns flowOf(
-                    Result.Failure(
-                        ResetPasswordErrorHMM.Other
-                    )
-                )
-
-
-                try {
-                    signInVM.onEvent(
-                        AuthenticationUIEvent.OnEmailResetChanged(
-                            "test@test.fr"
-                        )
-                    )
-                    signInVM.onEvent(AuthenticationUIEvent.OnResetPasswordConfirmed)
-                    advanceUntilIdle()
-
-                    signInVM.resetPasswordState.value shouldBe ResetPasswordEvent.Error(
-                        "unknown error while resetting"
-                    )
-                } finally {
-                    Dispatchers.resetMain()
-                }
-            }
+        coEvery { unifiedSignInUC.invoke(any()) } coAnswers {
+            delay(1)
+            AppResult.Failure(AppError.Domain.Forbidden)
         }
 
-        test("should emit Loading when resetPasswordUseCase loads") {
-            runTest {
-                val testDispatcher = UnconfinedTestDispatcher(testScheduler)
-                Dispatchers.setMain(testDispatcher)
+        vm.onEvent(AuthenticationUIEvent.OnEmailChanged("mail@example.com"))
+        vm.onEvent(AuthenticationUIEvent.OnPasswordChanged("Secret123"))
+        pump()
 
-                val signInVM = SignInViewModel(
-                    authFormValidationUseCase, resetPasswordUseCase,
-                    unifiedSignInUseCase, socialClients, testDispatcher,
-                    FakeSignInErrorMessageProvider()
-                )
+        vm.oneTimeEventChannelFlow.test {
+            vm.onEvent(AuthenticationUIEvent.OnSignIn)
+            pump()
+            vm.signInState.value shouldBe SignInEvent.Loading
 
-                every { validateEmailUseCase("test@test.fr") } returns
-                    ValidationResult(true)
-                every { resetPasswordUseCase(any()) } returns flowOf(Result.Loading)
+            scheduler.advanceTimeBy(1); pump()
 
-                try {
-                    signInVM.onEvent(
-                        AuthenticationUIEvent.OnEmailResetChanged(
-                            "test@test.fr"
-                        )
-                    )
-                    signInVM.onEvent(AuthenticationUIEvent.OnResetPasswordConfirmed)
-                    advanceUntilIdle()
-
-                    signInVM.resetPasswordState.value shouldBe ResetPasswordEvent.Loading
-                } finally {
-                    Dispatchers.resetMain()
-                }
-            }
-        }
-
-        test("should not call useCase if email reset is wrong") {
-            runTest {
-                val testDispatcher = UnconfinedTestDispatcher(testScheduler)
-                Dispatchers.setMain(testDispatcher)
-
-                val signInVM = SignInViewModel(
-                    authFormValidationUseCase, resetPasswordUseCase,
-                    unifiedSignInUseCase, socialClients, testDispatcher,
-                    FakeSignInErrorMessageProvider()
-                )
-
-                every { validateEmailUseCase(any()) } returns ValidationResult()
-
-                try {
-                    signInVM.onEvent(
-                        AuthenticationUIEvent.OnEmailResetChanged(
-                            "test@test.fr"
-                        )
-                    )
-                    signInVM.onEvent(AuthenticationUIEvent.OnResetPasswordConfirmed)
-                    advanceUntilIdle()
-
-                    verify(exactly = 0) { resetPasswordUseCase(any()) }
-                    signInVM.resetPasswordState.value shouldBe ResetPasswordEvent.Idle
-                } finally {
-                    Dispatchers.resetMain()
-                }
-            }
+            val ev = awaitItem() as AuthUiEventModel.ShowError
+            (ev.error as UIText.Plain).value shouldBe "err"
+            vm.signInState.value shouldBe SignInEvent.Idle
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
-    context("signInUnified") {
-        test("should emit Success when signing in") {
-            runTest {
-                val testDispatcher = UnconfinedTestDispatcher(testScheduler)
-                Dispatchers.setMain(testDispatcher)
+    test("Forgot password dialog toggles openResetDialog") {
+        val vm = buildVM()
+        vm.openResetDialog.value shouldBe false
 
-                val signInVM = SignInViewModel(
-                    authFormValidationUseCase, resetPasswordUseCase,
-                    unifiedSignInUseCase, socialClients, testDispatcher,
-                    FakeSignInErrorMessageProvider()
-                )
+        vm.onEvent(AuthenticationUIEvent.OnForgotPasswordClicked)
+        vm.openResetDialog.value shouldBe true
 
-                every { validateEmailUseCase(any()) } returns ValidationResult(true)
-                every { validatePasswordUseCase.validateLoginPassword(any()) } returns
-                    ValidationResult(true)
+        vm.onEvent(AuthenticationUIEvent.HideForgotPasswordDialog)
+        vm.openResetDialog.value shouldBe false
+    }
 
-                every { unifiedSignInUseCase.signIn(any()) } returns flowOf(
-                    Result.Success(
-                        SignInSuccess
-                    )
-                )
+    test("ResetPassword: ignored when submitEmailReset=false") {
+        val vm = buildVM()
+        every { authValidationUC.validateEmailUseCase("bad") } returns ValidationResult(
+            false,
+            1
+        )
 
-                try {
-                    signInVM.onEvent(AuthenticationUIEvent.OnEmailChanged("test@test.fr"))
-                    signInVM.onEvent(AuthenticationUIEvent.OnPasswordChanged("123456"))
-                    signInVM.onEvent(AuthenticationUIEvent.OnSignIn)
-                    advanceUntilIdle()
+        vm.onEvent(AuthenticationUIEvent.OnEmailResetChanged("bad"))
+        pump()
 
-                    signInVM.signInState.value shouldBe SignInEvent.Success
-                    signInVM.circularProgressLoading.value shouldBe false
-                    signInVM.isSignIn shouldBe false
-                } finally {
-                    Dispatchers.resetMain()
-                }
-            }
+        vm.oneTimeEventChannelFlow.test {
+            vm.onEvent(AuthenticationUIEvent.OnResetPasswordConfirmed)
+            pump()
+            vm.resetPasswordState.value shouldBe ResetPasswordEvent.Idle
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+        coVerify(exactly = 0) { resetPasswordUC.invoke(any()) }
+    }
+
+    test("ResetPassword success -> Loading then Success event + clears emailReset + Idle") {
+        val vm = buildVM()
+        every { authValidationUC.validateEmailUseCase("mail@example.com") } returns ValidationResult(
+            true,
+            null
+        )
+        coEvery { resetPasswordUC.invoke(any()) } coAnswers {
+            delay(1)
+            AppResult.Success(Unit)
         }
 
-        test("should emit Loading when waiting") {
-            runTest {
-                val testDispatcher = UnconfinedTestDispatcher(testScheduler)
-                Dispatchers.setMain(testDispatcher)
+        vm.onEvent(AuthenticationUIEvent.OnEmailResetChanged("mail@example.com"))
+        pump()
 
-                val signInVM = SignInViewModel(
-                    authFormValidationUseCase, resetPasswordUseCase,
-                    unifiedSignInUseCase, socialClients, testDispatcher,
-                    FakeSignInErrorMessageProvider()
-                )
+        vm.oneTimeEventChannelFlow.test {
+            vm.onEvent(AuthenticationUIEvent.OnResetPasswordConfirmed)
+            pump()
+            vm.resetPasswordState.value shouldBe ResetPasswordEvent.Loading
 
-                every { validateEmailUseCase(any()) } returns ValidationResult(true)
-                every { validatePasswordUseCase.validateLoginPassword(any()) } returns
-                    ValidationResult(true)
-                every { unifiedSignInUseCase.signIn(any()) } returns flowOf(Result.Loading)
+            scheduler.advanceTimeBy(1); pump()
 
-                try {
-                    signInVM.onEvent(AuthenticationUIEvent.OnEmailChanged("test@test.fr"))
-                    signInVM.onEvent(AuthenticationUIEvent.OnPasswordChanged("123456"))
-                    signInVM.onEvent(AuthenticationUIEvent.OnSignIn)
-                    advanceUntilIdle()
+            awaitItem() shouldBe AuthUiEventModel.OnResetPasswordSuccess
+            vm.resetPasswordState.value shouldBe ResetPasswordEvent.Idle
+            vm.formDataFlow.value.emailReset shouldBe ""
+            cancelAndIgnoreRemainingEvents()
+        }
 
-                    signInVM.circularProgressLoading.value shouldBe true
-                    signInVM.signInState.value shouldBe SignInEvent.Loading
-                } finally {
-                    Dispatchers.resetMain()
-                }
-            }
+        coVerify {
+            resetPasswordUC.invoke(Parameters.StringParam("mail@example.com"))
         }
     }
 
-    context("submit form") {
-        test("should not be enabled when password is empty") {
-            val signInVM = SignInViewModel(
-                authFormValidationUseCase, resetPasswordUseCase,
-                unifiedSignInUseCase, socialClients, dispatcher,
-                FakeSignInErrorMessageProvider()
-            )
-
-            every { validateEmailUseCase("test@test.fr") } returns
-                ValidationResult(true)
-            every { validatePasswordUseCase.validateLoginPassword("") } returns
-                ValidationResult()
-
-            signInVM.onEvent(AuthenticationUIEvent.OnEmailChanged("test@test.fr"))
-            signInVM.onEvent(AuthenticationUIEvent.OnPasswordChanged(""))
-
-            signInVM.formDataFlow.value.email shouldBe "test@test.fr"
-            signInVM.formDataFlow.value.password shouldBe ""
-            signInVM.formDataFlow.value.submit shouldBe false
+    test("ResetPassword failure -> Loading then ShowError(err) + Idle") {
+        val vm = buildVM()
+        every { authValidationUC.validateEmailUseCase("mail@example.com") } returns ValidationResult(
+            true,
+            null
+        )
+        coEvery { resetPasswordUC.invoke(any()) } coAnswers {
+            delay(1)
+            AppResult.Failure(AppError.Domain.NotFound)
         }
 
-        test("should not be enabled when email is empty") {
-            val signInVM = SignInViewModel(
-                authFormValidationUseCase, resetPasswordUseCase,
-                unifiedSignInUseCase, socialClients, dispatcher,
-                FakeSignInErrorMessageProvider()
-            )
+        vm.onEvent(AuthenticationUIEvent.OnEmailResetChanged("mail@example.com"))
+        pump()
 
-            every { validateEmailUseCase(any()) } returns ValidationResult(false)
-            every { validatePasswordUseCase.validateLoginPassword(any()) } returns
-                ValidationResult(true)
+        vm.oneTimeEventChannelFlow.test {
+            vm.onEvent(AuthenticationUIEvent.OnResetPasswordConfirmed)
+            pump()
+            vm.resetPasswordState.value shouldBe ResetPasswordEvent.Loading
 
-            signInVM.onEvent(AuthenticationUIEvent.OnEmailChanged(""))
-            signInVM.onEvent(AuthenticationUIEvent.OnPasswordChanged("123456"))
+            scheduler.advanceTimeBy(1); pump()
 
-            signInVM.formDataFlow.value.email shouldBe ""
-            signInVM.formDataFlow.value.password shouldBe "123456"
-            signInVM.formDataFlow.value.submit shouldBe false
+            val ev = awaitItem() as AuthUiEventModel.ShowError
+            (ev.error as UIText.Plain).value shouldBe "err"
+            vm.resetPasswordState.value shouldBe ResetPasswordEvent.Idle
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    test("Continue as guest writes preference (dontAskAgain=true -> shouldShow=false)") {
+        val vm = buildVM()
+        coEvery { setGuestDialogUC.invoke(false) } returns AppResult.Success(Unit)
+
+        vm.onEvent(AuthenticationUIEvent.OnContinueAsGuestConfirmed(dontAskAgain = true))
+        pump()
+
+        coVerify(exactly = 1) { setGuestDialogUC.invoke(false) }
+    }
+
+    test("Google social sign-in -> success emits OnSignInSuccess") {
+        val vm = buildVM()
+        val credential = mockk<AuthCredential>(relaxed = true)
+        coEvery { googleClient.getCredential() } returns credential
+
+        coEvery { unifiedSignInUC.invoke(any()) } coAnswers {
+            delay(1)
+            AppResult.Success(SignInSuccess)
         }
 
-        test("should not be enabled when email fails") {
-            val signInVM = SignInViewModel(
-                authFormValidationUseCase, resetPasswordUseCase,
-                unifiedSignInUseCase, socialClients, dispatcher,
-                FakeSignInErrorMessageProvider()
-            )
+        vm.oneTimeEventChannelFlow.test {
+            vm.onEvent(AuthenticationUIEvent.OnGoogleButtonClicked)
+            pump()
+            vm.signInState.value shouldBe SignInEvent.Loading
 
-            every { validateEmailUseCase(any()) } returns ValidationResult()
-            every { validatePasswordUseCase.validateLoginPassword(any()) } returns
-                ValidationResult()
+            scheduler.advanceTimeBy(1); pump()
 
-            signInVM.onEvent(AuthenticationUIEvent.OnEmailChanged("test"))
-            signInVM.onEvent(AuthenticationUIEvent.OnPasswordChanged("123456"))
+            awaitItem() shouldBe AuthUiEventModel.OnSignInSuccess
+            vm.signInState.value shouldBe SignInEvent.Idle
 
-            signInVM.formDataFlow.value.email shouldBe "test"
-            signInVM.formDataFlow.value.password shouldBe "123456"
-            signInVM.formDataFlow.value.submit shouldBe false
+            coVerify {
+                unifiedSignInUC.invoke(
+                    UnifiedSignInUseCase.Params.SocialMedia(credential, ProviderType.GOOGLE)
+                )
+            }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    test("Apple social sign-in -> no credential -> ShowError and allow retry (isSignIn=false)") {
+        val vm = buildVM()
+        coEvery { appleClient.getCredential() } returns null
+
+        vm.oneTimeEventChannelFlow.test {
+            vm.onEvent(AuthenticationUIEvent.OnAppleButtonClicked)
+            pump()
+            val ev = awaitItem() as AuthUiEventModel.ShowError
+            (ev.error as UIText.Plain).value shouldBe "Unable to get credentials"
+            vm.isSignIn shouldBe false
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        coVerify(exactly = 0) { unifiedSignInUC.invoke(any()) }
+    }
+
+    test("Facebook sign-in uses fetched credential (does not call client.getCredential)") {
+        val vm = buildVM()
+        val fbCred = mockk<AuthCredential>(relaxed = true)
+
+        coEvery { unifiedSignInUC.invoke(any()) } coAnswers {
+            delay(1)
+            AppResult.Success(SignInSuccess)
+        }
+
+        vm.oneTimeEventChannelFlow.test {
+            vm.onEvent(AuthenticationUIEvent.OnFacebookButtonClicked(credential = fbCred))
+            pump()
+            vm.signInState.value shouldBe SignInEvent.Loading
+
+            scheduler.advanceTimeBy(1); pump()
+
+            awaitItem() shouldBe AuthUiEventModel.OnSignInSuccess
+            vm.signInState.value shouldBe SignInEvent.Idle
+
+            coVerify(exactly = 0) { facebookClient.getCredential() }
+            coVerify {
+                unifiedSignInUC.invoke(
+                    UnifiedSignInUseCase.Params.SocialMedia(fbCred, ProviderType.FACEBOOK)
+                )
+            }
+            cancelAndIgnoreRemainingEvents()
         }
     }
 })
