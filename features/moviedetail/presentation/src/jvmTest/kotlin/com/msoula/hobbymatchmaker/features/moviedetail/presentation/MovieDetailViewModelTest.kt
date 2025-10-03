@@ -1,239 +1,245 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.presentation
 
 import app.cash.turbine.test
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.core.common.ErrorMessageMapper
+import com.msoula.hobbymatchmaker.core.common.UIText
 import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.FetchingTrailerErrorHMM
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ManageMovieTrailerUseCase
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.MovieTrailerReady
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieDetailUseCase
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieErrors
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieSuccess
-import com.msoula.hobbymatchmaker.features.moviedetail.fakes.FakeMovieDetailErrorMessageProvider
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiEventModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailViewStateModel
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.toMovieDetailUiModel
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.mockk.clearAllMocks
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
+import io.mockk.unmockkAll
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.TestCoroutineScheduler
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class MovieDetailViewModelTest : FunSpec({
 
-    val dispatcher = StandardTestDispatcher()
+    val scheduler = TestCoroutineScheduler()
+    val dispatcher = StandardTestDispatcher(scheduler)
+    val testScope = TestScope(dispatcher + Job())
 
-    val observeMovieDetailUseCase = mockk<ObserveMovieDetailUseCase>()
-    val manageMovieTrailerUseCase = mockk<ManageMovieTrailerUseCase>()
-    val connectivityCheck = mockk<NetworkConnectivityChecker>()
-    val fakeErrorMessageProvider = FakeMovieDetailErrorMessageProvider()
-
-    lateinit var movieDetailVM: MovieDetailViewModel
-
-    context("viewState - Success") {
-        test("should emit Success when observeMovieDetail returns existing movie") {
-            val fakeMovie = MovieDetailDomainModel(
-                id = 42L, title = "fake movie detail title"
-            )
-            val successfulResult = flowOf(Result.Success(ObserveMovieSuccess.Success(fakeMovie)))
-
-            coEvery { observeMovieDetailUseCase(any()) } returns successfulResult
-
-            runTest(dispatcher) {
-                movieDetailVM = MovieDetailViewModel(
-                    42L,
-                    dispatcher,
-                    observeMovieDetailUseCase,
-                    manageMovieTrailerUseCase,
-                    connectivityCheck,
-                    fakeErrorMessageProvider
-                )
-
-                movieDetailVM.viewState.test {
-                    awaitItem() shouldBe MovieDetailViewStateModel.Loading
-                    awaitItem() shouldBe MovieDetailViewStateModel.Success(fakeMovie.toMovieDetailUiModel())
-                    cancelAndIgnoreRemainingEvents()
-                }
-            }
-        }
-
-        test("should emit Empty when observeMovieDetail returns DataLoadedInDB") {
-            val successfulResult = flowOf(Result.Success(ObserveMovieSuccess.DataLoadedInDB))
-
-            coEvery { observeMovieDetailUseCase(any()) } returns successfulResult
-
-            runTest(dispatcher) {
-                movieDetailVM = MovieDetailViewModel(
-                    42L,
-                    dispatcher,
-                    observeMovieDetailUseCase,
-                    manageMovieTrailerUseCase,
-                    connectivityCheck,
-                    fakeErrorMessageProvider
-                )
-
-                movieDetailVM.viewState.test {
-                    awaitItem() shouldBe MovieDetailViewStateModel.Loading
-                    awaitItem() shouldBe MovieDetailViewStateModel.Empty
-                }
-            }
+    lateinit var observeMovieDetailUseCase: ObserveMovieDetailUseCase
+    lateinit var manageMovieTrailerUseCase: ManageMovieTrailerUseCase
+    lateinit var connectivity: NetworkConnectivityChecker
+    val errorMapper = object : ErrorMessageMapper {
+        override fun toUIText(error: AppError): UIText {
+            return UIText.Plain("err")
         }
     }
 
-    context("viewState - Failure") {
-        test("should emit Error when observeMovieDetail returns failure") {
-            val failureResult = flowOf(Result.Failure(ObserveMovieErrors.MovieDetailErrorHMM))
+    lateinit var detailFlow: MutableSharedFlow<AppResult<ObserveMovieSuccess, AppError>>
 
-            coEvery { observeMovieDetailUseCase(any()) } returns failureResult
+    suspend fun pump() {
+        scheduler.runCurrent()
+    }
 
-            runTest(dispatcher) {
-                movieDetailVM = MovieDetailViewModel(
-                    42L,
-                    dispatcher,
-                    observeMovieDetailUseCase,
-                    manageMovieTrailerUseCase,
-                    connectivityCheck,
-                    fakeErrorMessageProvider
-                )
+    fun buildVM(movieId: Long = 42L): MovieDetailViewModel {
+        detailFlow = MutableSharedFlow(replay = 1)
 
-                movieDetailVM.viewState.test {
-                    awaitItem() shouldBe MovieDetailViewStateModel.Loading
-                    awaitItem() shouldBe MovieDetailViewStateModel.Error("")
-                }
-            }
+        observeMovieDetailUseCase = mockk {
+            every { this@mockk(any(), any()) } returns detailFlow
+        }
+        manageMovieTrailerUseCase = mockk(relaxed = true)
+        connectivity = mockk(relaxed = true)
+
+        return MovieDetailViewModel(
+            movieId = movieId,
+            observeMovieDetailUseCase = observeMovieDetailUseCase,
+            manageMovieTrailerUseCase = manageMovieTrailerUseCase,
+            connectivityCheck = connectivity,
+            defaultErrorMessageMapper = errorMapper,
+            externalScope = testScope
+        )
+    }
+
+    beforeSpec {
+        Dispatchers.setMain(dispatcher)
+    }
+    afterSpec {
+        Dispatchers.resetMain()
+        unmockkAll()
+    }
+    beforeTest {
+        clearAllMocks()
+    }
+
+
+    test("initial state is Loading") {
+        val vm = buildVM()
+        vm.viewState.value shouldBe MovieDetailViewStateModel.Loading
+    }
+
+    test("viewState stays Loading when DataLoadedInDB arrives") {
+        val vm = buildVM()
+
+        vm.viewState.test {
+            awaitItem() shouldBe MovieDetailViewStateModel.Loading
+
+            pump()
+            detailFlow.emit(AppResult.Success(ObserveMovieSuccess.DataLoadedInDB))
+            pump()
+
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
-    context("onPlayTrailerClicked - Video uri known") {
-        test("should emit OnPlayMovieTrailerReady when network available") {
-            coEvery { connectivityCheck.hasActiveConnection() } returns true
+    test("viewState -> Error when upstream emits Failure") {
+        val vm = buildVM()
 
-            runTest(dispatcher) {
-                movieDetailVM = MovieDetailViewModel(
-                    42L,
-                    dispatcher,
-                    observeMovieDetailUseCase,
-                    manageMovieTrailerUseCase,
-                    connectivityCheck,
-                    fakeErrorMessageProvider
-                )
+        vm.viewState.test {
+            awaitItem() shouldBe MovieDetailViewStateModel.Loading
 
-                movieDetailVM.oneTimeEventChannelFlow.test {
-                    movieDetailVM.onPlayTrailerClicked(42L, true)
-                    advanceUntilIdle()
+            pump()
+            detailFlow.emit(AppResult.Failure(AppError.Domain.NotFound))
+            pump()
 
-                    awaitItem() shouldBe MovieDetailUiEventModel.OnPlayMovieTrailerReady("")
-                    cancelAndIgnoreRemainingEvents()
-                }
-            }
-        }
-
-        test("should emit NoConnection no network available") {
-            coEvery { connectivityCheck.hasActiveConnection() } returns false
-
-            runTest(dispatcher) {
-                movieDetailVM = MovieDetailViewModel(
-                    42L,
-                    dispatcher,
-                    observeMovieDetailUseCase,
-                    manageMovieTrailerUseCase,
-                    connectivityCheck,
-                    fakeErrorMessageProvider
-                )
-
-                movieDetailVM.oneTimeEventChannelFlow.test {
-                    movieDetailVM.onPlayTrailerClicked(42L, true)
-                    advanceUntilIdle()
-
-                    awaitItem() shouldBe MovieDetailUiEventModel.NoConnection
-                    cancelAndIgnoreRemainingEvents()
-                }
-            }
+            val err = awaitItem() as MovieDetailViewStateModel.Error
+            (err.error as UIText.Plain).value shouldBe "err"
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
-    context("onPlayTrailerClicked - video uri unknown") {
-        test("should emit Success when manageMovieTrailer returns success") {
-            val successfulResult = flowOf(
-                Result.Success(
-                    MovieTrailerReady("random uri")
+    test("OnPlayMovieTrailerClicked with isVideoURIknown=true & network ON -> emits Ready(with currentMovie.videoKey or empty)") {
+        val vm = buildVM()
+        every { connectivity.hasActiveConnection() } returns true
+
+        vm.oneTimeEventChannelFlow.test {
+            vm.onEvent(
+                MovieDetailUiEventModel.OnPlayMovieTrailerClicked(
+                    movieId = 42L,
+                    isVideoURIknown = true
                 )
             )
-
-            coEvery { manageMovieTrailerUseCase(any()) } returns successfulResult
-
-            runTest(dispatcher) {
-                movieDetailVM = MovieDetailViewModel(
-                    42L,
-                    dispatcher,
-                    observeMovieDetailUseCase,
-                    manageMovieTrailerUseCase,
-                    connectivityCheck,
-                    fakeErrorMessageProvider
-                )
-
-                movieDetailVM.oneTimeEventChannelFlow.test {
-                    movieDetailVM.onPlayTrailerClicked(42L, false)
-                    awaitItem() shouldBe MovieDetailUiEventModel.OnPlayMovieTrailerReady(
-                        "random uri"
-                    )
-                }
-            }
+            pump()
+            awaitItem() shouldBe MovieDetailUiEventModel.OnPlayMovieTrailerReady("")
+            cancelAndIgnoreRemainingEvents()
         }
+    }
 
-        test("should emit NoConnection when manageMovieTrailer fails with no network") {
-            val failureResult = flowOf(
-                Result.Failure(FetchingTrailerErrorHMM.NoConnectionErrorHMM("No network!"))
-            )
+    test("OnPlayMovieTrailerClicked with isVideoURIknown=true & network OFF -> emits NoConnection") {
+        val vm = buildVM()
+        every { connectivity.hasActiveConnection() } returns false
 
-            coEvery { manageMovieTrailerUseCase(any()) } returns failureResult
-
-            runTest(dispatcher) {
-                movieDetailVM = MovieDetailViewModel(
-                    42L,
-                    dispatcher,
-                    observeMovieDetailUseCase,
-                    manageMovieTrailerUseCase,
-                    connectivityCheck,
-                    fakeErrorMessageProvider
+        vm.oneTimeEventChannelFlow.test {
+            vm.onEvent(
+                MovieDetailUiEventModel.OnPlayMovieTrailerClicked(
+                    movieId = 42L,
+                    isVideoURIknown = true
                 )
-
-                movieDetailVM.oneTimeEventChannelFlow.test {
-                    movieDetailVM.onPlayTrailerClicked(42L, false)
-
-                    awaitItem() shouldBe MovieDetailUiEventModel.NoConnection
-                }
-            }
+            )
+            pump()
+            awaitItem() shouldBe MovieDetailUiEventModel.NoConnection
+            cancelAndIgnoreRemainingEvents()
         }
+    }
 
-        test("should emit ErrorFetchingTrailer when manageMovieTrailer fails") {
-            val failureResult = flowOf(
-                Result.Failure(FetchingTrailerErrorHMM.NoTrailerFoundErrorHMM("Error fetching"))
+    test("OnPlayMovieTrailerClicked with isVideoURIknown=false -> emits Loading then NoConnection on connectivity failure") {
+        val vm = buildVM()
+        coEvery { manageMovieTrailerUseCase.invoke(any(), any()) } returns
+            AppResult.Failure(AppError.Network.Unreachable)
+
+        vm.oneTimeEventChannelFlow.test {
+            vm.onEvent(
+                MovieDetailUiEventModel.OnPlayMovieTrailerClicked(
+                    movieId = 7L,
+                    isVideoURIknown = false
+                )
+            )
+            pump()
+            awaitItem() shouldBe MovieDetailUiEventModel.LoadingTrailer
+            awaitItem() shouldBe MovieDetailUiEventModel.NoConnection
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    test("OnPlayMovieTrailerClicked with isVideoURIknown=false -> emits Loading then ErrorFetchingTrailer on non-connectivity failure") {
+        val vm = buildVM()
+        coEvery { manageMovieTrailerUseCase.invoke(any(), any()) } returns
+            AppResult.Failure(AppError.Storage.WriteFailed)
+
+        vm.oneTimeEventChannelFlow.test {
+            vm.onEvent(
+                MovieDetailUiEventModel.OnPlayMovieTrailerClicked(
+                    movieId = 9L,
+                    isVideoURIknown = false
+                )
+            )
+            pump()
+            awaitItem() shouldBe MovieDetailUiEventModel.LoadingTrailer
+            awaitItem() shouldBe MovieDetailUiEventModel.ErrorFetchingTrailer
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    test("viewState -> Success when ObserveMovieDetail emits Success(domain)") {
+        val vm = buildVM()
+
+        vm.viewState.test {
+            awaitItem() shouldBe MovieDetailViewStateModel.Loading
+            pump()
+
+            val domain = MovieDetailDomainModel(
+                id = 123L,
+                title = "Blade Runner",
+                synopsis = "Replicants...",
+                localCoverFilePath = "/local/poster.jpg",
+                genre = emptyList(),
+                releaseDate = "1982-06-25",
+                status = "Released",
+                popularity = 42.0,
+                cast = emptyList(),
+                videoKey = "yt-abc123",
+                duration = 117
             )
 
-            coEvery { manageMovieTrailerUseCase(any()) } returns failureResult
+            detailFlow.emit(AppResult.Success(ObserveMovieSuccess.Success(domain)))
+            pump()
 
-            runTest(dispatcher) {
-                movieDetailVM = MovieDetailViewModel(
-                    42L,
-                    dispatcher,
-                    observeMovieDetailUseCase,
-                    manageMovieTrailerUseCase,
-                    connectivityCheck,
-                    fakeErrorMessageProvider
+            val s = awaitItem() as MovieDetailViewStateModel.Success
+            s.movie.id shouldBe 123L
+            s.movie.title shouldBe "Blade Runner"
+            s.movie.videoKey shouldBe "yt-abc123"
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    test("OnPlayMovieTrailerClicked isVideoURIknown=false -> emits Loading then Ready(videoURI)") {
+        val vm = buildVM()
+        coEvery { manageMovieTrailerUseCase.invoke(any(), any()) } returns
+            AppResult.Success(MovieTrailerReady("yt-video-key-999"))
+
+        vm.oneTimeEventChannelFlow.test {
+            vm.onEvent(
+                MovieDetailUiEventModel.OnPlayMovieTrailerClicked(
+                    movieId = 9L,
+                    isVideoURIknown = false
                 )
+            )
+            pump()
 
-                movieDetailVM.oneTimeEventChannelFlow.test {
-                    movieDetailVM.onPlayTrailerClicked(42L, false)
-
-                    awaitItem() shouldBe MovieDetailUiEventModel.ErrorFetchingTrailer
-                }
-            }
+            awaitItem() shouldBe MovieDetailUiEventModel.LoadingTrailer
+            awaitItem() shouldBe MovieDetailUiEventModel.OnPlayMovieTrailerReady("yt-video-key-999")
+            cancelAndIgnoreRemainingEvents()
         }
     }
 })

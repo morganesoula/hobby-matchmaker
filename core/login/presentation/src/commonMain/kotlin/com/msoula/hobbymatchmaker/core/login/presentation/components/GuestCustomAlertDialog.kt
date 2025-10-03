@@ -19,12 +19,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import com.msoula.hobbymatchmaker.core.login.presentation.Res
-import com.msoula.hobbymatchmaker.core.login.presentation.continue_as_guest_create_redirect_button
-import com.msoula.hobbymatchmaker.core.login.presentation.continue_as_guest_dialog_text
-import com.msoula.hobbymatchmaker.core.login.presentation.continue_as_guest_dialog_title
-import com.msoula.hobbymatchmaker.core.login.presentation.continue_as_guest_dont_ask_again
-import com.msoula.hobbymatchmaker.core.login.presentation.continue_as_guest_validation_button
+import com.msoula.hobbymatchmaker.core.design.Res
+import com.msoula.hobbymatchmaker.core.design.continue_as_guest_create_redirect_button
+import com.msoula.hobbymatchmaker.core.design.continue_as_guest_dialog_text
+import com.msoula.hobbymatchmaker.core.design.continue_as_guest_dialog_title
+import com.msoula.hobbymatchmaker.core.design.continue_as_guest_dont_ask_again
+import com.msoula.hobbymatchmaker.core.design.continue_as_guest_validation_button
 import org.jetbrains.compose.resources.stringResource
 
 @Composable

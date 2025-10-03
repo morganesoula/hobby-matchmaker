@@ -26,9 +26,3 @@ kotlin {
 android {
     namespace = "com.msoula.hobbymatchmaker.features.movies.presentation"
 }
-
-compose.resources {
-    publicResClass = true
-    packageOfResClass = "com.msoula.hobbymatchmaker.features.movies.presentation"
-    generateResClass = always
-}

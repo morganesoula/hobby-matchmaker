@@ -16,9 +16,3 @@ kotlin {
 android {
     namespace = "com.msoula.hobbymatchmaker.core.splashscreen.presentation"
 }
-
-compose.resources {
-    publicResClass = true
-    packageOfResClass = "com.msoula.hobbymatchmaker.core.splashscreen.presentation"
-    generateResClass = always
-}

@@ -1,16 +1,16 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.presentation.models
 
 import com.msoula.hobbymatchmaker.core.common.extractYear
+import com.msoula.hobbymatchmaker.core.design.Res
+import com.msoula.hobbymatchmaker.core.design.movie_canceled
+import com.msoula.hobbymatchmaker.core.design.movie_in_production
+import com.msoula.hobbymatchmaker.core.design.movie_planned
+import com.msoula.hobbymatchmaker.core.design.movie_post_production
+import com.msoula.hobbymatchmaker.core.design.movie_released
+import com.msoula.hobbymatchmaker.core.design.movie_rumored
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.GenreDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieActorDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.Res
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.movie_canceled
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.movie_in_production
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.movie_planned
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.movie_post_production
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.movie_released
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.movie_rumored
 import org.jetbrains.compose.resources.getString
 
 data class MovieDetailUiModel(

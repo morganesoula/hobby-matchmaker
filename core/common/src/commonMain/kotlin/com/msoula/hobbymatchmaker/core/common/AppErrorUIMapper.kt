@@ -1,6 +1,23 @@
 package com.msoula.hobbymatchmaker.core.common
 
 import com.msoula.hobbymatchmaker.core.common.UIText.Resource
+import com.msoula.hobbymatchmaker.core.design.Res
+import com.msoula.hobbymatchmaker.core.design.authentication_already_exists
+import com.msoula.hobbymatchmaker.core.design.authentication_unknown
+import com.msoula.hobbymatchmaker.core.design.external_service_error
+import com.msoula.hobbymatchmaker.core.design.forbidden
+import com.msoula.hobbymatchmaker.core.design.http_error_code
+import com.msoula.hobbymatchmaker.core.design.network_timeout
+import com.msoula.hobbymatchmaker.core.design.network_unreachable
+import com.msoula.hobbymatchmaker.core.design.not_found
+import com.msoula.hobbymatchmaker.core.design.request_canceled
+import com.msoula.hobbymatchmaker.core.design.serialization_error
+import com.msoula.hobbymatchmaker.core.design.storage_corrupted
+import com.msoula.hobbymatchmaker.core.design.storage_read_failed
+import com.msoula.hobbymatchmaker.core.design.storage_write_failed
+import com.msoula.hobbymatchmaker.core.design.unauthorized
+import com.msoula.hobbymatchmaker.core.design.unknown_error
+import com.msoula.hobbymatchmaker.core.design.validation_error
 import org.jetbrains.compose.resources.StringResource
 
 sealed interface UIText {

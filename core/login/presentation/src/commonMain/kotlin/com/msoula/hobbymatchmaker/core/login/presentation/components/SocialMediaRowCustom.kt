@@ -13,12 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.msoula.hobbymatchmaker.core.login.presentation.Res
+import com.msoula.hobbymatchmaker.core.design.Res
+import com.msoula.hobbymatchmaker.core.design.facebook_alt
+import com.msoula.hobbymatchmaker.core.design.facebook_logo
+import com.msoula.hobbymatchmaker.core.design.google_alt
+import com.msoula.hobbymatchmaker.core.design.google_logo
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.GoogleUIClient
-import com.msoula.hobbymatchmaker.core.login.presentation.facebook_alt
-import com.msoula.hobbymatchmaker.core.login.presentation.facebook_logo
-import com.msoula.hobbymatchmaker.core.login.presentation.google_alt
-import com.msoula.hobbymatchmaker.core.login.presentation.google_logo
 import dev.gitlive.firebase.auth.AuthCredential
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource

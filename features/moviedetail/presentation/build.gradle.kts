@@ -45,12 +45,6 @@ android {
     namespace = "com.msoula.hobbymatchmaker.features.moviedetail.presentation"
 }
 
-compose.resources {
-    publicResClass = true
-    packageOfResClass = "com.msoula.hobbymatchmaker.features.moviedetail.presentation"
-    generateResClass = always
-}
-
 swiftPackageConfig {
     create("nativeIosPlayerShared") {
         minIos = "18.0"

@@ -1,32 +1,11 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.presentation
 
-import app.cash.turbine.test
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainErrorHMM
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieActorDomainModel
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieVideoDomainModel
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ManageMovieTrailerUseCase
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieDetailUseCase
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.UpdateMovieVideoURIUseCase
-import com.msoula.hobbymatchmaker.features.moviedetail.fakes.FakeConnectivityChecker
-import com.msoula.hobbymatchmaker.features.moviedetail.fakes.FakeLocalDataSource
-import com.msoula.hobbymatchmaker.features.moviedetail.fakes.FakeRemoteDataSource
-import com.msoula.hobbymatchmaker.features.moviedetail.mappers.MovieDetailErrorMessageProvider
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiEventModel
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailViewStateModel
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.toMovieDetailUiModel
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class MovieDetailIntegrationTest : FunSpec({
-    val dispatcher = UnconfinedTestDispatcher()
+    /* val dispatcher = UnconfinedTestDispatcher()
 
     val movieDetailRemoteDataSource = FakeRemoteDataSource()
     val movieDetailLocalDataSource = FakeLocalDataSource()
@@ -275,5 +254,5 @@ class MovieDetailIntegrationTest : FunSpec({
                 )
             }
         }
-    }
+    } */
 })

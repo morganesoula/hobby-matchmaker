@@ -56,9 +56,9 @@ import coil3.compose.LocalPlatformContext
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import com.msoula.hobbymatchmaker.core.common.formatOneDecimal
+import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.component.HMMShimmerEffect
-import com.msoula.hobbymatchmaker.features.movies.presentation.Res
-import com.msoula.hobbymatchmaker.features.movies.presentation.ic_movie_clapper_board
+import com.msoula.hobbymatchmaker.core.design.ic_movie_clapper_board
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiModel
 import kotlinx.coroutines.delay

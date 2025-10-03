@@ -95,12 +95,6 @@ android {
     }
 }
 
-compose.resources {
-    publicResClass = true
-    packageOfResClass = "com.msoula.hobbymatchmaker.core.login.presentation"
-    generateResClass = always
-}
-
 swiftPackageConfig {
     create("nativeIosAuthShared") {
         minIos = "18.0"

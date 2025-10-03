@@ -31,7 +31,9 @@ import com.msoula.hobbymatchmaker.core.common.ObserveEvents
 import com.msoula.hobbymatchmaker.core.common.SnackEffect
 import com.msoula.hobbymatchmaker.core.common.UIText
 import com.msoula.hobbymatchmaker.core.common.isIosPlatform
+import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.component.HMMHomeTopBar
+import com.msoula.hobbymatchmaker.core.design.no_fetching_detail_possible
 import com.msoula.hobbymatchmaker.features.movies.presentation.components.MovieItem
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiEventModel
