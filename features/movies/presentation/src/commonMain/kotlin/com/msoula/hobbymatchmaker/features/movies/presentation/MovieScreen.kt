@@ -27,6 +27,7 @@ import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.common.CallOnceEffect
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.ObserveEvents
 import com.msoula.hobbymatchmaker.core.common.SnackEffect
 import com.msoula.hobbymatchmaker.core.common.UIText
@@ -52,6 +53,8 @@ fun MovieScreenContent(
 ) {
     val listState = rememberLazyListState()
     val snackBarHostState = remember { SnackbarHostState() }
+
+    Logger.d("🎬 Into MovieScreenContent")
 
     ObserveEvents(oneTimeEventChannelFlow) { event ->
         when (event) {
@@ -83,7 +86,7 @@ fun MovieScreenContent(
         }
     }
 
-    Scaffold(
+    /* Scaffold(
         snackbarHost = {
             SnackbarHost(snackBarHostState) { data ->
                 Snackbar(
@@ -109,6 +112,7 @@ fun MovieScreenContent(
                 ),
             contentAlignment = Alignment.Center
         ) {
+            Text("Just displaying a list of movies")
             LazyRow(
                 modifier = modifier,
                 contentPadding = PaddingValues(start = 60.dp),
@@ -125,9 +129,7 @@ fun MovieScreenContent(
                 }
             }
 
-            HMMHomeTopBar { logOut() }
-        }
-    }
+            HMMHomeTopBar { logOut() } */
 }
 
 @Composable

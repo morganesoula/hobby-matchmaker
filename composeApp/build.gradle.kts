@@ -24,7 +24,7 @@ kotlin {
     iosArm64().apply {
         compilations["main"].cinterops.create("nativeIosShared")
         binaries.framework {
-            baseName = "ComposeApp"
+            baseName = "composeApp"
             isStatic = true
             xcf.add(this)
         }

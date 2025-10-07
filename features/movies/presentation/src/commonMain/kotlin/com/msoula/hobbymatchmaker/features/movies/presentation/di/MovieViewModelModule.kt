@@ -6,5 +6,4 @@ import org.koin.dsl.module
 val featuresModuleMovieViewModel = module {
     includes(featuresModuleMovieViewModelPresentationPlatformSpecific)
 }
-
 expect val featuresModuleMovieViewModelPresentationPlatformSpecific: Module

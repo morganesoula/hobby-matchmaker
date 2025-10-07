@@ -7,7 +7,7 @@ object ProjectApplication {
 }
 
 object ProjectConfig {
-    const val PROJECT_CONFIG_SDK_VERSION = 35
+    const val PROJECT_CONFIG_SDK_VERSION = 36
     const val PROJECT_CONFIG_MIN_SDK_VERSION = 26
     const val PROJECT_CONFIG_TARGET_SDK_VERSION = 35
     val PROJECT_CONFIG_JAVA_VERSION = JavaVersion.VERSION_21

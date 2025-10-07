@@ -40,9 +40,3 @@ data class ExtendedColors(
     val disabledContainer: Color,
     val onDisabled: Color
 )
-
-@Composable
-expect fun getColorScheme(darkTheme: Boolean): ColorScheme
-
-@Composable
-expect fun isDarkModeEnabled(): Boolean

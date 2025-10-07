@@ -1,5 +1,6 @@
 package com.msoula.hobbymatchmaker.core.design.theme
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
@@ -8,21 +9,21 @@ import androidx.compose.ui.graphics.Color
 
 @Composable
 fun disabledContainerColor(): Color {
-    return if (isDarkModeEnabled())
+    return if (isSystemInDarkTheme())
         md_theme_dark_disabledContainer else
         md_theme_light_disabledContainer
 }
 
 @Composable
 fun onDisabledColor(): Color {
-    return if (isDarkModeEnabled())
+    return if (isSystemInDarkTheme())
         md_theme_dark_onDisabled else
         md_theme_light_onDisabled
 }
 
 @Composable
 fun successContainerColor(): Color {
-    return if (isDarkModeEnabled())
+    return if (isSystemInDarkTheme())
         md_theme_dark_successContainer else
         md_theme_light_successContainer
 }

@@ -2,20 +2,30 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 	<key>FACEBOOK_APPLICATION_API</key>
-	<string>$(facebook_application_api)</string>
+	<string>$(FACEBOOK_APPLICATION_ID)</string>
 	<key>FACEBOOK_CLIENT_TOKEN</key>
-	<string>$(facebook_client_token)</string>
+	<string>$(FACEBOOK_CLIENT_TOKEN)</string>
 	<key>FIREBASE_APPLICATION_ID</key>
-	<string>$(firebase_application_id)</string>
+	<string>$(FIREBASE_APPLICATION_ID)</string>
 	<key>FIREBASE_API_KEY</key>
-	<string>$(firebase_api_key)</string>
+	<string>$(FIREBASE_API_KEY)</string>
 	<key>WEB_CLIENT_ID</key>
-	<string>$(web_client_id)</string>
+	<string>$(WEB_CLIENT_ID)</string>
 	<key>TMDB_KEY</key>
-	<string>$(tmdb_key)</string>
+	<string>$(TMDB_KEY)</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.msoula.hobbymatchmaker</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleName</key>
 	<string>HobbyMatchMaker</string>
 	<key>CFBundleURLTypes</key>

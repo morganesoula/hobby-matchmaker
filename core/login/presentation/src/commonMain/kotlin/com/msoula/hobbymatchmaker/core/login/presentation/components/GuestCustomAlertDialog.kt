@@ -78,6 +78,6 @@ fun GuestModeDialog(
             dismissOnClickOutside = true,
             usePlatformDefaultWidth = true
         ),
-        modifier = Modifier.widthIn(420.dp)
+        modifier = Modifier.widthIn(400.dp)
     )
 }
