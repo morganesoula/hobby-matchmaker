@@ -1,17 +1,7 @@
 package com.msoula.hobbymatchmaker.presentation.navigation
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.stack.animation.plus
@@ -34,20 +24,6 @@ fun App(
     facebookUIClient: FacebookUIClient
 ) {
     HobbyMatchMakerTheme {
-        /* Box(
-            Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .border(2.dp, Color.Magenta)
-            ) {
-                Text("This a text to test screen size on iPhone", color = Color.White)
-            }
-        }*/
-
         val slotChild by component.currentRootSlot.subscribeAsState()
         val instance = slotChild.child?.instance
 

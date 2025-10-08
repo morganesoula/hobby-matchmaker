@@ -20,12 +20,12 @@ class ImageRepositoryImpl(
         updateMovie: suspend (localImagePath: String) -> Unit
     ) {
         val localImagePath = downloadImage(coverFileName)
-        updateMovie(localImagePath)
+        localImagePath?.let { updateMovie(it) }
     }
 
-    override suspend fun getRemoteImage(localPosterPath: String) = downloadImage(localPosterPath)
+    override suspend fun getRemoteImage(remotePosterPath: String) = downloadImage(remotePosterPath)
 
-    override suspend fun downloadImage(remotePosterPath: String): String {
+    override suspend fun downloadImage(remotePosterPath: String): String? {
         val imgPrefix = "https://image.tmdb.org/t/p/w500"
         val fullURL = "$imgPrefix$remotePosterPath"
 

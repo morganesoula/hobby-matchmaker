@@ -5,7 +5,7 @@
 //  Created by Morgane Soula on 05/10/2025.
 //
 
-/* import SwiftUI
+import SwiftUI
 import composeApp
 
 @main
@@ -22,4 +22,4 @@ struct iOSApp: App {
                 .ignoresSafeArea(.all)
         }
     }
-} */
+}

@@ -2,10 +2,17 @@ package com.msoula.hobbymatchmaker.features.movies.data.di
 
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.ImageRepositoryImpl
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.ImageRepository
-import org.koin.core.module.dsl.singleOf
-import org.koin.dsl.bind
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 actual val featuresModuleMovieDataPlatformSpecific = module {
-    singleOf(::ImageRepositoryImpl) bind ImageRepository::class
+    single<CoroutineDispatcher>(named("imageDispatcher")) { Dispatchers.IO }
+    single<ImageRepository> {
+        ImageRepositoryImpl(
+            get(named("imageDispatcher")),
+            get()
+        )
+    }
 }

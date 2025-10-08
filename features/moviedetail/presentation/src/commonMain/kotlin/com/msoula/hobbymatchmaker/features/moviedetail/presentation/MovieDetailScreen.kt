@@ -1,5 +1,6 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.presentation
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -83,6 +84,7 @@ import com.msoula.hobbymatchmaker.core.design.component.HMMDetailTopBar
 import com.msoula.hobbymatchmaker.core.design.component.LoadingCircularProgress
 import com.msoula.hobbymatchmaker.core.design.component.LoadingOverlay
 import com.msoula.hobbymatchmaker.core.design.connection_issue
+import com.msoula.hobbymatchmaker.core.design.ic_movie_clapper_board
 import com.msoula.hobbymatchmaker.core.design.no_data
 import com.msoula.hobbymatchmaker.core.design.no_trailer_available
 import com.msoula.hobbymatchmaker.core.design.play_icon_accessibility
@@ -94,7 +96,7 @@ import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.Movie
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailViewStateModel
 import kotlinx.coroutines.flow.Flow
-import okio.Path.Companion.toPath
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -131,11 +133,30 @@ fun MovieDetailScreen(
 
     val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
-    val posterModel = remember(movie.posterPath) {
-        ImageRequest.Builder(platformContext)
-            .data(movie.posterPath.toPath())
-            .crossfade(true)
-            .build()
+    val model = remember(movie.posterPath) {
+        val s = movie.posterPath
+        when {
+            s.isBlank() -> null
+            s.startsWith("file:", ignoreCase = true) -> s
+            s.startsWith("http", ignoreCase = true) -> s
+            s.startsWith("/var/") || s.startsWith("/private/var/") -> "file://$s"
+            s.startsWith("/") -> "https://image.tmdb.org/t/p/w500$s"
+            else -> s
+        }
+    }
+
+    val posterRequest = remember(model) {
+        model?.let {
+            ImageRequest.Builder(platformContext)
+                .data(it)
+                .crossfade(true)
+                .listener(
+                    onStart = { println("🎬 Detail Start: $it") },
+                    onSuccess = { _, _ -> println("✅ Detail Loaded: $it") },
+                    onError = { _, r -> println("❌ Detail Error: ${r.throwable.message} (model=$it)") }
+                )
+                .build()
+        }
     }
 
     val scrim = rememberLegibilityScrim()
@@ -217,14 +238,23 @@ fun MovieDetailScreen(
                 )
         ) {
             // Background image
-            AsyncImage(
-                model = posterModel,
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .graphicsLayer { translationY = -scrollState.value * 0.2f },
-                contentScale = ContentScale.Crop
-            )
+            posterRequest?.let {
+                AsyncImage(
+                    model = it,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .graphicsLayer { translationY = -scrollState.value * 0.2f },
+                    contentScale = ContentScale.Crop
+                )
+            } ?: run {
+                Image(
+                    painter = painterResource(Res.drawable.ic_movie_clapper_board),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
 
             // Content on top of the image and below the main content
             Box(

@@ -8,8 +8,8 @@ class FakeImageRepository(
     private val behavior: (String) -> String
 ) : ImageRepository {
 
-    override suspend fun getRemoteImage(localPosterPath: String): String =
-        behavior(localPosterPath)
+    override suspend fun getRemoteImage(remotePosterPath: String): String =
+        behavior(remotePosterPath)
 
     override suspend fun downloadImage(remotePosterPath: String): String =
         behavior(remotePosterPath)

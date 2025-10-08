@@ -66,15 +66,12 @@ class MovieRemoteDataSourceImpl(
         return supervisorScope {
             list.map { movie ->
                 async {
-                    val cover = movie.poster
-                    if (cover?.isBlank() == true) {
-                        Logger.w("Skipping movie ${movie.title} (${movie.id}: poster")
-                        return@async movie
-                    }
+                    val remote = movie.poster
+                    if (remote.isNullOrBlank()) return@async movie
 
                     try {
-                        val localPath = imageRepository.getRemoteImage(movie.poster.orEmpty())
-                        movie.copy(poster = localPath)
+                        val localUrl = imageRepository.getRemoteImage(movie.poster.orEmpty())
+                        movie.copy(poster = localUrl)
                     } catch (e: Exception) {
                         Logger.e("Error downloading image for ${movie.title}: ${e.message}")
                         movie

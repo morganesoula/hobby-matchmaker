@@ -55,6 +55,7 @@ import coil3.compose.AsyncImagePainter
 import coil3.compose.LocalPlatformContext
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
+import coil3.size.Size
 import com.msoula.hobbymatchmaker.core.common.formatOneDecimal
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.component.HMMShimmerEffect
@@ -62,7 +63,7 @@ import com.msoula.hobbymatchmaker.core.design.ic_movie_clapper_board
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiModel
 import kotlinx.coroutines.delay
-import okio.Path.Companion.toPath
+import org.jetbrains.compose.resources.painterResource
 import kotlin.math.abs
 
 @Composable
@@ -73,28 +74,33 @@ fun MovieItem(
     state: LazyListState,
     onCardEvent: (CardEventModel) -> Unit
 ) {
-    val painter = rememberAsyncImagePainter(
-        model = if (movie.coverFilePath.isEmpty()) {
-            ImageRequest.Builder(LocalPlatformContext.current)
-                .data(
-                    Res.drawable.ic_movie_clapper_board
-                ).size(coil3.size.Size(150, 150))
-                .build()
-        } else {
-            ImageRequest.Builder(LocalPlatformContext.current)
-                .data(movie.coverFilePath.toPath())
-                .size(coil3.size.Size.ORIGINAL)
-                .listener(
-                    onStart = { print("\"\uD83C\uDFAC Start loading image\"") },
-                    onSuccess = { _, _ -> print("✅ Success loading image") },
-                    onError = { _, result ->
-                        print(
-                            "❌ Error loading image: " +
-                                "${result.throwable.message}"
-                        )
-                    })
-                .build()
+    val model = remember(movie.coverFilePath) {
+        val source = movie.coverFilePath
+
+        when {
+            source.isBlank() -> null
+            source.startsWith("file:", ignoreCase = true) -> source
+            source.startsWith("http", ignoreCase = true) -> source
+            source.startsWith("/var/")
+                || source.startsWith("/private/var/") -> "file://$source"
+
+            source.startsWith("/") -> "https://image.tmdb.org/t/p/w500$source"
+            else -> source
         }
+    }
+
+    val painter = rememberAsyncImagePainter(
+        model = ImageRequest.Builder(LocalPlatformContext.current)
+            .data(model)
+            .size(Size.ORIGINAL)
+            .listener(
+                onStart = { println("🎬 Start loading image: $model") },
+                onSuccess = { _, _ -> println("✅ Success loading image: $model") },
+                onError = { _, r -> println("❌ Error: ${r.throwable.message} (model=$model)") }
+            )
+            .build(),
+        placeholder = painterResource(Res.drawable.ic_movie_clapper_board),
+        error = painterResource(Res.drawable.ic_movie_clapper_board)
     )
 
     if (painter.state is AsyncImagePainter.State.Loading) {
