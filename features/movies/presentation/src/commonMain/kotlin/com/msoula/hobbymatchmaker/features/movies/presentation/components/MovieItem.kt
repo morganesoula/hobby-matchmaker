@@ -5,7 +5,6 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -39,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -51,19 +51,23 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import coil3.compose.AsyncImagePainter
+import coil3.ImageLoader
 import coil3.compose.LocalPlatformContext
-import coil3.compose.rememberAsyncImagePainter
+import coil3.compose.SubcomposeAsyncImage
+import coil3.compose.SubcomposeAsyncImageContent
+import coil3.network.ktor3.KtorNetworkFetcherFactory
 import coil3.request.ImageRequest
-import coil3.size.Size
+import coil3.request.crossfade
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.formatOneDecimal
-import com.msoula.hobbymatchmaker.core.design.Res
+import com.msoula.hobbymatchmaker.core.design.component.ErrorPosterPlaceholder
 import com.msoula.hobbymatchmaker.core.design.component.HMMShimmerEffect
-import com.msoula.hobbymatchmaker.core.design.ic_movie_clapper_board
+import com.msoula.hobbymatchmaker.core.design.component.LoadingPosterPlaceholder
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiModel
+import io.ktor.client.HttpClient
 import kotlinx.coroutines.delay
-import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
 import kotlin.math.abs
 
 @Composable
@@ -74,49 +78,13 @@ fun MovieItem(
     state: LazyListState,
     onCardEvent: (CardEventModel) -> Unit
 ) {
-    val model = remember(movie.coverFilePath) {
-        val source = movie.coverFilePath
-
-        when {
-            source.isBlank() -> null
-            source.startsWith("file:", ignoreCase = true) -> source
-            source.startsWith("http", ignoreCase = true) -> source
-            source.startsWith("/var/")
-                || source.startsWith("/private/var/") -> "file://$source"
-
-            source.startsWith("/") -> "https://image.tmdb.org/t/p/w500$source"
-            else -> source
-        }
-    }
-
-    val painter = rememberAsyncImagePainter(
-        model = ImageRequest.Builder(LocalPlatformContext.current)
-            .data(model)
-            .size(Size.ORIGINAL)
-            .listener(
-                onStart = { println("🎬 Start loading image: $model") },
-                onSuccess = { _, _ -> println("✅ Success loading image: $model") },
-                onError = { _, r -> println("❌ Error: ${r.throwable.message} (model=$model)") }
-            )
-            .build(),
-        placeholder = painterResource(Res.drawable.ic_movie_clapper_board),
-        error = painterResource(Res.drawable.ic_movie_clapper_board)
+    MovieItemContent(
+        modifier = modifier,
+        state = state,
+        index = index,
+        movie = movie,
+        onCardEvent = onCardEvent
     )
-
-    if (painter.state is AsyncImagePainter.State.Loading) {
-        HMMShimmerEffect(isLoading = true) {}
-    } else {
-        HMMShimmerEffect(isLoading = false) {
-            MovieItemContent(
-                modifier = modifier,
-                state = state,
-                index = index,
-                movie = movie,
-                onCardEvent = onCardEvent,
-                painter = painter
-            )
-        }
-    }
 }
 
 @Composable
@@ -125,8 +93,7 @@ fun MovieItemContent(
     state: LazyListState,
     index: Int,
     movie: MovieUiModel,
-    onCardEvent: (CardEventModel) -> Unit,
-    painter: AsyncImagePainter
+    onCardEvent: (CardEventModel) -> Unit
 ) {
     val scale by remember {
         derivedStateOf {
@@ -165,7 +132,7 @@ fun MovieItemContent(
                 containerColor = Color.Transparent
             )
         ) {
-            MovieItemContentCard(modifier, movie, onCardEvent, painter)
+            MovieItemContentCard(modifier, movie, onCardEvent)
         }
     }
 }
@@ -174,9 +141,10 @@ fun MovieItemContent(
 fun MovieItemContentCard(
     modifier: Modifier = Modifier,
     movie: MovieUiModel,
-    onCardEvent: (CardEventModel) -> Unit,
-    painter: AsyncImagePainter
+    onCardEvent: (CardEventModel) -> Unit
 ) {
+    val imageLoader = rememberCoilImageLoader()
+
     var showBigHeart by remember { mutableStateOf(false) }
     var animateFavorite by remember { mutableStateOf(false) }
 
@@ -224,11 +192,26 @@ fun MovieItemContentCard(
                 )
             }
     ) {
-        Image(
-            painter = painter,
+        SubcomposeAsyncImage(
+            imageLoader = imageLoader,
+            model = ImageRequest.Builder(LocalPlatformContext.current)
+                .data(movie.coverFilePath)
+                .crossfade(true)
+                .build(),
             contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(RoundedCornerShape(5)),
+            contentScale = ContentScale.Crop,
+            loading = {
+                HMMShimmerEffect()
+                LoadingPosterPlaceholder()
+            },
+            error = {
+                Logger.e("Error while syncing poster image")
+                ErrorPosterPlaceholder()
+            },
+            success = { SubcomposeAsyncImageContent() }
         )
 
         Box(
@@ -320,5 +303,19 @@ fun RatingChip(voteAverage: Double, modifier: Modifier = Modifier) {
         Icon(Icons.Default.Star, contentDescription = null, tint = Color.White)
         Spacer(Modifier.width(4.dp))
         Text(voteAverage.formatOneDecimal(), style = MaterialTheme.typography.labelLarge)
+    }
+}
+
+@Composable
+fun rememberCoilImageLoader(): ImageLoader {
+    val context = LocalPlatformContext.current
+    val httpClient: HttpClient = koinInject()
+
+    return remember {
+        ImageLoader.Builder(context)
+            .components {
+                add(KtorNetworkFetcherFactory(httpClient))
+            }
+            .build()
     }
 }

@@ -25,5 +25,4 @@ class MovieDetailLocalDataSourceImpl(
         safeCallStorage {
             movieDAO.updateExistingMovieWithDetail(movieDetail)
         }
-
 }

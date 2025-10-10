@@ -2,7 +2,6 @@ package com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
-import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.common.safeFirebaseCall
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.MovieRemoteModel
@@ -10,9 +9,6 @@ import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.servic
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.ImageRepository
 import dev.gitlive.firebase.firestore.FieldValue
 import dev.gitlive.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.supervisorScope
 
 class MovieRemoteDataSourceImpl(
     private val imageRepository: ImageRepository,
@@ -31,8 +27,7 @@ class MovieRemoteDataSourceImpl(
             }
         }
 
-        val updatedList = updateLocalPosterPath(movies)
-        return AppResult.Success(updatedList)
+        return AppResult.Success(movies)
     }
 
     override suspend fun updateUserFavoriteMovieList(
@@ -61,23 +56,4 @@ class MovieRemoteDataSourceImpl(
     ): AppResult<List<MovieRemoteModel>, AppError> =
         tmdbKtorService.getMoviesByPopularityDesc(language, page)
             .mapSuccess { response -> response.results ?: emptyList() }
-
-    private suspend fun updateLocalPosterPath(list: List<MovieRemoteModel>): List<MovieRemoteModel> {
-        return supervisorScope {
-            list.map { movie ->
-                async {
-                    val remote = movie.poster
-                    if (remote.isNullOrBlank()) return@async movie
-
-                    try {
-                        val localUrl = imageRepository.getRemoteImage(movie.poster.orEmpty())
-                        movie.copy(poster = localUrl)
-                    } catch (e: Exception) {
-                        Logger.e("Error downloading image for ${movie.title}: ${e.message}")
-                        movie
-                    }
-                }
-            }.awaitAll()
-        }
-    }
 }

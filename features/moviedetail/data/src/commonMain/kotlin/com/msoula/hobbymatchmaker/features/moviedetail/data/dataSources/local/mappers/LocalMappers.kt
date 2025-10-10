@@ -19,6 +19,7 @@ fun MovieDetailDataEntity.toMovieDetailDomainModel(): MovieDetailDomainModel {
         synopsis = this.movie.synopsis,
         status = this.movie.status,
         localCoverFilePath = this.movie.localCoverFilePath,
+        coverFileName = this.movie.posterFileName,
         videoKey = this.movie.videoKey,
         cast = this.actors.map { actor ->
             MovieActorDomainModel(

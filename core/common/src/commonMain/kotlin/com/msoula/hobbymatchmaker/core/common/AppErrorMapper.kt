@@ -79,7 +79,7 @@ fun Throwable.toFirebaseError(): AppError = when (this) {
             RX_USER_NOT_FOUND.containsMatchIn(m) -> AppError.Domain.Unauthorized
             RX_USER_DISABLED.containsMatchIn(m) -> AppError.Domain.Forbidden
             RX_RECENT_REQUIRED.containsMatchIn(m) -> AppError.Domain.Unauthorized
-            RX_INVALID_CRED.containsMatchIn(m) -> AppError.Domain.Validation("Invalid credentials")
+            RX_INVALID_CRED.containsMatchIn(m) -> AppError.Authentication.InvalidCredentials
             RX_WEAK_PASSWORD.containsMatchIn(m) -> AppError.Domain.Validation("Weak password")
             else -> AppError.Authentication.Unknown
         }

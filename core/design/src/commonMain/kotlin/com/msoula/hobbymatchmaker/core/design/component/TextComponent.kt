@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -21,9 +22,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -98,6 +102,31 @@ fun ExpandableTextComponent(
             }
         }
     }
+}
+
+@Composable
+fun rememberSubmitKeyBoardActions(onSubmit: (() -> Unit)?): KeyboardActions {
+    val keyboard = LocalSoftwareKeyboardController.current
+    val focus = LocalFocusManager.current
+
+    return KeyboardActions(
+        onNext = { focus.moveFocus(FocusDirection.Down) },
+        onDone = {
+            onSubmit?.let { it() }
+            keyboard?.hide()
+            focus.clearFocus(force = true)
+        },
+        onSend = {
+            onSubmit?.let { it() }
+            keyboard?.hide()
+            focus.clearFocus(force = true)
+        },
+        onGo = {
+            onSubmit?.let { it() }
+            keyboard?.hide()
+            focus.clearFocus(force = true)
+        }
+    )
 }
 
 

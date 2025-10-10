@@ -8,13 +8,18 @@ import com.msoula.hobbymatchmaker.features.movies.data.dataSources.mappers.toMov
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.mappers.toMovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.MovieRemoteDataSource
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
+import com.msoula.hobbymatchmaker.features.movies.domain.repositories.ImageRepository
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.MovieRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.supervisorScope
 
 class MovieRepositoryImpl(
     private val movieRemoteDataSource: MovieRemoteDataSource,
-    private val movieLocalDataSource: MovieLocalDataSource
+    private val movieLocalDataSource: MovieLocalDataSource,
+    private val imageRepository: ImageRepository
 ) : MovieRepository {
 
     override fun observeMovies(): Flow<List<MovieDomainModel>> {
@@ -36,10 +41,32 @@ class MovieRepositoryImpl(
         )
 
     override suspend fun fetchMovies(language: String): AppResult<Unit, AppError> =
-        movieRemoteDataSource.fetchMovies(language)
-            .flatMap { movies ->
-                movieLocalDataSource.upsertAll(movies.map { it.toMovieDB() })
+        movieRemoteDataSource.fetchMovies(language).flatMap { movies ->
+            movieLocalDataSource.upsertAll(movies.map { it.toMovieDB() }).flatMap {
+                supervisorScope {
+                    movies.mapNotNull { m ->
+                        val id = m.id ?: return@mapNotNull null
+                        val remotePath = m.poster ?: return@mapNotNull null
+
+                        async {
+                            try {
+                                val local = imageRepository.getRemoteImage(remotePath)
+                                if (!local.isNullOrBlank()) {
+                                    movieLocalDataSource.updateMovieWithLocalCoverFilePath(
+                                        coverFileName = remotePath,
+                                        localCoverFilePath = local,
+                                        movieId = id.toLong()
+                                    )
+                                }
+                            } catch (e: Exception) {
+
+                            }
+                        }
+                    }.awaitAll()
+                }
+                AppResult.Success(Unit)
             }
+        }
 
     override suspend fun updateMovieFavoriteLocal(id: Long, isFavorite: Boolean) =
         movieLocalDataSource.updateMovieWithFavoriteValue(id, isFavorite)

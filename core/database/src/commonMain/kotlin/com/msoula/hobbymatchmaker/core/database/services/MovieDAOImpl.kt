@@ -209,7 +209,7 @@ class MovieDAOImpl(private val database: HMMDatabase) : MovieDAO {
                 MovieDetailDataEntity(
                     movie = Movie(
                         movieId = movieId, title = firstRow.title,
-                        posterFileName = null,
+                        posterFileName = firstRow.posterFileName,
                         synopsis = firstRow.synopsis,
                         releaseDate = firstRow.releaseDate,
                         genres = firstRow.genres,

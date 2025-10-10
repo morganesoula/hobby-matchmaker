@@ -31,9 +31,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -57,8 +55,6 @@ fun HMMTextFieldAuthComponent(
     keyboardOptions: KeyboardOptions? = null,
     keyboardActions: KeyboardActions? = null
 ) {
-    val focusManager = LocalFocusManager.current
-
     OutlinedTextField(
         value = value,
         onValueChange = { onValueChange(it) },
@@ -79,9 +75,7 @@ fun HMMTextFieldAuthComponent(
                 .padding(horizontal = 16.dp, vertical = 8.dp),
         colors = HMMTextFieldColors(),
         keyboardOptions = keyboardOptions ?: KeyboardOptions.Default,
-        keyboardActions = keyboardActions ?: KeyboardActions(
-            onNext = { focusManager.moveFocus(FocusDirection.Down) }
-        )
+        keyboardActions = keyboardActions ?: rememberSubmitKeyBoardActions {}
     )
 }
 
@@ -137,9 +131,9 @@ fun HMMTextFieldPasswordComponent(
             keyboardType = KeyboardType.Password,
             imeAction = ImeAction.Done
         ),
-        keyboardActions = KeyboardActions(
-            onDone = { onFormDoneClicked() }
-        )
+        keyboardActions = rememberSubmitKeyBoardActions {
+            onFormDoneClicked()
+        }
     )
 }
 

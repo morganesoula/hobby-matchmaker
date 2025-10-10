@@ -3,6 +3,7 @@ package com.msoula.hobbymatchmaker.core.common
 import com.msoula.hobbymatchmaker.core.common.UIText.Resource
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.authentication_already_exists
+import com.msoula.hobbymatchmaker.core.design.authentication_invalid_credentials
 import com.msoula.hobbymatchmaker.core.design.authentication_unknown
 import com.msoula.hobbymatchmaker.core.design.external_service_error
 import com.msoula.hobbymatchmaker.core.design.forbidden
@@ -59,5 +60,6 @@ object DefaultErrorMessageMapper : ErrorMessageMapper {
 
         AppError.Authentication.AlreadyExists -> Resource(Res.string.authentication_already_exists)
         AppError.Authentication.Unknown -> Resource(Res.string.authentication_unknown)
+        AppError.Authentication.InvalidCredentials -> Resource(Res.string.authentication_invalid_credentials)
     }
 }

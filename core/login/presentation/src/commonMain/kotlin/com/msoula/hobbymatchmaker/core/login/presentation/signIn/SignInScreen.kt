@@ -162,6 +162,7 @@ fun SignInScreenContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(8.dp)
                 .background(MaterialTheme.colorScheme.background)
                 .consumeWindowInsets(paddingValues)
                 .verticalScroll(rememberScrollState())

@@ -26,6 +26,7 @@ sealed interface AppError {
     sealed interface Authentication : AppError {
         data object AlreadyExists : Authentication
         data object Unknown : Authentication
+        data object InvalidCredentials : Authentication
     }
 
     sealed interface External : AppError {

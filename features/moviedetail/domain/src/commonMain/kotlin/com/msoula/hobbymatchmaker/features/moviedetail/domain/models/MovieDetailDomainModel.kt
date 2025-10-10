@@ -11,6 +11,7 @@ data class MovieDetailDomainModel(
     val synopsis: String? = null,
     val status: String? = null,
     val localCoverFilePath: String? = null,
+    val coverFileName: String? = null,
     var videoKey: String? = "",
     val cast: List<MovieActorDomainModel>? = null,
     val duration: Int ? = null

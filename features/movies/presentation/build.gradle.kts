@@ -12,6 +12,8 @@ multiplatformConfig {
 kotlin {
     sourceSets {
         commonMain.dependencies {
+            // Coil
+            implementation(libs.findLibrary("coil-network").get())
             // Modules
             implementation(project(Modules.AUTHENTICATION_DOMAIN))
             implementation(project(Modules.COMMON))
@@ -19,6 +21,16 @@ kotlin {
             implementation(project(Modules.DI))
             implementation(project(Modules.MOVIE_DOMAIN))
             implementation(project(Modules.NETWORK))
+        }
+
+        androidMain.dependencies {
+            // Network for Coil
+            implementation(libs.findLibrary("ktor-client-android").get())
+        }
+
+        iosMain.dependencies {
+            // Network for Coil
+            implementation(libs.findLibrary("ktor-client-darwin").get())
         }
     }
 }

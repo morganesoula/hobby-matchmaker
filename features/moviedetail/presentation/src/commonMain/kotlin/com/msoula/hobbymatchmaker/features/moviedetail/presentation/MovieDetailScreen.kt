@@ -66,11 +66,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
+import coil3.network.ktor3.KtorNetworkFetcherFactory
+import coil3.request.ErrorResult
 import coil3.request.ImageRequest
+import coil3.request.SuccessResult
 import coil3.request.crossfade
 import com.msoula.hobbymatchmaker.core.common.CallOnceEffect
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.ObserveEvents
 import com.msoula.hobbymatchmaker.core.common.SnackEffect
 import com.msoula.hobbymatchmaker.core.common.UIText
@@ -84,7 +89,7 @@ import com.msoula.hobbymatchmaker.core.design.component.HMMDetailTopBar
 import com.msoula.hobbymatchmaker.core.design.component.LoadingCircularProgress
 import com.msoula.hobbymatchmaker.core.design.component.LoadingOverlay
 import com.msoula.hobbymatchmaker.core.design.connection_issue
-import com.msoula.hobbymatchmaker.core.design.ic_movie_clapper_board
+import com.msoula.hobbymatchmaker.core.design.ic_no_image_found_playstore
 import com.msoula.hobbymatchmaker.core.design.no_data
 import com.msoula.hobbymatchmaker.core.design.no_trailer_available
 import com.msoula.hobbymatchmaker.core.design.play_icon_accessibility
@@ -95,9 +100,11 @@ import com.msoula.hobbymatchmaker.core.design.theme.successContainerColor
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiEventModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailViewStateModel
+import io.ktor.client.HttpClient
 import kotlinx.coroutines.flow.Flow
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 
 @Composable
 fun MovieDetailContent(
@@ -128,36 +135,12 @@ fun MovieDetailScreen(
     onPlayTrailerClicked: (event: MovieDetailUiEventModel) -> Unit,
     onMovieDetailBackPressed: () -> Unit
 ) {
-    val platformContext = LocalPlatformContext.current
     val snackBarHostState = remember { SnackbarHostState() }
-
     val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
-    val model = remember(movie.posterPath) {
-        val s = movie.posterPath
-        when {
-            s.isBlank() -> null
-            s.startsWith("file:", ignoreCase = true) -> s
-            s.startsWith("http", ignoreCase = true) -> s
-            s.startsWith("/var/") || s.startsWith("/private/var/") -> "file://$s"
-            s.startsWith("/") -> "https://image.tmdb.org/t/p/w500$s"
-            else -> s
-        }
-    }
-
-    val posterRequest = remember(model) {
-        model?.let {
-            ImageRequest.Builder(platformContext)
-                .data(it)
-                .crossfade(true)
-                .listener(
-                    onStart = { println("🎬 Detail Start: $it") },
-                    onSuccess = { _, _ -> println("✅ Detail Loaded: $it") },
-                    onError = { _, r -> println("❌ Detail Error: ${r.throwable.message} (model=$it)") }
-                )
-                .build()
-        }
-    }
+    val context = LocalPlatformContext.current
+    val imageLoader = rememberCoilImageLoader()
+    val posterUrl = movie.posterPath.takeIf { it.isNotBlank() }
 
     val scrim = rememberLegibilityScrim()
     val titleShadow = Shadow(
@@ -238,9 +221,27 @@ fun MovieDetailScreen(
                 )
         ) {
             // Background image
-            posterRequest?.let {
+            posterUrl?.let {
                 AsyncImage(
-                    model = it,
+                    imageLoader = imageLoader,
+                    model = ImageRequest.Builder(context)
+                        .data(posterUrl)
+                        .crossfade(true)
+                        .listener(
+                            object : ImageRequest.Listener {
+                                override fun onSuccess(
+                                    request: ImageRequest,
+                                    result: SuccessResult
+                                ) {
+                                    Logger.d("✅ detail bg loaded: ${request.data}")
+                                }
+
+                                override fun onError(request: ImageRequest, result: ErrorResult) {
+                                    Logger.e("❌ detail bg error: ${request.data} → ${result.throwable.message}")
+                                }
+                            }
+                        )
+                        .build(),
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxSize()
@@ -249,7 +250,7 @@ fun MovieDetailScreen(
                 )
             } ?: run {
                 Image(
-                    painter = painterResource(Res.drawable.ic_movie_clapper_board),
+                    painter = painterResource(Res.drawable.ic_no_image_found_playstore),
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
@@ -514,5 +515,19 @@ fun EmptyMovieDetailScreen() {
             text = stringResource(Res.string.no_data),
             style = MaterialTheme.typography.bodyLarge
         )
+    }
+}
+
+@Composable
+fun rememberCoilImageLoader(): ImageLoader {
+    val context = LocalPlatformContext.current
+    val httpClient: HttpClient = koinInject()
+
+    return remember {
+        ImageLoader.Builder(context)
+            .components {
+                add(KtorNetworkFetcherFactory(httpClient))
+            }
+            .build()
     }
 }

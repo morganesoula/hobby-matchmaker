@@ -28,11 +28,28 @@ data class MovieDetailUiModel(
 )
 
 suspend fun MovieDetailDomainModel.toMovieDetailUiModel(): MovieDetailUiModel {
+    val local = this.localCoverFilePath.orEmpty()
+    val remote = this.coverFileName.orEmpty()
+
+    val resolvedPoster = when {
+        local.startsWith("file://", ignoreCase = true) -> local
+        local.startsWith("/data/")
+            || local.startsWith("/storage/")
+            || local.startsWith("/var/")
+            || local.startsWith("/private/var/")
+            -> "file://$local"
+
+        remote.startsWith("http", ignoreCase = true) -> remote
+        remote.startsWith("/") -> "https://image.tmdb.org/t/p/w500$remote"
+
+        else -> MovieDetailDomainModel.DEFAULT_POSTER_PATH
+    }
+
     return MovieDetailUiModel(
         id = this.id ?: MovieDetailDomainModel.DEFAULT_ID,
         title = this.title ?: MovieDetailDomainModel.DEFAULT_TITLE,
         synopsis = this.synopsis ?: MovieDetailDomainModel.DEFAULT_SYNOPSIS,
-        posterPath = this.localCoverFilePath ?: MovieDetailDomainModel.DEFAULT_POSTER_PATH,
+        posterPath = resolvedPoster,
         genre = this.genre?.map { it.name ?: "" } ?: listOf(GenreDomainModel.DEFAULT_NAME),
         releaseDate = this.releaseDate?.extractYear()
             ?: MovieDetailDomainModel.DEFAULT_RELEASE_DATE,
