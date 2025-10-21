@@ -10,8 +10,8 @@
 		A107BB8E2DBC08CA00ABD150 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A107BB8D2DBC08CA00ABD150 /* libsqlite3.tbd */; };
 		A18419902DCFD1930033E797 /* YouTubeiOSPlayerHelper in Frameworks */ = {isa = PBXBuildFile; productRef = A184198F2DCFD1930033E797 /* YouTubeiOSPlayerHelper */; };
 		A194D2AD2DC2897E001FDC09 /* exportedNativeIosShared in Frameworks */ = {isa = PBXBuildFile; productRef = A194D2AC2DC2897E001FDC09 /* exportedNativeIosShared */; };
-		A1B42AE22E8EDA2000C218FD /* composeApp.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1B42AE12E8EDA2000C218FD /* composeApp.xcframework */; };
-		A1B42AE32E8EDA2000C218FD /* composeApp.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A1B42AE12E8EDA2000C218FD /* composeApp.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		A1F3BA3E2DCA4DE6005104EF /* composeApp.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1F3BA3D2DCA4DE6005104EF /* composeApp.xcframework */; };
+		A1F3BA3F2DCA4DE6005104EF /* composeApp.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A1F3BA3D2DCA4DE6005104EF /* composeApp.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,7 +38,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				A1B42AE32E8EDA2000C218FD /* composeApp.xcframework in Embed Frameworks */,
+				A1F3BA3F2DCA4DE6005104EF /* composeApp.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -50,11 +50,11 @@
 		A1654D952D5BB95100F7F8E6 /* HobbyMatchMaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HobbyMatchMaker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1654DA52D5BB95200F7F8E6 /* iosAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iosAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1654DAF2D5BB95200F7F8E6 /* iosAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iosAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		A1B42AE12E8EDA2000C218FD /* composeApp.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = composeApp.xcframework; path = ../composeApp/build/XCFrameworks/debug/composeApp.xcframework; sourceTree = "<group>"; };
+		A1F3BA3D2DCA4DE6005104EF /* composeApp.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = composeApp.xcframework; path = ../composeApp/build/XCFrameworks/debug/composeApp.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		A1E0AC822E966C520072A1C8 /* Exceptions for "iosApp" folder in "iosApp" target */ = {
+		A18DEC7B2EA7E3390065D9B8 /* Exceptions for "iosApp" folder in "iosApp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -67,7 +67,7 @@
 		A1654D972D5BB95100F7F8E6 /* iosApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				A1E0AC822E966C520072A1C8 /* Exceptions for "iosApp" folder in "iosApp" target */,
+				A18DEC7B2EA7E3390065D9B8 /* Exceptions for "iosApp" folder in "iosApp" target */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -89,7 +89,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A1B42AE22E8EDA2000C218FD /* composeApp.xcframework in Frameworks */,
+				A1F3BA3E2DCA4DE6005104EF /* composeApp.xcframework in Frameworks */,
 				A107BB8E2DBC08CA00ABD150 /* libsqlite3.tbd in Frameworks */,
 				A194D2AD2DC2897E001FDC09 /* exportedNativeIosShared in Frameworks */,
 				A18419902DCFD1930033E797 /* YouTubeiOSPlayerHelper in Frameworks */,
@@ -116,7 +116,7 @@
 		7DEDD20BC06CE39FE6B82CDD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				A1B42AE12E8EDA2000C218FD /* composeApp.xcframework */,
+				A1F3BA3D2DCA4DE6005104EF /* composeApp.xcframework */,
 				A107BB8D2DBC08CA00ABD150 /* libsqlite3.tbd */,
 			);
 			name = Frameworks;
@@ -505,8 +505,6 @@
 		};
 		A1654DBA2D5BB95200F7F8E6 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = A1654D972D5BB95100F7F8E6 /* iosApp */;
-			baseConfigurationReferenceRelativePath = secrets.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -523,8 +521,6 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/Pods";
 				INFOPLIST_FILE = iosApp/Info.plist;
-				INFOPLIST_KEY_CADisableMinimumFrameDurationOnPhone = YES;
-				INFOPLIST_KEY_TMDB_KEY = "$(TMDB_KEY)";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -553,8 +549,6 @@
 		};
 		A1654DBB2D5BB95200F7F8E6 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = A1654D972D5BB95100F7F8E6 /* iosApp */;
-			baseConfigurationReferenceRelativePath = secrets.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -571,8 +565,6 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/Pods";
 				INFOPLIST_FILE = iosApp/Info.plist;
-				INFOPLIST_KEY_CADisableMinimumFrameDurationOnPhone = YES;
-				INFOPLIST_KEY_TMDB_KEY = "$(TMDB_KEY)";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
