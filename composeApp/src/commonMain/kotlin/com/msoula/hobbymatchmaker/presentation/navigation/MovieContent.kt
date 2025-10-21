@@ -3,6 +3,7 @@ package com.msoula.hobbymatchmaker.presentation.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import com.msoula.hobbymatchmaker.core.common.asString
 import com.msoula.hobbymatchmaker.core.design.component.LoadingCircularProgress
 import com.msoula.hobbymatchmaker.core.design.component.PlatformBackHandler
 import com.msoula.hobbymatchmaker.core.navigation.domain.MainComponent
@@ -16,6 +17,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun MovieContent(component: MainComponent) {
     val movieViewModel = koinViewModel<MovieViewModel>()
+
     val moviesState by movieViewModel.movieState.collectAsState()
     val oneTimeEventChannelFlow = movieViewModel.oneTimeEventChannelFlow
 
@@ -32,7 +34,7 @@ fun MovieContent(component: MainComponent) {
         }
 
         is MovieUiStateModel.Empty -> EmptyMovieScreen()
-        is MovieUiStateModel.Error -> ErrorMovieScreen(error = (moviesState as MovieUiStateModel.Error).errorMessage)
+        is MovieUiStateModel.Error -> ErrorMovieScreen(error = (moviesState as MovieUiStateModel.Error).errorMessage.asString())
         else -> LoadingCircularProgress()
     }
 

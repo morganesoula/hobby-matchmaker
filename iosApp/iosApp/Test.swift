@@ -10,7 +10,7 @@ import UIKit
 import FirebaseCore
 import FirebaseAuth
 import GoogleSignIn
-import ComposeApp
+import composeApp
 
 @objcMembers public class IosNativeSocialCredential: NSObject {
 

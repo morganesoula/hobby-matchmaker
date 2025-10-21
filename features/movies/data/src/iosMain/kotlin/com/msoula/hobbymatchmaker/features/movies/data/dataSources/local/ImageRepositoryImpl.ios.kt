@@ -2,16 +2,19 @@ package com.msoula.hobbymatchmaker.features.movies.data.dataSources.local
 
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.ImageRepository
+import io.ktor.util.date.getTimeMillis
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import platform.Foundation.NSCachesDirectory
 import platform.Foundation.NSData
-import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
-import platform.Foundation.NSSearchPathForDirectoriesInDomains
+import platform.Foundation.NSFileSize
+import platform.Foundation.NSNumber
 import platform.Foundation.NSURL
 import platform.Foundation.NSUserDomainMask
 import platform.Foundation.dataWithContentsOfURL
-import platform.Foundation.writeToFile
+import platform.Foundation.writeToURL
 
 class ImageRepositoryImpl(
     private val coroutineDispatcher: CoroutineDispatcher
@@ -21,17 +24,23 @@ class ImageRepositoryImpl(
         coverFileName: String,
         updateMovie: suspend (localImagePath: String) -> Unit
     ) {
-        val localImagePath = downloadImage(coverFileName)
-        updateMovie(localImagePath)
+        downloadImage(coverFileName)?.let { updateMovie(it) }
     }
 
-    override suspend fun getRemoteImage(localPosterPath: String): String {
-        return downloadImage(localPosterPath)
+    override suspend fun getRemoteImage(remotePosterPath: String): String? {
+        return downloadImage(remotePosterPath)
     }
 
-    override suspend fun downloadImage(remotePosterPath: String): String {
-        val imgPrefix = "https://image.tmdb.org/t/p/w500"
-        val fullURL = "$imgPrefix$remotePosterPath"
+    override suspend fun downloadImage(remotePosterPath: String): String? {
+        val raw = remotePosterPath.trim()
+        if (raw.isBlank()) return null
+
+        if (raw.startsWith("file://", ignoreCase = true)) return raw
+        if (raw.startsWith("/var/") || raw.startsWith("/private/var/"))
+            return "file://$raw"
+
+        val base = "https://image.tmdb.org/t/p/w500"
+        val fullURL = if (raw.startsWith("http", ignoreCase = true)) raw else "$base$raw"
 
         return try {
             val imageData = withContext(coroutineDispatcher) {
@@ -40,47 +49,69 @@ class ImageRepositoryImpl(
 
             if (imageData == null) {
                 Logger.d("Failed to download image")
-                ""
+                null
             } else {
-                saveImageToLocal(imageData, remotePosterPath)
+                val imageName = when {
+                    raw.startsWith("http", ignoreCase = true) -> raw.substringAfterLast('/')
+                        .substringBefore('?')
+
+                    raw.startsWith("/") -> raw.removePrefix("/")
+                    else -> raw
+                }.ifBlank { "poster_${getTimeMillis()}.jpg" }
+
+                saveImageToLocal(imageData, imageName)
             }
         } catch (e: Exception) {
-            Logger.e("Failed to download image")
-            ""
+            Logger.e("Failed to download image: ${e.message}")
+            null
         }
     }
 
+    @OptIn(ExperimentalForeignApi::class)
     private fun saveImageToLocal(
         imageData: NSData,
         imageName: String
-    ): String {
+    ): String? {
         return try {
             val cleanImageName = imageName.removePrefix("/")
-            val documentsPath = NSSearchPathForDirectoriesInDomains(
-                directory = NSDocumentDirectory,
-                domainMask = NSUserDomainMask,
-                expandTilde = true
-            ).first() as String
+            val fm = NSFileManager.defaultManager
+            val baseDirUrl =
+                fm.URLsForDirectory(NSCachesDirectory, NSUserDomainMask).first() as NSURL
+            val imagesDirUrl = baseDirUrl.URLByAppendingPathComponent("Images", isDirectory = true)
 
-            val filePath = "$documentsPath/$cleanImageName"
-            val fileManager = NSFileManager.defaultManager
-
-            if (!fileManager.fileExistsAtPath(filePath)) {
-                val success = imageData.writeToFile(filePath, atomically = true)
-                if (success) {
-                    Logger.d("Successfully saved image: $filePath")
-                } else {
-                    Logger.e("Writing failure: $filePath")
-                    return ""
-                }
-            } else {
-                Logger.d("File already exists: $filePath")
+            if (!fm.fileExistsAtPath(imagesDirUrl?.path!!)) {
+                fm.createDirectoryAtPath(
+                    imagesDirUrl.path!!,
+                    withIntermediateDirectories = true,
+                    attributes = null,
+                    error = null
+                )
             }
 
-            filePath
+            val fileUrl =
+                imagesDirUrl.URLByAppendingPathComponent(cleanImageName, isDirectory = false)
+
+            if (fm.fileExistsAtPath(fileUrl?.path!!)) {
+                val attrs = fm.attributesOfItemAtPath(fileUrl.path!!, null)
+                val size = (attrs?.get(NSFileSize) as? NSNumber)?.longLongValue ?: 0L
+                if (size > 0L) {
+                    val absolute = fileUrl.absoluteString
+                    Logger.d("Image already cached: $absolute (size=$size)")
+                    return absolute
+                }
+            }
+
+            val ok = imageData.writeToURL(fileUrl, atomically = true)
+            val exists = fm.fileExistsAtPath(fileUrl.path!!)
+            val attrs = fm.attributesOfItemAtPath(fileUrl.path!!, null)
+            val size = (attrs?.get(NSFileSize) as? NSNumber)?.longLongValue ?: 0L
+            val absolute = fileUrl.absoluteString
+
+            Logger.d("Saved ok=$ok exists=$exists size=$size at $absolute")
+            if (!ok || !exists || size <= 0L) null else absolute
         } catch (e: Exception) {
             Logger.e("Exception while writing image: ${e.message}")
-            ""
+            null
         }
     }
 }

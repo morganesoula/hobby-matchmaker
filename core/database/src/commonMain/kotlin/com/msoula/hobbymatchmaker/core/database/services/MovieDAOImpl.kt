@@ -28,7 +28,9 @@ class MovieDAOImpl(private val database: HMMDatabase) : MovieDAO {
             isSeen = movie.isSeen,
             popularity = movie.popularity,
             status = movie.status,
-            videoKey = movie.videoKey
+            videoKey = movie.videoKey,
+            duration = movie.duration,
+            note = movie.note
         )
     }
 
@@ -45,7 +47,9 @@ class MovieDAOImpl(private val database: HMMDatabase) : MovieDAO {
             isSeen = movie.isSeen,
             popularity = movie.popularity,
             status = movie.status,
-            videoKey = movie.videoKey
+            videoKey = movie.videoKey,
+            duration = movie.duration,
+            note = movie.note
         )
     }
 
@@ -68,7 +72,9 @@ class MovieDAOImpl(private val database: HMMDatabase) : MovieDAO {
                         isSeen = movie.isSeen,
                         popularity = movie.popularity,
                         status = movie.status,
-                        videoKey = movie.videoKey
+                        videoKey = movie.videoKey,
+                        duration = movie.duration,
+                        note = movie.note
                     )
                 } else {
                     database.hmm_databaseQueries.updateExistingMovie(
@@ -83,7 +89,9 @@ class MovieDAOImpl(private val database: HMMDatabase) : MovieDAO {
                         isSeen = movie.isSeen,
                         popularity = movie.popularity,
                         status = movie.status,
-                        videoKey = movie.videoKey
+                        videoKey = movie.videoKey,
+                        duration = movie.duration,
+                        note = movie.note
                     )
                 }
             }
@@ -98,6 +106,7 @@ class MovieDAOImpl(private val database: HMMDatabase) : MovieDAO {
                 movieUpdated.status,
                 movieUpdated.popularity,
                 movieUpdated.genres,
+                movieUpdated.duration?.toLong(),
                 movieUpdated.movieId
             )
 
@@ -200,7 +209,7 @@ class MovieDAOImpl(private val database: HMMDatabase) : MovieDAO {
                 MovieDetailDataEntity(
                     movie = Movie(
                         movieId = movieId, title = firstRow.title,
-                        posterFileName = null,
+                        posterFileName = firstRow.posterFileName,
                         synopsis = firstRow.synopsis,
                         releaseDate = firstRow.releaseDate,
                         genres = firstRow.genres,
@@ -210,6 +219,8 @@ class MovieDAOImpl(private val database: HMMDatabase) : MovieDAO {
                         popularity = firstRow.popularity,
                         status = firstRow.status,
                         videoKey = firstRow.videoKey,
+                        duration = firstRow.duration,
+                        note = null
                     ),
                     actors = rows
                         .filter { it.actorId != null }
@@ -234,5 +245,9 @@ class MovieDAOImpl(private val database: HMMDatabase) : MovieDAO {
 
     override suspend fun isMovieSynopsisAvailable(movieId: Long): Boolean {
         return database.hmm_databaseQueries.isMovieSynopsisAvailable(movieId).executeAsOne()
+    }
+
+    override suspend fun getFavoriteLocalMovieIds(): List<Long> {
+        return database.hmm_databaseQueries.getFavoriteIds().executeAsList()
     }
 }

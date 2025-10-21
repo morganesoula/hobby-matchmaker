@@ -3,6 +3,7 @@ package com.msoula.hobbymatchmaker.core.design.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -25,8 +27,14 @@ import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 
 @Composable
 fun HMMIosTopBar(
@@ -84,6 +92,7 @@ fun BoxScope.HMMHomeTopBar(onLogoutIconClick: () -> Unit) {
                 shape = CircleShape
             )
             .clickable(onClick = onLogoutIconClick)
+            .semantics { role = Role.Button }
             .align(Alignment.TopEnd),
         contentAlignment = Alignment.Center
     ) {
@@ -97,22 +106,28 @@ fun BoxScope.HMMHomeTopBar(onLogoutIconClick: () -> Unit) {
 
 @Composable
 fun BoxScope.HMMDetailTopBar(onNavigationIconClick: () -> Unit) {
+    val isLightTheme = !isSystemInDarkTheme()
+    val backgroundColor = if (isLightTheme) Color.Black.copy(alpha = 0.6f) else
+        MaterialTheme.colorScheme.surface.copy(0.6f)
+    val iconColor = if (isLightTheme) Color.White else MaterialTheme.colorScheme.onSurface
+
     Box(
         modifier = Modifier
-            .padding(top = 16.dp, start = 16.dp)
-            .size(44.dp)
-            .background(
-                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
-                shape = CircleShape
-            )
+            .statusBarsPadding()
+            .padding(top = 8.dp, start = 8.dp)
+            .size(40.dp)
+            .clip(CircleShape)
+            .background(color = backgroundColor)
             .clickable(onClick = onNavigationIconClick)
-            .align(Alignment.TopStart),
+            .shadow(elevation = 4.dp, shape = CircleShape)
+            .align(Alignment.TopStart)
+            .zIndex(1f),
         contentAlignment = Alignment.Center
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
             contentDescription = "Back",
-            tint = MaterialTheme.colorScheme.onSurface
+            tint = iconColor
         )
     }
 }

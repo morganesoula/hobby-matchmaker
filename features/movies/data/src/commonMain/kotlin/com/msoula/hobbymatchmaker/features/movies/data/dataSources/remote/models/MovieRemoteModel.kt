@@ -7,5 +7,6 @@ import kotlinx.serialization.Serializable
 data class MovieRemoteModel(
     @SerialName("id") val id: Int? = null,
     @SerialName("title") val title: String? = null,
-    @SerialName("poster_path") val poster: String? = null
+    @SerialName("poster_path") val poster: String? = null,
+    @SerialName("vote_average") val note: Double? = null
 )

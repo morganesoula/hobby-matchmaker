@@ -6,10 +6,17 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
+            // Compose Resources
+            implementation(compose.runtime)
+            implementation(compose.components.resources)
+
             implementation(libs.findLibrary("kotlinx-datetime").get())
 
             // FireStore
             implementation(libs.findLibrary("firebase-kmp-firestore").get())
+
+            // Ktor
+            implementation(libs.findBundle("ktor").get())
 
             // Modules
             implementation(project(Modules.DESIGN))
@@ -25,10 +32,19 @@ kotlin {
             implementation(libs.findLibrary("timber-android").get())
         }
 
-        iosMain.dependencies {  }
+        iosMain.dependencies { }
     }
 }
 
 android {
     namespace = "com.msoula.hobbymatchmaker.core.common"
+    androidResources {
+        enable = false
+    }
+}
+
+compose.resources {
+    publicResClass = true
+    packageOfResClass = "com.msoula.hobbymatchmaker.core.common"
+    generateResClass = always
 }

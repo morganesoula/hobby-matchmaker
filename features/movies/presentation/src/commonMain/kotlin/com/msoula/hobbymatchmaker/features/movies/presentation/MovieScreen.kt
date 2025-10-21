@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.features.movies.presentation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
@@ -16,22 +19,26 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
-import com.msoula.hobbymatchmaker.core.common.ObserveAsEvents
+import com.msoula.hobbymatchmaker.core.common.CallOnceEffect
+import com.msoula.hobbymatchmaker.core.common.ObserveEvents
+import com.msoula.hobbymatchmaker.core.common.SnackEffect
+import com.msoula.hobbymatchmaker.core.common.UIText
 import com.msoula.hobbymatchmaker.core.common.isIosPlatform
+import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.component.HMMHomeTopBar
+import com.msoula.hobbymatchmaker.core.design.no_fetching_detail_possible
 import com.msoula.hobbymatchmaker.features.movies.presentation.components.MovieItem
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun MovieScreenContent(
@@ -44,50 +51,62 @@ fun MovieScreenContent(
     redirectToAuth: () -> Unit
 ) {
     val listState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
 
-    val noFetchingDetailPossibleMessage = stringResource(Res.string.no_fetching_detail_possible)
-
-    ObserveAsEvents(flow = oneTimeEventChannelFlow) { event ->
-        coroutineScope.launch {
-            when (event) {
-                is MovieUiEventModel.OnMovieDetailClicked ->
+    ObserveEvents(oneTimeEventChannelFlow) { event ->
+        when (event) {
+            is MovieUiEventModel.OnMovieDetailClicked ->
+                CallOnceEffect(event) {
                     redirectToMovieDetail(event.movieId)
+                }
 
-                is MovieUiEventModel.OnMovieUiFetchedError ->
-                    snackBarHostState.showSnackbar(message = event.error)
+            is MovieUiEventModel.OnLogOutSuccess ->
+                CallOnceEffect(event) {
+                    redirectToAuth()
+                }
 
-                is MovieUiEventModel.OnLogOutFailure ->
-                    snackBarHostState.showSnackbar(message = event.error)
+            is MovieUiEventModel.OnMovieUiFetchedError ->
+                SnackEffect(snackBarHostState, event.error, event)
 
-                is MovieUiEventModel.OnLogOutSuccess -> redirectToAuth()
+            is MovieUiEventModel.OnLogOutFailure ->
+                SnackEffect(snackBarHostState, event.error, event)
 
-                is MovieUiEventModel.NoFetchingDetailPossible ->
-                    snackBarHostState.showSnackbar(noFetchingDetailPossibleMessage)
-            }
+            is MovieUiEventModel.ShowError ->
+                SnackEffect(snackBarHostState, event.error, event)
+
+            is MovieUiEventModel.NoFetchingDetailPossible ->
+                SnackEffect(
+                    snackBarHostState,
+                    UIText.Resource(Res.string.no_fetching_detail_possible),
+                    event
+                )
         }
     }
 
     Scaffold(
         snackbarHost = {
             SnackbarHost(snackBarHostState) { data ->
-                Snackbar(modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth()) {
+                Snackbar(
+                    modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }
+                        .padding(horizontal = 16.dp).fillMaxWidth(),
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    shape = RoundedCornerShape(8.dp)
+                ) {
                     Text(text = data.visuals.message)
                 }
             }
         }
     ) { padding ->
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .padding(
                     top = if (isIosPlatform()) padding.calculateTopPadding() - 8.dp else padding.calculateTopPadding(),
                     bottom = padding.calculateBottomPadding(),
                     start = padding.calculateStartPadding(LocalLayoutDirection.current),
-                    end = padding.calculateStartPadding(LocalLayoutDirection.current)
-                )
-                .zIndex(0f),
+                    end = padding.calculateEndPadding(LocalLayoutDirection.current)
+                ),
             contentAlignment = Alignment.Center
         ) {
             LazyRow(

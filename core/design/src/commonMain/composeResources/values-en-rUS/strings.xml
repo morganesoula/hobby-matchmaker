@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    // GENERAL
+    <string name="welcome_title">Welcome!</string>
+    <string name="welcome_subtitle">Create your HobbyMatchMaker account</string>
+    <string name="welcome_back_title">Welcome back!</string>
+    <string name="welcome_back_subtitle">Sign in to HobbyMatchMaker</string>
+
+    // ACCESSIBILITY
+    <string name="facebook_alt">Facebook logo</string>
+    <string name="google_alt">Google logo</string>
+    <string name="apple_alt">Apple Logo</string>
+    <string name="actor_name_content_description">Actor name</string>
+
+    // FORM
+    <string name="firstname">First name</string>
+    <string name="lastname">Last name</string>
+    <string name="example">Example:&#160;</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="at_least">At least:&#160;</string>
+    <string name="password_hint"> 8 characters • 1 number • 1 uppercase \n• 1 lowercase • 1 special character</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="already_a_member">Already using HobbyMatchMaker? </string>
+    <string name="already_a_member_connect">Log in</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="log_in">Log In</string>
+    <string name="new_member">Not a member? </string>
+    <string name="new_member_clickable_part">Sign up</string>
+    <string name="forgot_password_title">Please enter your email address. We will send you an email with instructions to reset your password.</string>
+    <string name="your_email">Your email</string>
+    <string name="reset_password">Reset password</string>
+    <string name="cancel">Cancel</string>"
+    <string name="sign_out">Sign Out</string>
+    <string name="email_sent">Please check your inbox</string>
+    <string name="continue_with_rs">Or continue with</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
+    <string name="sign_in_with_facebook">Sign in with Facebook</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="sign_in_with_apple">Sign in with Apple</string>
+
+    // ERROR
+    <string name="login_error">Incorrect email or password</string>
+    <string name="signup_error">This email is already associated with an existing account</string>
+    <string name="email_already_exists_error">This email is already associated with an existing account</string>
+    <string name="user_disabled_error">This account is disabled</string>
+    <string name="too_many_requests_error">Too many attempts: please try again later</string>
+    <string name="internal_error">An internal error occurred: the development teams have been notified</string>
+    <string name="user_not_found_error">User not found. Please register first</string>
+    <string name="reset_password_error">Could not reset your password</string>
+    <string name="malformed_sign_in_error">Oops, please check your credentials</string>
+    <string name="connection_issue">Connection issue. Please check your network</string>
+    <string name="rest_password_other_error">An error occurred. Please contact the development team.</string>
+
+    // OTHER
+    <string name="continue_as_guest_button_title">Continue as guest</string>
+    <string name="continue_as_guest_dialog_title">Try as guest</string>
+    <string name="continue_as_guest_dialog_text">Start without an account: some features are restricted (sync, recovery). You can create an account later to keep your data.</string>
+    <string name="continue_as_guest_dont_ask_again">Don't ask again</string>
+    <string name="continue_as_guest_create_redirect_button">Create an account</string>
+    <string name="continue_as_guest_validation_button">Continue</string>
+
+    <string name="movies_network_error">Error loading movies</string>
+    <string name="movies_api_error">The data source is not responding</string>
+    <string name="movies_unknown_error">An unknown error occurred</string>
+    <string name="no_fetching_detail_possible">This movie's details need an internet
+        connection to load. Try again when you're back online!</string>
+
+    <string name="play_trailer">Play trailer</string>
+    <string name="cast">Top Cast</string>
+    <string name="no_data">No data found</string>
+    <string name="play_icon_accessibility">Play trailer icon</string>
+    <string name="show_less"> Show less</string>
+    <string name="show_more">… Show more</string>
+    <string name="no_trailer_available">No trailer available at the moment</string>
+    <string name="credit_error">No cast found</string>
+    <string name="back">Back</string>
+
+    <string name="movie_rumored">Rumored</string>
+    <string name="movie_planned">Planned</string>
+    <string name="movie_in_production">In Production</string>
+    <string name="movie_post_production">Post Production</string>
+    <string name="movie_released">Released</string>
+    <string name="movie_canceled">Canceled</string>
+
+    <string name="network_timeout">Request timed out. Please try again.</string>
+    <string name="network_unreachable">No internet connection.</string>
+    <string name="http_error_code">Server error (%1$d).</string>
+    <string name="request_canceled">Request canceled.</string>
+    <string name="serialization_error">Invalid response from server.</string>
+    <string name="unknown_error">Something went wrong.</string>
+
+    <string name="validation_error">%1$s</string>
+    <string name="unauthorized">You need to sign in.</string>
+    <string name="forbidden">You don’t have permission.</string>
+    <string name="not_found">Not found.</string>
+
+    <string name="external_service_error">External service error: %1$s</string>
+
+    <string name="storage_write_failed">Unable to save your data.</string>
+    <string name="storage_read_failed">Unable to load your data.</string>
+    <string name="storage_corrupted">Local data appears to be corrupted.</string>
+
+    <string name="authentication_already_exists">An account already exists. Please sign in :)</string>
+    <string name="authentication_unknown">Sign-in failed. Try again!</string>
+    <string name="authentication_invalid_credentials">Invalid credentials.</string>
+</resources>

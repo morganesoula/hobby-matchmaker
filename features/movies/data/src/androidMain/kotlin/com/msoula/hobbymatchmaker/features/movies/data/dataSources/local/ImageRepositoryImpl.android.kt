@@ -8,41 +8,63 @@ import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.ImageRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import java.net.HttpURLConnection
 import java.net.URL
 
 class ImageRepositoryImpl(
     private val coroutineDispatcher: CoroutineDispatcher,
     private val context: Context
-): ImageRepository {
+) : ImageRepository {
 
     override suspend fun saveRemoteImageAndUpdateMovie(
         coverFileName: String,
         updateMovie: suspend (localImagePath: String) -> Unit
     ) {
         val localImagePath = downloadImage(coverFileName)
-        updateMovie(localImagePath)
+        localImagePath?.let { updateMovie(it) }
     }
 
-    override suspend fun getRemoteImage(localPosterPath: String) = downloadImage(localPosterPath)
+    override suspend fun getRemoteImage(remotePosterPath: String) = downloadImage(remotePosterPath)
 
-    override suspend fun downloadImage(remotePosterPath: String): String {
+    override suspend fun downloadImage(remotePosterPath: String): String? {
+        var imageName = ""
+
+        val raw = remotePosterPath.trim()
+        if (raw.isBlank()) return null
+
+        if (raw.startsWith("/data/") || raw.startsWith("/storage/")) return raw
+
         val imgPrefix = "https://image.tmdb.org/t/p/w500"
-        val fullURL = "$imgPrefix$remotePosterPath"
+        val fullURL = "$imgPrefix$raw"
 
         return try {
             val bitmap = withContext(coroutineDispatcher) {
-                BitmapFactory.decodeStream(URL(fullURL).openStream())
+                val connexion = (URL(fullURL).openConnection() as HttpURLConnection).apply {
+                    connectTimeout = 8000
+                    readTimeout = 8000
+                    instanceFollowRedirects = true
+                }
+
+                connexion.inputStream.use { stream ->
+                    BitmapFactory.decodeStream(stream)
+                }
             }
 
             if (bitmap == null) {
                 Logger.e("Bitmap is null for URL: $fullURL")
-                ""
+                null
             } else {
-                saveImageToLocal(bitmap, remotePosterPath)
+                imageName = if (raw.isBlank()) {
+                    "poster_${System.currentTimeMillis()}.jpg"
+                } else {
+                    if (raw.startsWith("/")) raw.removePrefix("/") else raw
+                }
             }
+
+            saveImageToLocal(bitmap, imageName)
         } catch (e: Exception) {
             Logger.e("Exception while downloading image: ${e.message}")
-            ""
+            null
         }
     }
 

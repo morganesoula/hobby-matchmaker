@@ -1,151 +1,88 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases
 
 import com.msoula.hobbymatchmaker.core.common.AppError
-import com.msoula.hobbymatchmaker.core.common.FlowUseCase
-import com.msoula.hobbymatchmaker.core.common.Logger
-import com.msoula.hobbymatchmaker.core.common.Parameters
-import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainError
+import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.core.common.toStorageError
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieActorDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.repositories.MovieDetailRepository
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.launch
-
-class ObserveMovieDetailUseCase(
-    private val movieDetailRepository: MovieDetailRepository,
-    private val dispatcher: CoroutineDispatcher
-) :
-    FlowUseCase<Parameters.LongStringParam, ObserveMovieSuccess, ObserveMovieErrors>(
-        dispatcher
-    ) {
-    override fun execute(parameters: Parameters.LongStringParam):
-        Flow<Result<ObserveMovieSuccess, ObserveMovieErrors>> {
-
-        return channelFlow {
-            send(Result.Loading)
-
-            val job = launch {
-                movieDetailRepository.observeMovieDetail(parameters.longValue)
-                    .collect { movieDetail ->
-                        when {
-                            movieDetail == null -> send(Result.Failure(ObserveMovieErrors.Empty))
-
-                            movieDetail.synopsis.isNullOrBlank() ->
-                                send(
-                                    fetchAndSaveMovieData(
-                                        parameters.longValue,
-                                        parameters.stringValue
-                                    )
-                                )
-
-                            movieDetail.cast.isNullOrEmpty() -> {
-                                when (val result = movieDetailRepository.fetchMovieCredit(
-                                    parameters.longValue,
-                                    parameters.stringValue
-                                )) {
-                                    is Result.Success -> {
-                                        val cast = result.data?.takeIf { it.isNotEmpty() }
-                                            ?: listOf(
-                                                MovieActorDomainModel(
-                                                    name = "NO_CAST",
-                                                    role = "MARKER"
-                                                )
-                                            )
-
-                                        val updated = movieDetail.copy(cast = cast)
-                                        movieDetailRepository.saveMovieDetail(updated)
-                                        send(Result.Success(ObserveMovieSuccess.DataLoadedInDB))
-                                    }
-
-                                    is Result.Failure -> {
-                                        Logger.e("Error fetching cast: ${result.error.message}")
-                                        send(Result.Failure(mapCreditError(result.error as MovieDetailDomainError)))
-                                    }
-
-                                    else -> {
-                                        Logger.e("Unexpected error while fetching cast")
-                                        send(Result.Failure(ObserveMovieErrors.Error("Unexpected error")))
-                                    }
-                                }
-                            }
-
-                            else -> send(Result.Success(ObserveMovieSuccess.Success(movieDetail)))
-                        }
-                    }
-            }
-
-            awaitClose { job.cancel() }
-        }.flowOn(dispatcher)
-    }
-
-    private suspend fun fetchAndSaveMovieData(
-        movieId: Long,
-        language: String
-    ): Result<ObserveMovieSuccess, ObserveMovieErrors> {
-        val detailResult = movieDetailRepository.fetchMovieDetail(
-            movieId = movieId,
-            language = language
-        )
-
-        return when (detailResult) {
-            is Result.Failure -> {
-                Logger.e("FetchMovieDetail error: ${detailResult.error.message}")
-                Result.Failure(mapDetailError(detailResult.error as MovieDetailDomainError))
-            }
-
-            is Result.Success -> {
-                val creditResult = movieDetailRepository.fetchMovieCredit(
-                    movieId = movieId,
-                    language = language
-                )
-
-                val safeCast =
-                    if (creditResult is Result.Success) creditResult.data else emptyList()
-
-                val updatedMovie = detailResult.data.copy(cast = safeCast)
-                movieDetailRepository.saveMovieDetail(updatedMovie)
-
-                return Result.Success(ObserveMovieSuccess.DataLoadedInDB)
-            }
-
-            else -> {
-                Logger.e("Unknown error")
-                Result.Failure(ObserveMovieErrors.Error("Unknown error"))
-            }
-        }
-    }
-}
+import kotlinx.coroutines.flow.transformLatest
 
 sealed class ObserveMovieSuccess {
     data class Success(val data: MovieDetailDomainModel) : ObserveMovieSuccess()
     data object DataLoadedInDB : ObserveMovieSuccess()
 }
 
-sealed class ObserveMovieErrors(override val message: String) : AppError {
-    data object Empty : ObserveMovieErrors("")
-    data object NoConnection : ObserveMovieErrors("")
-    data object CreditError : ObserveMovieErrors("")
-    data object MovieDetailError : ObserveMovieErrors("")
-    data class Error(val error: String) : ObserveMovieErrors(error)
+class ObserveMovieDetailUseCase(
+    private val movieDetailRepository: MovieDetailRepository,
+    private val dispatcher: CoroutineDispatcher
+) {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    operator fun invoke(movieId: Long, language: String): Flow<AppResult<ObserveMovieSuccess, AppError>> =
+        movieDetailRepository.observeMovieDetail(movieId)
+            .distinctUntilChanged()
+            .transformLatest { detail ->
+                when {
+                    detail == null -> emit(AppResult.Failure(AppError.Domain.NotFound))
+
+                    detail.synopsis.isNullOrBlank() -> {
+                        when (val detailResult =
+                            movieDetailRepository.fetchMovieDetail(movieId, language)) {
+                            is AppResult.Failure -> emit(AppResult.Failure(detailResult.error))
+                            is AppResult.Success -> {
+                                val creditResult = movieDetailRepository.fetchMovieCredit(
+                                    movieId,
+                                    language
+                                )
+                                val safeCast: List<MovieActorDomainModel> = when (creditResult) {
+                                    is AppResult.Success -> creditResult.data?.takeIf { it.isNotEmpty() }
+                                        ?: emptyList()
+
+                                    is AppResult.Failure -> emptyList()
+                                }
+
+                                detailResult.data?.copy(cast = safeCast)?.let { updated ->
+                                    when (val result =
+                                        movieDetailRepository.saveMovieDetail(updated)) {
+                                        is AppResult.Failure -> emit(AppResult.Failure(result.error))
+                                        is AppResult.Success -> emit(AppResult.Success(ObserveMovieSuccess.DataLoadedInDB))
+                                    }
+                                } ?: emit(AppResult.Failure(AppError.Domain.NotFound))
+                            }
+                        }
+                    }
+
+                    detail.cast.isNullOrEmpty() -> {
+                        when (val creditResult =
+                            movieDetailRepository.fetchMovieCredit(movieId, language)) {
+                            is AppResult.Failure -> emit(AppResult.Failure(creditResult.error))
+                            is AppResult.Success -> {
+                                val cast =
+                                    creditResult.data?.takeIf { it.isNotEmpty() } ?: listOf(
+                                        MovieActorDomainModel(
+                                            name = "NO_CAST",
+                                            role = "MARKER"
+                                        )
+                                    )
+
+                                when (val result =
+                                    movieDetailRepository.saveMovieDetail(detail.copy(cast = cast))) {
+                                    is AppResult.Failure -> emit(AppResult.Failure(result.error))
+                                    is AppResult.Success -> emit(AppResult.Success(ObserveMovieSuccess.DataLoadedInDB))
+                                }
+                            }
+                        }
+                    }
+
+                    else -> emit(AppResult.Success(ObserveMovieSuccess.Success(detail)))
+                }
+            }
+            .catch { e -> emit(AppResult.Failure(e.toStorageError())) }
+            .flowOn(dispatcher)
 }
-
-private fun mapDetailError(error: MovieDetailDomainError): ObserveMovieErrors =
-    when (error) {
-        is MovieDetailDomainError.NoConnection -> ObserveMovieErrors.NoConnection
-        is MovieDetailDomainError.MovieDetailError -> ObserveMovieErrors.MovieDetailError
-        else -> ObserveMovieErrors.Error(error.message)
-    }
-
-private fun mapCreditError(error: MovieDetailDomainError): ObserveMovieErrors =
-    when (error) {
-        is MovieDetailDomainError.NoConnection -> ObserveMovieErrors.NoConnection
-        is MovieDetailDomainError.CreditError -> ObserveMovieErrors.CreditError
-        else -> ObserveMovieErrors.Error(error.message)
-    }
-
-

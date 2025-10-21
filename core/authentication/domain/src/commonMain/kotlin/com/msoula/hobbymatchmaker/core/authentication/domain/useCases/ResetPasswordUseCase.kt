@@ -2,38 +2,24 @@ package com.msoula.hobbymatchmaker.core.authentication.domain.useCases
 
 import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepository
 import com.msoula.hobbymatchmaker.core.common.AppError
-import com.msoula.hobbymatchmaker.core.common.FlowUseCase
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Parameters
-import com.msoula.hobbymatchmaker.core.common.Result
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.flowOn
 
 class ResetPasswordUseCase(
-    private val authenticationRepository: AuthenticationRepository,
-    private val dispatcher: CoroutineDispatcher
-) :
-    FlowUseCase<Parameters.StringParam, ResetPasswordSuccess, ResetPasswordErrors>(dispatcher) {
+    private val authenticationRepository: AuthenticationRepository
+) {
+    suspend operator fun invoke(parameters: Parameters.StringParam): AppResult<Unit, AppError> {
+        val email = parameters.value.trim()
+        if (email.isBlank()) {
+            return AppResult.Failure(AppError.Domain.Validation("Email is required"))
+        }
 
-    override fun execute(parameters: Parameters.StringParam):
-        Flow<Result<ResetPasswordSuccess, ResetPasswordErrors>> {
-        return channelFlow {
-            send(Result.Loading)
-
-            when (val result = authenticationRepository.resetPassword(parameters.value)) {
-                is Result.Success -> send(Result.Success(ResetPasswordSuccess))
-                is Result.Failure -> send(
-                    Result.Failure(
-                        ResetPasswordErrors(result.error.message)
-                    )
-                )
-
-                else -> Unit
+        return when (val result = authenticationRepository.resetPassword(email)) {
+            is AppResult.Success -> result
+            is AppResult.Failure -> when (result.error) {
+                is AppError.Domain.Unauthorized -> AppResult.Success(Unit)
+                else -> result
             }
-        }.flowOn(dispatcher)
+        }
     }
 }
-
-data object ResetPasswordSuccess
-data class ResetPasswordErrors(override val message: String) : AppError

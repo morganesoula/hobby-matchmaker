@@ -1,12 +1,15 @@
 package com.msoula.hobbymatchmaker.features.movies.presentation.components
 
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,13 +17,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,27 +40,34 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import coil3.compose.AsyncImagePainter
+import coil3.ImageLoader
 import coil3.compose.LocalPlatformContext
-import coil3.compose.rememberAsyncImagePainter
+import coil3.compose.SubcomposeAsyncImage
+import coil3.compose.SubcomposeAsyncImageContent
+import coil3.network.ktor3.KtorNetworkFetcherFactory
 import coil3.request.ImageRequest
+import coil3.request.crossfade
+import com.msoula.hobbymatchmaker.core.common.Logger
+import com.msoula.hobbymatchmaker.core.common.formatOneDecimal
+import com.msoula.hobbymatchmaker.core.design.component.ErrorPosterPlaceholder
 import com.msoula.hobbymatchmaker.core.design.component.HMMShimmerEffect
-import com.msoula.hobbymatchmaker.features.movies.presentation.Res
-import com.msoula.hobbymatchmaker.features.movies.presentation.ic_movie_clapper_board
+import com.msoula.hobbymatchmaker.core.design.component.LoadingPosterPlaceholder
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiModel
+import io.ktor.client.HttpClient
 import kotlinx.coroutines.delay
-import okio.Path.Companion.toPath
+import org.koin.compose.koinInject
 import kotlin.math.abs
 
 @Composable
@@ -65,44 +78,13 @@ fun MovieItem(
     state: LazyListState,
     onCardEvent: (CardEventModel) -> Unit
 ) {
-    val painter = rememberAsyncImagePainter(
-        model = if (movie.coverFilePath.isEmpty()) {
-            ImageRequest.Builder(LocalPlatformContext.current)
-                .data(
-                    Res.drawable.ic_movie_clapper_board
-                ).size(coil3.size.Size(150, 150))
-                .build()
-        } else {
-            ImageRequest.Builder(LocalPlatformContext.current)
-                .data(movie.coverFilePath.toPath())
-                .size(coil3.size.Size.ORIGINAL)
-                .listener(
-                    onStart = { print("\"\uD83C\uDFAC Start loading image\"") },
-                    onSuccess = { _, _ -> print("✅ Success loading image") },
-                    onError = { _, result ->
-                        print(
-                            "❌ Error loading image: " +
-                                "${result.throwable.message}"
-                        )
-                    })
-                .build()
-        }
+    MovieItemContent(
+        modifier = modifier,
+        state = state,
+        index = index,
+        movie = movie,
+        onCardEvent = onCardEvent
     )
-
-    if (painter.state.value is AsyncImagePainter.State.Loading) {
-        HMMShimmerEffect(isLoading = true) {}
-    } else {
-        HMMShimmerEffect(isLoading = false) {
-            MovieItemContent(
-                modifier = modifier,
-                state = state,
-                index = index,
-                movie = movie,
-                onCardEvent = onCardEvent,
-                painter = painter
-            )
-        }
-    }
 }
 
 @Composable
@@ -111,8 +93,7 @@ fun MovieItemContent(
     state: LazyListState,
     index: Int,
     movie: MovieUiModel,
-    onCardEvent: (CardEventModel) -> Unit,
-    painter: AsyncImagePainter
+    onCardEvent: (CardEventModel) -> Unit
 ) {
     val scale by remember {
         derivedStateOf {
@@ -132,31 +113,27 @@ fun MovieItemContent(
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Card(
             modifier = modifier
+                .semantics(mergeDescendants = true) {
+                    contentDescription = "${movie.title}, ${
+                        if (movie.isFavorite) "favorite"
+                        else "not favorite"
+                    }"
+                }
                 .width(300.dp)
                 .height(440.dp)
                 .padding(end = 10.dp)
                 .scale(scale)
                 .zIndex(scale * 10),
             shape = RoundedCornerShape(5),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = if (scale > 1f) 12.dp else 4.dp
+            ),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.Transparent
+            )
         ) {
-            MovieItemContentCard(modifier, movie, onCardEvent, painter)
+            MovieItemContentCard(modifier, movie, onCardEvent)
         }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Text(
-            modifier = Modifier
-                .width(270.dp)
-                .semantics { contentDescription = "movieTitle" },
-            text = movie.title,
-            fontSize = 20.sp,
-            color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.bodyMedium,
-            maxLines = 3,
-            overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Center
-        )
     }
 }
 
@@ -164,27 +141,39 @@ fun MovieItemContent(
 fun MovieItemContentCard(
     modifier: Modifier = Modifier,
     movie: MovieUiModel,
-    onCardEvent: (CardEventModel) -> Unit,
-    painter: AsyncImagePainter
+    onCardEvent: (CardEventModel) -> Unit
 ) {
-    var showBigHeart by remember { mutableStateOf(false) }
-    var pulse by remember { mutableStateOf(false) }
-    val animationDelay = 600L
+    val imageLoader = rememberCoilImageLoader()
 
-    val heartScaleAnimation by animateFloatAsState(
-        targetValue = if (showBigHeart || pulse) 2f else 1f,
-        animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing), label = ""
+    var showBigHeart by remember { mutableStateOf(false) }
+    var animateFavorite by remember { mutableStateOf(false) }
+
+    val bigHeartScale by animateFloatAsState(
+        targetValue = if (showBigHeart) 2f else 0f,
+        animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing),
+        label = ""
     )
 
-    LaunchedEffect(showBigHeart, pulse) {
+    val favoriteScale by animateFloatAsState(
+        targetValue = if (animateFavorite) 1.2f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = ""
+    )
+
+    LaunchedEffect(showBigHeart) {
         if (showBigHeart) {
-            delay(animationDelay)
+            delay(600)
             showBigHeart = false
         }
+    }
 
-        if (pulse) {
-            delay(animationDelay)
-            pulse = false
+    LaunchedEffect(animateFavorite) {
+        if (animateFavorite) {
+            delay(300)
+            animateFavorite = false
         }
     }
 
@@ -195,7 +184,6 @@ fun MovieItemContentCard(
                 detectTapGestures(
                     onDoubleTap = {
                         showBigHeart = true
-                        pulse = true
                         onCardEvent(CardEventModel.OnDoubleTap(movie))
                     },
                     onTap = {
@@ -203,35 +191,131 @@ fun MovieItemContentCard(
                     }
                 )
             }
-            .testTag(movie.title + "1")
     ) {
-        Image(
-            painter = painter,
+        SubcomposeAsyncImage(
+            imageLoader = imageLoader,
+            model = ImageRequest.Builder(LocalPlatformContext.current)
+                .data(movie.coverFilePath)
+                .crossfade(true)
+                .build(),
             contentDescription = null,
             modifier = Modifier
-                .clip(RoundedCornerShape(5))
                 .fillMaxSize()
+                .clip(RoundedCornerShape(5)),
+            contentScale = ContentScale.Crop,
+            loading = {
+                HMMShimmerEffect()
+                LoadingPosterPlaceholder()
+            },
+            error = {
+                Logger.e("Error while syncing poster image")
+                ErrorPosterPlaceholder()
+            },
+            success = { SubcomposeAsyncImageContent() }
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(80.dp)
+                .align(Alignment.BottomCenter)
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Transparent,
+                            Color.Black.copy(alpha = 0.7f)
+                        )
+                    )
+                )
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+                .align(Alignment.TopCenter),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            RatingChip(movie.note)
+            Spacer(Modifier.weight(1f))
+            FavoriteButton(
+                movie.isFavorite,
+                favoriteScale,
+                onClick = {
+                    animateFavorite = true
+                    onCardEvent(CardEventModel.OnDoubleTap(movie))
+                }
+            )
+        }
+
+        Text(
+            text = movie.title,
+            color = Color.White,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(start = 12.dp, bottom = 12.dp)
         )
 
         if (showBigHeart) {
             Icon(
                 imageVector = Icons.Default.Favorite,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .scale(heartScaleAnimation)
-                    .padding(top = 10.dp, end = 10.dp),
                 contentDescription = "heart icon",
-                tint = Color.Red
+                tint = Color.Red.copy(alpha = 0.8f),
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .scale(bigHeartScale)
             )
         }
+    }
+}
+
+@Composable
+fun FavoriteButton(isFavorite: Boolean, scale: Float, onClick: () -> Unit) {
+    IconButton(
+        onClick = onClick,
+        modifier = Modifier
+            .background(color = Color.Black.copy(alpha = 0.3f), shape = CircleShape)
+            .scale(scale)
+    ) {
         Icon(
-            imageVector = if (movie.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-            contentDescription = "Like",
-            tint = if (movie.isFavorite) Color.Red else Color.White,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .scale(heartScaleAnimation)
-                .padding(top = 10.dp, end = 10.dp)
+            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+            contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
+            tint = if (isFavorite) Color.Red else Color.White,
         )
+    }
+}
+
+@Composable
+fun RatingChip(voteAverage: Double, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+            .background(
+                color = Color.Black.copy(alpha = 0.3f),
+                shape = RoundedCornerShape(12.dp)
+            )
+            .padding(10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(Icons.Default.Star, contentDescription = null, tint = Color.White)
+        Spacer(Modifier.width(4.dp))
+        Text(voteAverage.formatOneDecimal(), style = MaterialTheme.typography.labelLarge)
+    }
+}
+
+@Composable
+fun rememberCoilImageLoader(): ImageLoader {
+    val context = LocalPlatformContext.current
+    val httpClient: HttpClient = koinInject()
+
+    return remember {
+        ImageLoader.Builder(context)
+            .components {
+                add(KtorNetworkFetcherFactory(httpClient))
+            }
+            .build()
     }
 }

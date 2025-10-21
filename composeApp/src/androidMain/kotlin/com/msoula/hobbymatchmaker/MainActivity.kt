@@ -4,10 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.credentials.CredentialManager
 import com.facebook.CallbackManager
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
-import com.msoula.hobbymatchmaker.core.design.theme.HobbyMatchmakerTheme
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.AndroidFacebookUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.AndroidGoogleUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClientImpl
@@ -22,6 +22,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        enableEdgeToEdge()
+
         val googleUIClient = AndroidGoogleUIClient(CredentialManager.create(this), this)
         val facebookUIClient = AndroidFacebookUIClient({ this }, callbackManager)
 
@@ -33,16 +35,15 @@ class MainActivity : ComponentActivity() {
         setContent {
             val rootComponent = getRootComponent()
 
-            HobbyMatchmakerTheme {
-                App(
-                    component = rootComponent,
-                    socialClients = socialClients,
-                    facebookUIClient = facebookUIClient
-                )
-            }
+            App(
+                component = rootComponent,
+                socialClients = socialClients,
+                facebookUIClient = facebookUIClient
+            )
         }
     }
 
+    @Deprecated("")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         callbackManager.onActivityResult(requestCode, resultCode, data)

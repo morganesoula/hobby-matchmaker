@@ -1,75 +1,43 @@
 package com.msoula.hobbymatchmaker.features.movies.domain.useCases
 
 import com.msoula.hobbymatchmaker.core.common.AppError
-import com.msoula.hobbymatchmaker.core.common.FlowUseCase
-import com.msoula.hobbymatchmaker.core.common.Parameters
-import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.features.movies.domain.errors.MovieErrors
+import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.core.common.toStorageError
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.MovieRepository
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.mapLatest
+
+sealed class ObserveAllMoviesSuccess {
+    data class Success(val movies: List<MovieDomainModel>) : ObserveAllMoviesSuccess()
+    data object DataLoadedInDB : ObserveAllMoviesSuccess()
+}
 
 class ObserveAllMoviesUseCase(
     private val movieRepository: MovieRepository,
     private val fetchMoviesUseCase: FetchMoviesUseCase,
-    dispatcher: CoroutineDispatcher
-) : FlowUseCase<Parameters.StringParam, ObserveAllMoviesSuccess, ObserveAllMoviesErrors>(dispatcher) {
+    private val dispatcher: CoroutineDispatcher
+) {
 
-    override fun execute(parameters: Parameters.StringParam):
-        Flow<Result<ObserveAllMoviesSuccess, ObserveAllMoviesErrors>> {
-        return channelFlow {
-            val job = launch {
-                movieRepository.observeMovies().distinctUntilChanged().collect { list ->
-                    if (list.isEmpty()) {
-                        send(Result.Success(ObserveAllMoviesSuccess.Loading))
-
-                        when (val fetchStatus = fetchMoviesUseCase(parameters.value)) {
-                            is Result.Success -> send(Result.Success(ObserveAllMoviesSuccess.DataLoadedInDB))
-                            is Result.Failure -> {
-                                val error = when (fetchStatus.error) {
-                                    is MovieErrors.NetworkError -> ObserveAllMoviesErrors.NetworkError(
-                                        fetchStatus.error.message
-                                    )
-
-                                    is MovieErrors.ApiError -> ObserveAllMoviesErrors.ApiError(
-                                        fetchStatus.error.message
-                                    )
-
-                                    else -> ObserveAllMoviesErrors.UnknownError(fetchStatus.error.message)
-                                }
-                                send(Result.Failure(error))
-                            }
-
-                            else -> send(Result.Success(ObserveAllMoviesSuccess.Loading))
-                        }
-                    } else {
-                        send(Result.Success(ObserveAllMoviesSuccess.Success(list)))
+    @OptIn(ExperimentalCoroutinesApi::class)
+    operator fun invoke(language: String): Flow<AppResult<ObserveAllMoviesSuccess, AppError>> =
+        movieRepository.observeMovies()
+            .distinctUntilChanged()
+            .mapLatest { list ->
+                if (list.isEmpty()) {
+                    when (val fetch = fetchMoviesUseCase(language)) {
+                        is AppResult.Success -> AppResult.Success(ObserveAllMoviesSuccess.DataLoadedInDB)
+                        is AppResult.Failure -> AppResult.Failure(fetch.error)
                     }
+                } else {
+                    AppResult.Success(ObserveAllMoviesSuccess.Success(list))
                 }
             }
-
-            awaitClose { job.cancel() }
-        }
-    }
-}
-
-sealed class ObserveAllMoviesSuccess {
-    data class Success(val movies: List<MovieDomainModel>) : ObserveAllMoviesSuccess()
-    data object Loading : ObserveAllMoviesSuccess()
-    data object DataLoadedInDB : ObserveAllMoviesSuccess()
-}
-
-sealed class ObserveAllMoviesErrors(override val message: String) : AppError {
-    data object Empty : ObserveAllMoviesErrors("")
-    data class NetworkError(val networkErrorMessage: String) :
-        ObserveAllMoviesErrors(networkErrorMessage)
-
-    data class ApiError(val apiErrorMessage: String) : ObserveAllMoviesErrors(apiErrorMessage)
-    data class UnknownError(val unknownErrorMessage: String) :
-        ObserveAllMoviesErrors(unknownErrorMessage)
+            .catch { e -> emit(AppResult.Failure(e.toStorageError())) }
+            .flowOn(dispatcher)
 }

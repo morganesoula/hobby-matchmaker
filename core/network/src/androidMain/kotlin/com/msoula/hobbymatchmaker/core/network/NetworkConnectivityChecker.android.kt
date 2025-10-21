@@ -11,7 +11,7 @@ class AndroidNetworkConnectivityChecker(
 ) : NetworkConnectivityChecker {
 
     @RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
-    override suspend fun hasActiveConnection(): Boolean {
+    override fun hasActiveConnection(): Boolean {
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork = connectivityManager.activeNetwork ?: return false

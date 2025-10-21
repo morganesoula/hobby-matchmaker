@@ -1,215 +1,213 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases
 
-import com.msoula.hobbymatchmaker.core.common.Parameters
-import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainError
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.fakes.FakeMovieDetailRepository
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieActorDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.test.StandardTestDispatcher
+import io.kotest.matchers.types.shouldBeInstanceOf
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.TestCoroutineScheduler
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import java.io.IOException
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ObserveMovieDetailUseCaseTest : FunSpec({
-    val dispatcher = StandardTestDispatcher()
+    val scheduler = TestCoroutineScheduler()
 
-    val dummyMovieDetail = MovieDetailDomainModel(
-        1,
-        "Dummy movie detail",
-        emptyList(),
-        null,
-        "",
-        "Dummy movie detail synopsis",
-        null,
-        null,
-        null,
-        listOf(
-            MovieActorDomainModel(
-                id = 1,
-                name = "Actor 1",
-                role = "Role 1"
-            ), MovieActorDomainModel(
-                id = 2,
-                name = "Actor 2",
-                role = "Role 2"
-            )
+    lateinit var repo: FakeMovieDetailRepository
+    lateinit var useCase: ObserveMovieDetailUseCase
+
+    beforeTest {
+        repo = FakeMovieDetailRepository()
+        useCase = ObserveMovieDetailUseCase(
+            movieDetailRepository = repo,
+            dispatcher = UnconfinedTestDispatcher(scheduler)
         )
-    )
+    }
 
-    context("ObserveMovieDetail - success") {
-        test("Should return Success when movie detail is fully available") {
-            val fakeMovieDetailRepository = FakeMovieDetailRepository(
-                movieDetailFlow = flowOf(dummyMovieDetail)
-            )
+    test("detail == null -> Failure(NotFound)") {
+        runTest {
+            val flow = useCase(movieId = 1L, language = "fr-FR")
+            repo.emitDetail(null)
 
-            val useCase = ObserveMovieDetailUseCase(
-                movieDetailRepository = fakeMovieDetailRepository,
-                dispatcher = dispatcher
-            )
-
-            runTest(dispatcher) {
-                val result = useCase.execute(Parameters.LongStringParam(1L, "en")).take(2).toList()
-
-                result shouldBe listOf(
-                    Result.Loading,
-                    Result.Success(ObserveMovieSuccess.Success(dummyMovieDetail))
-                )
-            }
-        }
-
-        test("Should return Failure when movie detail is null") {
-            val fakeMovieDetailRepository = FakeMovieDetailRepository(
-                movieDetailFlow = flowOf(null)
-            )
-
-            val useCase = ObserveMovieDetailUseCase(
-                movieDetailRepository = fakeMovieDetailRepository,
-                dispatcher = dispatcher
-            )
-
-            runTest(dispatcher) {
-                val result = useCase.execute(Parameters.LongStringParam(1L, "en")).take(2).toList()
-
-                result shouldBe listOf(
-                    Result.Loading,
-                    Result.Failure(ObserveMovieErrors.Empty)
-                )
-            }
+            val res = flow.first()
+            res.shouldBeInstanceOf<AppResult.Failure<ObserveMovieSuccess>>()
+            res.error shouldBe AppError.Domain.NotFound
         }
     }
 
-    context("ObserveMovieDetail - Failure") {
-        test("Fetches and saves movie detail + cast when synopsis is blank") {
-            val observedMovie = dummyMovieDetail.copy(synopsis = null, cast = emptyList())
+    test("synopsis blank + fetch detail Failure -> error") {
+        runTest {
+            repo.fetchDetailResult = AppResult.Failure(AppError.Network.Timeout)
+            val flow = useCase(movieId = 2L, language = "fr-FR")
+            repo.emitDetail(detail(synopsis = ""))
 
-            val fetchedDetail =
-                dummyMovieDetail.copy(synopsis = "Fetched synopsis", cast = emptyList())
-            val fetchedCast = listOf(
-                MovieActorDomainModel(
-                    id = 3,
-                    name = "Actor 3",
-                    role = "Role 3"
-                )
-            )
-            val expectedSavedMovie = fetchedDetail.copy(cast = fetchedCast)
-
-            val fakeMovieDetailRepository = FakeMovieDetailRepository(
-                movieDetailFlow = flowOf(observedMovie),
-                fetchDetailResult = Result.Success(fetchedDetail),
-                fetchCreditResult = Result.Success(fetchedCast)
-            )
-
-            val useCase = ObserveMovieDetailUseCase(
-                movieDetailRepository = fakeMovieDetailRepository,
-                dispatcher = dispatcher
-            )
-
-            runTest(dispatcher) {
-                val result = useCase
-                    .execute(Parameters.LongStringParam(1L, "en"))
-                    .take(2)
-                    .toList()
-
-                result shouldBe listOf(
-                    Result.Loading,
-                    Result.Success(ObserveMovieSuccess.DataLoadedInDB)
-                )
-
-                fakeMovieDetailRepository.savedMovie shouldBe expectedSavedMovie
-            }
-        }
-
-        test("return MovieDetailError when fetchMovieDetail fails") {
-            val dummyEmptyMovie = MovieDetailDomainModel(
-                id = 1L,
-                title = "Some title",
-                genre = emptyList(),
-            )
-
-            val fakeMovieDetailRepository = FakeMovieDetailRepository(
-                movieDetailFlow = flowOf(dummyEmptyMovie),
-                fetchDetailResult = Result.Failure(
-                    MovieDetailDomainError.MovieDetailError("Something went wrong")
-                )
-            )
-
-            val useCase = ObserveMovieDetailUseCase(
-                movieDetailRepository = fakeMovieDetailRepository,
-                dispatcher = dispatcher
-            )
-
-            runTest(dispatcher) {
-                val result = useCase
-                    .execute(Parameters.LongStringParam(1L, "en"))
-                    .take(2)
-                    .toList()
-
-                result shouldBe listOf(
-                    Result.Loading,
-                    Result.Failure(ObserveMovieErrors.MovieDetailError)
-                )
-            }
-        }
-
-        test("return CreditError when fetchMovieCredit fails") {
-            val dummyMovieWithoutCast = MovieDetailDomainModel(
-                id = 1L,
-                title = "Some title",
-                genre = emptyList(),
-                synopsis = "This movie has no cast",
-                cast = emptyList()
-            )
-
-            val fakeMovieDetailRepository = FakeMovieDetailRepository(
-                movieDetailFlow = flowOf(dummyMovieWithoutCast),
-                fetchCreditResult = Result.Failure(
-                    MovieDetailDomainError.CreditError("No cast available")
-                )
-            )
-
-            val useCase = ObserveMovieDetailUseCase(
-                movieDetailRepository = fakeMovieDetailRepository,
-                dispatcher = dispatcher
-            )
-
-            runTest(dispatcher) {
-                val result = useCase
-                    .execute(Parameters.LongStringParam(1L, "en"))
-                    .take(2)
-                    .toList()
-
-                result shouldBe listOf(
-                    Result.Loading,
-                    Result.Failure(ObserveMovieErrors.CreditError)
-                )
-            }
-        }
-
-        test("returns Empty when observeMovieDetail emits null") {
-            val fakeMovieDetailRepository = FakeMovieDetailRepository(
-                movieDetailFlow = flowOf(null)
-            )
-
-            val useCase = ObserveMovieDetailUseCase(
-                movieDetailRepository = fakeMovieDetailRepository,
-                dispatcher = dispatcher
-            )
-
-            runTest(dispatcher) {
-                val result = useCase
-                    .execute(Parameters.LongStringParam(1L, "en"))
-                    .take(2)
-                    .toList()
-
-                result shouldBe listOf(
-                    Result.Loading,
-                    Result.Failure(ObserveMovieErrors.Empty)
-                )
-            }
+            val res = flow.first()
+            res.shouldBeInstanceOf<AppResult.Failure<ObserveMovieSuccess>>()
+            res.error shouldBe AppError.Network.Timeout
         }
     }
+
+    test("synopsis blank + fetch detail Success(null) -> Failure(NotFound)") {
+        runTest {
+            repo.fetchDetailResult = AppResult.Success(null)
+            val flow = useCase(movieId = 3L, language = "fr-FR")
+            repo.emitDetail(detail(synopsis = " "))
+
+            val res = flow.first()
+            res.shouldBeInstanceOf<AppResult.Failure<ObserveMovieSuccess>>()
+            res.error shouldBe AppError.Domain.NotFound
+        }
+    }
+
+    test(
+        "synopsis blank + fetch detail Success + fetch credit Success(non-empty) + " +
+            "save success -> Success(DataLoadedInDB)"
+    ) {
+        runTest {
+            val fetched = detail(synopsis = "synopsis fetched", cast = null)
+            repo.fetchDetailResult = AppResult.Success(fetched)
+            val cast = listOf(MovieActorDomainModel(name = "A", role = "B"))
+            repo.fetchCreditResult = AppResult.Success(cast)
+            repo.saveDetailResult = AppResult.Success(Unit)
+
+            val flow = useCase(movieId = 4L, language = "fr-FR")
+            repo.emitDetail(detail(synopsis = ""))
+
+            val res = flow.first()
+            repo.lastSaved?.cast?.shouldHaveSize(1)
+            repo.lastSaved?.cast?.first()?.name shouldBe "A"
+            repo.lastSaved?.cast?.first()?.role shouldBe "B"
+
+            res.shouldBeInstanceOf<AppResult.Success<ObserveMovieSuccess>>()
+            res.data shouldBe ObserveMovieSuccess.DataLoadedInDB
+        }
+    }
+
+    test(
+        "synopsis blank + fetch detail Success + fetch credit Failure -> cast=[] " +
+            "+ save success -> Success(DataLoadedInDB)"
+    ) {
+        runTest {
+            val fetched = detail(synopsis = "synopsis fetched", cast = null)
+            repo.fetchDetailResult = AppResult.Success(fetched)
+            repo.fetchCreditResult = AppResult.Failure(AppError.Network.Unreachable)
+            repo.saveDetailResult = AppResult.Success(Unit)
+
+            val flow = useCase(movieId = 5L, language = "fr-FR")
+            repo.emitDetail(detail(synopsis = ""))
+
+            val res = flow.first()
+            repo.lastSaved?.cast?.size shouldBe 0
+
+            res.shouldBeInstanceOf<AppResult.Success<ObserveMovieSuccess>>()
+            res.data shouldBe ObserveMovieSuccess.DataLoadedInDB
+        }
+    }
+
+    test("cast empty + fetch credit Failure -> Failure") {
+        runTest {
+            repo.fetchCreditResult = AppResult.Failure(AppError.Network.Http(500))
+            val flow = useCase(movieId = 6L, language = "fr")
+            repo.emitDetail(detail(synopsis = "ok", cast = emptyList()))
+
+            val res = flow.first()
+            res.shouldBeInstanceOf<AppResult.Failure<ObserveMovieSuccess>>()
+            res.error shouldBe AppError.Network.Http(500)
+        }
+    }
+
+    test(
+        "cast empty + fetch credit Success(empty) -> cast=[NO_CAST/MARKER] " +
+            "+ save success -> Success(DataLoadedInDB)"
+    ) {
+        runTest {
+            repo.fetchCreditResult = AppResult.Success(emptyList())
+            repo.saveDetailResult = AppResult.Success(Unit)
+
+            val flow = useCase(movieId = 7L, language = "fr")
+            repo.emitDetail(detail(synopsis = "ok", cast = emptyList()))
+
+            val res = flow.first()
+            val savedCast = repo.lastSaved?.cast
+            savedCast?.shouldHaveSize(1)
+            savedCast?.first()?.name shouldBe "NO_CAST"
+            savedCast?.first()?.role shouldBe "MARKER"
+
+            res.shouldBeInstanceOf<AppResult.Success<ObserveMovieSuccess>>()
+            res.data shouldBe ObserveMovieSuccess.DataLoadedInDB
+        }
+    }
+
+    test(
+        "full detail (synopsis not blank, cast not empty) -> " +
+            "Success(ObserveMovieSuccess.Success(detail))"
+    ) {
+        runTest {
+            val ready = detail(
+                synopsis = "ok",
+                cast = listOf(MovieActorDomainModel(name = "X", role = "Y"))
+            )
+            val flow = useCase(movieId = 8L, language = "fr")
+            repo.emitDetail(ready)
+
+            val res = flow.first()
+            res.shouldBeInstanceOf<AppResult.Success<ObserveMovieSuccess>>()
+            res.data shouldBe ObserveMovieSuccess.Success(ready)
+        }
+    }
+
+    test("exception in fetchMovieDetail -> catch -> Failure(toStorageError)") {
+        runTest {
+            repo.fetchDetailThrows = IOException("disk")
+            val flow = useCase(movieId = 9L, language = "fr-FR")
+            repo.emitDetail(detail(synopsis = ""))
+
+            val res = flow.first()
+            res.shouldBeInstanceOf<AppResult.Failure<ObserveMovieSuccess>>()
+            res.error shouldBe AppError.Storage.ReadFailed
+        }
+    }
+
+    test("saveMovieDetail Failure") {
+        runTest {
+            val fetched = detail(synopsis = "fetched", cast = null)
+            repo.fetchDetailResult = AppResult.Success(fetched)
+            repo.fetchCreditResult =
+                AppResult.Success(listOf(MovieActorDomainModel(name = "A", role = "B")))
+            repo.saveDetailResult = AppResult.Failure(AppError.Storage.WriteFailed)
+
+            val flow = useCase(movieId = 10L, language = "en")
+            repo.emitDetail(detail(synopsis = ""))
+
+            val res = flow.first()
+            res.shouldBeInstanceOf<AppResult.Failure<ObserveMovieSuccess>>()
+            res.error shouldBe AppError.Storage.WriteFailed
+        }
+    }
+
 })
+
+
+private fun detail(
+    synopsis: String?,
+    cast: List<MovieActorDomainModel>? = null
+) = MovieDetailDomainModel(
+    id = 1L,
+    title = "t",
+    genre = emptyList(),
+    popularity = 0.0,
+    releaseDate = "2020-01-01",
+    synopsis = synopsis,
+    status = "ok",
+    localCoverFilePath = null,
+    videoKey = "",
+    cast = cast,
+    duration = 100
+)

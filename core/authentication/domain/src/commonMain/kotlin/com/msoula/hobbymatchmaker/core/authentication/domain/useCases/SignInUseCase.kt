@@ -1,63 +1,21 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.useCases
 
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.SignInWithEmailAndPasswordError
 import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepository
 import com.msoula.hobbymatchmaker.core.common.AppError
-import com.msoula.hobbymatchmaker.core.common.FlowUseCase
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Parameters
-import com.msoula.hobbymatchmaker.core.common.Result
+import com.msoula.hobbymatchmaker.core.common.flatMapSuspend
+import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetIsConnectedUseCase
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.flowOn
-
-class SignInUseCase(
-    private val dispatcher: CoroutineDispatcher,
-    private val authenticationRepository: AuthenticationRepository,
-    private val setIsConnectedUseCase: SetIsConnectedUseCase
-) : FlowUseCase<Parameters.DoubleStringParam, SignInSuccess, SignInError>(dispatcher) {
-
-    override fun execute(parameters: Parameters.DoubleStringParam): Flow<Result<SignInSuccess, SignInError>> {
-        return channelFlow {
-            send(Result.Loading)
-
-            when (val result = authenticationRepository.signInWithEmailAndPassword(
-                parameters.firstValue,
-                parameters.secondValue
-            )) {
-                is Result.Success -> {
-                    setIsConnectedUseCase(true)
-                    send(Result.Success(SignInSuccess))
-                }
-
-                is Result.Failure -> send(
-                    Result.Failure(
-                        mapSignInError(result.error)
-                    )
-                )
-
-
-                else -> Unit
-            }
-        }.flowOn(dispatcher)
-    }
-}
 
 data object SignInSuccess
-sealed class SignInError(override val message: String) : AppError {
-    data object WrongPassword : SignInError("")
-    data object UserNotFound : SignInError("")
-    data object UserDisabled : SignInError("")
-    data object TooManyRequests : SignInError("")
-    data class Other(val customErrorMessage: String) : SignInError(customErrorMessage)
+class SignInUseCase(
+    private val authenticationRepository: AuthenticationRepository,
+    private val setIsConnectedUseCase: SetIsConnectedUseCase
+) {
+    suspend operator fun invoke(parameters: Parameters.DoubleStringParam): AppResult<SignInSuccess, AppError> =
+        authenticationRepository
+            .signInWithEmailAndPassword(parameters.firstValue, parameters.secondValue)
+            .flatMapSuspend { setIsConnectedUseCase(true) }
+            .mapSuccess { SignInSuccess }
 }
-
-private fun mapSignInError(error: AppError): SignInError =
-    when (error) {
-        is SignInWithEmailAndPasswordError.UserNotFound -> SignInError.UserNotFound
-        is SignInWithEmailAndPasswordError.WrongPassword -> SignInError.WrongPassword
-        is SignInWithEmailAndPasswordError.UserDisabled -> SignInError.UserDisabled
-        is SignInWithEmailAndPasswordError.TooManyRequests -> SignInError.TooManyRequests
-        else -> SignInError.Other(error.message)
-    }

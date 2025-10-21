@@ -1,27 +1,25 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.mappers
 
-import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.errors.MovieDetailDataError
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.CastResponseRemoteModel
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.MovieDetailResponseRemoteModel
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.MovieVideosResponseRemoteModel
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.errors.MovieDetailDomainError
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.GenreDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieActorDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieCastDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieVideoDomainModel
 
-fun MovieDetailResponseRemoteModel.toMovieDetailDomainModel(): MovieDetailDomainModel {
-    return MovieDetailDomainModel(
+fun MovieDetailResponseRemoteModel.toMovieDetailDomainModel(): MovieDetailDomainModel =
+    MovieDetailDomainModel(
         id = this.id.toLong(),
         title = this.title,
         genre = this.genres.map { genre -> GenreDomainModel(genre.id ?: -1, genre.name ?: "") },
         popularity = this.popularity,
         releaseDate = this.releaseDate,
         synopsis = this.overview,
-        status = this.status
+        status = this.status,
+        duration = this.duration
     )
-}
 
 fun CastResponseRemoteModel.toMovieActorDomainModel(): MovieCastDomainModel {
     return MovieCastDomainModel(this.cast?.map {
@@ -47,14 +45,3 @@ fun MovieVideosResponseRemoteModel.toMovieVideoDomainModel(): MovieVideoDomainMo
         )
     }
 }
-
-fun MovieDetailDataError.toMovieDetailDomainError(): MovieDetailDomainError {
-    return when (this) {
-        is MovieDetailDataError.Other -> MovieDetailDomainError.Other(this.reason)
-        is MovieDetailDataError.NoConnectionError -> MovieDetailDomainError.NoConnection(this.reason)
-        is MovieDetailDataError.TrailerError -> MovieDetailDomainError.TrailerError(this.reason)
-        is MovieDetailDataError.CreditError -> MovieDetailDomainError.CreditError(this.reason)
-        is MovieDetailDataError.MovieDetail -> MovieDetailDomainError.MovieDetailError(this.reason)
-    }
-}
-

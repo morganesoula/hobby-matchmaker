@@ -10,5 +10,4 @@ fun createDataStore(producePath: () -> String): DataStore<Preferences> {
         produceFile = { producePath().toPath() }
     )
 }
-
 internal const val dataStoreFileName = "app.preferences_pb"

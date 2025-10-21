@@ -2,9 +2,8 @@ package com.msoula.hobbymatchmaker.core.authentication.domain.useCases
 
 import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepository
 
-class IsFirstSignInUseCase(private val authenticationRepository: AuthenticationRepository) {
-
-    suspend operator fun invoke(uid: String): Boolean {
-        return authenticationRepository.isFirstSignIn(uid)
-    }
+class IsFirstSignInUseCase(
+    private val authenticationRepository: AuthenticationRepository
+) {
+    suspend operator fun invoke(uid: String) = authenticationRepository.isFirstSignIn(uid)
 }

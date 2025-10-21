@@ -1,15 +1,16 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.presentation.models
 
 import com.msoula.hobbymatchmaker.core.common.extractYear
+import com.msoula.hobbymatchmaker.core.design.Res
+import com.msoula.hobbymatchmaker.core.design.movie_canceled
+import com.msoula.hobbymatchmaker.core.design.movie_in_production
+import com.msoula.hobbymatchmaker.core.design.movie_planned
+import com.msoula.hobbymatchmaker.core.design.movie_post_production
+import com.msoula.hobbymatchmaker.core.design.movie_released
+import com.msoula.hobbymatchmaker.core.design.movie_rumored
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.GenreDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieActorDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.Res
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.movie_canceled
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.movie_in_production
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.movie_planned
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.movie_post_production
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.movie_released
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.movie_rumored
 import org.jetbrains.compose.resources.getString
 
 data class MovieDetailUiModel(
@@ -22,35 +23,44 @@ data class MovieDetailUiModel(
     val status: String = "",
     val popularity: Double = 0.0,
     val cast: Map<String, String> = emptyMap(),
-    val videoKey: String = ""
-) {
-    companion object {
-        const val DEFAULT_ID = -1
-        const val DEFAULT_TITLE = ""
-        const val DEFAULT_SYNOPSIS = ""
-        const val DEFAULT_POSTER_PATH = ""
-        const val DEFAULT_RELEASE_DATE = ""
-        const val DEFAULT_STATUS = ""
-        const val DEFAULT_POPULARITY = 0.0
-        const val DEFAULT_VIDEO_URI = ""
-    }
-}
+    val videoKey: String = "",
+    val duration: Int = -1
+)
 
 suspend fun MovieDetailDomainModel.toMovieDetailUiModel(): MovieDetailUiModel {
+    val local = this.localCoverFilePath.orEmpty()
+    val remote = this.coverFileName.orEmpty()
+
+    val resolvedPoster = when {
+        local.startsWith("file://", ignoreCase = true) -> local
+        local.startsWith("/data/")
+            || local.startsWith("/storage/")
+            || local.startsWith("/var/")
+            || local.startsWith("/private/var/")
+            -> "file://$local"
+
+        remote.startsWith("http", ignoreCase = true) -> remote
+        remote.startsWith("/") -> "https://image.tmdb.org/t/p/w500$remote"
+
+        else -> MovieDetailDomainModel.DEFAULT_POSTER_PATH
+    }
+
     return MovieDetailUiModel(
         id = this.id ?: MovieDetailDomainModel.DEFAULT_ID,
         title = this.title ?: MovieDetailDomainModel.DEFAULT_TITLE,
         synopsis = this.synopsis ?: MovieDetailDomainModel.DEFAULT_SYNOPSIS,
-        posterPath = this.localCoverFilePath ?: "",
-        genre = this.genre?.map { it.name ?: "" } ?: emptyList(),
-        releaseDate = this.releaseDate?.extractYear() ?: "",
-        status = this.status?.mapStatus() ?: "",
-        popularity = this.popularity ?: 0.0,
+        posterPath = resolvedPoster,
+        genre = this.genre?.map { it.name ?: "" } ?: listOf(GenreDomainModel.DEFAULT_NAME),
+        releaseDate = this.releaseDate?.extractYear()
+            ?: MovieDetailDomainModel.DEFAULT_RELEASE_DATE,
+        status = this.status?.mapStatus() ?: MovieDetailDomainModel.DEFAULT_STATUS,
+        popularity = this.popularity ?: MovieDetailDomainModel.DEFAULT_POPULARITY,
         cast = this.cast?.associate { actor ->
             (actor.name ?: MovieActorDomainModel.DEFAULT_NAME) to
                 (actor.role ?: MovieActorDomainModel.DEFAULT_ROLE)
         } ?: emptyMap(),
-        videoKey = this.videoKey ?: ""
+        videoKey = this.videoKey ?: MovieDetailDomainModel.DEFAULT_VIDEO_KEY,
+        duration = this.duration ?: MovieDetailDomainModel.DEFAULT_DURATION
     )
 }
 

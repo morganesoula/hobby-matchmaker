@@ -1,45 +1,66 @@
 package com.msoula.hobbymatchmaker.features.movies.domain.fakes
 
-import com.msoula.hobbymatchmaker.core.common.Result
-import com.msoula.hobbymatchmaker.features.movies.domain.errors.MovieErrors
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.MovieRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
-class FakeMovieRepository(
-    initialMovies: List<MovieDomainModel> = emptyList(),
-    private var fetchResult: Result<Unit, MovieErrors> = Result.Success(Unit)
-) : MovieRepository {
+class FakeMovieRepository() : MovieRepository {
+    private val _flow =
+        MutableSharedFlow<List<MovieDomainModel>>(replay = 1, extraBufferCapacity = 16)
+    var favoriteIdsResult: AppResult<List<Long>, AppError> = AppResult.Success(emptyList())
+    var syncRemoteResult: AppResult<Unit, AppError> = AppResult.Success(Unit)
 
-    private val moviesFlow = MutableSharedFlow<List<MovieDomainModel>>(replay = 1)
+    var getFavoriteLocalMovieIdsCall = 0
+    var syncUserFavoritesRemoteCalls = 0
+    var lastSyncUid: String? = null
+    var lastSyncIds: List<Long>? = null
 
-    init {
-        moviesFlow.tryEmit(initialMovies)
-    }
+    override fun observeMovies(): Flow<List<MovieDomainModel>> = _flow.asSharedFlow()
 
-    override fun observeMovies(): Flow<List<MovieDomainModel>> = moviesFlow
-    override suspend fun fetchMovies(language: String): Result<Unit, MovieErrors> = fetchResult
-    override suspend fun isSynopsisMovieAvailable(movieId: Long): Boolean = true
+    suspend fun emit(list: List<MovieDomainModel>) = _flow.emit(list)
+    fun tryEmit(list: List<MovieDomainModel>) = _flow.tryEmit(list)
 
-    fun emitMovies(movies: List<MovieDomainModel>) = moviesFlow.tryEmit(movies)
-    fun setFetchResult(result: Result<Unit, MovieErrors>) {
-        fetchResult = result
-    }
-
-    override suspend fun updateMovieWithFavoriteValue(
-        uuidUser: String,
+    override suspend fun updateMovieFavoriteLocal(
         id: Long,
         isFavorite: Boolean
-    ) {
-        TODO("Not yet implemented")
-    }
+    ): AppResult<Unit, AppError> = error("Not used in this test")
+
+    override suspend fun updateMovieFavoriteRemote(
+        uid: String,
+        id: Long,
+        isFavorite: Boolean
+    ): AppResult<Unit, AppError> = error("Not used in this test")
 
     override suspend fun updateMovieWithLocalCoverFilePath(
         coverFileName: String,
         localCoverFilePath: String,
         movieId: Long
-    ) {
+    ): AppResult<Unit, AppError> = error("Not used in this test")
+
+    override suspend fun fetchMovies(language: String): AppResult<Unit, AppError> {
         TODO("Not yet implemented")
+    }
+
+    override suspend fun isSynopsisMovieAvailable(movieId: Long): AppResult<Boolean, AppError> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getFavoriteLocalMovieIds(): AppResult<List<Long>, AppError> {
+        getFavoriteLocalMovieIdsCall++
+        return favoriteIdsResult
+    }
+
+    override suspend fun syncUserFavoritesRemote(
+        uid: String,
+        localIds: List<Long>
+    ): AppResult<Unit, AppError> {
+        syncUserFavoritesRemoteCalls++
+        lastSyncUid = uid
+        lastSyncIds = localIds
+        return syncRemoteResult
     }
 }

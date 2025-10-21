@@ -20,6 +20,9 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            // Coil
+            implementation(libs.findLibrary("coil-network").get())
+
             // Media Player
             implementation(libs.findLibrary("media-player-kmp").get())
 
@@ -32,23 +35,25 @@ kotlin {
         }
 
         androidMain.dependencies {
+            // Network for Coil
+            implementation(libs.findLibrary("ktor-client-android").get())
+
             // Back handler
             implementation(libs.findLibrary("activity-compose").get())
 
             // Media player
             implementation(libs.findLibrary("youtube-player").get())
         }
+
+        iosMain.dependencies {
+            // Network for Coil
+            implementation(libs.findLibrary("ktor-client-darwin").get())
+        }
     }
 }
 
 android {
     namespace = "com.msoula.hobbymatchmaker.features.moviedetail.presentation"
-}
-
-compose.resources {
-    publicResClass = true
-    packageOfResClass = "com.msoula.hobbymatchmaker.features.moviedetail.presentation"
-    generateResClass = always
 }
 
 swiftPackageConfig {

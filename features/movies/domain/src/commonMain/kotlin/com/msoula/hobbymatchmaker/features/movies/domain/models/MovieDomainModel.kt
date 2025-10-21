@@ -7,7 +7,8 @@ data class MovieDomainModel(
     var localCoverFilePath: String = "",
     var isFavorite: Boolean = false,
     var isSeen: Boolean = false,
-    var overview: String? = null
+    var overview: String? = null,
+    var note: Double = 0.0
 ) {
     companion object {
         const val DEFAULT_ID: Long = -1L
@@ -17,5 +18,6 @@ data class MovieDomainModel(
         const val DEFAULT_IS_FAVORITE: Boolean = false
         const val DEFAULT_IS_SEEN: Boolean = false
         const val DEFAULT_OVERVIEW: String = ""
+        const val DEFAULT_NOTE: Double = 0.0
     }
 }
