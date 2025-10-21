@@ -50,8 +50,8 @@ actual fun SocialMediaButtonListPlatformSpecificUI(
                     .defaultMinSize(minHeight = 48.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = Color.Black,
-                    contentColor = Color.White
+                    containerColor = Color.White,
+                    contentColor = Color.Black
                 ),
                 border = BorderStroke(1.dp, Color.Black)
             ) {
@@ -76,10 +76,9 @@ actual fun SocialMediaButtonListPlatformSpecificUI(
                 .defaultMinSize(minHeight = 48.dp),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.outlinedButtonColors(
-                containerColor = Color.White,
-                contentColor = Color.Black
-            ),
-            border = BorderStroke(1.dp, Color.LightGray)
+                containerColor = Color.Black,
+                contentColor = Color.White
+            )
         ) {
             Icon(
                 painter = painterResource(Res.drawable.google_logo),

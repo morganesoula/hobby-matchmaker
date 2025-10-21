@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -157,6 +159,59 @@ fun SignInScreenContent(
                     ) { Text(text = data.visuals.message) }
                 }
             )
+        },
+        bottomBar = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.background)
+                    .navigationBarsPadding()
+                    .imePadding()
+                    .padding(horizontal = 8.dp, vertical = 12.dp)
+            ) {
+                Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    AnnotatedStringWithLinkAnnotation(isSystemInDarkTheme()) {
+                        signInViewModel.onEvent(AuthenticationUIEvent.OnScreenChanged)
+                        redirectToSignUpScreen()
+                    }
+                }
+
+                Spacer(Modifier.height(12.dp))
+
+                OutlinedButton(
+                    onClick = {
+                        if (shouldShowGuestWarning) {
+                            showGuestDialog = true
+                        } else {
+                            signInViewModel.onEvent(
+                                AuthenticationUIEvent.OnContinueAsGuestConfirmed(true)
+                            )
+                            redirectToMovieScreen()
+                        }
+                    },
+                    enabled = !isGuestLoading,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onSurface
+                    )
+                ) {
+                    if (isGuestLoading) {
+                        CircularProgressIndicator(
+                            strokeWidth = 2.dp,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(Modifier.width(12.dp))
+                    } else {
+                        Text(
+                            text = stringResource(Res.string.continue_as_guest_button_title),
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
         }
     ) { paddingValues ->
         Column(
@@ -211,49 +266,6 @@ fun SignInScreenContent(
             )
 
             Spacer(Modifier.height(48.dp))
-
-            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                AnnotatedStringWithLinkAnnotation(isSystemInDarkTheme()) {
-                    signInViewModel.onEvent(AuthenticationUIEvent.OnScreenChanged)
-                    redirectToSignUpScreen()
-                }
-            }
-
-            Spacer(Modifier.height(12.dp))
-
-            OutlinedButton(
-                onClick = {
-                    if (shouldShowGuestWarning) {
-                        showGuestDialog = true
-                    } else {
-                        signInViewModel.onEvent(
-                            AuthenticationUIEvent.OnContinueAsGuestConfirmed(true)
-                        )
-                        redirectToMovieScreen()
-                    }
-                },
-                enabled = !isGuestLoading,
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                )
-            ) {
-                if (isGuestLoading) {
-                    CircularProgressIndicator(
-                        strokeWidth = 2.dp,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(Modifier.width(12.dp))
-                } else {
-                    Text(
-                        text = stringResource(Res.string.continue_as_guest_button_title),
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
         }
 
         if (openResetDialog) {

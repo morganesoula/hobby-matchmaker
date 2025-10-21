@@ -1,14 +1,19 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.signUp
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
@@ -137,10 +142,27 @@ fun SignUpScreenContent(
                     }
                 }
             )
+        },
+        bottomBar = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.background)
+                    .navigationBarsPadding()
+                    .imePadding()
+                    .padding(horizontal = 8.dp, vertical = 12.dp)
+            ) {
+                SignUpScreenBottomContent(
+                    redirectText = annotatedString,
+                    redirectToLogInScreen = {
+                        signUpViewModel.onEvent(AuthenticationUIEvent.OnScreenChanged)
+                        redirectToSignInScreen()
+                    })
+            }
         }
     )
     { paddingValues ->
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier.keyboardDismissOnTap()
             ) {
@@ -179,13 +201,6 @@ fun SignUpScreenContent(
                     signUpState = signUpState
                 )
             }
-
-            SignUpScreenBottomContent(
-                redirectText = annotatedString,
-                redirectToLogInScreen = {
-                    signUpViewModel.onEvent(AuthenticationUIEvent.OnScreenChanged)
-                    redirectToSignInScreen()
-                })
         }
 
         LoadingOverlay(visible = signUpState == SignUpEvent.Loading)
@@ -288,26 +303,19 @@ fun SignUpScreenMainContent(
 }
 
 @Composable
-fun BoxScope.SignUpScreenBottomContent(
-    modifier: Modifier = Modifier,
+fun SignUpScreenBottomContent(
     redirectText: AnnotatedString,
     redirectToLogInScreen: () -> Unit
 ) {
-    Box(
-        modifier = modifier
-            .align(Alignment.BottomCenter)
-            .padding(bottom = 8.dp)
-    ) {
-        Text(
-            text = redirectText,
-            modifier = Modifier
-                .wrapContentSize()
-                .semantics {
-                    role = Role.Button
-                    contentDescription = redirectText.text
-                }
-                .clickable { redirectToLogInScreen() },
-            style = TextStyle(color = MaterialTheme.colorScheme.onBackground)
-        )
-    }
+    Text(
+        text = redirectText,
+        modifier = Modifier
+            .wrapContentSize()
+            .semantics {
+                role = Role.Button
+                contentDescription = redirectText.text
+            }
+            .clickable { redirectToLogInScreen() },
+        style = TextStyle(color = MaterialTheme.colorScheme.onBackground)
+    )
 }
