@@ -5,7 +5,6 @@ import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 internal fun KotlinMultiplatformExtension.configureMultiplatformIos() {
-    iosX64()
     iosArm64()
     iosSimulatorArm64()
 }
@@ -24,7 +23,6 @@ fun KotlinMultiplatformExtension.configureCInterops(project: Project) {
     if (project.name != "network") return
 
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { target ->
