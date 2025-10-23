@@ -18,6 +18,8 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,16 +32,46 @@ import com.msoula.hobbymatchmaker.core.common.CallOnceEffect
 import com.msoula.hobbymatchmaker.core.common.ObserveEvents
 import com.msoula.hobbymatchmaker.core.common.SnackEffect
 import com.msoula.hobbymatchmaker.core.common.UIText
+import com.msoula.hobbymatchmaker.core.common.asString
 import com.msoula.hobbymatchmaker.core.common.isIosPlatform
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.component.HMMHomeTopBar
+import com.msoula.hobbymatchmaker.core.design.component.LoadingCircularProgress
 import com.msoula.hobbymatchmaker.core.design.no_fetching_detail_possible
 import com.msoula.hobbymatchmaker.features.movies.presentation.components.MovieItem
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiModel
+import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiStateModel
 import kotlinx.coroutines.flow.Flow
+import org.koin.compose.viewmodel.koinViewModel
 
+@Composable
+fun MovieContent(
+    modifier: Modifier = Modifier,
+    movieViewModel: MovieViewModel,
+    movieState: MovieUiStateModel,
+    oneTimeEventChannelFlow: Flow<MovieUiEventModel>,
+    redirectToMovieDetail: (Long) -> Unit,
+    redirectToAuth: () -> Unit
+) {
+    when (movieState) {
+        is MovieUiStateModel.Success -> {
+            MovieScreenContent(
+                movies = movieState.list,
+                oneTimeEventChannelFlow = oneTimeEventChannelFlow,
+                redirectToMovieDetail = { id -> redirectToMovieDetail(id) },
+                onCardEvent = movieViewModel::onCardEvent,
+                logOut = { movieViewModel.logOut() },
+                redirectToAuth = { redirectToAuth() }
+            )
+        }
+
+        is MovieUiStateModel.Empty -> EmptyMovieScreen()
+        is MovieUiStateModel.Error -> ErrorMovieScreen(error = movieState.errorMessage.asString())
+        else -> LoadingCircularProgress()
+    }
+}
 @Composable
 fun MovieScreenContent(
     modifier: Modifier = Modifier,

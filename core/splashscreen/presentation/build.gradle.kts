@@ -9,6 +9,7 @@ kotlin {
             // Modules
             implementation(project(Modules.COMMON))
             implementation(project(Modules.DESIGN))
+            implementation(project(Modules.SESSION_DOMAIN))
         }
     }
 }

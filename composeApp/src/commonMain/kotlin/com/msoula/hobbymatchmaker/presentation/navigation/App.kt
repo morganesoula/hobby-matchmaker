@@ -1,7 +1,9 @@
 package com.msoula.hobbymatchmaker.presentation.navigation
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.stack.animation.plus
@@ -16,15 +18,18 @@ import com.msoula.hobbymatchmaker.core.navigation.domain.AuthRootComponent
 import com.msoula.hobbymatchmaker.core.navigation.domain.MainRootComponent
 import com.msoula.hobbymatchmaker.core.navigation.domain.RootComponent
 import com.msoula.hobbymatchmaker.core.splashscreen.presentation.SplashScreenContent
+import presentation.AppNavHost
 
 @Composable
 fun App(
     component: RootComponent,
     socialClients: Map<ProviderType, SocialUIClient>,
-    facebookUIClient: FacebookUIClient
+    facebookUIClient: FacebookUIClient,
+    isConnected: Boolean,
+    onFinishApp: () -> Unit
 ) {
     HobbyMatchMakerTheme {
-        val slotChild by component.currentRootSlot.subscribeAsState()
+        /* val slotChild by component.currentRootSlot.subscribeAsState()
         val instance = slotChild.child?.instance
 
         instance?.let { inst ->
@@ -61,6 +66,14 @@ fun App(
                     }
                 }
             }
-        }
+        } */
+
+        AppNavHost(
+            modifier = Modifier.fillMaxSize(),
+            onFinishApp = onFinishApp,
+            isConnected = isConnected,
+            facebookUIClient = facebookUIClient,
+            socialClients = socialClients
+        )
     }
 }

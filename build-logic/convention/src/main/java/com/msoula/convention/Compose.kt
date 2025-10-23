@@ -48,5 +48,8 @@ internal fun KotlinMultiplatformExtension.configureCompose(
         api(libs.findLibrary("koin-core").get())
         implementation(libs.findLibrary("koin-compose").get())
         implementation(libs.findLibrary("koin-compose-viewmodel").get())
+
+        // Navigation
+        implementation(libs.findLibrary("compose-navigation").get())
     }
 }

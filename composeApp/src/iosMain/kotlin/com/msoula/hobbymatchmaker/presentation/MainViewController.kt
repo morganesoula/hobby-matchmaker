@@ -21,6 +21,7 @@ fun MainViewController() = ComposeUIViewController {
     App(
         component = rootComponent,
         socialClients = socialClients,
-        facebookUIClient = IosFacebookUIClient()
+        facebookUIClient = IosFacebookUIClient(),
+        onFinishApp = {}
     )
 }

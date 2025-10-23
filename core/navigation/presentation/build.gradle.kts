@@ -12,8 +12,12 @@ kotlin {
         commonMain.dependencies {
             // Module
             implementation(project(Modules.COMMON))
+            implementation(project(Modules.LOGIN_PRESENTATION))
+            implementation(project(Modules.MOVIE_PRESENTATION))
+            implementation(project(Modules.MOVIE_DETAIL_PRESENTATION))
             implementation(project(Modules.NAVIGATION_DOMAIN))
             implementation(project(Modules.SESSION_DOMAIN))
+            implementation(project(Modules.SPLASHSCREEN_PRESENTATION))
         }
     }
 }

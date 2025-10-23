@@ -32,6 +32,9 @@ internal fun KotlinMultiplatformExtension.configureMultiplatform(
         // Koin
         api(libs.findLibrary("koin-core").get())
 
+        // Navigation
+        implementation(libs.findLibrary("compose-navigation").get())
+
         // Serialization
         implementation(libs.findLibrary("kotlinx-serialization").get())
     }

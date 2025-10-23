@@ -3,6 +3,7 @@ activityCompose = "1.11.0"
 appcompat = "1.7.1"
 coil = "3.3.0"
 composeMultiplatform = "1.9.1"
+composeNavigation = "2.9.1"
 coreKtx = "1.17.0"
 credentials = "1.5.0"
 datastore = "1.1.7"
@@ -40,6 +41,7 @@ appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat"
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-network = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
 compose-gradle-plugin = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "composeMultiplatform" }
+compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "composeNavigation"}
 core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
 credentials-play-services = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
