@@ -1,12 +1,10 @@
 package presentation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.backhandler.BackHandler
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
@@ -20,6 +18,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SocialUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.signUp.SignUpScreenContent
 import com.msoula.hobbymatchmaker.core.login.presentation.signUp.SignUpViewModel
 import com.msoula.hobbymatchmaker.core.splashscreen.presentation.SplashScreenContent
+import com.msoula.hobbymatchmaker.core.splashscreen.presentation.SplashViewModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailContent
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailViewModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.MovieContent
@@ -31,35 +30,43 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun AppNavHost(
     modifier: Modifier = Modifier,
-    onFinishApp: () -> Unit,
-    isConnected: Boolean,
     facebookUIClient: FacebookUIClient,
     socialClients: Map<ProviderType, SocialUIClient>
 ) {
     val nav = rememberNavController()
 
-    LaunchedEffect(Unit) {
-        if (isConnected) {
-            nav.navigateAndReplaceAll(Route.Movies)
-        } else {
-            nav.navigateAndReplaceAll(Route.Auth)
-        }
-    }
-
     NavHost(
         modifier = modifier,
         navController = nav,
-        startDestination = Route.Splash
+        startDestination = Splash
     ) {
-        composable<Route.Splash> {
-            SplashScreenContent()
+        composable<Splash> {
+            val splashViewModel = koinViewModel<SplashViewModel>()
+            val state by splashViewModel.state.collectAsState()
+
+            SplashScreenContent(
+                state = state,
+                redirectToAuth = {
+                    nav.navigate(Auth) {
+                        popUpTo<Splash> {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                },
+                redirectToMovies = {
+                    nav.navigate(Movies) {
+                        popUpTo<Splash> {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
+            )
         }
 
-        navigation(
-            route = Route.Auth.path(),
-            startDestination = Route.SignIn.path()
-        ) {
-            composable<Route.SignIn> {
+        navigation<Auth>(startDestination = SignIn) {
+            composable<SignIn> {
                 val signInViewModel = koinViewModel<SignInViewModel> {
                     parametersOf(socialClients)
                 }
@@ -69,10 +76,10 @@ fun AppNavHost(
                     .collectAsState(initial = false)
 
                 SignInScreenContent(
-                    redirectToSignUpScreen = { nav.navigate(Route.SignUp) },
+                    redirectToSignUpScreen = { nav.navigate(SignUp) },
                     redirectToMovieScreen = {
-                        nav.navigate(Route.Movies) {
-                            popUpTo<Route.Auth> { inclusive = true }
+                        nav.navigate(Movies) {
+                            popUpTo<Auth> { inclusive = true }
                             launchSingleTop = true
                         }
                     },
@@ -84,15 +91,15 @@ fun AppNavHost(
                 )
             }
 
-            composable<Route.SignUp> {
+            composable<SignUp> {
                 val signUpViewModel = koinViewModel<SignUpViewModel>()
 
                 SignUpScreenContent(
                     oneTimeEventChannelFlow = signUpViewModel.oneTimeEventChannelFlow,
                     redirectToSignInScreen = { nav.popBackStack() },
                     redirectToMovieScreen = {
-                        nav.navigate(Route.Movies) {
-                            popUpTo<Route.Auth> { inclusive = true }
+                        nav.navigate(Movies) {
+                            popUpTo<Auth> { inclusive = true }
                             launchSingleTop = true
                         }
                     },
@@ -101,9 +108,7 @@ fun AppNavHost(
             }
         }
 
-        composable<Route.Movies> {
-            BackHandler { onFinishApp() }
-
+        composable<Movies> {
             val movieViewModel = koinViewModel<MovieViewModel>()
             val moviesState by movieViewModel.movieState.collectAsState()
 
@@ -112,23 +117,23 @@ fun AppNavHost(
                 movieViewModel = movieViewModel,
                 movieState = moviesState,
                 oneTimeEventChannelFlow = movieViewModel.oneTimeEventChannelFlow,
-                redirectToMovieDetail = { movieId -> nav.navigate(Route.MovieDetail(movieId)) },
+                redirectToMovieDetail = { movieId -> nav.navigate(MovieDetail(movieId)) },
                 redirectToAuth = {
-                    movieViewModel.logOut()
-                    nav.navigate(Route.Auth) {
-                        popUpTo<Route.Movies> { inclusive = true }
+                    nav.navigate(Auth) {
+                        popUpTo<Movies> { inclusive = true }
                         launchSingleTop = true
                     }
                 }
             )
         }
 
-        composable<Route.MovieDetail> { backStackEntry ->
-            val movieId = backStackEntry.toRoute<Route.MovieDetail>().id
+        composable<MovieDetail> { backStackEntry ->
+            val movieId = backStackEntry.toRoute<MovieDetail>().id
             val movieDetailViewModel = koinViewModel<MovieDetailViewModel>(
                 key = "movieDetail-$movieId",
                 parameters = { parametersOf(movieId) }
             )
+
             val viewState by movieDetailViewModel.viewState.collectAsState()
 
             MovieDetailContent(

@@ -9,7 +9,6 @@ plugins {
 }
 
 multiplatformConfig {
-    useDecomposeWithCompose()
     useCoil()
 }
 
@@ -37,9 +36,6 @@ kotlin {
         androidMain.dependencies {
             // Network for Coil
             implementation(libs.findLibrary("ktor-client-android").get())
-
-            // Back handler
-            implementation(libs.findLibrary("activity-compose").get())
 
             // Media player
             implementation(libs.findLibrary("youtube-player").get())

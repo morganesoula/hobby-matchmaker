@@ -18,8 +18,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,7 +42,6 @@ import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiEve
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiStateModel
 import kotlinx.coroutines.flow.Flow
-import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun MovieContent(
@@ -60,7 +57,7 @@ fun MovieContent(
             MovieScreenContent(
                 movies = movieState.list,
                 oneTimeEventChannelFlow = oneTimeEventChannelFlow,
-                redirectToMovieDetail = { id -> redirectToMovieDetail(id) },
+                redirectToMovieDetail = redirectToMovieDetail,
                 onCardEvent = movieViewModel::onCardEvent,
                 logOut = { movieViewModel.logOut() },
                 redirectToAuth = { redirectToAuth() }
@@ -72,6 +69,7 @@ fun MovieContent(
         else -> LoadingCircularProgress()
     }
 }
+
 @Composable
 fun MovieScreenContent(
     modifier: Modifier = Modifier,

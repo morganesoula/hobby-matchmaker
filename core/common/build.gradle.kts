@@ -31,8 +31,6 @@ kotlin {
             // Timber
             implementation(libs.findLibrary("timber-android").get())
         }
-
-        iosMain.dependencies { }
     }
 }
 

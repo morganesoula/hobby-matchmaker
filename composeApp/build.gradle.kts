@@ -14,7 +14,6 @@ plugins {
 
 multiplatformConfig {
     useCoil()
-    useDecomposeWithCompose()
     useFirebase()
 }
 
@@ -47,7 +46,6 @@ kotlin {
             implementation(project(Modules.MOVIE_DETAIL_DATA))
             implementation(project(Modules.MOVIE_DETAIL_DOMAIN))
             implementation(project(Modules.MOVIE_DETAIL_PRESENTATION))
-            implementation(project(Modules.NAVIGATION_DOMAIN))
             implementation(project(Modules.NAVIGATION_PRESENTATION))
             implementation(project(Modules.NETWORK))
             implementation(project(Modules.SESSION_DATA))

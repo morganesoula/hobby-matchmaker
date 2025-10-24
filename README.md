@@ -11,7 +11,7 @@ It allows users to connect around shared interests such as movies, games (upcomi
 - Display of popular movies using the **TMDB API**
 - Like and match system around shared interests
 - Shared UI built with **Compose Multiplatform**
-- (Currently migrating from **Decompose** to **Compose Navigation Multiplatform**)
+- Shared navigation with **Compose Navigation**
 - Image handling with **Coil 3** and per-request listeners for debugging
 
 ---

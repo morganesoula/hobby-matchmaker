@@ -53,7 +53,6 @@ class MovieViewModel(
                 is AppResult.Success -> {
                     when (val payload = result.data) {
                         is ObserveAllMoviesSuccess.Success -> {
-                            Logger.d("MovieVM: movies:${payload.movies.size}")
                             MovieUiStateModel.Success(
                                 payload.movies.map { it.toMovieUiModel() }
                             )
@@ -100,9 +99,12 @@ class MovieViewModel(
                 }
             }
 
-            is CardEventModel.OnSingleTap -> scope.launch {
-                val eventToSend = handleSingleTap(event.movieId)
-                sendOnce(eventToSend)
+            is CardEventModel.OnSingleTap -> {
+                Logger.d("Detect single tap on card")
+                scope.launch {
+                    val eventToSend = handleSingleTap(event.movieId)
+                    sendOnce(eventToSend)
+                }
             }
         }
     }

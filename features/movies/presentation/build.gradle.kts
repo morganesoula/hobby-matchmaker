@@ -14,6 +14,7 @@ kotlin {
         commonMain.dependencies {
             // Coil
             implementation(libs.findLibrary("coil-network").get())
+
             // Modules
             implementation(project(Modules.AUTHENTICATION_DOMAIN))
             implementation(project(Modules.COMMON))

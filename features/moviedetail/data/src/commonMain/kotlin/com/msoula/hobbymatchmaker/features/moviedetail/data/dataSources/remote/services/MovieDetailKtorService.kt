@@ -2,7 +2,6 @@ package com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
-import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.safeCall
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.CastResponseRemoteModel
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.remote.models.MovieDetailResponseRemoteModel
@@ -38,9 +37,6 @@ class MovieDetailKtorServiceImpl(private val client: HttpClient) : MovieDetailKt
             url { encodedPath = "movie/$movieId" }
             parameter(PARAMS_LANGUAGE, language)
         }.body<MovieDetailResponseRemoteModel>()
-            .also {
-                Logger.d("MovieDetail: id=$movieId lang=$language")
-            }
     }
 
     override suspend fun fetchMovieCredits(
@@ -52,8 +48,5 @@ class MovieDetailKtorServiceImpl(private val client: HttpClient) : MovieDetailKt
             url { encodedPath = "movie/$movieId/credits" }
             parameter(PARAMS_LANGUAGE, language)
         }.body<CastResponseRemoteModel>()
-            .also {
-                Logger.d("MovieCredits: id=$movieId lang=$language")
-            }
     }
 }

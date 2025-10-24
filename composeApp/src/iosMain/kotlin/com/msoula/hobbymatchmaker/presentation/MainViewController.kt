@@ -8,20 +8,15 @@ import com.msoula.hobbymatchmaker.core.login.presentation.clients.IosAppleUIClie
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.IosFacebookUIClient
 import com.msoula.hobbymatchmaker.presentation.clients.IosGoogleUIClient
 import com.msoula.hobbymatchmaker.presentation.navigation.App
-import com.msoula.hobbymatchmaker.presentation.navigation.getRootComponent
 
 fun MainViewController() = ComposeUIViewController {
-    val rootComponent = getRootComponent()
-
     val socialClients = mapOf(
         ProviderType.GOOGLE to GoogleUIClientImpl(IosGoogleUIClient()),
         ProviderType.APPLE to AppleUIClientImpl(IosAppleUIClient())
     )
 
     App(
-        component = rootComponent,
         socialClients = socialClients,
-        facebookUIClient = IosFacebookUIClient(),
-        onFinishApp = {}
+        facebookUIClient = IosFacebookUIClient()
     )
 }

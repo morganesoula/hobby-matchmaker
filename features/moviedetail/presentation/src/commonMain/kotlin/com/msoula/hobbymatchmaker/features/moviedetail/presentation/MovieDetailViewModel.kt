@@ -24,6 +24,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -44,12 +45,14 @@ class MovieDetailViewModel(
 
     val viewState: StateFlow<MovieDetailViewStateModel> =
         observeMovieDetailUseCase(movieId, language)
+            .onStart {
+                Logger.d("Inside MovieDetailVM with movieId: $movieId")
+            }
             .map { result ->
                 when (result) {
                     is AppResult.Success -> {
                         when (val success = result.data) {
                             is ObserveMovieSuccess.Success -> {
-                                Logger.d("DetailVM: title=${success.data.title}")
                                 currentMovie = success.data.toMovieDetailUiModel()
                                 MovieDetailViewStateModel.Success(requireNotNull(currentMovie))
                             }

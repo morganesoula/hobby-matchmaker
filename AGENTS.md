@@ -7,7 +7,7 @@ The app lets users:
 - Authenticate via **Google**, **Apple**, or **Facebook** using **Firebase Authentication**.
 - View popular movies via the **TMDB API**.
 - Like movies and see matches with their circle.
-- Navigate via **Decompose** (migration to Compose Navigation planned).
+- Navigate via **Compose Navigation**.
 - Share UI code between Android and iOS via **Compose Multiplatform**.
 
 ---
@@ -55,7 +55,7 @@ All modules are designed for testability and KMP compatibility.
 - Coil 3 for image loading (with `ImageRequest.Listener` for debug)
 - Firebase Auth + Firestore
 - Material3 + dynamic color
-- `Decompose` navigation migrating to `Compose Navigation`
+- `Compose Navigation`
 
 ### ✅ iOS
 - Compose Multiplatform UI

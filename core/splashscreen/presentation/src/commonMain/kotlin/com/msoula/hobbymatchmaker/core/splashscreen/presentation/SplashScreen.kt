@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.msoula.hobbymatchmaker.core.design.Res
@@ -18,10 +19,19 @@ fun SplashScreenContent(
     redirectToAuth: () -> Unit,
     redirectToMovies: () -> Unit
 ) {
-    when (state) {
-        is SplashUiState.Loading -> SplashLoading()
+    LaunchedEffect(state) {
+        when (state) {
+            is SplashUiState.GoToMovies -> redirectToMovies()
+            is SplashUiState.GoToAuth -> redirectToAuth()
+            else -> Unit
+        }
     }
 
+    when (state) {
+        SplashUiState.Loading -> SplashLoading()
+        is SplashUiState.Error -> SplashError()
+        else -> Unit
+    }
 }
 
 @Composable

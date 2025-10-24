@@ -32,12 +32,6 @@ internal fun KotlinMultiplatformExtension.configureCompose(
         implementation(compose.material3)
         implementation(compose.materialIconsExtended)
 
-        // Decompose - Compose
-        if (config.useDecomposeWithCompose) {
-            implementation(libs.findLibrary("decompose-core").get())
-            implementation(libs.findLibrary("decompose-compose").get())
-        }
-
         // Firebase - FireStore
         if (config.useFirebase) {
             implementation(libs.findLibrary("firebase-kmp-auth").get())

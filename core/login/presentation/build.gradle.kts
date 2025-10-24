@@ -27,18 +27,6 @@ kotlin {
         compilations["main"].cinterops.create("nativeIosAuthShared")
     }
 
-    /* listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach {
-        it.compilations {
-            val main by getting {
-                cinterops.create("nativeIosShared")
-            }
-        }
-    } */
-
     sourceSets {
         commonMain.dependencies {
             // Modules

@@ -18,11 +18,6 @@ internal fun KotlinMultiplatformExtension.configureMultiplatform(
         // Coroutines
         implementation(libs.findLibrary("kotlinx-coroutines-kmp").get())
 
-        // Decompose
-        if (config.useDecompose) {
-            implementation(libs.findLibrary("decompose-core").get())
-        }
-
         // Firebase
         if (config.useFirebase) {
             implementation(libs.findLibrary("firebase-kmp-auth").get())
