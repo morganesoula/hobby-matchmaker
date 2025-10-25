@@ -20,3 +20,12 @@ iosApp/tmdb.plist
 **/*.cinteropLibraries.json
 iosApp/**/*.xcuserdata/
 iosApp/**/*.xcuserstate
+
+# Xcode
+DerivedData/
+*.xcworkspace/xcuserdata/
+*.xcuserstate
+*.xcuserdatad
+.build/
+.swiftpm/
+

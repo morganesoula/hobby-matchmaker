@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		A107BB8E2DBC08CA00ABD150 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A107BB8D2DBC08CA00ABD150 /* libsqlite3.tbd */; };
 		A18419902DCFD1930033E797 /* YouTubeiOSPlayerHelper in Frameworks */ = {isa = PBXBuildFile; productRef = A184198F2DCFD1930033E797 /* YouTubeiOSPlayerHelper */; };
-		A194D2AD2DC2897E001FDC09 /* exportedNativeIosShared in Frameworks */ = {isa = PBXBuildFile; productRef = A194D2AC2DC2897E001FDC09 /* exportedNativeIosShared */; };
+		A18E733E2EAD1F6500B1816D /* nativeIosShared in Frameworks */ = {isa = PBXBuildFile; productRef = A18E733D2EAD1F6500B1816D /* nativeIosShared */; };
 		A1F3BA3E2DCA4DE6005104EF /* composeApp.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1F3BA3D2DCA4DE6005104EF /* composeApp.xcframework */; };
 		A1F3BA3F2DCA4DE6005104EF /* composeApp.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A1F3BA3D2DCA4DE6005104EF /* composeApp.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
@@ -89,9 +89,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A18E733E2EAD1F6500B1816D /* nativeIosShared in Frameworks */,
 				A1F3BA3E2DCA4DE6005104EF /* composeApp.xcframework in Frameworks */,
 				A107BB8E2DBC08CA00ABD150 /* libsqlite3.tbd in Frameworks */,
-				A194D2AD2DC2897E001FDC09 /* exportedNativeIosShared in Frameworks */,
 				A18419902DCFD1930033E797 /* YouTubeiOSPlayerHelper in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -244,8 +244,8 @@
 			mainGroup = A1654D8C2D5BB95100F7F8E6;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				A194D2AB2DC2897E001FDC09 /* XCLocalSwiftPackageReference "../composeApp/exportedNativeIosShared" */,
 				A184198E2DCFD1930033E797 /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */,
+				A18E733C2EAD1F6500B1816D /* XCLocalSwiftPackageReference "../composeApp/build/spmKmpPlugin/nativeIosShared" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A1654D962D5BB95100F7F8E6 /* Products */;
@@ -705,9 +705,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		A194D2AB2DC2897E001FDC09 /* XCLocalSwiftPackageReference "../composeApp/exportedNativeIosShared" */ = {
+		A18E733C2EAD1F6500B1816D /* XCLocalSwiftPackageReference "../composeApp/build/spmKmpPlugin/nativeIosShared" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = ../composeApp/exportedNativeIosShared;
+			relativePath = ../composeApp/build/spmKmpPlugin/nativeIosShared;
 		};
 /* End XCLocalSwiftPackageReference section */
 
@@ -728,9 +728,9 @@
 			package = A184198E2DCFD1930033E797 /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */;
 			productName = YouTubeiOSPlayerHelper;
 		};
-		A194D2AC2DC2897E001FDC09 /* exportedNativeIosShared */ = {
+		A18E733D2EAD1F6500B1816D /* nativeIosShared */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = exportedNativeIosShared;
+			productName = nativeIosShared;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
