@@ -37,5 +37,8 @@ fun appModule() = listOf(
     featuresModuleMovieData,
     featuresModuleMovieDomain,
     featuresModuleMovieViewModel,
+    /* featuresModuleUserProfileData,
+    featuresModuleUserProfileDomain,
+    featuresModuleUserProfilePresentation,*/
     coreModuleSplashPresentation
 )
