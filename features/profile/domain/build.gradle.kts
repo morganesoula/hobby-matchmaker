@@ -3,6 +3,15 @@ plugins {
     alias(libs.plugins.kover)
 }
 
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            // Modules
+            implementation(project(Modules.COMMON))
+        }
+    }
+}
+
 android {
     namespace = "com.msoula.hobbymatchmaker.features.profile.domain"
 }

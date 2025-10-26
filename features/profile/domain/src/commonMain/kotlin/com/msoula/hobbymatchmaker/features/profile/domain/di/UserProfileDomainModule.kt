@@ -1,11 +1,11 @@
 package com.msoula.hobbymatchmaker.features.profile.domain.di
 
-import com.msoula.hobbymatchmaker.features.profile.domain.useCases.GetCurrentUserProfileUseCase
-import com.msoula.hobbymatchmaker.features.profile.domain.useCases.UpdateUserProfileUseCase
+import com.msoula.hobbymatchmaker.features.profile.domain.useCases.ObserveCurrentUserProfileUseCase
+import com.msoula.hobbymatchmaker.features.profile.domain.useCases.RefreshUserProfileUseCase
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 
 val featuresModuleUserProfileDomain = module {
-    factoryOf(::GetCurrentUserProfileUseCase)
-    factoryOf(::UpdateUserProfileUseCase)
+    factoryOf(::ObserveCurrentUserProfileUseCase)
+    factoryOf(::RefreshUserProfileUseCase)
 }

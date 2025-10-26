@@ -1,3 +1,6 @@
+import kotlin.String;
+import kotlin.collections.List;
+
 CREATE TABLE movie (
     movieId INTEGER NOT NULL PRIMARY KEY,
     title TEXT,
@@ -32,6 +35,17 @@ CREATE TABLE movie_actor_cross_ref (
     FOREIGN KEY(movieId) REFERENCES movie(movieId) ON DELETE CASCADE,
     FOREIGN KEY(actorId) REFERENCES actor(actorId) ON DELETE CASCADE,
     PRIMARY KEY(movieId, actorId)
+);
+
+CREATE TABLE user_profile (
+    uid TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    avatar_url TEXT,
+    bio TEXT,
+    interests_json TEXT AS List<String> NOT NULL,
+    liked_count INTEGER NOT NULL,
+    circle_count INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
 );
 
  -- QUERIES --
@@ -125,3 +139,27 @@ FROM movie
 WHERE isFavorite = 1;
 
 CREATE INDEX IF NOT EXISTS movie_is_favorite ON movie(isFavorite);
+
+selectUserById:
+SELECT *
+FROM user_profile
+WHERE uid = ?;
+
+insertUserProfile:
+INSERT INTO user_profile(
+uid, name, avatar_url, bio, interests_json, liked_count, circle_count, updated_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+updateUserProfile:
+UPDATE user_profile SET
+    name = :name,
+    avatar_url = :avatar_url,
+    bio = :bio,
+    interests_json = :interests_json,
+    liked_count = :liked_count,
+    circle_count = :circle_count,
+    updated_at = :updated_at
+WHERE uid = :uid;
+
+deleteUserProfile:
+DELETE FROM user_profile;

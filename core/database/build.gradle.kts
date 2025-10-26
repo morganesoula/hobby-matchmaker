@@ -19,6 +19,9 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            // Serialization
+            implementation(libs.findLibrary("kotlinx-serialization").get())
+
             // SQLDelight
             implementation(libs.findLibrary("sqldelight-runtime").get())
             implementation(libs.findLibrary("sqldelight-coroutines").get())
