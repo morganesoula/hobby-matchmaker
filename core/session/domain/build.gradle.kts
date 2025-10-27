@@ -7,6 +7,9 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(project(Modules.COMMON))
+
+                // Uuid
+                implementation(libs.findLibrary("uuid").get())
             }
         }
     }

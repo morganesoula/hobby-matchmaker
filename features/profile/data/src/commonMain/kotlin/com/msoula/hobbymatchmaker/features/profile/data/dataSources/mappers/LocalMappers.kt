@@ -2,7 +2,6 @@ package com.msoula.hobbymatchmaker.features.profile.data.dataSources.mappers
 
 import com.msoula.hobbymatchmaker.core.database.models.UserProfileDataEntity
 import com.msoula.hobbymatchmaker.features.profile.data.models.UserProfileLocalDataModel
-import com.msoula.hobbymatchmaker.features.profile.domain.models.UserProfileDomainModel
 
 fun UserProfileDataEntity.toUserProfileLocalDataModel(): UserProfileLocalDataModel {
     return UserProfileLocalDataModel(
@@ -25,17 +24,5 @@ fun UserProfileLocalDataModel.toUserProfileDataEntity(): UserProfileDataEntity {
         interests = this.interests,
         likedCount = this.likedCount,
         circleCount = this.circleCount
-    )
-}
-
-fun UserProfileLocalDataModel.toUserProfileDomainModel(): UserProfileDomainModel {
-    return UserProfileDomainModel(
-        uid = this.uid,
-        name = this.name,
-        avatarUrl = this.avatarUrl,
-        bio = this.bio,
-        interests = this.interests,
-        likedMoviesCount = this.likedCount,
-        socialCircle = this.circleCount
     )
 }

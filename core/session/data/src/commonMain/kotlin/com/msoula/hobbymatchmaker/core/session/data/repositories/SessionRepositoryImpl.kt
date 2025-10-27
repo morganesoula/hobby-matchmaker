@@ -25,4 +25,13 @@ class SessionRepositoryImpl(
 
     override fun observeShouldShowGuestDialog(): Flow<Boolean> =
         sessionLocalDataSource.observeShouldShowGuestDialog()
+
+    override suspend fun setCurrentUserUid(uid: String) =
+        sessionLocalDataSource.setCurrentUid(uid)
+
+    override fun observeCurrentUserUid(): Flow<String> =
+        sessionLocalDataSource.observeCurrentUid()
+
+    override suspend fun getCurrentUserUid() =
+        sessionLocalDataSource.getCurrentUserUid()
 }

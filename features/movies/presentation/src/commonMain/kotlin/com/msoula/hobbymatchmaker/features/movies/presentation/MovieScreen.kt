@@ -50,7 +50,8 @@ fun MovieContent(
     movieState: MovieUiStateModel,
     oneTimeEventChannelFlow: Flow<MovieUiEventModel>,
     redirectToMovieDetail: (Long) -> Unit,
-    redirectToAuth: () -> Unit
+    redirectToAuth: () -> Unit,
+    redirectToProfile: () -> Unit
 ) {
     when (movieState) {
         is MovieUiStateModel.Success -> {
@@ -60,7 +61,8 @@ fun MovieContent(
                 redirectToMovieDetail = redirectToMovieDetail,
                 onCardEvent = movieViewModel::onCardEvent,
                 logOut = { movieViewModel.logOut() },
-                redirectToAuth = { redirectToAuth() }
+                redirectToAuth = redirectToAuth,
+                redirectToProfile = redirectToProfile
             )
         }
 
@@ -78,7 +80,8 @@ fun MovieScreenContent(
     redirectToMovieDetail: (movieId: Long) -> Unit,
     logOut: () -> Unit,
     onCardEvent: (CardEventModel) -> Unit,
-    redirectToAuth: () -> Unit
+    redirectToAuth: () -> Unit,
+    redirectToProfile: () -> Unit
 ) {
     val listState = rememberLazyListState()
     val snackBarHostState = remember { SnackbarHostState() }
@@ -155,7 +158,7 @@ fun MovieScreenContent(
                 }
             }
 
-            HMMHomeTopBar { logOut() }
+            HMMHomeTopBar(onLogoutIconClick = logOut, onRedirectIconClick = redirectToProfile)
         }
     }
 }

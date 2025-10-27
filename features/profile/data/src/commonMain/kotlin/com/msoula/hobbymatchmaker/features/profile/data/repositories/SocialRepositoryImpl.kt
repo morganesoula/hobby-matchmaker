@@ -1,24 +1,39 @@
 package com.msoula.hobbymatchmaker.features.profile.data.repositories
 
+import com.msoula.hobbymatchmaker.features.profile.data.dataSources.local.SocialLocalDataSource
+import com.msoula.hobbymatchmaker.features.profile.data.models.SocialMemberLocalDataModel
 import com.msoula.hobbymatchmaker.features.profile.domain.models.UserSummaryDomainModel
+import com.msoula.hobbymatchmaker.features.profile.domain.models.UserSummaryDomainModel.Companion.DEFAULT_AVATAR_URL
+import com.msoula.hobbymatchmaker.features.profile.domain.models.UserSummaryDomainModel.Companion.DEFAULT_NAME
 import com.msoula.hobbymatchmaker.features.profile.domain.repositories.SocialRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
-class SocialRepositoryImpl: SocialRepository {
-    
-    override fun observeSocialCircleCount(): Flow<Int> {
-        TODO("Not yet implemented")
-    }
+class SocialRepositoryImpl(
+    private val socialLocalDataSource: SocialLocalDataSource
+) : SocialRepository {
 
-    override fun observeSocialCircle(): Flow<List<UserSummaryDomainModel>> {
-        TODO("Not yet implemented")
-    }
+    override fun observeSocialCircleCount(): Flow<Int> =
+        socialLocalDataSource.observeSocialCircleCount()
+
+    override fun observeSocialCircle(): Flow<List<UserSummaryDomainModel>> =
+        socialLocalDataSource.observeSocialCircle().map { members ->
+            members.map {
+                UserSummaryDomainModel(
+                    uid = it.memberId,
+                    name = it.name ?: DEFAULT_NAME,
+                    avatarUrl = it.avatarUrl ?: DEFAULT_AVATAR_URL
+                )
+            }
+        }
 
     override suspend fun addToCircle(memberUid: String) {
-        TODO("Not yet implemented")
+        socialLocalDataSource.addToCircle(
+            SocialMemberLocalDataModel(memberUid, null, null)
+        )
     }
 
     override suspend fun removeFromCircle(memberUid: String) {
-        TODO("Not yet implemented")
+        socialLocalDataSource.removeFromCircle(memberUid)
     }
 }

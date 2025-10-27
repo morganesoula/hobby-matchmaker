@@ -11,7 +11,7 @@ fun UserProfileDomainModel.toUserProfileRemoteDataModel(): UserProfileRemoteData
 
 fun UserProfileRemoteDataModel.toUserProfileDomainModel(): UserProfileDomainModel {
     return UserProfileDomainModel(
-        uid = this.uid.toLong(),
+        uid = this.uid,
         name = "",
         avatarUrl = "",
         bio = "",

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Announcement
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material.icons.filled.ArrowBackIosNew
@@ -82,7 +83,7 @@ fun HMMIosTopBar(
 }
 
 @Composable
-fun BoxScope.HMMHomeTopBar(onLogoutIconClick: () -> Unit) {
+fun BoxScope.HMMHomeTopBar(onLogoutIconClick: () -> Unit, onRedirectIconClick: () -> Unit) {
     Box(
         modifier = Modifier
             .padding(top = 16.dp, start = 16.dp, end = 16.dp)
@@ -91,7 +92,7 @@ fun BoxScope.HMMHomeTopBar(onLogoutIconClick: () -> Unit) {
                 color = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
                 shape = CircleShape
             )
-            .clickable(onClick = onLogoutIconClick)
+            .clickable(onClick = { onLogoutIconClick() })
             .semantics { role = Role.Button }
             .align(Alignment.TopEnd),
         contentAlignment = Alignment.Center
@@ -99,6 +100,26 @@ fun BoxScope.HMMHomeTopBar(onLogoutIconClick: () -> Unit) {
         Icon(
             imageVector = Icons.AutoMirrored.Rounded.Logout,
             contentDescription = "Logout",
+            tint = MaterialTheme.colorScheme.onSurface
+        )
+    }
+
+    Box(
+        modifier = Modifier
+            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+            .size(44.dp)
+            .background(
+                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
+                shape = CircleShape
+            )
+            .clickable(onClick = { onRedirectIconClick() })
+            .semantics { role = Role.Button }
+            .align(Alignment.TopStart),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Rounded.Announcement,
+            contentDescription = "Profile",
             tint = MaterialTheme.colorScheme.onSurface
         )
     }

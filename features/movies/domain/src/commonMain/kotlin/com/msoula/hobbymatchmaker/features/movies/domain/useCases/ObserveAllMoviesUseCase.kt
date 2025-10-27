@@ -18,13 +18,12 @@ sealed class ObserveAllMoviesSuccess {
     data object DataLoadedInDB : ObserveAllMoviesSuccess()
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ObserveAllMoviesUseCase(
     private val movieRepository: MovieRepository,
     private val fetchMoviesUseCase: FetchMoviesUseCase,
     private val dispatcher: CoroutineDispatcher
 ) {
-
-    @OptIn(ExperimentalCoroutinesApi::class)
     operator fun invoke(language: String): Flow<AppResult<ObserveAllMoviesSuccess, AppError>> =
         movieRepository.observeMovies()
             .distinctUntilChanged()

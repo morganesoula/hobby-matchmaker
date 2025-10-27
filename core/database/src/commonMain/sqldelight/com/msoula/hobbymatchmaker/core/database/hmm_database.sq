@@ -48,6 +48,16 @@ CREATE TABLE user_profile (
     updated_at INTEGER NOT NULL
 );
 
+CREATE TABLE social_circle_member (
+    uid TEXT NOT NULL,
+    member_uid TEXT NOT NULL,
+    member_name TEXT,
+    member_avatar_url TEXT,
+    added_at INTEGER NOT NULL,
+    PRIMARY KEY (uid, member_uid),
+    FOREIGN KEY (uid) REFERENCES user_profile(uid) ON DELETE CASCADE
+);
+
  -- QUERIES --
 
  insertMovie:
@@ -145,6 +155,24 @@ SELECT *
 FROM user_profile
 WHERE uid = ?;
 
+selectUserProfileWIthMembersById:
+SELECT
+up.uid AS uid,
+up.name AS name,
+up.avatar_url AS avatar_url,
+up.bio AS bio,
+up.interests_json AS interests_json,
+up.liked_count AS liked_count,
+up.circle_count AS circle_count,
+scm.member_uid AS member_uid,
+scm.member_name AS member_name,
+scm.member_avatar_url AS member_avatar_url,
+scm.added_at AS member_added_at
+FROM user_profile up
+LEFT JOIN social_circle_member scm
+ON scm.uid = up.uid
+WHERE up.uid = ?;
+
 insertUserProfile:
 INSERT INTO user_profile(
 uid, name, avatar_url, bio, interests_json, liked_count, circle_count, updated_at
@@ -161,5 +189,15 @@ UPDATE user_profile SET
     updated_at = :updated_at
 WHERE uid = :uid;
 
-deleteUserProfile:
-DELETE FROM user_profile;
+deleteUserProfileById:
+DELETE FROM user_profile WHERE uid = ?;
+
+insertSocialMember:
+INSERT INTO social_circle_member (uid, member_uid, member_name, member_avatar_url, added_at)
+VALUES (?, ?, ?, ?, ?);
+
+deleteSocialMember:
+DELETE FROM social_circle_member WHERE uid = ? AND member_uid = ?;
+
+selectSocialMembersByUid:
+SELECT * FROM social_circle_member WHERE uid = ?;

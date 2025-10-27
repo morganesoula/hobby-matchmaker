@@ -23,6 +23,8 @@ import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailC
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailViewModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.MovieContent
 import com.msoula.hobbymatchmaker.features.movies.presentation.MovieViewModel
+import com.msoula.hobbymatchmaker.features.profile.presentation.UserProfileContent
+import com.msoula.hobbymatchmaker.features.profile.presentation.UserProfileViewModel
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -123,6 +125,12 @@ fun AppNavHost(
                         popUpTo<Movies> { inclusive = true }
                         launchSingleTop = true
                     }
+                },
+                redirectToProfile = {
+                    nav.navigate(Profile) {
+                        popUpTo<Movies> { inclusive = true }
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -141,6 +149,15 @@ fun AppNavHost(
                 viewState = viewState,
                 onPlayTrailerClicked = movieDetailViewModel::onEvent,
                 onMovieDetailBackPressed = { nav.popBackStack() },
+            )
+        }
+
+        composable<Profile> {
+            val profileViewModel = koinViewModel<UserProfileViewModel>()
+            val userProfileState by profileViewModel.currentUserProfileState.collectAsState()
+
+            UserProfileContent(
+                state = userProfileState
             )
         }
     }

@@ -48,6 +48,9 @@ kotlin {
             implementation(project(Modules.MOVIE_DETAIL_PRESENTATION))
             implementation(project(Modules.NAVIGATION_PRESENTATION))
             implementation(project(Modules.NETWORK))
+            implementation(project(Modules.PROFILE_DATA))
+            implementation(project(Modules.PROFILE_DOMAIN))
+            implementation(project(Modules.PROFILE_PRESENTATION))
             implementation(project(Modules.SESSION_DATA))
             implementation(project(Modules.SESSION_DOMAIN))
             implementation(project(Modules.SPLASHSCREEN_PRESENTATION))
@@ -131,6 +134,9 @@ dependencies {
     kover(project(Modules.MOVIE_DETAIL_DOMAIN))
     kover(project(Modules.MOVIE_DETAIL_PRESENTATION))
     kover(project(Modules.MOVIE_PRESENTATION))
+    kover(project(Modules.PROFILE_DATA))
+    kover(project(Modules.PROFILE_DOMAIN))
+    kover(project(Modules.PROFILE_PRESENTATION))
     kover(project(Modules.SESSION_DATA))
 }
 

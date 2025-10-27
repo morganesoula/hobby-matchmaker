@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ResetPasswordUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.UnifiedSignInUseCase
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.UIText
@@ -18,6 +19,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.models.ResetPasswordEv
 import com.msoula.hobbymatchmaker.core.login.presentation.models.SignInEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.models.SignInFormStateModel
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveShouldShowGuestDialogUseCase
+import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetCurrentUserProfileUuidUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetShouldShowGuestDialogUseCase
 import dev.gitlive.firebase.auth.AuthCredential
 import kotlinx.coroutines.CoroutineScope
@@ -37,6 +39,7 @@ class SignInViewModel(
     private val resetPasswordUseCase: ResetPasswordUseCase,
     private val setShouldShowGuestDialogUseCase: SetShouldShowGuestDialogUseCase,
     val observeShouldShowGuestDialog: ObserveShouldShowGuestDialogUseCase,
+    val setCurrentUserProfileUuidUseCase: SetCurrentUserProfileUuidUseCase,
     private val unifiedSignInUseCase: UnifiedSignInUseCase,
     private val socialClients: Map<ProviderType, SocialUIClient>,
     private val defaultErrorMessageMapper: ErrorMessageMapper,
@@ -45,7 +48,6 @@ class SignInViewModel(
     private val scope = externalScope ?: viewModelScope
     private val _oneTimeEventChannel = Channel<AuthUiEventModel>()
     val oneTimeEventChannelFlow = _oneTimeEventChannel.receiveAsFlow()
-
     private val _formDataFlow = MutableStateFlow(SignInFormStateModel())
     val formDataFlow = _formDataFlow.asStateFlow()
     val openResetDialog = MutableStateFlow(false)
@@ -98,7 +100,12 @@ class SignInViewModel(
 
             is AuthenticationUIEvent.OnContinueAsGuestConfirmed ->
                 scope.launch {
-                    setShouldShowGuestDialogUseCase(shouldShow = !event.dontAskAgain)
+                    when (setCurrentUserProfileUuidUseCase()) {
+                        is AppResult.Success ->
+                            setShouldShowGuestDialogUseCase(shouldShow = !event.dontAskAgain)
+
+                        is AppResult.Failure -> {}
+                    }
                 }
 
             AuthenticationUIEvent.OnGoogleButtonClicked ->

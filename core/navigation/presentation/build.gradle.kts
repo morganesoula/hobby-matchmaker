@@ -12,6 +12,7 @@ kotlin {
             implementation(project(Modules.LOGIN_PRESENTATION))
             implementation(project(Modules.MOVIE_PRESENTATION))
             implementation(project(Modules.MOVIE_DETAIL_PRESENTATION))
+            implementation(project(Modules.PROFILE_PRESENTATION))
             implementation(project(Modules.SESSION_DOMAIN))
             implementation(project(Modules.SPLASHSCREEN_PRESENTATION))
         }

@@ -33,6 +33,8 @@ timber = "5.0.1"
 turbine = "1.2.1"
 youtube = "13.0.0"
 jetbrainsKotlinJvm = "2.2.20"
+uiTooling = "1.9.4"
+uuid = "0.8.4"
 
 [libraries]
 activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
@@ -40,7 +42,7 @@ appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat"
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-network = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
 compose-gradle-plugin = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "composeMultiplatform" }
-compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "composeNavigation"}
+compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
 core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
 credentials-play-services = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
@@ -87,6 +89,8 @@ sqldelight-runtime = { module = "app.cash.sqldelight:runtime", version.ref = "sq
 timber-android = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 youtube-player = { module = "com.pierfrancescosoffritti.androidyoutubeplayer:core", version.ref = "youtube" }
+ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
+uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 
 [bundles]
 ktor = ["ktor-client-core", "ktor-client-logging", "ktor-client-negotiation", "ktor-serialization-json"]

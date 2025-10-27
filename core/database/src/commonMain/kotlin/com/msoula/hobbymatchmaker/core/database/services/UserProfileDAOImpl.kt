@@ -17,7 +17,7 @@ class UserProfileDAOImpl(
 ) : UserProfileDAO {
     override suspend fun insertUserProfile(userProfile: UserProfileDataEntity) {
         database.hmm_databaseQueries.insertUserProfile(
-            userProfile.uid.toString(),
+            userProfile.uid,
             userProfile.name,
             userProfile.avatarUrl,
             userProfile.bio,
@@ -50,7 +50,7 @@ class UserProfileDAOImpl(
             .map { row ->
                 row?.let {
                     UserProfileDataEntity(
-                        uid = it.uid.toLong(),
+                        uid = it.uid,
                         name = it.name,
                         avatarUrl = it.avatar_url,
                         bio = it.bio,

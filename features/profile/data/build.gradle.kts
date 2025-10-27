@@ -18,6 +18,7 @@ kotlin {
             implementation(project(Modules.DATABASE))
             implementation(project(Modules.NETWORK))
             implementation(project(Modules.PROFILE_DOMAIN))
+            implementation(project(Modules.SESSION_DATA))
         }
     }
 }

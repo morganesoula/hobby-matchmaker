@@ -15,6 +15,7 @@ val coreModuleSignInViewModel = module {
             resetPasswordUseCase = get(),
             observeShouldShowGuestDialog = get(),
             setShouldShowGuestDialogUseCase = get(),
+            setCurrentUserProfileUuidUseCase = get(),
             unifiedSignInUseCase = get(),
             socialClients = socialClients,
             defaultErrorMessageMapper = get()

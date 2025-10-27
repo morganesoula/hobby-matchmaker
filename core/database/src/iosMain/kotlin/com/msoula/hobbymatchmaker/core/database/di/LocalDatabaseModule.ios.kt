@@ -8,8 +8,11 @@ import org.koin.dsl.module
 
 actual val coreModuleDaoPlatformSpecific = module {
     single<HMMDatabase> {
+        val driver = DatabaseDriver().createDriver()
+        driver.execute(null, "PRAGMA foreign_keys=ON", 0)
+
         HMMDatabase(
-            driver = DatabaseDriver().createDriver(),
+            driver = driver,
             user_profileAdapter = User_profile.Adapter(
                 interests_jsonAdapter = InterestsAdapter
             )

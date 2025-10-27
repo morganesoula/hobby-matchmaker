@@ -1,35 +1,43 @@
 package com.msoula.hobbymatchmaker.features.profile.domain.models
 
 data class UserProfileDomainModel(
-    val uid: Long,
+    val uid: String,
     val name: String,
     val avatarUrl: String?,
     val bio: String?,
-    val interests: List<String>?,
+    val interests: List<String>,
     val likedMoviesCount: Int,
-    val socialCircle: List<UserSummaryDomainModel>?
+    val socialCircle: List<UserSummaryDomainModel>
 ) {
     companion object {
-        const val DEFAULT_UID: Long = -1
+        const val DEFAULT_UID: String = ""
         const val DEFAULT_NAME = ""
         const val DEFAULT_AVATAR_URL = ""
         const val DEFAULT_BIO = ""
-        val DEFAULT_INTERESTS = emptyList<String>()
+        val DEFAULT_INTERESTS: List<String> = emptyList()
         const val DEFAULT_LIKED_MOVIES_COUNT = 0
-        val DEFAULT_SOCIAL_CIRCLE = emptyList<UserSummaryDomainModel>()
+        val DEFAULT_SOCIAL_CIRCLE: List<UserSummaryDomainModel> = emptyList()
+
+        fun empty(): UserProfileDomainModel = UserProfileDomainModel(
+            uid = DEFAULT_UID,
+            name = DEFAULT_NAME,
+            avatarUrl = DEFAULT_AVATAR_URL,
+            bio = DEFAULT_BIO,
+            interests = DEFAULT_INTERESTS,
+            likedMoviesCount = DEFAULT_LIKED_MOVIES_COUNT,
+            socialCircle = DEFAULT_SOCIAL_CIRCLE
+        )
     }
 }
 
 data class UserSummaryDomainModel(
-    val uid: Long,
+    val uid: String,
     val name: String,
-    val avatarUrl: String,
-    val likedMoviesCount: Int
+    val avatarUrl: String?
 ) {
     companion object {
-        const val DEFAULT_UID: Long = -1
+        const val DEFAULT_UID: String = ""
         const val DEFAULT_NAME: String = ""
         const val DEFAULT_AVATAR_URL: String = ""
-        const val DEFAULT_LIKED_MOVIES_COUNT: Int = 0
     }
 }
