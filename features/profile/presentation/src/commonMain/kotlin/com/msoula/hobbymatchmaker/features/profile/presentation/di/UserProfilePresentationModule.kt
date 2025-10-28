@@ -8,6 +8,7 @@ val featuresModuleUserProfilePresentation = module {
         UserProfileViewModel(
             get(),
             get(),
+            get(),
             null
         )
     }

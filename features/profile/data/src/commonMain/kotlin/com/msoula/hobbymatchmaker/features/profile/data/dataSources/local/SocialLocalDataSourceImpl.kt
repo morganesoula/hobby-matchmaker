@@ -21,13 +21,15 @@ class SocialLocalDataSourceImpl(
             emitAll(
                 socialMemberDAO.observeUserProfileMembers(uid)
                     .map { list ->
-                        list.map {
-                            SocialMemberLocalDataModel(
-                                memberId = it.memberUid,
-                                name = it.memberName,
-                                avatarUrl = it.memberAvatarUrl
-                            )
-                        }
+                        if (list.isNotEmpty()) {
+                            list.map {
+                                SocialMemberLocalDataModel(
+                                    memberId = it.memberUid,
+                                    name = it.memberName,
+                                    avatarUrl = it.memberAvatarUrl
+                                )
+                            }
+                        } else emptyList()
                     }
             )
 

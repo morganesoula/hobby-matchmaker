@@ -4,16 +4,17 @@ plugins {
     alias(libs.plugins.kover)
 }
 
+multiplatformConfig {
+    useCoil()
+}
+
 kotlin {
     sourceSets {
-        androidMain.dependencies {
-            implementation("androidx.compose.ui:ui-tooling:1.9.4")
-            implementation("androidx.compose.ui:ui-tooling-preview:1.9.4")
-        }
-
         commonMain.dependencies {
+            // Modules
             implementation(project(Modules.COMMON))
             implementation(project(Modules.DESIGN))
+            implementation(project(Modules.SESSION_DOMAIN))
             implementation(project(Modules.PROFILE_DOMAIN))
         }
     }

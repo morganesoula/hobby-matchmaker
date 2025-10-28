@@ -9,6 +9,7 @@ fun UserProfileDomainModel.toUserProfileUiModel(): UserProfileUiModel =
     UserProfileUiModel(
         name = this.name,
         avatarUrl = this.avatarUrl,
+        bio = this.bio,
         interests = this.interests,
         moviesLikedCount = this.likedMoviesCount,
         socialMembersCount = this.socialCircle.size,

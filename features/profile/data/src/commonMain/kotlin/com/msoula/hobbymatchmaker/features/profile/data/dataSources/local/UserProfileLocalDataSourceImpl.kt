@@ -1,5 +1,6 @@
 package com.msoula.hobbymatchmaker.features.profile.data.dataSources.local
 
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.database.services.UserProfileDAO
 import com.msoula.hobbymatchmaker.core.session.data.dataSources.local.SessionLocalDataSource
 import com.msoula.hobbymatchmaker.features.profile.data.dataSources.mappers.toUserProfileDataEntity
@@ -19,7 +20,6 @@ class UserProfileLocalDataSourceImpl(
     override fun observeCurrentUserProfile(): Flow<UserProfileLocalDataModel?> =
         flow {
             val uid = sessionLocalDataSource.observeCurrentUid().first()
-
             emitAll(
                 userProfileDAO.observeUserProfile(uid).map { it?.toUserProfileLocalDataModel() }
             )

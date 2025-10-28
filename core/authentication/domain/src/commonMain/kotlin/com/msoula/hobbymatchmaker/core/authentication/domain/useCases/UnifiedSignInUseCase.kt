@@ -27,7 +27,9 @@ class UnifiedSignInUseCase(
 
             is Params.SocialMedia ->
                 signInWithCredentialUseCase(params.credential, params.providerType)
+                    .mapSuccess { info -> SignInSuccess(uid = info.uid ?: "") }
         }
-            .flatMapSuspend { setIsConnectedUseCase(true) }
-            .mapSuccess { SignInSuccess }
+            .flatMapSuspend { success ->
+                setIsConnectedUseCase(true).mapSuccess { success }
+            }
 }

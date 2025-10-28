@@ -157,7 +157,14 @@ fun AppNavHost(
             val userProfileState by profileViewModel.currentUserProfileState.collectAsState()
 
             UserProfileContent(
-                state = userProfileState
+                state = userProfileState,
+                onEvent = profileViewModel::onEvent,
+                navigateToSignUpScreen = {
+                    nav.navigate(Auth) {
+                        popUpTo<Profile> { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
             )
         }
     }

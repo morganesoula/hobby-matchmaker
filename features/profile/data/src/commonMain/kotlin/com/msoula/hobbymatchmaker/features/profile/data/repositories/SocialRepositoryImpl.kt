@@ -18,13 +18,15 @@ class SocialRepositoryImpl(
 
     override fun observeSocialCircle(): Flow<List<UserSummaryDomainModel>> =
         socialLocalDataSource.observeSocialCircle().map { members ->
-            members.map {
-                UserSummaryDomainModel(
-                    uid = it.memberId,
-                    name = it.name ?: DEFAULT_NAME,
-                    avatarUrl = it.avatarUrl ?: DEFAULT_AVATAR_URL
-                )
-            }
+            if (members.isNotEmpty()) {
+                members.map {
+                    UserSummaryDomainModel(
+                        uid = it.memberId,
+                        name = it.name ?: DEFAULT_NAME,
+                        avatarUrl = it.avatarUrl ?: DEFAULT_AVATAR_URL
+                    )
+                }
+            } else emptyList()
         }
 
     override suspend fun addToCircle(memberUid: String) {

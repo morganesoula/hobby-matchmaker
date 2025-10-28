@@ -164,7 +164,8 @@ class SignInViewModel(
                 val uiError = defaultErrorMessageMapper.toUIText(it)
                 sendOnce(AuthUiEventModel.ShowError(uiError))
             }
-            .onSuccess {
+            .onSuccess { result ->
+                setCurrentUserProfileUuidUseCase(result.uid)
                 resetSignInState()
                 sendOnce(AuthUiEventModel.OnSignInSuccess)
             }

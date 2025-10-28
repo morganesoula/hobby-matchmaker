@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.core.session.domain.di
 
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.CreateUserUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveIsConnectedUseCase
+import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveSessionStateUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveShouldShowGuestDialogUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetCurrentUserProfileUuidUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetIsConnectedUseCase
@@ -16,4 +17,5 @@ val coreModuleSessionDomain = module {
     factoryOf(::SetShouldShowGuestDialogUseCase)
     factoryOf(::ObserveShouldShowGuestDialogUseCase)
     factoryOf(::SetCurrentUserProfileUuidUseCase)
+    factoryOf(::ObserveSessionStateUseCase)
 }

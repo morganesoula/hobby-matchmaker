@@ -4,6 +4,6 @@ import com.msoula.hobbymatchmaker.features.profile.domain.models.UserProfileDoma
 import kotlinx.coroutines.flow.Flow
 
 interface UserProfileRepository {
-    fun observeCurrentUserProfile(): Flow<UserProfileDomainModel>
+    fun observeCurrentUserProfile(): Flow<UserProfileDomainModel?>
     suspend fun refreshUserProfile(userProfileDomainModel: UserProfileDomainModel)
 }
