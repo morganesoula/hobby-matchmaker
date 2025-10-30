@@ -12,7 +12,7 @@ import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.UIText
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
-import com.msoula.hobbymatchmaker.core.di.domain.useCases.AuthFormValidationUseCase
+import com.msoula.hobbymatchmaker.core.common.validation.AuthFormValidationUseCase
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthUiEventModel
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.ResetPasswordEvent

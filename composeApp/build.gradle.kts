@@ -37,7 +37,6 @@ kotlin {
             implementation(project(Modules.COMMON))
             implementation(project(Modules.DATABASE))
             implementation(project(Modules.DESIGN))
-            implementation(project(Modules.DI))
             implementation(project(Modules.LOGIN_DOMAIN))
             implementation(project(Modules.LOGIN_PRESENTATION))
             implementation(project(Modules.MOVIE_DATA))
@@ -125,7 +124,6 @@ kover {
 dependencies {
     kover(project(Modules.AUTHENTICATION_DATA))
     kover(project(Modules.AUTHENTICATION_DOMAIN))
-    kover(project(Modules.DI))
     kover(project(Modules.LOGIN_DOMAIN))
     kover(project(Modules.LOGIN_PRESENTATION))
     kover(project(Modules.MOVIE_DATA))

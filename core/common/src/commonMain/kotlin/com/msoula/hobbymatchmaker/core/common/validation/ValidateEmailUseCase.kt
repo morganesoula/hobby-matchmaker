@@ -1,6 +1,6 @@
-package com.msoula.hobbymatchmaker.core.di.domain.useCases
+package com.msoula.hobbymatchmaker.core.common.validation
 
-import com.msoula.hobbymatchmaker.core.di.data.ValidationResult
+import com.msoula.hobbymatchmaker.core.common.data.ValidationResult
 
 class ValidateEmailUseCase {
     operator fun invoke(email: String): ValidationResult {

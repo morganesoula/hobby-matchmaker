@@ -1,4 +1,4 @@
-package com.msoula.hobbymatchmaker.core.di.domain.useCases
+package com.msoula.hobbymatchmaker.core.common.validation
 
 data class AuthFormValidationUseCase(
     val validatePasswordUseCase: ValidatePasswordUseCase,

@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -23,11 +21,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.icons.Sparkle
-import com.msoula.hobbymatchmaker.core.design.sparkle
 import com.msoula.hobbymatchmaker.core.design.user_profile_interests_title
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.ProfileMode
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiModel
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -47,8 +43,7 @@ fun ProfileInterestsSection(
                 Icon(
                     Sparkle,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.dp)
+                    tint = MaterialTheme.colorScheme.primary
                 )
 
                 Spacer(Modifier.width(4.dp))
