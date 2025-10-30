@@ -74,12 +74,11 @@ import coil3.request.ErrorResult
 import coil3.request.ImageRequest
 import coil3.request.SuccessResult
 import coil3.request.crossfade
-import com.msoula.hobbymatchmaker.core.common.CallOnceEffect
+import com.msoula.hobbymatchmaker.core.design.CallOnceEffect
 import com.msoula.hobbymatchmaker.core.common.Logger
-import com.msoula.hobbymatchmaker.core.common.ObserveEvents
-import com.msoula.hobbymatchmaker.core.common.SnackEffect
-import com.msoula.hobbymatchmaker.core.common.UIText
-import com.msoula.hobbymatchmaker.core.common.asString
+import com.msoula.hobbymatchmaker.core.design.ObserveEvents
+import com.msoula.hobbymatchmaker.core.design.SnackEffect
+import com.msoula.hobbymatchmaker.core.design.util.asString
 import com.msoula.hobbymatchmaker.core.common.toReadableDuration
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.actor_name_content_description
@@ -97,6 +96,7 @@ import com.msoula.hobbymatchmaker.core.design.play_trailer
 import com.msoula.hobbymatchmaker.core.design.show_less
 import com.msoula.hobbymatchmaker.core.design.show_more
 import com.msoula.hobbymatchmaker.core.design.theme.successContainerColor
+import com.msoula.hobbymatchmaker.core.design.util.UIText
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiEventModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailViewStateModel

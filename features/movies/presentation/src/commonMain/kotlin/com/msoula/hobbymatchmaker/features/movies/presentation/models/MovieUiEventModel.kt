@@ -1,6 +1,7 @@
 package com.msoula.hobbymatchmaker.features.movies.presentation.models
 
-import com.msoula.hobbymatchmaker.core.common.UIText
+import com.msoula.hobbymatchmaker.core.design.util.UIText
+
 
 sealed interface MovieUiEventModel {
     data class OnMovieDetailClicked(val movieId: Long) : MovieUiEventModel

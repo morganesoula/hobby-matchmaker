@@ -25,7 +25,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.msoula.hobbymatchmaker.core.common.asString
+import com.msoula.hobbymatchmaker.core.design.util.asString
 import com.msoula.hobbymatchmaker.core.design.component.ShimmerCard
 import com.msoula.hobbymatchmaker.core.design.component.ShimmerCircle
 import com.msoula.hobbymatchmaker.core.design.component.ShimmerRectangle

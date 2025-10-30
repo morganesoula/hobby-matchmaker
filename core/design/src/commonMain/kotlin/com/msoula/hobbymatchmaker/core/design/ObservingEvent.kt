@@ -1,4 +1,4 @@
-package com.msoula.hobbymatchmaker.core.common
+package com.msoula.hobbymatchmaker.core.design
 
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -6,6 +6,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
+import com.msoula.hobbymatchmaker.core.design.util.UIText
+import com.msoula.hobbymatchmaker.core.design.util.asString
 import kotlinx.coroutines.flow.Flow
 
 @Composable

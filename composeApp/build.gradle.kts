@@ -68,6 +68,9 @@ kotlin {
             implementation("com.google.firebase:firebase-common-ktx:21.0.0")
             implementation("com.google.firebase:firebase-firestore:25.1.2")
 
+            // Google
+            implementation(libs.findLibrary("play-services-auth").get())
+
             // Koin
             implementation(libs.findLibrary("koin-android").get())
 

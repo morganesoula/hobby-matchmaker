@@ -2,7 +2,7 @@ package com.msoula.hobbymatchmaker.features.movies.presentation.models
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import com.msoula.hobbymatchmaker.core.common.UIText
+import com.msoula.hobbymatchmaker.core.design.util.UIText
 
 @Stable
 sealed interface MovieUiStateModel {

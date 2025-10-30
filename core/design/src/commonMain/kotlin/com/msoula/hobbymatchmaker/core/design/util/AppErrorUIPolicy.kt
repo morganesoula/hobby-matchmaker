@@ -1,4 +1,6 @@
-package com.msoula.hobbymatchmaker.core.common
+package com.msoula.hobbymatchmaker.core.design.util
+
+import com.msoula.hobbymatchmaker.core.common.AppError
 
 enum class RetryPolicy { Never, WithBackoff }
 

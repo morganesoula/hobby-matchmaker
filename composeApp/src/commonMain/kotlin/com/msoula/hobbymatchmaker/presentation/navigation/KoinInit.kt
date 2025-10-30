@@ -4,7 +4,7 @@ import com.msoula.hobbymatchmaker.core.authentication.data.di.coreModuleAuthenti
 import com.msoula.hobbymatchmaker.core.authentication.domain.di.coreModuleAuthenticationDomain
 import com.msoula.hobbymatchmaker.core.common.di.coreModuleCommon
 import com.msoula.hobbymatchmaker.core.database.di.coreModuleDAO
-import com.msoula.hobbymatchmaker.core.di.di.coreModuleDI
+import com.msoula.hobbymatchmaker.core.design.di.coreModuleDi
 import com.msoula.hobbymatchmaker.core.login.domain.useCases.di.coreModuleLoginFormValidation
 import com.msoula.hobbymatchmaker.core.login.presentation.di.coreModuleSignInViewModel
 import com.msoula.hobbymatchmaker.core.login.presentation.di.coreModuleSignUpViewModel
@@ -30,7 +30,7 @@ fun appModule() = listOf(
     coreModuleAuthenticationDomain,
     coreModuleCommon,
     coreModuleDAO,
-    coreModuleDI,
+    coreModuleDi,
     coreModuleLoginFormValidation,
     coreModuleSignInViewModel,
     coreModuleSignUpViewModel,

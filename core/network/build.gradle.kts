@@ -14,16 +14,17 @@ kotlin {
         commonMain.dependencies {
             // Ktor
             implementation(libs.findBundle("ktor").get())
-            implementation(libs.findLibrary("ktor-client-cio").get())
 
             // Modules
-            implementation(project(Modules.DESIGN))
             implementation(project(Modules.COMMON))
         }
 
         androidMain.dependencies {
             // Google
             implementation(libs.findLibrary("play-services-auth").get())
+
+            // Ktor client
+            implementation(libs.findLibrary("ktor-client-cio").get())
         }
 
         iosMain.dependencies {

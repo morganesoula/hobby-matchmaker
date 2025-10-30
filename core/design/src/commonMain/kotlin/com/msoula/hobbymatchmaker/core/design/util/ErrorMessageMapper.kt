@@ -1,6 +1,6 @@
-package com.msoula.hobbymatchmaker.core.common
+package com.msoula.hobbymatchmaker.core.design.util
 
-import com.msoula.hobbymatchmaker.core.common.UIText.Resource
+import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.authentication_already_exists
 import com.msoula.hobbymatchmaker.core.design.authentication_invalid_credentials
@@ -32,34 +32,63 @@ interface ErrorMessageMapper {
 
 object DefaultErrorMessageMapper : ErrorMessageMapper {
     override fun toUIText(error: AppError): UIText = when (error) {
-        AppError.Network.Timeout -> Resource(Res.string.network_timeout)
-        AppError.Network.Unreachable -> Resource(Res.string.network_unreachable)
-        is AppError.Network.Http -> Resource(
+        AppError.Network.Timeout -> UIText.Resource(Res.string.network_timeout)
+        AppError.Network.Unreachable -> UIText.Resource(Res.string.network_unreachable)
+        is AppError.Network.Http -> UIText.Resource(
             Res.string.http_error_code, listOf(error.code)
         )
 
-        AppError.Network.Canceled -> Resource(Res.string.request_canceled)
-        AppError.Network.Serialization -> Resource(Res.string.serialization_error)
-        is AppError.Network.Unknown -> Resource(Res.string.unknown_error)
+        AppError.Network.Canceled -> UIText.Resource(Res.string.request_canceled)
+        AppError.Network.Serialization -> UIText.Resource(
+            Res.string.serialization_error
+        )
 
-        is AppError.Domain.Validation -> Resource(
+        is AppError.Network.Unknown -> UIText.Resource(
+            Res.string.unknown_error
+        )
+
+        is AppError.Domain.Validation -> UIText.Resource(
             Res.string.validation_error, listOf(error.reason)
         )
 
-        AppError.Domain.Unauthorized -> Resource(Res.string.unauthorized)
-        AppError.Domain.Forbidden -> Resource(Res.string.forbidden)
-        AppError.Domain.NotFound -> Resource(Res.string.not_found)
+        AppError.Domain.Unauthorized -> UIText.Resource(
+            Res.string.unauthorized
+        )
 
-        is AppError.External.Service -> Resource(
+        AppError.Domain.Forbidden -> UIText.Resource(
+            Res.string.forbidden
+        )
+
+        AppError.Domain.NotFound -> UIText.Resource(
+            Res.string.not_found
+        )
+
+        is AppError.External.Service -> UIText.Resource(
             Res.string.external_service_error, listOf(error.provider)
         )
 
-        AppError.Storage.WriteFailed -> Resource(Res.string.storage_write_failed)
-        AppError.Storage.ReadFailed -> Resource(Res.string.storage_read_failed)
-        AppError.Storage.Corrupted -> Resource(Res.string.storage_corrupted)
+        AppError.Storage.WriteFailed -> UIText.Resource(
+            Res.string.storage_write_failed
+        )
 
-        AppError.Authentication.AlreadyExists -> Resource(Res.string.authentication_already_exists)
-        AppError.Authentication.Unknown -> Resource(Res.string.authentication_unknown)
-        AppError.Authentication.InvalidCredentials -> Resource(Res.string.authentication_invalid_credentials)
+        AppError.Storage.ReadFailed -> UIText.Resource(
+            Res.string.storage_read_failed
+        )
+
+        AppError.Storage.Corrupted -> UIText.Resource(
+            Res.string.storage_corrupted
+        )
+
+        AppError.Authentication.AlreadyExists -> UIText.Resource(
+            Res.string.authentication_already_exists
+        )
+
+        AppError.Authentication.Unknown -> UIText.Resource(
+            Res.string.authentication_unknown
+        )
+
+        AppError.Authentication.InvalidCredentials -> UIText.Resource(
+            Res.string.authentication_invalid_credentials
+        )
     }
 }

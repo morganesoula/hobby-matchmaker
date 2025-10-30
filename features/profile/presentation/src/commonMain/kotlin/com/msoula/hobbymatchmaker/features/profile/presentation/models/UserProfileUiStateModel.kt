@@ -1,6 +1,6 @@
 package com.msoula.hobbymatchmaker.features.profile.presentation.models
 
-import com.msoula.hobbymatchmaker.core.common.UIText
+import com.msoula.hobbymatchmaker.core.design.util.UIText
 
 sealed interface UserProfileUiStateModel {
     object Loading : UserProfileUiStateModel

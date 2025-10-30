@@ -64,10 +64,9 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.msoula.hobbymatchmaker.core.common.CallOnceEffect
-import com.msoula.hobbymatchmaker.core.common.ObserveEvents
-import com.msoula.hobbymatchmaker.core.common.SnackEffect
-import com.msoula.hobbymatchmaker.core.common.UIText
+import com.msoula.hobbymatchmaker.core.design.CallOnceEffect
+import com.msoula.hobbymatchmaker.core.design.ObserveEvents
+import com.msoula.hobbymatchmaker.core.design.SnackEffect
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.cancel
 import com.msoula.hobbymatchmaker.core.design.component.HMMButtonAuthComponent
@@ -87,6 +86,7 @@ import com.msoula.hobbymatchmaker.core.design.new_member_clickable_part
 import com.msoula.hobbymatchmaker.core.design.password
 import com.msoula.hobbymatchmaker.core.design.reset_password
 import com.msoula.hobbymatchmaker.core.design.show_password
+import com.msoula.hobbymatchmaker.core.design.util.UIText
 import com.msoula.hobbymatchmaker.core.design.welcome_back_subtitle
 import com.msoula.hobbymatchmaker.core.design.welcome_back_title
 import com.msoula.hobbymatchmaker.core.design.your_email

@@ -3,6 +3,15 @@ plugins {
     alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform.compose)
 }
 
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            // Modules
+            implementation(project(Modules.COMMON))
+        }
+    }
+}
+
 android {
     namespace = "com.msoula.hobbymatchmaker.core.design"
 }

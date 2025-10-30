@@ -1,6 +1,6 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.models
 
-import com.msoula.hobbymatchmaker.core.common.UIText
+import com.msoula.hobbymatchmaker.core.design.util.UIText
 
 sealed interface AuthUiEventModel {
     data class ShowError(val error: UIText) : AuthUiEventModel

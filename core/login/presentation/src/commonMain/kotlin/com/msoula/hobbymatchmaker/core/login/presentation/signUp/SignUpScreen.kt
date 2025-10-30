@@ -51,9 +51,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import com.msoula.hobbymatchmaker.core.common.CallOnceEffect
-import com.msoula.hobbymatchmaker.core.common.ObserveEvents
-import com.msoula.hobbymatchmaker.core.common.SnackEffect
+import com.msoula.hobbymatchmaker.core.design.CallOnceEffect
+import com.msoula.hobbymatchmaker.core.design.ObserveEvents
+import com.msoula.hobbymatchmaker.core.design.SnackEffect
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.already_a_member
 import com.msoula.hobbymatchmaker.core.design.already_a_member_connect

@@ -11,24 +11,15 @@ kotlin {
             implementation(compose.components.resources)
 
             implementation(libs.findLibrary("kotlinx-datetime").get())
+            implementation(libs.findLibrary("kotlinx-io").get())
 
             // FireStore
             implementation(libs.findLibrary("firebase-kmp-firestore").get())
-
-            // Ktor
-            implementation(libs.findBundle("ktor").get())
-
-            // Modules
-            implementation(project(Modules.DESIGN))
         }
 
         androidMain.dependencies {
             implementation(libs.findLibrary("activity-compose").get())
-
-            // Facebook
             implementation(libs.findLibrary("facebook-android-sdk").get())
-
-            // Timber
             implementation(libs.findLibrary("timber-android").get())
         }
     }
@@ -39,10 +30,4 @@ android {
     androidResources {
         enable = false
     }
-}
-
-compose.resources {
-    publicResClass = true
-    packageOfResClass = "com.msoula.hobbymatchmaker.core.common"
-    generateResClass = always
 }

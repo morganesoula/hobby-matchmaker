@@ -1,4 +1,4 @@
-package com.msoula.hobbymatchmaker.core.common
+package com.msoula.hobbymatchmaker.core.design.util
 
 import androidx.compose.runtime.Composable
 import org.jetbrains.compose.resources.stringResource
