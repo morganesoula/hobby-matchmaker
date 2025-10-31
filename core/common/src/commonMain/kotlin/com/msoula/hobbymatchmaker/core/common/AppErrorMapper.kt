@@ -9,6 +9,7 @@ import dev.gitlive.firebase.firestore.FirestoreExceptionCode
 import dev.gitlive.firebase.firestore.code
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.io.IOException
 import kotlinx.serialization.SerializationException
 
 fun Throwable.toGenericAppError(): AppError = when (this) {

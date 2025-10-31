@@ -10,8 +10,6 @@ import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.UIText
-import com.msoula.hobbymatchmaker.core.common.validation.AuthFormValidationUseCase
-import com.msoula.hobbymatchmaker.core.common.validation.ValidatePasswordUseCase
 import com.msoula.hobbymatchmaker.core.login.domain.useCases.ValidateEmailUseCase
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthUiEventModel
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent

@@ -76,7 +76,7 @@ class SignUpViewModel(
     internal fun validateInput(formState: SignUpStateModel) {
         val emailResult = loginValidateFormUseCase.validateEmail(formState.email)
         val passwordResult =
-            loginValidateFormUseCase.validatePassword.validatePassword(formState.password)
+            loginValidateFormUseCase.validatePassword(formState.password)
         val firstNameResult =
             loginValidateFormUseCase.validateFirstName(formState.firstName)
 

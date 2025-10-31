@@ -10,9 +10,9 @@ import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
-import com.msoula.hobbymatchmaker.core.common.validation.AuthFormValidationUseCase
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.design.util.UIText
+import com.msoula.hobbymatchmaker.core.login.domain.useCases.LoginValidateFormUseCase
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthUiEventModel
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.ResetPasswordEvent
@@ -35,7 +35,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SignInViewModel(
-    private val authFormValidationUseCases: AuthFormValidationUseCase,
+    private val authFormValidationUseCases: LoginValidateFormUseCase,
     private val resetPasswordUseCase: ResetPasswordUseCase,
     private val setShouldShowGuestDialogUseCase: SetShouldShowGuestDialogUseCase,
     val observeShouldShowGuestDialog: ObserveShouldShowGuestDialogUseCase,
@@ -144,16 +144,16 @@ class SignInViewModel(
     }
 
     private fun validateInput() {
-        val emailResult = authFormValidationUseCases.validateEmailUseCase(formDataFlow.value.email)
+        val emailResult = authFormValidationUseCases.validateEmail(formDataFlow.value.email)
         val passwordResult =
-            authFormValidationUseCases.validatePasswordUseCase.validateLoginPassword(formDataFlow.value.password)
+            authFormValidationUseCases.validatePassword(formDataFlow.value.password)
         val hasError = listOf(emailResult, passwordResult).any { !it.successful }
 
         _formDataFlow.update { it.copy(submit = !hasError) }
     }
 
     private fun validateEmailReset(emailReset: String): Boolean =
-        authFormValidationUseCases.validateEmailUseCase(emailReset).successful
+        authFormValidationUseCases.validateEmail(emailReset).successful
 
     private suspend fun signInUnified(params: UnifiedSignInUseCase.Params) {
         _signInState.update { SignInEvent.Loading }
