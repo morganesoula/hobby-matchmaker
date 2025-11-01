@@ -1,4 +1,4 @@
-package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.providers
+package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote
 
 import com.msoula.hobbymatchmaker.core.authentication.data.models.AuthFirebaseUser
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType

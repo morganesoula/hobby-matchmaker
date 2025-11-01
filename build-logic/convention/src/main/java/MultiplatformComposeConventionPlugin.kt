@@ -20,6 +20,7 @@ class MultiplatformComposeConventionPlugin : Plugin<Project> {
             apply("org.jetbrains.kotlin.multiplatform")
             apply("org.jetbrains.kotlin.plugin.serialization")
             apply("org.jetbrains.kotlin.plugin.compose")
+            apply("org.jetbrains.compose")
         }
 
         val compose = extensions.getByType(ComposeExtension::class.java).dependencies

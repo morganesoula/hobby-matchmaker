@@ -3,7 +3,6 @@ import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
-    alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform.compose)
     alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform.test)
     alias(libs.plugins.kover)
@@ -30,7 +29,6 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             // Modules
-            implementation(project(Modules.AUTHENTICATION_DATA))
             implementation(project(Modules.AUTHENTICATION_DOMAIN))
             implementation(project(Modules.COMMON))
             implementation(project(Modules.DESIGN))
@@ -51,6 +49,7 @@ kotlin {
 
             // Facebook
             implementation(libs.findLibrary("facebook-android-sdk").get())
+            implementation(libs.findLibrary("facebook-login").get())
 
             // Google
             implementation(libs.findLibrary("play-services-auth").get())

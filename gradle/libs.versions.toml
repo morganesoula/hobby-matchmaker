@@ -111,10 +111,8 @@ spm-kmp = { id = "io.github.frankois944.spmForKmp", version.ref = "spm" }
 
 hobbymatchmaker-buildlogic-application = { id = "hobbymatchmaker.buildlogic.application", version = "unspecified" }
 hobbymatchmaker-buildlogic-multiplatform = { id = "hobbymatchmaker.buildlogic.multiplatform", version = "unspecified" }
-hobbymatchmaker-build-logic-multiplatform-no-ios = { id = "hobbymatchmaker.buildlogic.multiplatformNoIos", version = "unspecified" }
 hobbymatchmaker-buildlogic-multiplatform-compose = { id = "hobbymatchmaker.buildlogic.multiplatformCompose", version = "unspecified" }
 hobbymatchmaker-buildlogic-multiplatform-minimalist = { id = "hobbymatchmaker.buildlogic.multiplatformMinimalist", version = "unspecified" }
-hobbymatchmaker-build-logic-multiplatform-minimalist-no-ios = { id = "hobbymatchmaker.buildlogic.multiplatformMinimalistNoIos", version = "unspecified" }
 hobbymatchmaker-buildlogic-multiplatform-test = { id = "hobbymatchmaker.buildlogic.multiplatformTest", version = "unspecified" }
 
 ### Test

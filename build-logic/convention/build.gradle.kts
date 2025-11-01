@@ -19,13 +19,6 @@ gradlePlugin {
     }
 
     plugins {
-        register("multiplatformNoIos") {
-            id = "hobbymatchmaker.buildlogic.multiplatformNoIos"
-            implementationClass = "MultiplatformNoIosConventionPlugin"
-        }
-    }
-
-    plugins {
         register("multiplatformCompose") {
             id = "hobbymatchmaker.buildlogic.multiplatformCompose"
             implementationClass = "MultiplatformComposeConventionPlugin"
@@ -36,13 +29,6 @@ gradlePlugin {
         register("multiplatformMinimalist") {
             id = "hobbymatchmaker.buildlogic.multiplatformMinimalist"
             implementationClass = "MultiplatformMinimalistPlugin"
-        }
-    }
-
-    plugins {
-        register("multiplatformMinimalistNoIos") {
-            id = "hobbymatchmaker.buildlogic.multiplatformMinimalistNoIos"
-            implementationClass = "MultiplatformMinimalistNoIosConventionPlugin"
         }
     }
 

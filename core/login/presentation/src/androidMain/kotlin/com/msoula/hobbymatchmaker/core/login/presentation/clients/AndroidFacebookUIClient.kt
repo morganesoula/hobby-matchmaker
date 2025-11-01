@@ -38,7 +38,9 @@ class AndroidFacebookUIClient(
 
             override fun onSuccess(result: LoginResult) {
                 val accessToken = result.accessToken
-                val credential = FacebookAuthProvider.credential(accessToken.token)
+                val credential: AuthCredential =
+                    FacebookAuthProvider.credential(accessToken.token)
+
                 onSuccess(credential, null)
             }
         })

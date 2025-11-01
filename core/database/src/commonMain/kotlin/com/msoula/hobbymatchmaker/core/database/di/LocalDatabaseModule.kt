@@ -17,7 +17,7 @@ import org.koin.dsl.bind
 import org.koin.core.module.Module
 
 val coreModuleDAO = module {
-    includes()
+    includes(coreModuleDatabasePlatformSpecific)
     single<SqlDriver> { get<DriverFactory>().createDRiver() }
     single<HMMDatabase> {
         val driver = get<SqlDriver>()

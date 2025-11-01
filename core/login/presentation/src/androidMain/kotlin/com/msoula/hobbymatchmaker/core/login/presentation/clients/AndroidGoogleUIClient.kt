@@ -1,14 +1,14 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.clients
 
 import android.content.Context
-import android.os.Build
-import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.credentials.CredentialManager
-import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialException
+import androidx.credentials.CustomCredential
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.msoula.hobbymatchmaker.core.authentication.domain.errors.InvalidCredentialError
@@ -34,7 +34,6 @@ class AndroidGoogleUIClient(
         .addCredentialOption(googleIdOption)
         .build()
 
-    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     override suspend fun getGoogleCredentials(): AuthCredential? {
         return withContext(Dispatchers.IO) {
             try {

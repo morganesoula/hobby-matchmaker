@@ -11,9 +11,11 @@ import kotlin.coroutines.resumeWithException
 @OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 class IosAppleUIClient : AppleUIClient {
 
-    override suspend fun getAppleCredentials(): AuthCredential? {
-        return suspendCancellableCoroutine { continuation ->
-            AppleSignInManager.shared().signInWithApple { token, nonce, error ->
+    override suspend fun getAppleCredentials(): AuthCredential? =
+        suspendCancellableCoroutine { continuation ->
+            val cancel = AppleSignInManager.shared().signInWithApple { token, nonce, error ->
+                if (!continuation.isActive) return@signInWithApple
+
                 when {
                     token != null && nonce != null -> {
                         val credential = OAuthProvider.credential(
@@ -32,6 +34,8 @@ class IosAppleUIClient : AppleUIClient {
                     else -> continuation.resumeWithException(Exception("Unknown Apple Sign-In failure"))
                 }
             }
+            continuation.invokeOnCancellation {
+                try { AppleSignInManager.shared().cancel(cancel) } catch (_: Throwable) {}
+            }
         }
-    }
 }

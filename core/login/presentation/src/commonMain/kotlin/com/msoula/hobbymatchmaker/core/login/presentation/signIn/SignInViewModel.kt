@@ -22,6 +22,7 @@ import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveShouldShow
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetCurrentUserProfileUuidUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetShouldShowGuestDialogUseCase
 import dev.gitlive.firebase.auth.AuthCredential
+import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -70,6 +71,8 @@ class SignInViewModel(
         scope,
         SharingStarted.Eagerly, true
     )
+
+    private val signing = atomic(false)
 
     fun onEvent(event: AuthenticationUIEvent) {
         when (event) {
@@ -175,25 +178,27 @@ class SignInViewModel(
         providerType: ProviderType,
         fetchedCredential: AuthCredential? = null
     ) {
-        if (isSignIn) return
-        isSignIn = true
 
-        val client = socialClients[providerType]
-        val credential = fetchedCredential ?: client?.getCredential()
+        if (!signing.compareAndSet(expect = false, update = true)) return
 
-        if (credential != null) {
-            signInUnified(
-                UnifiedSignInUseCase.Params.SocialMedia(
-                    credential, providerType
+        try {
+            val client = socialClients[providerType]
+            val credential = fetchedCredential ?: client?.getCredential()
+            if (credential != null) {
+                signInUnified(
+                    UnifiedSignInUseCase.Params.SocialMedia(
+                        credential, providerType
+                    )
                 )
-            )
-        } else {
-            sendOnce(
-                AuthUiEventModel.ShowError(
-                    UIText.Plain("Unable to get credentials")
+            } else {
+                sendOnce(
+                    AuthUiEventModel.ShowError(
+                        UIText.Plain("Unable to get credentials")
+                    )
                 )
-            )
-            isSignIn = false
+            }
+        } finally {
+            signing.value = false
         }
     }
 

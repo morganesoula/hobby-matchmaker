@@ -13,13 +13,12 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val coreModuleAuthenticationData = module {
+    includes()
     single { Firebase.auth }
     single { Firebase.firestore }
-    includes(coreModuleAuthenticationDataPlatformSpecific)
 
     singleOf(::AuthenticationRemoteDataSourceImpl) bind AuthenticationRemoteDataSource::class
-
     singleOf(::AuthenticationRepositoryImpl) bind AuthenticationRepository::class
 }
 
-expect val coreModuleAuthenticationDataPlatformSpecific: Module
+expect val coreModuleAuthenticationPlatformSpecificData: Module

@@ -7,8 +7,6 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 
 val coreModuleSignInViewModel = module {
-    includes(coreModuleSignInPlatformSpecific)
-
     single { (socialClients: Map<ProviderType, SocialUIClient>) ->
         SignInViewModel(
             authFormValidationUseCases = get(),
@@ -22,5 +20,3 @@ val coreModuleSignInViewModel = module {
         )
     }
 }
-
-expect val coreModuleSignInPlatformSpecific: Module

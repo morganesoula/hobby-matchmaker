@@ -1,6 +1,6 @@
 package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote
 
-import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.providers.AuthProvider
+import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.AuthProvider
 import com.msoula.hobbymatchmaker.core.authentication.data.models.AuthFirebaseUser
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.common.AppError

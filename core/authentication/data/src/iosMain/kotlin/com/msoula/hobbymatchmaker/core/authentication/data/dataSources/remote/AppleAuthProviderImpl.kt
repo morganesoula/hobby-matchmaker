@@ -1,4 +1,4 @@
-package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.providers
+package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote
 
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.mappers.toAuthFirebaseUserSignedInWith
 import com.msoula.hobbymatchmaker.core.authentication.data.models.AuthFirebaseUser
@@ -9,9 +9,10 @@ import com.msoula.hobbymatchmaker.core.common.safeFirebaseCall
 import dev.gitlive.firebase.auth.AuthCredential
 import dev.gitlive.firebase.auth.FirebaseAuth
 
-class GoogleAuthProvider(private val auth: FirebaseAuth) : AuthProvider {
-    override val type: ProviderType = ProviderType.GOOGLE
-
+class AppleAuthProviderImpl(
+    private val auth: FirebaseAuth
+) : AuthProvider {
+    override val type: ProviderType = ProviderType.APPLE
     override suspend fun signIn(credentials: AuthCredential): AppResult<AuthFirebaseUser?, AppError> =
         safeFirebaseCall {
             auth.signInWithCredential(credentials)
