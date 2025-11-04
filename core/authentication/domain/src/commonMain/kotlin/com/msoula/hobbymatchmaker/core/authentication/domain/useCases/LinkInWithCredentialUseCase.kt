@@ -1,11 +1,13 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.useCases
 
+import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepository
-import dev.gitlive.firebase.auth.AuthCredential
 
 class LinkInWithCredentialUseCase(
     private val authenticationRepository: AuthenticationRepository
 ) {
-    suspend operator fun invoke(authCredential: AuthCredential) =
-        authenticationRepository.linkInWithCredential(authCredential)
+    suspend operator fun invoke(
+        providerType: ProviderType,
+        credentialProvider: suspend () -> Any?
+    ) = authenticationRepository.linkInWithCredential(providerType, credentialProvider)
 }

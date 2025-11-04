@@ -1,7 +1,7 @@
 package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote
 
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.mappers.toAuthFirebaseUserSignedInWith
-import com.msoula.hobbymatchmaker.core.authentication.data.models.AuthFirebaseUser
+import com.msoula.hobbymatchmaker.core.authentication.data.models.RemoteAuthUser
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
@@ -13,7 +13,7 @@ class AppleAuthProviderImpl(
     private val auth: FirebaseAuth
 ) : AuthProvider {
     override val type: ProviderType = ProviderType.APPLE
-    override suspend fun signIn(credentials: AuthCredential): AppResult<AuthFirebaseUser?, AppError> =
+    override suspend fun signIn(credentials: AuthCredential): AppResult<RemoteAuthUser?, AppError> =
         safeFirebaseCall {
             auth.signInWithCredential(credentials)
                 .user?.toAuthFirebaseUserSignedInWith(type.id)

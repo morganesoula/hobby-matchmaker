@@ -1,16 +1,16 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.signUp
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
@@ -53,8 +53,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.CallOnceEffect
 import com.msoula.hobbymatchmaker.core.design.ObserveEvents
-import com.msoula.hobbymatchmaker.core.design.SnackEffect
 import com.msoula.hobbymatchmaker.core.design.Res
+import com.msoula.hobbymatchmaker.core.design.SnackEffect
 import com.msoula.hobbymatchmaker.core.design.already_a_member
 import com.msoula.hobbymatchmaker.core.design.already_a_member_connect
 import com.msoula.hobbymatchmaker.core.design.at_least
@@ -139,23 +139,6 @@ fun SignUpScreenContent(
                     }
                 }
             )
-        },
-        bottomBar = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background)
-                    .navigationBarsPadding()
-                    .imePadding()
-                    .padding(horizontal = 8.dp, vertical = 12.dp)
-            ) {
-                SignUpScreenBottomContent(
-                    redirectText = annotatedString,
-                    redirectToLogInScreen = {
-                        signUpViewModel.onEvent(AuthenticationUIEvent.OnScreenChanged)
-                        redirectToSignInScreen()
-                    })
-            }
         }
     )
     { paddingValues ->
@@ -173,30 +156,21 @@ fun SignUpScreenContent(
                 SignUpScreenMainContent(
                     paddingValues = paddingValues,
                     registrationState = registrationState,
-                    onNameChanged = {
-                        signUpViewModel.onEvent(
-                            AuthenticationUIEvent.OnFirstNameChanged(
-                                it
-                            )
-                        )
-                    },
-                    onEmailChanged = {
-                        signUpViewModel.onEvent(
-                            AuthenticationUIEvent.OnEmailChanged(
-                                it
-                            )
-                        )
-                    },
-                    onPasswordChanged = {
-                        signUpViewModel.onEvent(
-                            AuthenticationUIEvent.OnPasswordChanged(
-                                it
-                            )
-                        )
-                    },
-                    onSignUpClicked = { signUpViewModel.onEvent(AuthenticationUIEvent.OnSignUp) },
+                    onEvent = signUpViewModel::onEvent,
                     signUpState = signUpState
                 )
+
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    SignUpScreenBottomContent(
+                        redirectText = annotatedString,
+                        redirectToSignIn = {
+                            signUpViewModel.onEvent(AuthenticationUIEvent.OnScreenChanged)
+                            redirectToSignInScreen()
+                        })
+                }
             }
         }
 
@@ -209,10 +183,7 @@ fun SignUpScreenMainContent(
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues,
     registrationState: SignUpStateModel,
-    onNameChanged: (name: String) -> Unit,
-    onEmailChanged: (email: String) -> Unit,
-    onPasswordChanged: (password: String) -> Unit,
-    onSignUpClicked: () -> Unit,
+    onEvent: (AuthenticationUIEvent) -> Unit,
     signUpState: SignUpEvent
 ) {
     val scrollState = rememberScrollState()
@@ -222,7 +193,8 @@ fun SignUpScreenMainContent(
     Box(
         modifier =
             Modifier
-                .wrapContentSize()
+                //wrapContentSize()
+                .fillMaxSize()
                 .padding(paddingValues),
         contentAlignment = Alignment.Center
     ) {
@@ -231,7 +203,7 @@ fun SignUpScreenMainContent(
                 label = stringResource(Res.string.firstname),
                 value = registrationState.firstName.trimEnd(),
                 onValueChange = {
-                    onNameChanged(it)
+                    onEvent(AuthenticationUIEvent.OnFirstNameChanged(it))
                 },
                 icon = Icons.Default.People,
                 keyboardOptions = KeyboardOptions(
@@ -254,7 +226,7 @@ fun SignUpScreenMainContent(
                     },
                 value = registrationState.email.trimEnd(),
                 onValueChange = {
-                    onEmailChanged(it)
+                    onEvent(AuthenticationUIEvent.OnEmailChanged(it))
                 },
                 icon = Icons.Default.Email,
                 label = stringResource(Res.string.email),
@@ -279,18 +251,18 @@ fun SignUpScreenMainContent(
                     },
                 value = registrationState.password,
                 onValueChange = {
-                    onPasswordChanged(it)
+                    onEvent(AuthenticationUIEvent.OnPasswordChanged(it))
                 },
                 leadingIcon = Icons.Default.Lock,
                 label = stringResource(Res.string.password),
                 showPasswordContentDescription = stringResource(Res.string.show_password),
                 hidePasswordContentDescription = stringResource(Res.string.hide_password),
-                onFormDoneClicked = onSignUpClicked
+                onFormDoneClicked = { onEvent(AuthenticationUIEvent.OnSignUp) }
             )
 
             Spacer(modifier = Modifier.height(32.dp))
             HMMButtonAuthComponent(
-                onClick = { onSignUpClicked() },
+                onClick = { onEvent(AuthenticationUIEvent.OnSignUp) },
                 enabled = registrationState.submit,
                 text = stringResource(Res.string.sign_up),
                 loading = signUpState == SignUpEvent.Loading
@@ -302,7 +274,7 @@ fun SignUpScreenMainContent(
 @Composable
 fun SignUpScreenBottomContent(
     redirectText: AnnotatedString,
-    redirectToLogInScreen: () -> Unit
+    redirectToSignIn: () -> Unit
 ) {
     Text(
         text = redirectText,
@@ -312,7 +284,7 @@ fun SignUpScreenBottomContent(
                 role = Role.Button
                 contentDescription = redirectText.text
             }
-            .clickable { redirectToLogInScreen() },
+            .clickable { redirectToSignIn() },
         style = TextStyle(color = MaterialTheme.colorScheme.onBackground)
     )
 }

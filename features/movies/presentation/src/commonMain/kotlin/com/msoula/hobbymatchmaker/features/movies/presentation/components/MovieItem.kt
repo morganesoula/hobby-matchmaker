@@ -250,7 +250,7 @@ fun MovieItemContentCard(
 
         Text(
             text = movie.title,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             maxLines = 2,
@@ -264,7 +264,7 @@ fun MovieItemContentCard(
             Icon(
                 imageVector = Icons.Default.Favorite,
                 contentDescription = "heart icon",
-                tint = Color.Red.copy(alpha = 0.8f),
+                tint = MaterialTheme.colorScheme.error.copy(alpha = 0.8f),
                 modifier = Modifier
                     .align(Alignment.Center)
                     .scale(bigHeartScale)
@@ -284,7 +284,7 @@ fun FavoriteButton(isFavorite: Boolean, scale: Float, onClick: () -> Unit) {
         Icon(
             imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
             contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
-            tint = if (isFavorite) Color.Red else Color.White,
+            tint = if (isFavorite) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
         )
     }
 }
@@ -300,7 +300,7 @@ fun RatingChip(voteAverage: Double, modifier: Modifier = Modifier) {
             .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(Icons.Default.Star, contentDescription = null, tint = Color.White)
+        Icon(Icons.Default.Star, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface)
         Spacer(Modifier.width(4.dp))
         Text(voteAverage.formatOneDecimal(), style = MaterialTheme.typography.labelLarge)
     }

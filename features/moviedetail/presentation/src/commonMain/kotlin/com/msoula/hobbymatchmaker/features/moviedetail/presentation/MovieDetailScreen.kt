@@ -27,19 +27,24 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -74,17 +79,15 @@ import coil3.request.ErrorResult
 import coil3.request.ImageRequest
 import coil3.request.SuccessResult
 import coil3.request.crossfade
-import com.msoula.hobbymatchmaker.core.design.CallOnceEffect
 import com.msoula.hobbymatchmaker.core.common.Logger
-import com.msoula.hobbymatchmaker.core.design.ObserveEvents
-import com.msoula.hobbymatchmaker.core.design.SnackEffect
-import com.msoula.hobbymatchmaker.core.design.util.asString
 import com.msoula.hobbymatchmaker.core.common.toReadableDuration
+import com.msoula.hobbymatchmaker.core.design.CallOnceEffect
+import com.msoula.hobbymatchmaker.core.design.ObserveEvents
 import com.msoula.hobbymatchmaker.core.design.Res
+import com.msoula.hobbymatchmaker.core.design.SnackEffect
 import com.msoula.hobbymatchmaker.core.design.actor_name_content_description
 import com.msoula.hobbymatchmaker.core.design.cast
 import com.msoula.hobbymatchmaker.core.design.component.ExpandableTextComponent
-import com.msoula.hobbymatchmaker.core.design.component.HMMDetailTopBar
 import com.msoula.hobbymatchmaker.core.design.component.LoadingCircularProgress
 import com.msoula.hobbymatchmaker.core.design.component.LoadingOverlay
 import com.msoula.hobbymatchmaker.core.design.connection_issue
@@ -97,6 +100,7 @@ import com.msoula.hobbymatchmaker.core.design.show_less
 import com.msoula.hobbymatchmaker.core.design.show_more
 import com.msoula.hobbymatchmaker.core.design.theme.successContainerColor
 import com.msoula.hobbymatchmaker.core.design.util.UIText
+import com.msoula.hobbymatchmaker.core.design.util.asString
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiEventModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailViewStateModel
@@ -127,6 +131,7 @@ fun MovieDetailContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieDetailScreen(
     modifier: Modifier = Modifier,
@@ -207,6 +212,24 @@ fun MovieDetailScreen(
                     ) {
                         Text(text = data.visuals.message)
                     }
+                }
+            )
+        },
+        topBar = {
+            TopAppBar(
+                title = {},
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
+                actions = {
+                    IconButton(
+                        onClick = { onMovieDetailBackPressed() },
+                        content = {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                                contentDescription = "Back",
+                                tint = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
+                    )
                 }
             )
         }
@@ -310,8 +333,7 @@ fun MovieDetailScreen(
                     )
 
                     Text(
-                        text = " · " + movie.genre.take(3).toString()
-                            .removeSurrounding("[", "]"),
+                        text = movie.genre.take(3).joinToString(" · "),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -355,7 +377,7 @@ fun MovieDetailScreen(
                                 modifier = Modifier
                                     .size(28.dp)
                                     .background(
-                                        Color.White.copy(alpha = 0.2f),
+                                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
                                         shape = CircleShape
                                     ),
                                 contentAlignment = Alignment.Center
@@ -387,10 +409,6 @@ fun MovieDetailScreen(
                 )
 
                 if (filteredCast.isNotEmpty()) MovieCastSection(filteredCast)
-            }
-
-            HMMDetailTopBar {
-                onMovieDetailBackPressed()
             }
 
             LoadingOverlay(isLoading)

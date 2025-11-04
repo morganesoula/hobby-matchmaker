@@ -17,8 +17,10 @@ kotlin {
     androidTarget {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_21)
-            freeCompilerArgs.addAll("-P",
-                "plugin:org.jetbrains.kotlin.parcelize:additionalAnnotation=com.msoula.hobbymatchmaker.core.login.presentation.models.HMMParcelize")
+            freeCompilerArgs.addAll(
+                "-P",
+                "plugin:org.jetbrains.kotlin.parcelize:additionalAnnotation=com.msoula.hobbymatchmaker.core.login.presentation.models.HMMParcelize"
+            )
         }
     }
 

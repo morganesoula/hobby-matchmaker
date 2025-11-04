@@ -24,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -71,7 +70,7 @@ fun ExpandableTextComponent(
                     style = MaterialTheme.typography.bodyMedium.copy(
                         shadow = if (isDarkTheme) {
                             Shadow(
-                                color = Color.Black.copy(alpha = 0.3f),
+                                color = MaterialTheme.colorScheme.scrim,
                                 offset = Offset(1f, 1f),
                                 blurRadius = 2f
                             )

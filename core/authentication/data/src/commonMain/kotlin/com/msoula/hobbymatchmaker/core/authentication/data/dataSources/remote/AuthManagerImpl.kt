@@ -1,7 +1,6 @@
 package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote
 
-import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.AuthProvider
-import com.msoula.hobbymatchmaker.core.authentication.data.models.AuthFirebaseUser
+import com.msoula.hobbymatchmaker.core.authentication.data.models.RemoteAuthUser
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
@@ -14,7 +13,7 @@ class AuthManagerImpl(providers: List<AuthProvider>) : AuthManager {
     override suspend fun signIn(
         providerType: ProviderType,
         credential: AuthCredential
-    ): AppResult<AuthFirebaseUser?, AppError> =
+    ): AppResult<RemoteAuthUser?, AppError> =
         map[providerType]?.signIn(credential)
             ?: AppResult.Failure(
                 AppError.External.Service(

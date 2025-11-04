@@ -4,7 +4,6 @@ import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import app.cash.turbine.test
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.AuthState
-import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfo
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutUseCase
 import com.msoula.hobbymatchmaker.core.common.AppError
@@ -276,7 +275,7 @@ class MoviesIntegrationKoinTest : FunSpec(), KoinTest {
                     mockk<FetchFirebaseUserInfo>(relaxed = true).also { uc ->
                         coEvery { uc.invoke() } returns AppResult.Success(
                             AuthState.Authenticated(
-                                FirebaseUserInfoDomainModel(
+                                AuthenticatedUserInfoDomainModel(
                                     uid = "u1",
                                     email = "",
                                     providers = emptyList()

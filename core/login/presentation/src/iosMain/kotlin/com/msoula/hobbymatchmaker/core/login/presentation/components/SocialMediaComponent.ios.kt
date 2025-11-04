@@ -26,71 +26,67 @@ import com.msoula.hobbymatchmaker.core.design.google_logo
 import com.msoula.hobbymatchmaker.core.design.sign_in_with_apple
 import com.msoula.hobbymatchmaker.core.design.sign_in_with_google
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient
-import dev.gitlive.firebase.auth.AuthCredential
+import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 actual fun SocialMediaButtonListPlatformSpecificUI(
     modifier: Modifier,
-    onFacebookButtonClicked: ((credential: AuthCredential) -> Unit)?,
-    onAppleButtonClicked: (() -> Unit)?,
-    onGoogleButtonClicked: () -> Unit,
+    onEvent: (AuthenticationUIEvent) -> Unit,
     facebookUIClient: FacebookUIClient?
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        if (onAppleButtonClicked != null) {
-            OutlinedButton(
-                onClick = onAppleButtonClicked,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .defaultMinSize(minHeight = 48.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = Color.White,
-                    contentColor = Color.Black
-                ),
-                border = BorderStroke(1.dp, Color.Black)
-            ) {
-                Icon(
-                    painter = painterResource(Res.drawable.apple_logo),
-                    contentDescription = stringResource(Res.string.apple_alt),
-                    tint = Color.Unspecified,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text = stringResource(Res.string.sign_in_with_apple),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        }
-
         OutlinedButton(
-            onClick = onGoogleButtonClicked,
+            onClick = { onEvent(AuthenticationUIEvent.OnAppleButtonClicked) },
             modifier = Modifier
                 .fillMaxWidth()
                 .defaultMinSize(minHeight = 48.dp),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.outlinedButtonColors(
-                containerColor = Color.Black,
-                contentColor = Color.White
-            )
+                containerColor = MaterialTheme.colorScheme.onSurface,
+                contentColor = Color.Black
+            ),
+            border = BorderStroke(1.dp, Color.Black)
         ) {
             Icon(
-                painter = painterResource(Res.drawable.google_logo),
-                contentDescription = stringResource(Res.string.google_alt),
+                painter = painterResource(Res.drawable.apple_logo),
+                contentDescription = stringResource(Res.string.apple_alt),
                 tint = Color.Unspecified,
                 modifier = Modifier.size(20.dp)
             )
             Spacer(Modifier.width(8.dp))
             Text(
-                text = stringResource(Res.string.sign_in_with_google),
+                text = stringResource(Res.string.sign_in_with_apple),
                 style = MaterialTheme.typography.bodyMedium
             )
         }
+    }
+
+    OutlinedButton(
+        onClick = { onEvent(AuthenticationUIEvent.OnGoogleButtonClicked) },
+        modifier = Modifier
+            .fillMaxWidth()
+            .defaultMinSize(minHeight = 48.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.outlinedButtonColors(
+            containerColor = Color.Black,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        )
+    ) {
+        Icon(
+            painter = painterResource(Res.drawable.google_logo),
+            contentDescription = stringResource(Res.string.google_alt),
+            tint = Color.Unspecified,
+            modifier = Modifier.size(20.dp)
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = stringResource(Res.string.sign_in_with_google),
+            style = MaterialTheme.typography.bodyMedium
+        )
     }
 }

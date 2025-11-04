@@ -13,7 +13,7 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val coreModuleAuthenticationData = module {
-    includes()
+    includes(coreModuleAuthenticationPlatformSpecificData)
     single { Firebase.auth }
     single { Firebase.firestore }
 

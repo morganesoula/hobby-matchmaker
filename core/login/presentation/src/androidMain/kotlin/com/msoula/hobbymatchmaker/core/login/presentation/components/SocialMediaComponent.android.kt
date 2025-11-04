@@ -27,26 +27,24 @@ import com.msoula.hobbymatchmaker.core.design.google_logo
 import com.msoula.hobbymatchmaker.core.design.sign_in_with_facebook
 import com.msoula.hobbymatchmaker.core.design.sign_in_with_google
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient
-import dev.gitlive.firebase.auth.AuthCredential
+import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 actual fun SocialMediaButtonListPlatformSpecificUI(
     modifier: Modifier,
-    onFacebookButtonClicked: ((credential: AuthCredential) -> Unit)?,
-    onAppleButtonClicked: (() -> Unit)?,
-    onGoogleButtonClicked: () -> Unit,
+    onEvent: (AuthenticationUIEvent) -> Unit,
     facebookUIClient: FacebookUIClient?
 ) {
     OutlinedButton(
-        onClick = { onGoogleButtonClicked() },
+        onClick = { onEvent(AuthenticationUIEvent.OnGoogleButtonClicked) },
         shape = RoundedCornerShape(12.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp, vertical = 4.dp),
         colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = Color.White,
+            containerColor = MaterialTheme.colorScheme.onSurface,
             contentColor = Color.Black
         ),
         border = BorderStroke(1.dp, Color.LightGray)
@@ -66,47 +64,45 @@ actual fun SocialMediaButtonListPlatformSpecificUI(
 
     Spacer(modifier = Modifier.height(8.dp))
 
-    if (onFacebookButtonClicked != null) {
-        OutlinedButton(
-            onClick = {
-                val token = AccessToken.getCurrentAccessToken()
-                if (token != null && !token.isExpired) {
-                    return@OutlinedButton
-                }
+    OutlinedButton(
+        onClick = {
+            val token = AccessToken.getCurrentAccessToken()
+            if (token != null && !token.isExpired) {
+                return@OutlinedButton
+            }
 
-                facebookUIClient?.let { fbClient ->
-                    fbClient.registerCallback(
-                        onSuccess = { credential, _ ->
-                            onFacebookButtonClicked(credential)
-                        },
-                        onError = {
-                            Logger.d("Error fetching Facebook credentials")
-                        }
-                    )
+            facebookUIClient?.let { fbClient ->
+                fbClient.registerCallback(
+                    onSuccess = { credential, _ ->
+                        onEvent(AuthenticationUIEvent.OnFacebookButtonClicked(credential))
+                    },
+                    onError = {
+                        Logger.d("Error fetching Facebook credentials")
+                    }
+                )
 
-                    facebookUIClient.logIn()
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 4.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF1877F2),
-                contentColor = Color.White
-            )
-        ) {
-            Icon(
-                painter = painterResource(Res.drawable.facebook_logo),
-                contentDescription = stringResource(Res.string.facebook_alt),
-                tint = Color.Unspecified,
-                modifier = Modifier.size(20.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = stringResource(Res.string.sign_in_with_facebook),
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
+                facebookUIClient.logIn()
+            }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp, vertical = 4.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0xFF1877F2),
+            contentColor = MaterialTheme.colorScheme.onSurface
+        )
+    ) {
+        Icon(
+            painter = painterResource(Res.drawable.facebook_logo),
+            contentDescription = stringResource(Res.string.facebook_alt),
+            tint = Color.Unspecified,
+            modifier = Modifier.size(20.dp)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = stringResource(Res.string.sign_in_with_facebook),
+            style = MaterialTheme.typography.bodyMedium
+        )
     }
 }

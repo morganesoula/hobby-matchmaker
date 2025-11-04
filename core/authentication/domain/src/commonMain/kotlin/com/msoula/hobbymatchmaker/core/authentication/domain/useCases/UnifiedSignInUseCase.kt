@@ -7,16 +7,18 @@ import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.flatMapSuspend
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetIsConnectedUseCase
-import dev.gitlive.firebase.auth.AuthCredential
 
 class UnifiedSignInUseCase(
     private val signInUseCase: SignInUseCase,
-    private val signInWithCredentialUseCase: SignInWithCredentialUseCase,
+    private val signInWithSocialProviderUseCase: SignInWithSocialProviderUseCase,
     private val setIsConnectedUseCase: SetIsConnectedUseCase
 ) {
     sealed interface Params {
         data class EmailPassword(val email: String, val password: String) : Params
-        data class SocialMedia(val credential: AuthCredential, val providerType: ProviderType) :
+        data class SocialProvider(
+            val providerType: ProviderType,
+            val credentialProvider: suspend () -> Any?
+        ) :
             Params
     }
 
@@ -25,9 +27,11 @@ class UnifiedSignInUseCase(
             is Params.EmailPassword ->
                 signInUseCase(Parameters.DoubleStringParam(params.email, params.password))
 
-            is Params.SocialMedia ->
-                signInWithCredentialUseCase(params.credential, params.providerType)
-                    .mapSuccess { info -> SignInSuccess(uid = info.uid ?: "") }
+            is Params.SocialProvider ->
+                signInWithSocialProviderUseCase(
+                    providerType = params.providerType,
+                    credentialProvider = params.credentialProvider
+                ).mapSuccess { user -> SignInSuccess(uid = user?.uid ?: "") }
         }
             .flatMapSuspend { success ->
                 setIsConnectedUseCase(true).mapSuccess { success }

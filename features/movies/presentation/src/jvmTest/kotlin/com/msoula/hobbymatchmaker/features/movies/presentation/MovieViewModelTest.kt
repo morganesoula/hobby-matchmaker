@@ -2,7 +2,6 @@ package com.msoula.hobbymatchmaker.features.movies.presentation
 
 import app.cash.turbine.test
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.AuthState
-import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfo
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutSuccess
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutUseCase
@@ -198,7 +197,7 @@ class MovieViewModelTest : FunSpec({
         val vm = buildVM()
         coEvery { fetchUser.invoke() } returns AppResult.Success(
             AuthState.Authenticated(
-                FirebaseUserInfoDomainModel(
+                AuthenticatedUserInfoDomainModel(
                     uid = "u1",
                     email = "",
                     providers = emptyList()
@@ -231,7 +230,7 @@ class MovieViewModelTest : FunSpec({
         val vm = buildVM()
         coEvery { fetchUser.invoke() } returns AppResult.Success(
             AuthState.Authenticated(
-                FirebaseUserInfoDomainModel(
+                AuthenticatedUserInfoDomainModel(
                     uid = "u1",
                     email = "",
                     providers = emptyList()

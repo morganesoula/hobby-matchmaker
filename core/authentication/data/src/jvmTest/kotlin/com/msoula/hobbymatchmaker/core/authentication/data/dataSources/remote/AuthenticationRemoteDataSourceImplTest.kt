@@ -1,6 +1,6 @@
 package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote
 
-import com.msoula.hobbymatchmaker.core.authentication.data.models.AuthFirebaseUser
+import com.msoula.hobbymatchmaker.core.authentication.data.models.RemoteAuthUser
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
@@ -62,7 +62,7 @@ class AuthenticationRemoteDataSourceImplTest : FunSpec({
 
     test("signInWithCredentials forwards to AuthManager.signIn(provider, credential)") {
         runTest {
-            val expected = AuthFirebaseUser(
+            val expected = RemoteAuthUser(
                 uid = "u123",
                 email = "e@acme.io",
                 providers = listOf("google.com")
@@ -76,7 +76,7 @@ class AuthenticationRemoteDataSourceImplTest : FunSpec({
 
             val res = dataSource.signInWithCredentials(credential, ProviderType.GOOGLE)
 
-            res.shouldBeInstanceOf<AppResult.Success<AuthFirebaseUser?>>()
+            res.shouldBeInstanceOf<AppResult.Success<RemoteAuthUser?>>()
             res.data shouldBe expected
             coVerify(exactly = 1) { authManager.signIn(ProviderType.GOOGLE, credential) }
         }
@@ -107,7 +107,7 @@ class AuthenticationRemoteDataSourceImplTest : FunSpec({
 
             val res = dataSource.linkWithCredential(credential)
 
-            res.shouldBeInstanceOf<AppResult.Success<AuthFirebaseUser?>>()
+            res.shouldBeInstanceOf<AppResult.Success<RemoteAuthUser?>>()
             val data = res.data!!
             data.uid shouldBe "u42"
             data.email shouldBe "x@acme.io"
@@ -264,7 +264,7 @@ class AuthenticationRemoteDataSourceImplTest : FunSpec({
 
             val res = dataSource.fetchFirebaseUserInfo()
 
-            res.shouldBeInstanceOf<AppResult.Success<AuthFirebaseUser?>>()
+            res.shouldBeInstanceOf<AppResult.Success<RemoteAuthUser?>>()
             res.data shouldBe null
         }
     }
@@ -280,7 +280,7 @@ class AuthenticationRemoteDataSourceImplTest : FunSpec({
 
             val res = dataSource.fetchFirebaseUserInfo()
 
-            res.shouldBeInstanceOf<AppResult.Success<AuthFirebaseUser?>>()
+            res.shouldBeInstanceOf<AppResult.Success<RemoteAuthUser?>>()
             val data = res.data!!
             data.uid shouldBe "U9"
             data.email shouldBe "u9@acme.io"

@@ -1,11 +1,15 @@
 package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote
 
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.mappers.toAuthFirebaseUser
-import com.msoula.hobbymatchmaker.core.authentication.data.models.AuthFirebaseUser
+import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.mappers.toAuthenticatedUser
+import com.msoula.hobbymatchmaker.core.authentication.data.models.RemoteAuthUser
+import com.msoula.hobbymatchmaker.core.authentication.domain.models.AuthenticatedUser
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.common.safeFirebaseCall
+import com.msoula.hobbymatchmaker.core.common.toGenericAppError
 import dev.gitlive.firebase.auth.AuthCredential
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.firestore.FirebaseFirestore
@@ -21,9 +25,9 @@ class AuthenticationRemoteDataSourceImpl(
     override suspend fun signInWithCredentials(
         credential: AuthCredential,
         providerType: ProviderType
-    ): AppResult<AuthFirebaseUser?, AppError> = authManager.signIn(providerType, credential)
+    ): AppResult<RemoteAuthUser?, AppError> = authManager.signIn(providerType, credential)
 
-    override suspend fun linkWithCredential(credential: AuthCredential): AppResult<AuthFirebaseUser?, AppError> =
+    override suspend fun linkWithCredential(credential: AuthCredential): AppResult<RemoteAuthUser?, AppError> =
         if (auth.currentUser == null) {
             AppResult.Failure(AppError.Domain.Unauthorized)
         } else {
@@ -69,8 +73,23 @@ class AuthenticationRemoteDataSourceImpl(
             !snapshot.exists
         }
 
-    override suspend fun fetchFirebaseUserInfo(): AppResult<AuthFirebaseUser?, AppError> =
+    override suspend fun fetchFirebaseUserInfo(): AppResult<RemoteAuthUser?, AppError> =
         safeFirebaseCall {
             auth.currentUser?.toAuthFirebaseUser()
         }
+
+    override suspend fun signInWithSocialProvider(
+        providerType: ProviderType,
+        credentialProvider: suspend () -> Any?
+    ): AppResult<AuthenticatedUser?, AppError> {
+        return try {
+            val credential = credentialProvider() as? AuthCredential
+                ?: return AppResult.Failure(AppError.Authentication.InvalidCredentials)
+
+            authManager.signIn(providerType, credential)
+                .mapSuccess { it?.toAuthenticatedUser() }
+        } catch (e: Exception) {
+            AppResult.Failure(e.toGenericAppError())
+        }
+    }
 }

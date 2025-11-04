@@ -6,7 +6,7 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LinkInWith
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ResetPasswordUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInUseCase
-import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInWithCredentialUseCase
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInWithSocialProviderUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignUpUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.UnifiedSignInUseCase
 import org.koin.core.module.dsl.factoryOf
@@ -18,8 +18,8 @@ val coreModuleAuthenticationDomain = module {
     factoryOf(::SignInUseCase)
     factoryOf(::SignUpUseCase)
     factoryOf(::LinkInWithCredentialUseCase)
-    factoryOf(::SignInWithCredentialUseCase)
     factoryOf(::IsFirstSignInUseCase)
     factoryOf(::FetchFirebaseUserInfo)
     factoryOf(::UnifiedSignInUseCase)
+    factoryOf(::SignInWithSocialProviderUseCase)
 }

@@ -25,7 +25,7 @@ class MultiplatformMinimalistPlugin : Plugin<Project> {
 
         target.afterEvaluate {
             extensions.configure<KotlinMultiplatformExtension> {
-                configureMultiplatformIos()
+                configureMultiplatformIos(this@with)
                 configureMultiplatformMinimalist(libs)
             }
         }

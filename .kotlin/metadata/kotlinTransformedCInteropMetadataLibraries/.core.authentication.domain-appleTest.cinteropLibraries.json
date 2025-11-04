@@ -1,10 +1,5 @@
 [
   {
-    "moduleId": "dev.gitlive:firebase-auth:2.1.0",
-    "file": "/Users/morganesoula/StudioProjects/hobby-matchmaker/.kotlin/metadata/kotlinTransformedCInteropMetadataLibraries/dev.gitlive-firebase-auth-2.1.0-iosMain-cinterop/dev.gitlive_firebase-auth-cinterop-FirebaseAuth-GIv_gQ.klib",
-    "sourceSetName": "iosMain"
-  },
-  {
     "moduleId": "dev.gitlive:firebase-firestore:2.1.0",
     "file": "/Users/morganesoula/StudioProjects/hobby-matchmaker/.kotlin/metadata/kotlinTransformedCInteropMetadataLibraries/dev.gitlive-firebase-firestore-2.1.0-iosMain-cinterop/dev.gitlive_firebase-firestore-cinterop-FirebaseFirestoreInternal-Cap0TQ.klib",
     "sourceSetName": "iosMain"

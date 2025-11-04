@@ -1,9 +1,8 @@
 package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote
 
-import com.msoula.hobbymatchmaker.core.authentication.data.models.AuthFirebaseUser
+import com.msoula.hobbymatchmaker.core.authentication.data.models.RemoteAuthUser
 import com.msoula.hobbymatchmaker.core.authentication.data.repositories.AuthenticationRepositoryImpl
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.AuthState
-import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepository
 import com.msoula.hobbymatchmaker.core.common.AppError
@@ -160,7 +159,7 @@ class AuthenticationRepositoryImplTest : FunSpec({
 
         test("signInWithCredential maps AuthFirebaseUser -> FirebaseUserInfoDomainModel") {
             runTest {
-                val remoteUser = AuthFirebaseUser(
+                val remoteUser = RemoteAuthUser(
                     uid = "U1",
                     email = "u1@acme.io",
                     providers = listOf("google.com", "password"),
@@ -171,7 +170,7 @@ class AuthenticationRepositoryImplTest : FunSpec({
 
                 val res = repo.signInWithCredential(credential, ProviderType.GOOGLE)
 
-                res.shouldBeInstanceOf<AppResult.Success<FirebaseUserInfoDomainModel>>()
+                res.shouldBeInstanceOf<AppResult.Success<AuthenticatedUserInfoDomainModel>>()
                 res.data.uid shouldBe "U1"
                 res.data.email shouldBe "u1@acme.io"
                 res.data.providers!!.shouldContainExactly(listOf("google.com", "password"))
@@ -205,7 +204,7 @@ class AuthenticationRepositoryImplTest : FunSpec({
 
         test("linkInWithCredential maps AuthFirebaseUser -> FirebaseUserInfoDomainModel") {
             runTest {
-                val remoteUser = AuthFirebaseUser(
+                val remoteUser = RemoteAuthUser(
                     uid = "U2",
                     email = null, // doit devenir DEFAULT_EMAIL via extension
                     providers = listOf("apple.com"),
@@ -217,9 +216,9 @@ class AuthenticationRepositoryImplTest : FunSpec({
 
                 val res = repo.linkInWithCredential(credential)
 
-                res.shouldBeInstanceOf<AppResult.Success<FirebaseUserInfoDomainModel>>()
+                res.shouldBeInstanceOf<AppResult.Success<AuthenticatedUserInfoDomainModel>>()
                 res.data.uid shouldBe "U2"
-                res.data.email shouldBe AuthFirebaseUser.DEFAULT_EMAIL
+                res.data.email shouldBe RemoteAuthUser.DEFAULT_EMAIL
                 res.data.providers!!.shouldContainExactly(listOf("apple.com"))
             }
         }
@@ -256,7 +255,7 @@ class AuthenticationRepositoryImplTest : FunSpec({
             runTest {
                 coEvery { remote.fetchFirebaseUserInfo() } returns AppResult.Success(null)
 
-                val res = repo.fetchFirebaseUserInfo()
+                val res = repo.fetchUserInfo()
 
                 res.shouldBeInstanceOf<AppResult.Success<AuthState>>()
                 res.data shouldBe AuthState.SignedOut
@@ -265,14 +264,14 @@ class AuthenticationRepositoryImplTest : FunSpec({
 
         test("fetchFirebaseUserInfo maps AuthFirebaseUser -> Success(Authenticated(mapped))") {
             runTest {
-                val remoteUser = AuthFirebaseUser(
+                val remoteUser = RemoteAuthUser(
                     uid = "U3",
                     email = "u3@acme.io",
                     providers = listOf("password")
                 )
                 coEvery { remote.fetchFirebaseUserInfo() } returns AppResult.Success(remoteUser)
 
-                val res = repo.fetchFirebaseUserInfo()
+                val res = repo.fetchUserInfo()
 
                 res.shouldBeInstanceOf<AppResult.Success<AuthState>>()
                 val state = res.data
@@ -287,7 +286,7 @@ class AuthenticationRepositoryImplTest : FunSpec({
             runTest {
                 coEvery { remote.fetchFirebaseUserInfo() } returns AppResult.Failure(AppError.Network.Unreachable)
 
-                val res = repo.fetchFirebaseUserInfo()
+                val res = repo.fetchUserInfo()
 
                 res.shouldBeInstanceOf<AppResult.Failure<AppError>>()
                 res.error shouldBe AppError.Network.Unreachable

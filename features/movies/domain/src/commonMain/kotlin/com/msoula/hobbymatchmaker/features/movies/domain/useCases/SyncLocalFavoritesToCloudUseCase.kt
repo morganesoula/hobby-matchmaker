@@ -14,7 +14,7 @@ class SyncLocalFavoritesToCloudUseCase(
     private val dispatcher: CoroutineDispatcher
 ) {
     suspend operator fun invoke() = withContext(dispatcher) {
-        val uid = when (val auth = authenticationRepository.fetchFirebaseUserInfo()) {
+        val uid = when (val auth = authenticationRepository.fetchUserInfo()) {
             is AppResult.Failure -> {
                 Logger.w("Auth state fetch failed: ${auth.error}")
                 return@withContext

@@ -1,7 +1,7 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.models
 
-data class FirebaseUserInfoDomainModel(
-    val uid: String?,
+data class AuthenticatedUser(
+    val uid: String,
     val email: String?,
-    val providers: List<String>?
+    val providers: List<String>
 )

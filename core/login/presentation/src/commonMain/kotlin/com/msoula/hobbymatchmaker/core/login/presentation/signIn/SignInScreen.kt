@@ -16,8 +16,6 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -66,9 +64,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.msoula.hobbymatchmaker.core.design.CallOnceEffect
 import com.msoula.hobbymatchmaker.core.design.ObserveEvents
-import com.msoula.hobbymatchmaker.core.design.SnackEffect
 import com.msoula.hobbymatchmaker.core.design.Res
+import com.msoula.hobbymatchmaker.core.design.SnackEffect
 import com.msoula.hobbymatchmaker.core.design.cancel
+import com.msoula.hobbymatchmaker.core.design.component.AppSpacing
 import com.msoula.hobbymatchmaker.core.design.component.HMMButtonAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldPasswordComponent
@@ -97,7 +96,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthUiEventMode
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.ResetPasswordEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.SignInEvent
-import dev.gitlive.firebase.auth.AuthCredential
+import com.msoula.hobbymatchmaker.core.login.presentation.signIn.models.SignInFormStateModel
 import kotlinx.coroutines.flow.Flow
 import org.jetbrains.compose.resources.stringResource
 
@@ -106,7 +105,6 @@ fun SignInScreenContent(
     signInViewModel: SignInViewModel,
     redirectToMovieScreen: () -> Unit,
     redirectToSignUpScreen: () -> Unit,
-    resetSignInState: () -> Unit,
     oneTimeEventChannelFlow: Flow<AuthUiEventModel>,
     shouldShowGuestWarning: Boolean,
     facebookUIClient: FacebookUIClient
@@ -114,7 +112,7 @@ fun SignInScreenContent(
     val resetPasswordState by signInViewModel.resetPasswordState.collectAsState()
     val signInState by signInViewModel.signInState.collectAsState()
     val openResetDialog by signInViewModel.openResetDialog.collectAsState()
-    val loginFormState by signInViewModel.formDataFlow.collectAsState()
+    val signInFormState by signInViewModel.formDataFlow.collectAsState()
     val isGuestLoading by signInViewModel.isGuestLoading.collectAsState()
 
     val snackBarHostState = remember { SnackbarHostState() }
@@ -128,7 +126,7 @@ fun SignInScreenContent(
             is AuthUiEventModel.OnSignInSuccess ->
                 CallOnceEffect(event) {
                     redirectToMovieScreen()
-                    resetSignInState()
+                    signInViewModel.onEvent(AuthenticationUIEvent.OnResetSignInState)
                 }
 
             is AuthUiEventModel.OnResetPasswordSuccess -> {
@@ -159,59 +157,6 @@ fun SignInScreenContent(
                     ) { Text(text = data.visuals.message) }
                 }
             )
-        },
-        bottomBar = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background)
-                    .navigationBarsPadding()
-                    .imePadding()
-                    .padding(horizontal = 8.dp, vertical = 12.dp)
-            ) {
-                Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    AnnotatedStringWithLinkAnnotation(isSystemInDarkTheme()) {
-                        signInViewModel.onEvent(AuthenticationUIEvent.OnScreenChanged)
-                        redirectToSignUpScreen()
-                    }
-                }
-
-                Spacer(Modifier.height(12.dp))
-
-                OutlinedButton(
-                    onClick = {
-                        if (shouldShowGuestWarning) {
-                            showGuestDialog = true
-                        } else {
-                            signInViewModel.onEvent(
-                                AuthenticationUIEvent.OnContinueAsGuestConfirmed(true)
-                            )
-                            redirectToMovieScreen()
-                        }
-                    },
-                    enabled = !isGuestLoading,
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = MaterialTheme.colorScheme.onSurface
-                    )
-                ) {
-                    if (isGuestLoading) {
-                        CircularProgressIndicator(
-                            strokeWidth = 2.dp,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(Modifier.width(12.dp))
-                    } else {
-                        Text(
-                            text = stringResource(Res.string.continue_as_guest_button_title),
-                            style = MaterialTheme.typography.bodyMedium,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
-            }
         }
     ) { paddingValues ->
         Column(
@@ -234,46 +179,24 @@ fun SignInScreenContent(
 
             SignInScreenMainContent(
                 modifier = Modifier.fillMaxWidth(),
-                email = loginFormState.email.trimEnd(),
-                onEmailChanged = {
-                    signInViewModel.onEvent(AuthenticationUIEvent.OnEmailChanged(it))
-                },
-                password = loginFormState.password,
-                onPasswordChanged = {
-                    signInViewModel.onEvent(AuthenticationUIEvent.OnPasswordChanged(it))
-                },
-                onForgotPasswordClicked = {
-                    signInViewModel.onEvent(AuthenticationUIEvent.OnForgotPasswordClicked)
-                },
-                onSignInClicked = {
-                    signInViewModel.onEvent(AuthenticationUIEvent.OnSignIn)
-                },
-                canSubmit = loginFormState.submit,
+                signInFormState = signInFormState,
+                onEvent = signInViewModel::onEvent,
                 signInState = signInState,
-                dividerConnectText = stringResource(Res.string.continue_with_rs),
-                onGoogleButtonClicked = {
-                    signInViewModel.onEvent(AuthenticationUIEvent.OnGoogleButtonClicked)
-                },
-                onAppleButtonClicked = {
-                    signInViewModel.onEvent(AuthenticationUIEvent.OnAppleButtonClicked)
-                },
-                onFacebookButtonClicked = { credential ->
-                    signInViewModel.onEvent(
-                        AuthenticationUIEvent.OnFacebookButtonClicked(credential)
-                    )
-                },
-                facebookUIClient = facebookUIClient
+                facebookUIClient = facebookUIClient,
+                shouldShowGuestWarning = shouldShowGuestWarning,
+                isGuestLoading = isGuestLoading,
+                displayGuestDialog = { showGuestDialog = true },
+                redirectToMovieScreen = redirectToMovieScreen,
+                redirectToSignUpScreen = redirectToSignUpScreen
             )
-
-            Spacer(Modifier.height(48.dp))
         }
 
         if (openResetDialog) {
             ForgotPasswordAlertDialog(
-                email = loginFormState.emailReset,
+                email = signInFormState.emailReset,
                 paddingValues = paddingValues,
-                enableSubmit = loginFormState.submitEmailReset,
-                authUIEvent = signInViewModel::onEvent,
+                enableSubmit = signInFormState.submitEmailReset,
+                onEvent = signInViewModel::onEvent,
                 isLoading = resetPasswordState == ResetPasswordEvent.Loading
             )
         }
@@ -287,7 +210,7 @@ fun SignInScreenContent(
                 )
                 redirectToMovieScreen()
             },
-            onCreateAccount = { redirectToSignUpScreen() }
+            onCreateAccount = redirectToSignUpScreen
         )
     }
 }
@@ -323,49 +246,45 @@ fun AnnotatedStringWithLinkAnnotation(isDarkTheme: Boolean, onClick: () -> Unit)
 @Composable
 fun ColumnScope.SignInScreenMainContent(
     modifier: Modifier = Modifier,
-    email: String = "",
-    onEmailChanged: (String) -> Unit,
-    password: String = "",
-    onPasswordChanged: (String) -> Unit,
-    onForgotPasswordClicked: () -> Unit = {},
-    onSignInClicked: () -> Unit,
-    canSubmit: Boolean = false,
+    signInFormState: SignInFormStateModel,
+    onEvent: (AuthenticationUIEvent) -> Unit,
     signInState: SignInEvent = SignInEvent.Idle,
-    dividerConnectText: String = "",
-    onGoogleButtonClicked: () -> Unit,
-    onAppleButtonClicked: () -> Unit,
-    onFacebookButtonClicked: (credential: AuthCredential) -> Unit,
-    facebookUIClient: FacebookUIClient
+    facebookUIClient: FacebookUIClient,
+    shouldShowGuestWarning: Boolean,
+    isGuestLoading: Boolean,
+    displayGuestDialog: () -> Unit,
+    redirectToMovieScreen: () -> Unit,
+    redirectToSignUpScreen: () -> Unit
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
 
     HMMTextFieldAuthComponent(
-        value = email,
+        value = signInFormState.email.trimEnd(),
         label = stringResource(Res.string.email),
         icon = Icons.Default.Email,
         contentDescription = stringResource(Res.string.email),
-        onValueChange = onEmailChanged,
+        onValueChange = { onEvent(AuthenticationUIEvent.OnEmailChanged(it)) },
         modifier = Modifier.fillMaxWidth()
     )
 
-    Spacer(modifier = modifier.height(8.dp))
+    Spacer(modifier = modifier.height(AppSpacing.Sixteen))
 
     HMMTextFieldPasswordComponent(
-        value = password,
-        onValueChange = onPasswordChanged,
+        value = signInFormState.password,
+        onValueChange = { onEvent(AuthenticationUIEvent.OnPasswordChanged(it)) },
         modifier = Modifier.fillMaxWidth(),
         label = stringResource(Res.string.password),
         leadingIcon = Icons.Default.Lock,
         showPasswordContentDescription = stringResource(Res.string.show_password),
         hidePasswordContentDescription = stringResource(Res.string.hide_password),
-        onFormDoneClicked = onSignInClicked
+        onFormDoneClicked = { onEvent(AuthenticationUIEvent.OnSignIn) }
     )
 
-    Spacer(modifier = Modifier.height(16.dp))
+    Spacer(modifier = Modifier.height(AppSpacing.Sixteen))
 
     ClickableText(
         text = AnnotatedString(stringResource(Res.string.forgot_password)),
-        onClick = { _ -> onForgotPasswordClicked() },
+        onClick = { onEvent(AuthenticationUIEvent.OnForgotPasswordClicked) },
         style = TextStyle(
             color = MaterialTheme.colorScheme.onBackground,
             textDecoration = TextDecoration.Underline
@@ -376,31 +295,76 @@ fun ColumnScope.SignInScreenMainContent(
             .padding(end = 16.dp)
     )
 
-    Spacer(modifier = Modifier.height(24.dp))
+    Spacer(modifier = Modifier.height(AppSpacing.Sixteen))
 
     HMMButtonAuthComponent(
         onClick = {
             keyboardController?.hide()
-            onSignInClicked()
+            onEvent(AuthenticationUIEvent.OnSignIn)
         },
         text = stringResource(Res.string.log_in),
-        enabled = canSubmit,
+        enabled = signInFormState.submit,
         loading = signInState == SignInEvent.Loading
     )
 
-    Spacer(modifier = Modifier.height(24.dp))
+    Spacer(modifier = Modifier.height(AppSpacing.Sixteen))
 
-    DividerRowComponent(modifier, dividerConnectText)
+    DividerRowComponent(modifier, stringResource(Res.string.continue_with_rs))
 
-    Spacer(modifier = Modifier.height(16.dp))
+    Spacer(modifier = Modifier.height(AppSpacing.Sixteen))
 
     SocialMediaButtonListPlatformSpecificUI(
         modifier = Modifier.fillMaxWidth(),
-        onFacebookButtonClicked = onFacebookButtonClicked,
-        onAppleButtonClicked = onAppleButtonClicked,
-        onGoogleButtonClicked = onGoogleButtonClicked,
+        onEvent = onEvent,
         facebookUIClient = facebookUIClient
     )
+
+    Spacer(Modifier.height(AppSpacing.TwentyFour))
+
+    Column(
+        verticalArrangement = Arrangement.Bottom
+    ) {
+        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            AnnotatedStringWithLinkAnnotation(isSystemInDarkTheme()) {
+                onEvent(AuthenticationUIEvent.OnScreenChanged)
+                redirectToSignUpScreen()
+            }
+        }
+
+        Spacer(Modifier.height(AppSpacing.FortyEight))
+
+        OutlinedButton(
+            onClick = {
+                if (shouldShowGuestWarning) {
+                    displayGuestDialog()
+                } else {
+                    onEvent(AuthenticationUIEvent.OnContinueAsGuestConfirmed(true))
+                    redirectToMovieScreen()
+                }
+            },
+            enabled = !isGuestLoading,
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = MaterialTheme.colorScheme.onSurface
+            )
+        ) {
+            if (isGuestLoading) {
+                CircularProgressIndicator(
+                    strokeWidth = 2.dp,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(Modifier.width(12.dp))
+            } else {
+                Text(
+                    text = stringResource(Res.string.continue_as_guest_button_title),
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -436,7 +400,7 @@ fun DividerRowComponent(modifier: Modifier = Modifier, dividerConnectText: Strin
 fun ForgotPasswordAlertDialog(
     modifier: Modifier = Modifier,
     email: String,
-    authUIEvent: (AuthenticationUIEvent) -> Unit,
+    onEvent: (AuthenticationUIEvent) -> Unit,
     paddingValues: PaddingValues,
     enableSubmit: Boolean,
     isLoading: Boolean
@@ -456,13 +420,13 @@ fun ForgotPasswordAlertDialog(
             HMMTextFieldAuthComponent(
                 value = email,
                 onValueChange = {
-                    authUIEvent(AuthenticationUIEvent.OnEmailResetChanged(it))
+                    onEvent(AuthenticationUIEvent.OnEmailResetChanged(it))
                 },
                 label = stringResource(Res.string.your_email),
                 modifier = Modifier.fillMaxWidth()
             )
         },
-        onDismissRequest = { authUIEvent(AuthenticationUIEvent.HideForgotPasswordDialog) },
+        onDismissRequest = { onEvent(AuthenticationUIEvent.HideForgotPasswordDialog) },
         confirmButton = {
             if (isLoading) {
                 CircularProgressIndicator()
@@ -470,7 +434,7 @@ fun ForgotPasswordAlertDialog(
                 Button(
                     onClick = {
                         keyboardController?.hide()
-                        authUIEvent(AuthenticationUIEvent.OnResetPasswordConfirmed)
+                        onEvent(AuthenticationUIEvent.OnResetPasswordConfirmed)
                     },
                     enabled = enableSubmit
                 ) {
@@ -481,7 +445,7 @@ fun ForgotPasswordAlertDialog(
         },
         dismissButton = {
             Button(
-                onClick = { authUIEvent(AuthenticationUIEvent.HideForgotPasswordDialog) },
+                onClick = { onEvent(AuthenticationUIEvent.HideForgotPasswordDialog) },
                 colors =
                     ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.background,

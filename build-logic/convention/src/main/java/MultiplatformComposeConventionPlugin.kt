@@ -32,7 +32,7 @@ class MultiplatformComposeConventionPlugin : Plugin<Project> {
 
         target.afterEvaluate {
             extensions.configure<KotlinMultiplatformExtension> {
-                configureMultiplatformIos()
+                configureMultiplatformIos(this@with)
                 configureCompose(libs, config, compose)
             }
         }

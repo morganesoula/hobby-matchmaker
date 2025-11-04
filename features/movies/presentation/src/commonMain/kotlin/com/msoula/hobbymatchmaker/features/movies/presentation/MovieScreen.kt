@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.features.movies.presentation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,12 +12,19 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Announcement
+import androidx.compose.material.icons.automirrored.rounded.Logout
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -26,16 +34,15 @@ import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import com.msoula.hobbymatchmaker.core.common.isIosPlatform
 import com.msoula.hobbymatchmaker.core.design.CallOnceEffect
 import com.msoula.hobbymatchmaker.core.design.ObserveEvents
-import com.msoula.hobbymatchmaker.core.design.SnackEffect
-import com.msoula.hobbymatchmaker.core.design.util.asString
-import com.msoula.hobbymatchmaker.core.common.isIosPlatform
 import com.msoula.hobbymatchmaker.core.design.Res
-import com.msoula.hobbymatchmaker.core.design.component.HMMHomeTopBar
+import com.msoula.hobbymatchmaker.core.design.SnackEffect
 import com.msoula.hobbymatchmaker.core.design.component.LoadingCircularProgress
 import com.msoula.hobbymatchmaker.core.design.no_fetching_detail_possible
 import com.msoula.hobbymatchmaker.core.design.util.UIText
+import com.msoula.hobbymatchmaker.core.design.util.asString
 import com.msoula.hobbymatchmaker.features.movies.presentation.components.MovieItem
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiEventModel
@@ -72,6 +79,7 @@ fun MovieContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieScreenContent(
     modifier: Modifier = Modifier,
@@ -129,6 +137,37 @@ fun MovieScreenContent(
                     Text(text = data.visuals.message)
                 }
             }
+        },
+        topBar = {
+            TopAppBar(
+                title = {},
+                actions = {
+                    Row {
+                        IconButton(
+                            onClick = { logOut() },
+                            content = {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Rounded.Logout,
+                                    contentDescription = "Logout",
+                                    tint = MaterialTheme.colorScheme.onSurface
+                                )
+                            },
+                        )
+
+                        IconButton(
+                            onClick = { redirectToProfile() },
+                            content = {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Rounded.Announcement,
+                                    contentDescription = "Profile",
+                                    tint = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        )
+                    }
+                }
+            )
+
         }
     ) { padding ->
         Box(
@@ -157,8 +196,6 @@ fun MovieScreenContent(
                     )
                 }
             }
-
-            HMMHomeTopBar(onLogoutIconClick = logOut, onRedirectIconClick = redirectToProfile)
         }
     }
 }

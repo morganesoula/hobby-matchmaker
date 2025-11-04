@@ -4,10 +4,6 @@ plugins {
     alias(libs.plugins.kover)
 }
 
-multiplatformConfig {
-    useFirebase()
-}
-
 kotlin {
     sourceSets {
         commonMain.dependencies {

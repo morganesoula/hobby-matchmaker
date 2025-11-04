@@ -327,7 +327,7 @@ class SignInViewModelTest : FunSpec({
 
             coVerify {
                 unifiedSignInUC.invoke(
-                    UnifiedSignInUseCase.Params.SocialMedia(credential, ProviderType.GOOGLE)
+                    UnifiedSignInUseCase.Params.SocialProvider(credential, ProviderType.GOOGLE)
                 )
             }
             cancelAndIgnoreRemainingEvents()
@@ -372,7 +372,7 @@ class SignInViewModelTest : FunSpec({
             coVerify(exactly = 0) { facebookClient.getCredential() }
             coVerify {
                 unifiedSignInUC.invoke(
-                    UnifiedSignInUseCase.Params.SocialMedia(fbCred, ProviderType.FACEBOOK)
+                    UnifiedSignInUseCase.Params.SocialProvider(fbCred, ProviderType.FACEBOOK)
                 )
             }
             cancelAndIgnoreRemainingEvents()

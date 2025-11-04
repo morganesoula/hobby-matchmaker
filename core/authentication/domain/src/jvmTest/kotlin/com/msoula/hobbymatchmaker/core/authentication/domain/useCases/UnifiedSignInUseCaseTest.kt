@@ -1,6 +1,5 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.useCases
 
-import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
@@ -20,7 +19,7 @@ import kotlinx.coroutines.test.runTest
 @OptIn(ExperimentalCoroutinesApi::class)
 class UnifiedSignInUseCaseTest : FunSpec({
     lateinit var signInUseCase: SignInUseCase
-    lateinit var signInWithCredentialUseCase: SignInWithCredentialUseCase
+    lateinit var signInWithSocialProviderUseCase: SignInWithSocialProviderUseCase
     lateinit var setIsConnected: SetIsConnectedUseCase
     lateinit var useCase: UnifiedSignInUseCase
 
@@ -29,13 +28,13 @@ class UnifiedSignInUseCaseTest : FunSpec({
     beforeTest {
         MockKAnnotations.init(this)
         signInUseCase = mockk()
-        signInWithCredentialUseCase = mockk()
+        signInWithSocialProviderUseCase = mockk()
         setIsConnected = mockk()
         credential = mockk(relaxed = true)
 
         useCase = UnifiedSignInUseCase(
             signInUseCase = signInUseCase,
-            signInWithCredentialUseCase = signInWithCredentialUseCase,
+            signInWithSocialProviderUseCase = signInWithSocialProviderUseCase,
             setIsConnectedUseCase = setIsConnected
         )
     }
@@ -106,7 +105,7 @@ class UnifiedSignInUseCaseTest : FunSpec({
                     AppResult.Failure(AppError.Domain.Forbidden)
 
                 val res = useCase(
-                    UnifiedSignInUseCase.Params.SocialMedia(credential, ProviderType.GOOGLE)
+                    UnifiedSignInUseCase.Params.SocialProvider(credential, ProviderType.GOOGLE)
                 )
 
                 res.shouldBeInstanceOf<AppResult.Failure<AppError>>()
@@ -118,7 +117,7 @@ class UnifiedSignInUseCaseTest : FunSpec({
 
         test("SocialMedia: success then setIsConnected Failure -> propagates set error") {
             runTest {
-                val fbUser = FirebaseUserInfoDomainModel(
+                val fbUser = AuthenticatedUserInfoDomainModel(
                     uid = "U_FB",
                     email = "fb@acme.io",
                     providers = listOf("facebook.com")
@@ -135,7 +134,7 @@ class UnifiedSignInUseCaseTest : FunSpec({
                     AppResult.Failure(AppError.Network.Timeout)
 
                 val res = useCase(
-                    UnifiedSignInUseCase.Params.SocialMedia(credential, ProviderType.APPLE)
+                    UnifiedSignInUseCase.Params.SocialProvider(credential, ProviderType.APPLE)
                 )
 
                 res.shouldBeInstanceOf<AppResult.Failure<AppError>>()
@@ -147,7 +146,7 @@ class UnifiedSignInUseCaseTest : FunSpec({
 
         test("SocialMedia: full success -> Success(SignInSuccess)") {
             runTest {
-                val fbUser2 = FirebaseUserInfoDomainModel(
+                val fbUser2 = AuthenticatedUserInfoDomainModel(
                     uid = "U_FB_2",
                     email = "fb2@acme.io",
                     providers = listOf("facebook.com")
@@ -162,7 +161,7 @@ class UnifiedSignInUseCaseTest : FunSpec({
                 coEvery { setIsConnected(true) } returns AppResult.Success(Unit)
 
                 val res = useCase(
-                    UnifiedSignInUseCase.Params.SocialMedia(credential, ProviderType.FACEBOOK)
+                    UnifiedSignInUseCase.Params.SocialProvider(credential, ProviderType.FACEBOOK)
                 )
 
                 res.shouldBeInstanceOf<AppResult.Success<SignInSuccess>>()

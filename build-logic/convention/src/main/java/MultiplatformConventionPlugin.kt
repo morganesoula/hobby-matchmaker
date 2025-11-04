@@ -29,7 +29,7 @@ class MultiplatformConventionPlugin : Plugin<Project> {
 
         target.afterEvaluate {
             extensions.configure<KotlinMultiplatformExtension> {
-                configureMultiplatformIos()
+                configureMultiplatformIos(this@with)
                 configureMultiplatform(libs, config)
                 configureCInterops(this@with)
             }

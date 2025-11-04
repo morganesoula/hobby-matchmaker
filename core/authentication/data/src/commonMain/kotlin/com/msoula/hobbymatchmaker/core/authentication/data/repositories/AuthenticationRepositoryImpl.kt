@@ -1,9 +1,9 @@
 package com.msoula.hobbymatchmaker.core.authentication.data.repositories
 
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.AuthenticationRemoteDataSource
-import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.mappers.toFirebaseUserInfoDomainModel
+import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.mappers.toAuthenticatedUser
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.AuthState
-import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
+import com.msoula.hobbymatchmaker.core.authentication.domain.models.AuthenticatedUser
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepository
 import com.msoula.hobbymatchmaker.core.common.AppError
@@ -33,33 +33,33 @@ class AuthenticationRepositoryImpl(
     override suspend fun resetPassword(email: String): AppResult<Unit, AppError> =
         remoteDataSource.resetPassword(email)
 
-    override suspend fun signInWithCredential(
-        authCredential: AuthCredential,
-        providerType: ProviderType
-    ): AppResult<FirebaseUserInfoDomainModel, AppError> =
-        remoteDataSource.signInWithCredentials(authCredential, providerType)
-            .requireNonNull { AppError.Authentication.Unknown }
-            .mapSuccess {
-                it.toFirebaseUserInfoDomainModel()
-            }
-
     override suspend fun linkInWithCredential(
-        authCredential: AuthCredential
-    ): AppResult<FirebaseUserInfoDomainModel, AppError> =
-        remoteDataSource.linkWithCredential(credential = authCredential)
+        providerType: ProviderType,
+        credentialProvider: suspend () -> Any?
+    ): AppResult<AuthenticatedUser, AppError> {
+        val credential = credentialProvider() as? AuthCredential
+            ?: return AppResult.Failure(AppError.Authentication.InvalidCredentials)
+
+        return remoteDataSource.linkWithCredential(credential)
             .requireNonNull { AppError.Authentication.Unknown }
-            .mapSuccess {
-                it.toFirebaseUserInfoDomainModel()
-            }
+            .mapSuccess { it.toAuthenticatedUser() }
+    }
+
 
     override suspend fun isFirstSignIn(uid: String): AppResult<Boolean, AppError> =
         remoteDataSource.isFirstSignIn(uid)
 
-    override suspend fun fetchFirebaseUserInfo(): AppResult<AuthState, AppError> =
+    override suspend fun fetchUserInfo(): AppResult<AuthState, AppError> =
         remoteDataSource.fetchFirebaseUserInfo()
             .mapSuccess { userData ->
-                userData?.toFirebaseUserInfoDomainModel()
+                userData?.toAuthenticatedUser()
                     ?.let { AuthState.Authenticated(it) }
                     ?: AuthState.SignedOut
             }
+
+    override suspend fun signInWithSocialProvider(
+        providerType: ProviderType,
+        credentialProvider: suspend () -> Any?
+    ): AppResult<AuthenticatedUser?, AppError> =
+        remoteDataSource.signInWithSocialProvider(providerType, credentialProvider)
 }

@@ -22,7 +22,6 @@ import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveShouldShow
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetCurrentUserProfileUuidUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetShouldShowGuestDialogUseCase
 import dev.gitlive.firebase.auth.AuthCredential
-import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -34,6 +33,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 
 class SignInViewModel(
     private val authFormValidationUseCases: LoginValidateFormUseCase,
@@ -72,7 +72,8 @@ class SignInViewModel(
         SharingStarted.Eagerly, true
     )
 
-    private val signing = atomic(false)
+    // Mutex to prevent concurrent social sign-in attempts
+    private val signingMutex = Mutex()
 
     fun onEvent(event: AuthenticationUIEvent) {
         when (event) {
@@ -140,6 +141,8 @@ class SignInViewModel(
                     )
                 }
 
+            AuthenticationUIEvent.OnResetSignInState -> resetSignInState()
+
             AuthenticationUIEvent.OnScreenChanged -> resetForm()
 
             else -> Unit
@@ -178,16 +181,23 @@ class SignInViewModel(
         providerType: ProviderType,
         fetchedCredential: AuthCredential? = null
     ) {
-
-        if (!signing.compareAndSet(expect = false, update = true)) return
+        // Try to acquire the mutex, if already locked, return immediately (prevents double-click)
+        if (!signingMutex.tryLock()) return
 
         try {
             val client = socialClients[providerType]
-            val credential = fetchedCredential ?: client?.getCredential()
-            if (credential != null) {
+            if (fetchedCredential != null) {
                 signInUnified(
-                    UnifiedSignInUseCase.Params.SocialMedia(
-                        credential, providerType
+                    UnifiedSignInUseCase.Params.SocialProvider(
+                        providerType = providerType,
+                        credentialProvider = { fetchedCredential }
+                    )
+                )
+            } else if (client != null) {
+                signInUnified(
+                    UnifiedSignInUseCase.Params.SocialProvider(
+                        providerType = providerType,
+                        credentialProvider = { client.getCredential() }
                     )
                 )
             } else {
@@ -198,7 +208,7 @@ class SignInViewModel(
                 )
             }
         } finally {
-            signing.value = false
+            signingMutex.unlock()
         }
     }
 

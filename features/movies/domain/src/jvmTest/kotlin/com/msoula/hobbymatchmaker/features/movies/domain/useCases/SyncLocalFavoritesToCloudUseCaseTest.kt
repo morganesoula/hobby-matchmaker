@@ -1,7 +1,6 @@
 package com.msoula.hobbymatchmaker.features.movies.domain.useCases
 
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.AuthState
-import com.msoula.hobbymatchmaker.core.authentication.domain.models.FirebaseUserInfoDomainModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepository
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
@@ -24,7 +23,7 @@ class SyncLocalFavoritesToCloudUseCaseTest : FunSpec({
 
                 val authenticationRepository = mockk<AuthenticationRepository>()
 
-                coEvery { authenticationRepository.fetchFirebaseUserInfo() } returns
+                coEvery { authenticationRepository.fetchUserInfo() } returns
                     AppResult.Failure(AppError.Authentication.Unknown)
 
                 val result = SyncLocalFavoritesToCloudUseCase(
@@ -48,10 +47,10 @@ class SyncLocalFavoritesToCloudUseCaseTest : FunSpec({
 
                 val authenticationRepository = mockk<AuthenticationRepository>()
 
-                coEvery { authenticationRepository.fetchFirebaseUserInfo() } returns
+                coEvery { authenticationRepository.fetchUserInfo() } returns
                     AppResult.Success(
                         AuthState.Authenticated(
-                            FirebaseUserInfoDomainModel(
+                            AuthenticatedUserInfoDomainModel(
                                 uid = "u1", email = null, providers = null
                             )
                         )
@@ -80,9 +79,9 @@ class SyncLocalFavoritesToCloudUseCaseTest : FunSpec({
 
                 val authRepo = mockk<AuthenticationRepository>()
 
-                coEvery { authRepo.fetchFirebaseUserInfo() } returns AppResult.Success(
+                coEvery { authRepo.fetchUserInfo() } returns AppResult.Success(
                     AuthState.Authenticated(
-                        FirebaseUserInfoDomainModel(
+                        AuthenticatedUserInfoDomainModel(
                             uid = "u42",
                             email = null,
                             providers = null
@@ -111,9 +110,9 @@ class SyncLocalFavoritesToCloudUseCaseTest : FunSpec({
                     favoriteIdsResult = AppResult.Success(emptyList())
                 }
                 val authRepo = mockk<AuthenticationRepository>()
-                coEvery { authRepo.fetchFirebaseUserInfo() } returns AppResult.Success(
+                coEvery { authRepo.fetchUserInfo() } returns AppResult.Success(
                     AuthState.Authenticated(
-                        FirebaseUserInfoDomainModel(
+                        AuthenticatedUserInfoDomainModel(
                             uid = "u1",
                             email = null,
                             providers = null
@@ -143,9 +142,9 @@ class SyncLocalFavoritesToCloudUseCaseTest : FunSpec({
                     syncRemoteResult = AppResult.Failure(AppError.Network.Http(503, "unavailable"))
                 }
                 val authRepo = mockk<AuthenticationRepository>()
-                coEvery { authRepo.fetchFirebaseUserInfo() } returns AppResult.Success(
+                coEvery { authRepo.fetchUserInfo() } returns AppResult.Success(
                     AuthState.Authenticated(
-                        FirebaseUserInfoDomainModel(
+                        AuthenticatedUserInfoDomainModel(
                             uid = "u1",
                             email = null,
                             providers = null

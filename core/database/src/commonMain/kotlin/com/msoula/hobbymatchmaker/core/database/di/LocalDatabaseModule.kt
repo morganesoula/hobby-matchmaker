@@ -11,10 +11,10 @@ import com.msoula.hobbymatchmaker.core.database.services.SocialMemberDAO
 import com.msoula.hobbymatchmaker.core.database.services.SocialMemberDAOImpl
 import com.msoula.hobbymatchmaker.core.database.services.UserProfileDAO
 import com.msoula.hobbymatchmaker.core.database.services.UserProfileDAOImpl
-import org.koin.dsl.module
+import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
-import org.koin.core.module.Module
+import org.koin.dsl.module
 
 val coreModuleDAO = module {
     includes(coreModuleDatabasePlatformSpecific)
