@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -80,6 +81,7 @@ import coil3.request.ImageRequest
 import coil3.request.SuccessResult
 import coil3.request.crossfade
 import com.msoula.hobbymatchmaker.core.common.Logger
+import com.msoula.hobbymatchmaker.core.common.isIosPlatform
 import com.msoula.hobbymatchmaker.core.common.toReadableDuration
 import com.msoula.hobbymatchmaker.core.design.CallOnceEffect
 import com.msoula.hobbymatchmaker.core.design.ObserveEvents
@@ -201,6 +203,7 @@ fun MovieDetailScreen(
     }
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0),
         snackbarHost = {
             SnackbarHost(
                 hostState = snackBarHostState,
@@ -216,22 +219,29 @@ fun MovieDetailScreen(
             )
         },
         topBar = {
-            TopAppBar(
-                title = {},
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
-                actions = {
-                    IconButton(
-                        onClick = { onMovieDetailBackPressed() },
-                        content = {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                                contentDescription = "Back",
-                                tint = MaterialTheme.colorScheme.onBackground
-                            )
-                        }
-                    )
-                }
-            )
+            if (isIosPlatform()) {
+                TopAppBar(
+                    title = {},
+                    modifier = Modifier.statusBarsPadding(),
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                        scrolledContainerColor = Color.Transparent
+                    ),
+                    windowInsets = WindowInsets(0),
+                    navigationIcon = {
+                        IconButton(
+                            onClick = { onMovieDetailBackPressed() },
+                            content = {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                                    contentDescription = "Back",
+                                    tint = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        )
+                    }
+                )
+            }
         }
     ) { padding ->
         Box(

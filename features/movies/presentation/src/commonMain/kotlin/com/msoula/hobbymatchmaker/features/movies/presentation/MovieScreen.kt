@@ -34,6 +34,7 @@ import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.isIosPlatform
 import com.msoula.hobbymatchmaker.core.design.CallOnceEffect
 import com.msoula.hobbymatchmaker.core.design.ObserveEvents
@@ -98,6 +99,7 @@ fun MovieScreenContent(
         when (event) {
             is MovieUiEventModel.OnMovieDetailClicked ->
                 CallOnceEffect(event) {
+                    Logger.d("Redirecting to movie detail as asked")
                     redirectToMovieDetail(event.movieId)
                 }
 
@@ -144,22 +146,22 @@ fun MovieScreenContent(
                 actions = {
                     Row {
                         IconButton(
-                            onClick = { logOut() },
-                            content = {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Rounded.Logout,
-                                    contentDescription = "Logout",
-                                    tint = MaterialTheme.colorScheme.onSurface
-                                )
-                            },
-                        )
-
-                        IconButton(
                             onClick = { redirectToProfile() },
                             content = {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Rounded.Announcement,
                                     contentDescription = "Profile",
+                                    tint = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        )
+
+                        IconButton(
+                            onClick = { logOut() },
+                            content = {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Rounded.Logout,
+                                    contentDescription = "Logout",
                                     tint = MaterialTheme.colorScheme.onSurface
                                 )
                             }

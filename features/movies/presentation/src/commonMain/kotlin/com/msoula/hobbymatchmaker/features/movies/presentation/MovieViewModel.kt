@@ -103,6 +103,7 @@ class MovieViewModel(
                 Logger.d("Detect single tap on card")
                 scope.launch {
                     val eventToSend = handleSingleTap(event.movieId)
+                    Logger.d("Event to send: $eventToSend")
                     sendOnce(eventToSend)
                 }
             }

@@ -2,17 +2,14 @@ package com.msoula.hobbymatchmaker.core.login.presentation.signUp
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -41,13 +38,13 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -58,6 +55,7 @@ import com.msoula.hobbymatchmaker.core.design.SnackEffect
 import com.msoula.hobbymatchmaker.core.design.already_a_member
 import com.msoula.hobbymatchmaker.core.design.already_a_member_connect
 import com.msoula.hobbymatchmaker.core.design.at_least
+import com.msoula.hobbymatchmaker.core.design.component.AppSpacing
 import com.msoula.hobbymatchmaker.core.design.component.HMMButtonAuthComponent
 import com.msoula.hobbymatchmaker.core.design.component.HMMFormHelperText
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldAuthComponent
@@ -94,21 +92,6 @@ fun SignUpScreenContent(
 
     val registrationState by signUpViewModel.formDataFlow.collectAsState()
     val signUpState by signUpViewModel.signUpState.collectAsState()
-
-    val annotatedString =
-        buildAnnotatedString {
-            append(stringResource(Res.string.already_a_member) + " ")
-            withStyle(
-                style =
-                    SpanStyle(
-                        color = if (isSystemInDarkTheme()) Color(0, 191, 255)
-                        else Color.Blue,
-                        textDecoration = TextDecoration.Underline
-                    )
-            ) {
-                append(stringResource(Res.string.already_a_member_connect))
-            }
-        }
 
     ObserveEvents(oneTimeEventChannelFlow) { event ->
         when (event) {
@@ -157,20 +140,9 @@ fun SignUpScreenContent(
                     paddingValues = paddingValues,
                     registrationState = registrationState,
                     onEvent = signUpViewModel::onEvent,
-                    signUpState = signUpState
+                    signUpState = signUpState,
+                    redirectToSignInScreen = redirectToSignInScreen
                 )
-
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.Bottom
-                ) {
-                    SignUpScreenBottomContent(
-                        redirectText = annotatedString,
-                        redirectToSignIn = {
-                            signUpViewModel.onEvent(AuthenticationUIEvent.OnScreenChanged)
-                            redirectToSignInScreen()
-                        })
-                }
             }
         }
 
@@ -183,22 +155,37 @@ fun SignUpScreenMainContent(
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues,
     registrationState: SignUpStateModel,
+    signUpState: SignUpEvent,
     onEvent: (AuthenticationUIEvent) -> Unit,
-    signUpState: SignUpEvent
+    redirectToSignInScreen: () -> Unit
 ) {
     val scrollState = rememberScrollState()
     val emailTipVisibility = rememberSaveable { mutableStateOf(false) }
     val passwordTipVisibility = rememberSaveable { mutableStateOf(false) }
 
+    val annotatedString =
+        buildAnnotatedString {
+            append(stringResource(Res.string.already_a_member) + " ")
+            withStyle(
+                style =
+                    SpanStyle(
+                        color = if (isSystemInDarkTheme()) Color(0, 191, 255)
+                        else Color.Blue,
+                        textDecoration = TextDecoration.Underline
+                    )
+            ) {
+                append(stringResource(Res.string.already_a_member_connect))
+            }
+        }
+
     Box(
         modifier =
             Modifier
-                //wrapContentSize()
                 .fillMaxSize()
                 .padding(paddingValues),
         contentAlignment = Alignment.Center
     ) {
-        Column(modifier = Modifier.verticalScroll(scrollState)) {
+        Column(modifier = Modifier.fillMaxSize().verticalScroll(scrollState)) {
             HMMTextFieldAuthComponent(
                 label = stringResource(Res.string.firstname),
                 value = registrationState.firstName.trimEnd(),
@@ -211,7 +198,7 @@ fun SignUpScreenMainContent(
                     imeAction = ImeAction.Next
                 )
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(AppSpacing.Eight))
 
             HMMFormHelperText(
                 isVisible = emailTipVisibility,
@@ -236,7 +223,7 @@ fun SignUpScreenMainContent(
                     autoCorrect = false
                 )
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(AppSpacing.Eight))
 
             HMMFormHelperText(
                 isVisible = passwordTipVisibility,
@@ -267,24 +254,22 @@ fun SignUpScreenMainContent(
                 text = stringResource(Res.string.sign_up),
                 loading = signUpState == SignUpEvent.Loading
             )
+
+            Spacer(Modifier.weight(1f))
+
+            Text(
+                text = annotatedString,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = AppSpacing.Sixteen)
+                    .semantics {
+                        role = Role.Button
+                        contentDescription = annotatedString.text
+                    }
+                    .clickable { redirectToSignInScreen() },
+                style = TextStyle(color = MaterialTheme.colorScheme.onBackground)
+            )
         }
     }
-}
-
-@Composable
-fun SignUpScreenBottomContent(
-    redirectText: AnnotatedString,
-    redirectToSignIn: () -> Unit
-) {
-    Text(
-        text = redirectText,
-        modifier = Modifier
-            .wrapContentSize()
-            .semantics {
-                role = Role.Button
-                contentDescription = redirectText.text
-            }
-            .clickable { redirectToSignIn() },
-        style = TextStyle(color = MaterialTheme.colorScheme.onBackground)
-    )
 }

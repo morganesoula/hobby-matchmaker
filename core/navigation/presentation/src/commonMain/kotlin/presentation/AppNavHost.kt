@@ -86,7 +86,6 @@ fun AppNavHost(
                         }
                     },
                     signInViewModel = signInViewModel,
-                    resetSignInState = { signInViewModel.resetSignInState() },
                     oneTimeEventChannelFlow = signInViewModel.oneTimeEventChannelFlow,
                     facebookUIClient = facebookUIClient,
                     shouldShowGuestWarning = shouldShowGuestWarning

@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -144,7 +146,6 @@ fun SignInScreenContent(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         containerColor = MaterialTheme.colorScheme.background,
         snackbarHost = {
             SnackbarHost(
@@ -162,11 +163,12 @@ fun SignInScreenContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp)
-                .background(MaterialTheme.colorScheme.background)
+                .padding(paddingValues)
                 .consumeWindowInsets(paddingValues)
+                .background(MaterialTheme.colorScheme.background)
                 .verticalScroll(rememberScrollState())
                 .keyboardDismissOnTap()
+                .imePadding()
         ) {
             Box(Modifier.fillMaxWidth().padding(top = 4.dp)) {
                 HeaderTextComponent(
@@ -319,50 +321,49 @@ fun ColumnScope.SignInScreenMainContent(
         facebookUIClient = facebookUIClient
     )
 
-    Spacer(Modifier.height(AppSpacing.TwentyFour))
+    Spacer(Modifier.weight(1f))
 
-    Column(
-        verticalArrangement = Arrangement.Bottom
-    ) {
-        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            AnnotatedStringWithLinkAnnotation(isSystemInDarkTheme()) {
-                onEvent(AuthenticationUIEvent.OnScreenChanged)
-                redirectToSignUpScreen()
-            }
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        AnnotatedStringWithLinkAnnotation(isSystemInDarkTheme()) {
+            onEvent(AuthenticationUIEvent.OnScreenChanged)
+            redirectToSignUpScreen()
         }
+    }
 
-        Spacer(Modifier.height(AppSpacing.FortyEight))
+    Spacer(Modifier.height(AppSpacing.Sixteen))
 
-        OutlinedButton(
-            onClick = {
-                if (shouldShowGuestWarning) {
-                    displayGuestDialog()
-                } else {
-                    onEvent(AuthenticationUIEvent.OnContinueAsGuestConfirmed(true))
-                    redirectToMovieScreen()
-                }
-            },
-            enabled = !isGuestLoading,
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-            colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = MaterialTheme.colorScheme.onSurface
-            )
-        ) {
-            if (isGuestLoading) {
-                CircularProgressIndicator(
-                    strokeWidth = 2.dp,
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(Modifier.width(12.dp))
+    OutlinedButton(
+        onClick = {
+            if (shouldShowGuestWarning) {
+                displayGuestDialog()
             } else {
-                Text(
-                    text = stringResource(Res.string.continue_as_guest_button_title),
-                    style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center
-                )
+                onEvent(AuthenticationUIEvent.OnContinueAsGuestConfirmed(true))
+                redirectToMovieScreen()
             }
+        },
+        enabled = !isGuestLoading,
+        modifier = Modifier
+            .fillMaxWidth()
+            .navigationBarsPadding()
+            .padding(bottom = AppSpacing.Sixteen),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+        colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = MaterialTheme.colorScheme.onSurface
+        )
+    ) {
+        if (isGuestLoading) {
+            CircularProgressIndicator(
+                strokeWidth = 2.dp,
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(Modifier.width(12.dp))
+        } else {
+            Text(
+                text = stringResource(Res.string.continue_as_guest_button_title),
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
