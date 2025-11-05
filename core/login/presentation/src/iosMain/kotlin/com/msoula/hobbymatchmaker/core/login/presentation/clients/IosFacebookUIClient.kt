@@ -13,4 +13,6 @@ class IosFacebookUIClient : FacebookUIClient {
     ) = Unit
 
     override fun logIn() = Unit
+
+    override fun hasValidToken(): Boolean = false
 }

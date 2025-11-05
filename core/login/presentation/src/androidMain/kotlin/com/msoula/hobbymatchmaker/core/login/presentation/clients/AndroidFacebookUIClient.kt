@@ -1,6 +1,7 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.clients
 
 import android.app.Activity
+import com.facebook.AccessToken
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
@@ -51,5 +52,10 @@ class AndroidFacebookUIClient(
             activityProvider(),
             listOf("email", "public_profile")
         )
+    }
+
+    override fun hasValidToken(): Boolean {
+        val token = AccessToken.getCurrentAccessToken()
+        return token != null && !token.isExpired
     }
 }

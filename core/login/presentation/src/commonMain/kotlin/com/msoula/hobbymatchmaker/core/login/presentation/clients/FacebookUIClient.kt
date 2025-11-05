@@ -11,6 +11,7 @@ interface FacebookUIClient {
         onError: (Exception) -> Unit
     )
     fun logIn()
+    fun hasValidToken(): Boolean
 }
 
 class FacebookUIClientImpl(
