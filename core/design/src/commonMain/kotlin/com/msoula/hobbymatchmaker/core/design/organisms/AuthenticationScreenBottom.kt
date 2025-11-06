@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -93,26 +92,6 @@ fun AuthenticationScreenBottom(
         }
     }
 
-    // Navigation link text
-    Text(
-        text = annotatedString,
-        textAlign = TextAlign.Center,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(bottom = CustomSize.Sixteen)
-            .semantics {
-                role = Role.Button
-                contentDescription = annotatedString.text
-            }
-            .clickable {
-                annotatedString
-                    .getStringAnnotations("clickable", 0, annotatedString.length)
-                    .firstOrNull()
-                    ?.let { if (it.item == "link") onNavigateToOppositeScreen() }
-            },
-        style = TextStyle(color = MaterialTheme.colorScheme.onBackground)
-    )
-
     // "Continue as Guest" button (only on SignIn screen)
     if (isSignInScreen) {
         OutlinedButton(
@@ -120,8 +99,10 @@ fun AuthenticationScreenBottom(
             enabled = guestButtonEnabled && !isGuestLoading,
             modifier = Modifier
                 .fillMaxWidth()
-                .navigationBarsPadding()
-                .padding(bottom = CustomSize.Sixteen, start = CustomSize.Sixteen, end = CustomSize.Sixteen),
+                .padding(
+                    start = CustomSize.Sixteen,
+                    end = CustomSize.Sixteen
+                ),
             shape = RoundedCornerShape(CustomSize.Eight),
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
             colors = ButtonDefaults.outlinedButtonColors(
@@ -135,6 +116,7 @@ fun AuthenticationScreenBottom(
                 )
                 Spacer(Modifier.width(CustomSize.Eight))
             }
+
             Text(
                 text = stringResource(Res.string.continue_as_guest_button_title),
                 style = MaterialTheme.typography.bodyMedium,
@@ -142,4 +124,27 @@ fun AuthenticationScreenBottom(
             )
         }
     }
+
+    // Navigation link text
+    Text(
+        text = annotatedString,
+        textAlign = TextAlign.Center,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(
+                bottom = CustomSize.Sixteen,
+                top = if (isSignInScreen) CustomSize.Eight else 0.dp
+            )
+            .semantics {
+                role = Role.Button
+                contentDescription = annotatedString.text
+            }
+            .clickable {
+                annotatedString
+                    .getStringAnnotations("clickable", 0, annotatedString.length)
+                    .firstOrNull()
+                    ?.let { if (it.item == "link") onNavigateToOppositeScreen() }
+            },
+        style = TextStyle(color = MaterialTheme.colorScheme.onBackground)
+    )
 }

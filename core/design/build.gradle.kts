@@ -3,9 +3,16 @@ plugins {
     alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform.compose)
 }
 
+multiplatformConfig {
+    useCoil()
+}
+
 kotlin {
     sourceSets {
         commonMain.dependencies {
+            // Coil
+            implementation(libs.findLibrary("coil-network").get())
+
             // Modules
             implementation(project(Modules.COMMON))
         }

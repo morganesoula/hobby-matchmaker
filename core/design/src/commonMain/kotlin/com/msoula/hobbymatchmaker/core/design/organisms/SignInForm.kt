@@ -27,6 +27,7 @@ import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.PasswordTextField
 import com.msoula.hobbymatchmaker.core.design.atoms.PrimaryButton
 import com.msoula.hobbymatchmaker.core.design.atoms.PrimaryTextField
+import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
 import com.msoula.hobbymatchmaker.core.design.component.rememberSubmitKeyBoardActions
 import com.msoula.hobbymatchmaker.core.design.email
@@ -106,7 +107,7 @@ fun SignInForm(
             .wrapContentWidth(Alignment.End)
     )
 
-    SpacerHeight8()
+    SpacerHeight16()
 
     PrimaryButton(
         text = stringResource(Res.string.log_in),

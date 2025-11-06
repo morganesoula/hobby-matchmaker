@@ -82,21 +82,26 @@ fun SignUpScreenContent(
         bottomSection = {
             AuthenticationScreenBottom(
                 isSignInScreen = false,
-                onNavigateToOppositeScreen = redirectToSignInScreen
+                onNavigateToOppositeScreen = {
+                    signUpViewModel.onEvent(AuthenticationUIEvent.OnScreenChanged)
+                    redirectToSignInScreen()
+                }
             )
         },
-        snackbarHost = { SnackbarHost(
-            hostState = snackBarHostState,
-            snackbar = { data ->
-                Snackbar(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    shape = RoundedCornerShape(CustomSize.Eight)
-                ) {
-                    Text(text = data.visuals.message)
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackBarHostState,
+                snackbar = { data ->
+                    Snackbar(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        shape = RoundedCornerShape(CustomSize.Eight)
+                    ) {
+                        Text(text = data.visuals.message)
+                    }
                 }
-            }
-        ) },
+            )
+        },
         loadingOverlay = {
             LoadingOverlay(visible = signUpState == SignUpEvent.Loading)
         }

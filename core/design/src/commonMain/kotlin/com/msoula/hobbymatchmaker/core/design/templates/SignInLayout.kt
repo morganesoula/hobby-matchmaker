@@ -45,9 +45,11 @@ fun SignInLayout(
                     .keyboardDismissOnTap()
             ) {
                 topBar()
-                SpacerHeight16()
+                SpacerWeight1()
                 form()
+                SpacerHeight16()
                 divider()
+                SpacerHeight16()
                 socialMediaSection()
                 SpacerWeight1()
                 bottomSection()

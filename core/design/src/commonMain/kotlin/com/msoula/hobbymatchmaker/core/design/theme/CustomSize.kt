@@ -11,6 +11,7 @@ object CustomSize {
     val TwentyFour = 24.dp
     val ThirtyTwo = 32.dp
     val FortyEight = 48.dp
+    val SixtyFour = 64.dp
 }
 
 object CustomFontSize {
