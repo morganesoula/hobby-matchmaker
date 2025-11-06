@@ -18,6 +18,7 @@ object CustomFontSize {
     val Two = 2.sp
     val Four = 4.sp
     val Eight = 8.sp
+    val Twelve = 12.sp
     val Sixteen = 16.sp
     val TwentyFour = 24.sp
     val FortyEight = 48.sp
