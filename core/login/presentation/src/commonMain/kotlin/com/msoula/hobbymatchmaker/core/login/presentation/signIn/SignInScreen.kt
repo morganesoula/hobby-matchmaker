@@ -1,8 +1,6 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.signIn
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,7 +8,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
@@ -23,7 +20,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextAlign
@@ -38,6 +34,7 @@ import com.msoula.hobbymatchmaker.core.design.cancel
 import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldAuthComponent
 import com.msoula.hobbymatchmaker.core.design.continue_with_rs
 import com.msoula.hobbymatchmaker.core.design.forgot_password_title
+import com.msoula.hobbymatchmaker.core.design.molecules.LabeledDivider
 import com.msoula.hobbymatchmaker.core.design.organisms.AuthenticationScreenBottom
 import com.msoula.hobbymatchmaker.core.design.organisms.AuthenticationScreenTop
 import com.msoula.hobbymatchmaker.core.design.organisms.SignInForm
@@ -119,7 +116,7 @@ fun SignInScreenContent(
                 }
             )
         },
-        divider = { DividerRowComponent() },
+        divider = { LabeledDivider(label = stringResource(Res.string.continue_with_rs)) },
         socialMediaSection = {
             SignInSocialMedia(
                 onGoogleClick = {
@@ -203,35 +200,6 @@ fun SignInScreenContent(
     )
 }
 
-
-@Composable
-fun DividerRowComponent(modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceAround
-    ) {
-        HorizontalDivider(
-            Modifier.weight(1f),
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-            thickness = 2.dp
-        )
-        Text(
-            text = stringResource(Res.string.continue_with_rs),
-            modifier = Modifier.weight(3f),
-            textAlign = TextAlign.Center,
-            fontSize = 16.sp,
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-        )
-        HorizontalDivider(
-            Modifier.weight(1f),
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-            thickness = 2.dp
-        )
-    }
-}
 
 @Composable
 fun ForgotPasswordAlertDialog(

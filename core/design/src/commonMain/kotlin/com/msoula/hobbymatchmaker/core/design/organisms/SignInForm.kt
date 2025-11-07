@@ -41,7 +41,6 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun SignInForm(
-    modifier: Modifier = Modifier,
     email: String,
     password: String,
     loading: Boolean,

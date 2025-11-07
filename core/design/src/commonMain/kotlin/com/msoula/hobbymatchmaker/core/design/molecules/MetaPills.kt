@@ -14,6 +14,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.msoula.hobbymatchmaker.core.common.toReadableDuration
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 
 @Composable
@@ -56,10 +57,9 @@ fun MovieTitleMetaPill(
 
 @Composable
 fun MovieInformationMetaPill(
-    modifier: Modifier = Modifier,
     releaseDate: String,
     genres: List<String>,
-    duration: String
+    duration: Int
 ) {
     MetaPill {
         Text(
@@ -75,7 +75,7 @@ fun MovieInformationMetaPill(
         )
 
         Text(
-            text = " · $duration",
+            text = " · ${duration.toReadableDuration()}",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface
         )

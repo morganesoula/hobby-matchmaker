@@ -8,11 +8,10 @@ expect fun YoutubePlayer(modifier: Modifier = Modifier, videoId: String, onClose
 
 @Composable
 fun VideoPlayer(
-    modifier: Modifier = Modifier,
     videoId: String,
-    onPlayerClosing: () -> Unit
+    onDismiss: () -> Unit
 ) {
     YoutubePlayer(videoId = videoId) {
-        onPlayerClosing()
+        onDismiss()
     }
 }

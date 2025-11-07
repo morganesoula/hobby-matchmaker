@@ -32,10 +32,3 @@ fun SpacerWidth8(modifier: Modifier = Modifier) {
 fun ColumnScope.SpacerWeight1(modifier: Modifier = Modifier) {
     Spacer(modifier = modifier.weight(1f))
 }
-
-@Composable
-fun ColumnScope.SpacerWeight2(modifier: Modifier = Modifier) {
-    Spacer(modifier = modifier.weight(2f))
-}
-
-
