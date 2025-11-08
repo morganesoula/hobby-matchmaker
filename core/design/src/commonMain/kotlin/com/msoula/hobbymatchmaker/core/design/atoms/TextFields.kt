@@ -1,8 +1,11 @@
 package com.msoula.hobbymatchmaker.core.design.atoms
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -11,12 +14,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
-import com.msoula.hobbymatchmaker.core.design.component.rememberSubmitKeyBoardActions
+import com.msoula.hobbymatchmaker.core.design.theme.CustomFontSize
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.HMMTextFieldColors
 import com.msoula.hobbymatchmaker.core.design.theme.IconSize
@@ -28,14 +35,14 @@ fun PrimaryTextField(
     label: String,
     contentDescription: String,
     singleLine: Boolean,
-    onEvent: (String) -> Unit,
+    onValueChanged: (String) -> Unit,
     icon: ImageVector? = null,
     keyboardOptions: KeyboardOptions? = null,
     keyboardActions: KeyboardActions? = null
 ) {
     OutlinedTextField(
         value = text,
-        onValueChange = { onEvent(it) },
+        onValueChange = { onValueChanged(it) },
         label = { Text(text = label) },
         leadingIcon = {
             icon?.let {
@@ -90,5 +97,56 @@ fun PasswordTextField(
             imeAction = ImeAction.Done
         ),
         keyboardActions = keyboardActions ?: KeyboardActions.Default
+    )
+}
+
+
+@Composable
+fun TextFieldHelper(
+    modifier: Modifier = Modifier,
+    isVisible: MutableState<Boolean>,
+    titleHint: String,
+    hint: String,
+) {
+    if (isVisible.value) {
+        Row(
+            modifier =
+                modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            Text(text = titleHint, fontSize = CustomFontSize.Twelve)
+            Text(
+                text = hint,
+                fontSize = CustomFontSize.Twelve,
+            )
+        }
+        SpacerHeight4()
+    }
+}
+
+@Composable
+fun rememberSubmitKeyBoardActions(onSubmit: (() -> Unit)?): KeyboardActions {
+    val keyboard = LocalSoftwareKeyboardController.current
+    val focus = LocalFocusManager.current
+
+    return KeyboardActions(
+        onNext = { focus.moveFocus(FocusDirection.Down) },
+        onDone = {
+            onSubmit?.let { it() }
+            keyboard?.hide()
+            focus.clearFocus(force = true)
+        },
+        onSend = {
+            onSubmit?.let { it() }
+            keyboard?.hide()
+            focus.clearFocus(force = true)
+        },
+        onGo = {
+            onSubmit?.let { it() }
+            keyboard?.hide()
+            focus.clearFocus(force = true)
+        }
     )
 }

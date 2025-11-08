@@ -1,15 +1,20 @@
 package com.msoula.hobbymatchmaker.core.design.atoms
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.no_data
+import com.msoula.hobbymatchmaker.core.design.util.UIText
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -93,4 +98,19 @@ fun EmptyDataText(
         modifier = modifier,
         style = MaterialTheme.typography.bodyLarge
     )
+}
+
+@Composable
+fun Modifier.keyboardDismissOnTap(): Modifier {
+    val controller = LocalSoftwareKeyboardController.current
+    return clickable(
+        indication = null,
+        interactionSource = remember { MutableInteractionSource() }
+    ) { controller?.hide() }
+}
+
+@Composable
+fun UIText.asString(): String = when (this) {
+    is UIText.Plain -> value
+    is UIText.Resource -> stringResource(res, *args.toTypedArray())
 }

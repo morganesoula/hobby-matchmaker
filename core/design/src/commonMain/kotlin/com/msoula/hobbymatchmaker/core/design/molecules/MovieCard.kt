@@ -48,9 +48,9 @@ import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.design.atoms.FavoriteButton
 import com.msoula.hobbymatchmaker.core.design.atoms.MovieGenericCard
 import com.msoula.hobbymatchmaker.core.design.atoms.RatingChip
-import com.msoula.hobbymatchmaker.core.design.component.ErrorPosterPlaceholder
-import com.msoula.hobbymatchmaker.core.design.component.HMMShimmerEffect
-import com.msoula.hobbymatchmaker.core.design.component.LoadingPosterPlaceholder
+import com.msoula.hobbymatchmaker.core.design.atoms.ErrorPosterPlaceholder
+import com.msoula.hobbymatchmaker.core.design.atoms.HMMShimmerEffect
+import com.msoula.hobbymatchmaker.core.design.atoms.LoadingPosterPlaceholder
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.delay
 import org.koin.compose.koinInject

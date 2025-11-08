@@ -21,13 +21,13 @@ import com.msoula.hobbymatchmaker.core.design.CallOnceEffect
 import com.msoula.hobbymatchmaker.core.design.ObserveEvents
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.SnackEffect
-import com.msoula.hobbymatchmaker.core.design.component.LoadingCircularProgress
+import com.msoula.hobbymatchmaker.core.design.atoms.LoadingCircularProgress
 import com.msoula.hobbymatchmaker.core.design.molecules.NavigationTopBar
 import com.msoula.hobbymatchmaker.core.design.no_fetching_detail_possible
 import com.msoula.hobbymatchmaker.core.design.organisms.MovieCarousel
 import com.msoula.hobbymatchmaker.core.design.templates.MovieLayout
 import com.msoula.hobbymatchmaker.core.design.util.UIText
-import com.msoula.hobbymatchmaker.core.design.util.asString
+import com.msoula.hobbymatchmaker.core.design.atoms.asString
 import com.msoula.hobbymatchmaker.features.movies.presentation.mappers.toCarouselItems
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiEventModel

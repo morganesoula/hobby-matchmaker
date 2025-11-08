@@ -29,7 +29,7 @@ import com.msoula.hobbymatchmaker.core.design.atoms.PrimaryButton
 import com.msoula.hobbymatchmaker.core.design.atoms.PrimaryTextField
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
-import com.msoula.hobbymatchmaker.core.design.component.rememberSubmitKeyBoardActions
+import com.msoula.hobbymatchmaker.core.design.atoms.rememberSubmitKeyBoardActions
 import com.msoula.hobbymatchmaker.core.design.email
 import com.msoula.hobbymatchmaker.core.design.forgot_password
 import com.msoula.hobbymatchmaker.core.design.hide_password
@@ -58,7 +58,7 @@ fun SignInForm(
         label = stringResource(Res.string.email),
         contentDescription = stringResource(Res.string.email),
         singleLine = true,
-        onEvent = onEmailChanged,
+        onValueChanged = onEmailChanged,
         icon = Icons.Default.Email
     )
 

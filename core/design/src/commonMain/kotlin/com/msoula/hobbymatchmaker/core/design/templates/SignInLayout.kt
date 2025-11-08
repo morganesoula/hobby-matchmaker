@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWeight1
-import com.msoula.hobbymatchmaker.core.design.component.keyboardDismissOnTap
+import com.msoula.hobbymatchmaker.core.design.atoms.keyboardDismissOnTap
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 
 @Composable

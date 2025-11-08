@@ -24,8 +24,8 @@ import com.msoula.hobbymatchmaker.core.design.CallOnceEffect
 import com.msoula.hobbymatchmaker.core.design.ObserveEvents
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.SnackEffect
-import com.msoula.hobbymatchmaker.core.design.component.LoadingCircularProgress
-import com.msoula.hobbymatchmaker.core.design.component.LoadingOverlay
+import com.msoula.hobbymatchmaker.core.design.atoms.LoadingCircularProgress
+import com.msoula.hobbymatchmaker.core.design.atoms.LoadingOverlay
 import com.msoula.hobbymatchmaker.core.design.connection_issue
 import com.msoula.hobbymatchmaker.core.design.molecules.BackNavigationTopBar
 import com.msoula.hobbymatchmaker.core.design.no_data
@@ -34,7 +34,7 @@ import com.msoula.hobbymatchmaker.core.design.organisms.ActorSection
 import com.msoula.hobbymatchmaker.core.design.organisms.MovieDetailInformation
 import com.msoula.hobbymatchmaker.core.design.templates.MovieDetailLayout
 import com.msoula.hobbymatchmaker.core.design.util.UIText
-import com.msoula.hobbymatchmaker.core.design.util.asString
+import com.msoula.hobbymatchmaker.core.design.atoms.asString
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiEventModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailViewStateModel

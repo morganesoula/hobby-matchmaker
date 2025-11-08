@@ -6,8 +6,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
+import com.msoula.hobbymatchmaker.core.design.atoms.asString
 import com.msoula.hobbymatchmaker.core.design.util.UIText
-import com.msoula.hobbymatchmaker.core.design.util.asString
 import kotlinx.coroutines.flow.Flow
 
 @Composable

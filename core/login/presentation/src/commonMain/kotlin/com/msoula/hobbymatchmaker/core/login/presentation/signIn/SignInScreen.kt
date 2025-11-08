@@ -1,13 +1,11 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.signIn
 
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
@@ -20,19 +18,24 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.design.CallOnceEffect
 import com.msoula.hobbymatchmaker.core.design.ObserveEvents
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.SnackEffect
+import com.msoula.hobbymatchmaker.core.design.atoms.PrimaryAlertDialog
+import com.msoula.hobbymatchmaker.core.design.atoms.PrimaryTextField
 import com.msoula.hobbymatchmaker.core.design.cancel
-import com.msoula.hobbymatchmaker.core.design.component.HMMTextFieldAuthComponent
+import com.msoula.hobbymatchmaker.core.design.continue_as_guest_create_redirect_button
+import com.msoula.hobbymatchmaker.core.design.continue_as_guest_dialog_text
+import com.msoula.hobbymatchmaker.core.design.continue_as_guest_dialog_title
+import com.msoula.hobbymatchmaker.core.design.continue_as_guest_dont_ask_again
+import com.msoula.hobbymatchmaker.core.design.continue_as_guest_validation_button
 import com.msoula.hobbymatchmaker.core.design.continue_with_rs
+import com.msoula.hobbymatchmaker.core.design.forgot_password
 import com.msoula.hobbymatchmaker.core.design.forgot_password_title
 import com.msoula.hobbymatchmaker.core.design.molecules.LabeledDivider
 import com.msoula.hobbymatchmaker.core.design.organisms.AuthenticationScreenBottom
@@ -44,7 +47,6 @@ import com.msoula.hobbymatchmaker.core.design.templates.SignInLayout
 import com.msoula.hobbymatchmaker.core.design.util.UIText
 import com.msoula.hobbymatchmaker.core.design.your_email
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient
-import com.msoula.hobbymatchmaker.core.login.presentation.components.GuestModeDialog
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthUiEventModel
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.models.ResetPasswordEvent
@@ -69,6 +71,7 @@ fun SignInScreenContent(
 
     val snackBarHostState = remember { SnackbarHostState() }
     var showGuestDialog by rememberSaveable { mutableStateOf(false) }
+    var dontAskGuestDialog by rememberSaveable { mutableStateOf(false) }
 
     ObserveEvents(oneTimeEventChannelFlow) { event ->
         when (event) {
@@ -176,88 +179,68 @@ fun SignInScreenContent(
         },
         overlayContent = { paddingValues ->
             if (openResetDialog) {
-                ForgotPasswordAlertDialog(
-                    email = signInFormState.emailReset,
+                PrimaryAlertDialog(
                     paddingValues = paddingValues,
-                    enableSubmit = signInFormState.submitEmailReset,
-                    onEvent = signInViewModel::onEvent,
-                    isLoading = resetPasswordState == ResetPasswordEvent.Loading
-                )
-            }
-
-            GuestModeDialog(
-                show = showGuestDialog,
-                onDismiss = { showGuestDialog = false },
-                onContinue = { dontAskAgain ->
-                    signInViewModel.onEvent(
-                        AuthenticationUIEvent.OnContinueAsGuestConfirmed(dontAskAgain)
-                    )
-                    redirectToMovieScreen()
-                },
-                onCreateAccount = redirectToSignUpScreen
-            )
-        }
-    )
-}
-
-
-@Composable
-fun ForgotPasswordAlertDialog(
-    modifier: Modifier = Modifier,
-    email: String,
-    onEvent: (AuthenticationUIEvent) -> Unit,
-    paddingValues: PaddingValues,
-    enableSubmit: Boolean,
-    isLoading: Boolean
-) {
-    val keyboardController = LocalSoftwareKeyboardController.current
-
-    AlertDialog(
-        modifier = modifier.padding(paddingValues),
-        title = {
-            Text(
-                text = stringResource(Res.string.forgot_password_title),
-                fontSize = 16.sp,
-                textAlign = TextAlign.Center
-            )
-        },
-        text = {
-            HMMTextFieldAuthComponent(
-                value = email,
-                onValueChange = {
-                    onEvent(AuthenticationUIEvent.OnEmailResetChanged(it))
-                },
-                label = stringResource(Res.string.your_email),
-                modifier = Modifier.fillMaxWidth()
-            )
-        },
-        onDismissRequest = { onEvent(AuthenticationUIEvent.HideForgotPasswordDialog) },
-        confirmButton = {
-            if (isLoading) {
-                CircularProgressIndicator()
-            } else {
-                Button(
-                    onClick = {
-                        keyboardController?.hide()
-                        onEvent(AuthenticationUIEvent.OnResetPasswordConfirmed)
-                    },
-                    enabled = enableSubmit
+                    title = stringResource(Res.string.forgot_password),
+                    confirmButtonText = stringResource(Res.string.reset_password),
+                    cancelButtonText = stringResource(Res.string.cancel),
+                    isEnabled = signInFormState.submitEmailReset,
+                    isLoading = resetPasswordState == ResetPasswordEvent.Loading,
+                    onDismiss = { signInViewModel.onEvent(AuthenticationUIEvent.HideForgotPasswordDialog) },
+                    onConfirm = { signInViewModel.onEvent(AuthenticationUIEvent.OnResetPasswordConfirmed) }
                 ) {
-                    Text(text = stringResource(Res.string.reset_password))
+                    PrimaryTextField(
+                        text = stringResource(Res.string.forgot_password_title),
+                        label = stringResource(Res.string.your_email),
+                        contentDescription = stringResource(Res.string.your_email),
+                        singleLine = true,
+                        onValueChanged = {
+                            signInViewModel.onEvent(
+                                AuthenticationUIEvent.OnEmailResetChanged(
+                                    it
+                                )
+                            )
+                        }
+                    )
                 }
             }
 
-        },
-        dismissButton = {
-            Button(
-                onClick = { onEvent(AuthenticationUIEvent.HideForgotPasswordDialog) },
-                colors =
-                    ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                        contentColor = MaterialTheme.colorScheme.onBackground
-                    )
-            ) {
-                Text(text = stringResource(Res.string.cancel))
+            if (showGuestDialog) {
+                PrimaryAlertDialog(
+                    paddingValues = paddingValues,
+                    title = stringResource(Res.string.continue_as_guest_dialog_title),
+                    confirmButtonText = stringResource(Res.string.continue_as_guest_validation_button),
+                    cancelButtonText = stringResource(
+                        Res.string.continue_as_guest_create_redirect_button
+                    ),
+                    isEnabled = true,
+                    isLoading = false,
+                    onDismiss = {
+                        showGuestDialog = false
+                        redirectToSignUpScreen()
+                    },
+                    onConfirm = {
+                        showGuestDialog = false
+                        signInViewModel.onEvent(
+                            AuthenticationUIEvent.OnContinueAsGuestConfirmed(dontAskGuestDialog)
+                        )
+                        redirectToMovieScreen()
+                    }
+                ) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(stringResource(Res.string.continue_as_guest_dialog_text))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Checkbox(
+                                checked = dontAskGuestDialog,
+                                onCheckedChange = { dontAskGuestDialog = it })
+                            Text(stringResource(Res.string.continue_as_guest_dont_ask_again))
+                        }
+                    }
+                }
             }
         }
     )

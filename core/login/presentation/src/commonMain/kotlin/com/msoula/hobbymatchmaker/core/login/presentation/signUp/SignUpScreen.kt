@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import com.msoula.hobbymatchmaker.core.design.CallOnceEffect
 import com.msoula.hobbymatchmaker.core.design.ObserveEvents
 import com.msoula.hobbymatchmaker.core.design.SnackEffect
-import com.msoula.hobbymatchmaker.core.design.component.LoadingOverlay
+import com.msoula.hobbymatchmaker.core.design.atoms.LoadingOverlay
 import com.msoula.hobbymatchmaker.core.design.organisms.AuthenticationScreenBottom
 import com.msoula.hobbymatchmaker.core.design.organisms.AuthenticationScreenTop
 import com.msoula.hobbymatchmaker.core.design.organisms.SignUpForm
