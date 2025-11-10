@@ -1,4 +1,4 @@
-package presentation
+package com.msoula.hobbymatchmaker.core.navigation.presentation
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

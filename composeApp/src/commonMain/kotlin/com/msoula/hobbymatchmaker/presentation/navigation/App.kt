@@ -7,7 +7,7 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.design.theme.HobbyMatchMakerTheme
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SocialUIClient
-import presentation.AppNavHost
+import com.msoula.hobbymatchmaker.core.navigation.presentation.AppNavHost
 
 @Composable
 fun App(

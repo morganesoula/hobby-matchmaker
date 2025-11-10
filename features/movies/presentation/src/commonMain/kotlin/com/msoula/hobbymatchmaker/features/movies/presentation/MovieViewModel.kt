@@ -6,11 +6,17 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.models.AuthState
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfo
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutUseCase
 import com.msoula.hobbymatchmaker.core.common.AppResult
-import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.getDeviceLocale
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
+import com.msoula.hobbymatchmaker.core.design.Res
+import com.msoula.hobbymatchmaker.core.design.connection_issue
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
+import com.msoula.hobbymatchmaker.core.design.util.RetryPolicy
+import com.msoula.hobbymatchmaker.core.design.util.UIErrorHint
+import com.msoula.hobbymatchmaker.core.design.util.UIText
+import com.msoula.hobbymatchmaker.core.design.util.UiEvent
+import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.CheckMovieSynopsisValueUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesSuccess
@@ -18,23 +24,24 @@ import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMovi
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.SetMovieFavoriteUseCase
 import com.msoula.hobbymatchmaker.features.movies.presentation.mappers.toMovieUiModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
-import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiEventModel
-import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiStateModel
+import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+
+typealias MovieUiStateModel = UiState<List<MovieUiModel>>
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class MovieViewModel(
     private val setMovieFavoriteUseCase: SetMovieFavoriteUseCase,
-    observeAllMoviesUseCase: ObserveAllMoviesUseCase,
+    val observeAllMoviesUseCase: ObserveAllMoviesUseCase,
     private val fetchFirebaseUserInfo: FetchFirebaseUserInfo,
     private val logOutUseCase: LogOutUseCase,
     private val checkMovieSynopsisValueUseCase: CheckMovieSynopsisValueUseCase,
@@ -42,51 +49,60 @@ class MovieViewModel(
     private val defaultMessageMapper: ErrorMessageMapper,
     externalScope: CoroutineScope? = null
 ) : ViewModel() {
+
     private val scope = externalScope ?: viewModelScope
-    private val _oneTimeEventChannel = Channel<MovieUiEventModel>()
-    val oneTimeEventChannelFlow = _oneTimeEventChannel.receiveAsFlow()
+    private val _events: Channel<UiEvent> = Channel(Channel.BUFFERED)
+    val events: Flow<UiEvent> = _events.receiveAsFlow()
+
     private val language = getDeviceLocale()
 
-    val movieState: StateFlow<MovieUiStateModel> =
-        observeAllMoviesUseCase(language).mapLatest { result ->
-            when (result) {
-                is AppResult.Success -> {
-                    when (val payload = result.data) {
-                        is ObserveAllMoviesSuccess.Success -> {
-                            MovieUiStateModel.Success(
-                                payload.movies.map { it.toMovieUiModel() }
-                            )
+    private val _screenState = MutableStateFlow<UiState<List<MovieUiModel>>>(UiState.Loading)
+    val screenState = _screenState.asStateFlow()
+
+    init {
+        observeMovies()
+    }
+
+    fun observeMovies() {
+        scope.launch {
+            observeAllMoviesUseCase(language).collect { result ->
+                _screenState.update {
+                    when (result) {
+                        is AppResult.Success -> {
+                            when (val payload = result.data) {
+                                is ObserveAllMoviesSuccess.Success -> {
+                                    val movies = payload.movies.map { it.toMovieUiModel() }
+                                    if (movies.isEmpty()) UiState.Empty else UiState.Success(movies)
+                                }
+
+                                is ObserveAllMoviesSuccess.DataLoadedInDB -> UiState.Loading
+                            }
                         }
 
-                        is ObserveAllMoviesSuccess.DataLoadedInDB -> MovieUiStateModel.Loading
+                        is AppResult.Failure -> {
+                            UiState.Error(
+                                error = defaultMessageMapper.toUIText(result.error),
+                                hint = UIErrorHint(retry = RetryPolicy.Manual)
+                            )
+                        }
                     }
-                }
-
-                is AppResult.Failure -> {
-                    MovieUiStateModel.Error(
-                        defaultMessageMapper.toUIText(result.error)
-                    )
                 }
             }
         }
-            .stateIn(
-                scope,
-                SharingStarted.WhileSubscribed(5000),
-                MovieUiStateModel.Loading
-            )
+    }
 
     fun logOut() {
         scope.launch {
             logOutUseCase()
-                .onFailure {
-                    _oneTimeEventChannel.send(
-                        MovieUiEventModel.OnLogOutFailure(
-                            defaultMessageMapper.toUIText(it)
+                .onFailure { error ->
+                    sendEvent(
+                        UiEvent.ShowSnackBar(
+                            defaultMessageMapper.toUIText(error)
                         )
                     )
                 }
                 .onSuccess {
-                    _oneTimeEventChannel.send(MovieUiEventModel.OnLogOutSuccess)
+                    sendEvent(UiEvent.NavigateToRoute("sign_in"))
                 }
         }
     }
@@ -100,17 +116,14 @@ class MovieViewModel(
             }
 
             is CardEventModel.OnSingleTap -> {
-                Logger.d("Detect single tap on card")
                 scope.launch {
-                    val eventToSend = handleSingleTap(event.movieId)
-                    Logger.d("Event to send: $eventToSend")
-                    sendOnce(eventToSend)
+                    handleSingleTap(event.movieId)
                 }
             }
         }
     }
 
-    internal suspend fun handleSingleTap(movieId: Long): MovieUiEventModel {
+    internal suspend fun handleSingleTap(movieId: Long) {
         val localResult = checkMovieSynopsisValueUseCase(movieId)
         val hasConnectivity = connectivityCheck.hasActiveConnection()
 
@@ -119,50 +132,43 @@ class MovieViewModel(
             is AppResult.Failure -> false
         }
 
-        return when {
-            hasLocal || hasConnectivity -> MovieUiEventModel.OnMovieDetailClicked(movieId)
-            else -> MovieUiEventModel.NoFetchingDetailPossible
+        if (hasLocal || hasConnectivity) {
+            sendEvent(UiEvent.NavigateToDetail(movieId))
+        } else {
+            sendEvent(
+                UiEvent.ShowSnackBar(
+                    UIText.Resource(Res.string.connection_issue)
+                )
+            )
         }
     }
 
     private suspend fun toggleFavorite(movieId: Long, isFavorite: Boolean) {
         fetchFirebaseUserInfo()
-            .onFailure {
-                val uiError = defaultMessageMapper.toUIText(it)
-                _oneTimeEventChannel.trySend(MovieUiEventModel.ShowError(uiError))
+            .onFailure { error ->
+                sendEvent(
+                    UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
+                )
             }
             .onSuccess { state ->
-                when (state) {
-                    is AuthState.Authenticated -> {
-                        val uid = state.user.uid
-                        setMovieFavoriteUseCase(uid ?: "", movieId, isFavorite)
-                            .onFailure {
-                                val uiError = defaultMessageMapper.toUIText(it)
-                                _oneTimeEventChannel.trySend(MovieUiEventModel.ShowError(uiError))
-                            }
-                            .onSuccess {
-                                Unit
-                            }
-                    }
-
-                    AuthState.SignedOut -> {
-                        setMovieFavoriteUseCase("", movieId, isFavorite)
-                            .onFailure {
-                                val uiError = defaultMessageMapper.toUIText(it)
-                                _oneTimeEventChannel.trySend(MovieUiEventModel.ShowError(uiError))
-                            }
-                            .onSuccess {
-                                Unit
-                            }
-                    }
+                val uid = when (state) {
+                    is AuthState.Authenticated -> state.user.uid
+                    AuthState.SignedOut -> ""
                 }
+
+                setMovieFavoriteUseCase(uid, movieId, isFavorite)
+                    .onFailure { error ->
+                        sendEvent(
+                            UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
+                        )
+                    }
             }
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    private suspend fun sendOnce(event: MovieUiEventModel) {
-        if (!_oneTimeEventChannel.isClosedForSend) {
-            _oneTimeEventChannel.send(event)
+    private suspend fun sendEvent(event: UiEvent) {
+        if (!_events.isClosedForSend) {
+            _events.send(event)
         }
     }
 }

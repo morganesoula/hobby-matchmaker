@@ -52,6 +52,7 @@
     <string name="reset_password_error">Impossible de réinitialiser votre mot de passe</string>
     <string name="malformed_sign_in_error">Identifiants incorrects. Veuillez vérifier vos informations.</string>
     <string name="connection_issue">Problème de connexion. Veuillez vérifier votre réseau</string>
+    <string name="error_issue_retry">Ressayer</string>
 
     // OTHER
     <string name="continue_as_guest_button_title">Continuer en tant qu'invité</string>

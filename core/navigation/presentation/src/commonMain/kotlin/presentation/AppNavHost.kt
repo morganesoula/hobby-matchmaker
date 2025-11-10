@@ -1,4 +1,4 @@
-package presentation
+package com.msoula.hobbymatchmaker.core.navigation.presentation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -110,27 +110,27 @@ fun AppNavHost(
         }
 
         composable<Movies> {
-            val movieViewModel = koinViewModel<MovieViewModel>()
-            val moviesState by movieViewModel.movieState.collectAsState()
+            val movieViewModel: MovieViewModel = koinViewModel()
 
             MovieContent(
                 modifier = Modifier,
                 movieViewModel = movieViewModel,
-                movieState = moviesState,
-                oneTimeEventChannelFlow = movieViewModel.oneTimeEventChannelFlow,
-                redirectToMovieDetail = { movieId -> nav.navigate(MovieDetail(movieId)) },
-                redirectToAuth = {
-                    nav.navigate(Auth) {
-                        popUpTo<Movies> { inclusive = true }
-                        launchSingleTop = true
+                onNavigate = { route ->
+                    when (route) {
+                        "sign_in" -> nav.navigate(SignIn) {
+                            popUpTo<Movies> { inclusive = true }
+                            launchSingleTop = true
+                        }
+
+                        "profile" -> nav.navigate(Profile) {
+                            popUpTo<Movies> { inclusive = true }
+                            launchSingleTop = true
+                        }
+
+                        else -> return@MovieContent
                     }
                 },
-                redirectToProfile = {
-                    nav.navigate(Profile) {
-                        popUpTo<Movies> { inclusive = true }
-                        launchSingleTop = true
-                    }
-                }
+                onNavigateToDetail = { movieId -> nav.navigate(MovieDetail(movieId)) }
             )
         }
 
@@ -141,13 +141,14 @@ fun AppNavHost(
                 parameters = { parametersOf(movieId) }
             )
 
-            val viewState by movieDetailViewModel.viewState.collectAsState()
-
             MovieDetailContent(
-                oneTimeEventFlow = movieDetailViewModel.oneTimeEventChannelFlow,
-                viewState = viewState,
-                onPlayTrailerClicked = movieDetailViewModel::onEvent,
-                onMovieDetailBackPressed = { nav.popBackStack() },
+                movieDetailViewModel = movieDetailViewModel,
+                onNavigate = { route ->
+                    when (route) {
+                        "movies" -> nav.popBackStack()
+                        else -> return@MovieDetailContent
+                    }
+                }
             )
         }
 

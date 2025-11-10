@@ -52,6 +52,7 @@
     <string name="malformed_sign_in_error">Oops, please check your credentials</string>
     <string name="connection_issue">Connection issue. Please check your network</string>
     <string name="rest_password_other_error">An error occurred. Please contact the development team.</string>
+    <string name="error_issue_retry">Retry</string>
 
     // OTHER
     <string name="continue_as_guest_button_title">Continue as guest</string>

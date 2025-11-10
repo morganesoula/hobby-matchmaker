@@ -2,7 +2,7 @@ package com.msoula.hobbymatchmaker.core.design.util
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 
-enum class RetryPolicy { Never, WithBackoff }
+enum class RetryPolicy { Manual, Never, WithBackoff }
 
 data class UIErrorHint(
     val retry: RetryPolicy = RetryPolicy.Never,

@@ -8,87 +8,84 @@ import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.getDeviceLocale
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
+import com.msoula.hobbymatchmaker.core.design.Res
+import com.msoula.hobbymatchmaker.core.design.connection_issue
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
-import com.msoula.hobbymatchmaker.core.design.util.route
+import com.msoula.hobbymatchmaker.core.design.util.RetryPolicy
+import com.msoula.hobbymatchmaker.core.design.util.UIErrorHint
+import com.msoula.hobbymatchmaker.core.design.util.UIText
+import com.msoula.hobbymatchmaker.core.design.util.UiEvent
+import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ManageMovieTrailerUseCase
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieDetailUseCase
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieSuccess
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiEventModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailViewStateModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.toMovieDetailUiModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MovieDetailViewModel(
-    movieId: Long,
-    observeMovieDetailUseCase: ObserveMovieDetailUseCase,
+    private val movieId: Long,
+    private val observeMovieDetailUseCase: ObserveMovieDetailUseCase,
     private val manageMovieTrailerUseCase: ManageMovieTrailerUseCase,
     private val connectivityCheck: NetworkConnectivityChecker,
     private val defaultErrorMessageMapper: ErrorMessageMapper,
     externalScope: CoroutineScope? = null
 ) : ViewModel() {
     val scope = externalScope ?: viewModelScope
-    private val _oneTimeEventChannel: Channel<MovieDetailUiEventModel>
-        get() = Channel<MovieDetailUiEventModel>()
-    val oneTimeEventChannelFlow = _oneTimeEventChannel.receiveAsFlow()
+
+    private val _events: Channel<UiEvent> = Channel(Channel.BUFFERED)
+    val events = _events.receiveAsFlow()
+
+    private val _screenState = MutableStateFlow<UiState<MovieDetailUiModel>>(UiState.Loading)
+    val screenState = _screenState.asStateFlow()
+
     private var currentMovie: MovieDetailUiModel? = MovieDetailUiModel()
     private val language = getDeviceLocale()
 
-    val viewState: StateFlow<MovieDetailViewStateModel> =
-        observeMovieDetailUseCase(movieId, language)
-            .onStart {
-                Logger.d("Inside MovieDetailVM with movieId: $movieId")
-            }
-            .map { result ->
-                when (result) {
-                    is AppResult.Success -> {
-                        when (val success = result.data) {
-                            is ObserveMovieSuccess.Success -> {
-                                currentMovie = success.data.toMovieDetailUiModel()
-                                MovieDetailViewStateModel.Success(requireNotNull(currentMovie))
+    init {
+        observeMovieDetail()
+    }
+
+    fun observeMovieDetail() {
+        scope.launch {
+            observeMovieDetailUseCase(movieId, language)
+                .onStart {
+                    Logger.d("Inside MovieDetailVM with movieId: $movieId")
+                }
+                .collect { result ->
+                    _screenState.update {
+                        when (result) {
+                            is AppResult.Success -> {
+                                when (val payload = result.data) {
+                                    is ObserveMovieSuccess.Success -> {
+                                        currentMovie = payload.data.toMovieDetailUiModel()
+                                        UiState.Success(requireNotNull(currentMovie))
+                                    }
+
+                                    is ObserveMovieSuccess.DataLoadedInDB -> UiState.Loading
+                                }
                             }
 
-                            is ObserveMovieSuccess.DataLoadedInDB -> MovieDetailViewStateModel.Loading
+                            is AppResult.Failure -> UiState.Error(
+                                error = defaultErrorMessageMapper.toUIText(result.error),
+                                hint = UIErrorHint(retry = RetryPolicy.Manual)
+                            )
                         }
                     }
 
-                    is AppResult.Failure -> {
-                        val event = result.error.route(
-                            onConnectivity = {
-                                MovieDetailViewStateModel.Error(
-                                    defaultErrorMessageMapper.toUIText(result.error)
-                                )
-                            },
-                            onUserActionRequired = {
-                                MovieDetailViewStateModel.Error(
-                                    defaultErrorMessageMapper.toUIText(result.error)
-                                )
-                            },
-                            onOther = {
-                                MovieDetailViewStateModel.Error(
-                                    defaultErrorMessageMapper.toUIText(result.error)
-                                )
-                            }
-                        )
-                        event
-                    }
                 }
-            }
-            .stateIn(
-                scope = scope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = MovieDetailViewStateModel.Loading
-            )
+        }
+    }
 
     fun onEvent(event: MovieDetailUiEventModel) {
         when (event) {
@@ -108,41 +105,27 @@ class MovieDetailViewModel(
     @VisibleForTesting
     internal suspend fun onPlayTrailerClicked(movieId: Long, isVideoURIknown: Boolean) {
         if (isVideoURIknown) {
-            sendOnce(
-                if (connectivityCheck.hasActiveConnection())
-                    MovieDetailUiEventModel.OnPlayMovieTrailerReady(
-                        currentMovie?.videoKey.orEmpty()
-                    )
-                else MovieDetailUiEventModel.NoConnection
-            )
+            if (connectivityCheck.hasActiveConnection()) {
+                sendEvent(UiEvent.OnDataReady(currentMovie?.videoKey.orEmpty()))
+            } else {
+                sendEvent(UiEvent.ShowSnackBar(UIText.Resource(Res.string.connection_issue)))
+            }
             return
         }
 
-        sendOnce(MovieDetailUiEventModel.LoadingTrailer)
-
         manageMovieTrailerUseCase(movieId, language)
-            .onFailure {
-                sendOnce(
-                    it.route(
-                        onConnectivity = { MovieDetailUiEventModel.NoConnection },
-                        onUserActionRequired = { MovieDetailUiEventModel.ErrorFetchingTrailer },
-                        onOther = { MovieDetailUiEventModel.ErrorFetchingTrailer }
-                    )
-                )
+            .onFailure { error ->
+                sendEvent(UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(error)))
             }
-            .onSuccess {
-                sendOnce(
-                    MovieDetailUiEventModel.OnPlayMovieTrailerReady(
-                        it.videoURI
-                    )
-                )
+            .onSuccess { data ->
+                sendEvent(UiEvent.OnDataReady(data.videoURI))
             }
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    private suspend fun sendOnce(event: MovieDetailUiEventModel) {
-        if (!_oneTimeEventChannel.isClosedForSend) {
-            _oneTimeEventChannel.send(event)
+    private fun sendEvent(event: UiEvent) {
+        if (!_events.isClosedForSend) {
+            _events.trySend(event)
         }
     }
 }
