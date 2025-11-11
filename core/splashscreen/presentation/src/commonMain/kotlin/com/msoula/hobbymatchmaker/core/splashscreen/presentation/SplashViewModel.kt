@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveIsConnectedUseCase
-import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveShouldShowGuestDialogUseCase
+import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveDontAskCheckboxValueUseCase
 import com.msoula.hobbymatchmaker.core.splashscreen.presentation.model.SplashUiState
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.SyncLocalFavoritesToCloudUseCase
 import kotlinx.coroutines.delay
@@ -17,7 +17,7 @@ import kotlinx.coroutines.withTimeout
 
 class SplashViewModel(
     private val observeIsConnectedUseCase: ObserveIsConnectedUseCase,
-    private val observeShouldShowGuestDialogUseCase: ObserveShouldShowGuestDialogUseCase,
+    private val observeShouldShowGuestDialogUseCase: ObserveDontAskCheckboxValueUseCase,
     private val syncLocalFavoritesToCloudUseCase: SyncLocalFavoritesToCloudUseCase
 ) : ViewModel() {
 

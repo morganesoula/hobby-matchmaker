@@ -23,8 +23,8 @@ class SessionRepositoryImpl(
     override suspend fun setShouldShowGuestDialog(shouldShow: Boolean) =
         sessionLocalDataSource.setShouldShowGuestDialog(shouldShow)
 
-    override fun observeShouldShowGuestDialog(): Flow<Boolean> =
-        sessionLocalDataSource.observeShouldShowGuestDialog()
+    override fun observeDontAskCheckboxValue(): Flow<Boolean> =
+        sessionLocalDataSource.observeDontAskCheckboxValue()
 
     override suspend fun setCurrentUserUid(uid: String) =
         sessionLocalDataSource.setCurrentUid(uid)

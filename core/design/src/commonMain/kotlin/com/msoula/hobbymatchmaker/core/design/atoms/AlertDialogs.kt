@@ -23,6 +23,7 @@ fun PrimaryAlertDialog(
     cancelButtonText: String,
     isEnabled: Boolean,
     isLoading: Boolean,
+    onCancel: () -> Unit,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
     content: @Composable () -> Unit
@@ -39,7 +40,7 @@ fun PrimaryAlertDialog(
             )
         },
         text = { content() },
-        onDismissRequest = onDismiss,
+        onDismissRequest = { onDismiss() },
         confirmButton = {
             if (isLoading) {
                 CircularProgressIndicator()
@@ -57,7 +58,7 @@ fun PrimaryAlertDialog(
         },
         dismissButton = {
             Button(
-                onClick = { onDismiss() },
+                onClick = { onCancel() },
                 colors =
                     ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.background,

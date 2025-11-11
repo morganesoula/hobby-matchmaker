@@ -3,14 +3,10 @@ package com.msoula.hobbymatchmaker.core.design.organisms
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -48,7 +44,6 @@ import org.jetbrains.compose.resources.stringResource
  * @param isSignInScreen True for SignIn screen, false for SignUp screen
  * @param onNavigateToOppositeScreen Callback to navigate to the opposite auth screen
  * @param onContinueAsGuest Callback when guest button is clicked (only for SignIn)
- * @param isGuestLoading Loading state for guest button
  * @param guestButtonEnabled Whether the guest button is enabled
  */
 @Composable
@@ -57,7 +52,6 @@ fun AuthenticationScreenBottom(
     isSignInScreen: Boolean,
     onNavigateToOppositeScreen: () -> Unit,
     onContinueAsGuest: () -> Unit = {},
-    isGuestLoading: Boolean = false,
     guestButtonEnabled: Boolean = true
 ) {
     val linkColor = if (isSystemInDarkTheme()) Color(0, 191, 255) else Color.Blue
@@ -96,7 +90,7 @@ fun AuthenticationScreenBottom(
     if (isSignInScreen) {
         OutlinedButton(
             onClick = onContinueAsGuest,
-            enabled = guestButtonEnabled && !isGuestLoading,
+            enabled = guestButtonEnabled,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
@@ -109,14 +103,6 @@ fun AuthenticationScreenBottom(
                 contentColor = MaterialTheme.colorScheme.onSurface
             )
         ) {
-            if (isGuestLoading) {
-                CircularProgressIndicator(
-                    strokeWidth = CustomSize.Two,
-                    modifier = Modifier.size(CustomSize.Sixteen)
-                )
-                Spacer(Modifier.width(CustomSize.Eight))
-            }
-
             Text(
                 text = stringResource(Res.string.continue_as_guest_button_title),
                 style = MaterialTheme.typography.bodyMedium,

@@ -8,7 +8,7 @@ interface SessionLocalDataSource {
     suspend fun setIsConnected(isConnected: Boolean): AppResult<Unit, AppError>
     fun observeIsConnected(): Flow<Boolean>
     suspend fun setShouldShowGuestDialog(shouldShow: Boolean): AppResult<Unit, AppError>
-    fun observeShouldShowGuestDialog(): Flow<Boolean>
+    fun observeDontAskCheckboxValue(): Flow<Boolean>
     fun observeCurrentUid(): Flow<String>
     suspend fun setCurrentUid(currentUid: String): AppResult<Unit, AppError>
     suspend fun getCurrentUserUid(): String

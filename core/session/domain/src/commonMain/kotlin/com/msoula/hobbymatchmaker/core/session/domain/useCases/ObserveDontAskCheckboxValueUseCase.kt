@@ -2,8 +2,8 @@ package com.msoula.hobbymatchmaker.core.session.domain.useCases
 
 import com.msoula.hobbymatchmaker.core.session.domain.repositories.SessionRepository
 
-class ObserveShouldShowGuestDialogUseCase(
+class ObserveDontAskCheckboxValueUseCase(
     private val sessionRepository: SessionRepository
 ) {
-    operator fun invoke() = sessionRepository.observeShouldShowGuestDialog()
+    operator fun invoke() = sessionRepository.observeDontAskCheckboxValue()
 }

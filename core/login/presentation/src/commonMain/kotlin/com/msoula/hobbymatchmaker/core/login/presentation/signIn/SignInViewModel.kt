@@ -6,19 +6,17 @@ import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ResetPasswordUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.UnifiedSignInUseCase
-import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.design.util.UIText
+import com.msoula.hobbymatchmaker.core.design.util.UiEvent
+import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.core.login.domain.useCases.LoginValidateFormUseCase
-import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthUiEventModel
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
-import com.msoula.hobbymatchmaker.core.login.presentation.models.ResetPasswordEvent
-import com.msoula.hobbymatchmaker.core.login.presentation.models.SignInEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.models.SignInFormStateModel
-import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveShouldShowGuestDialogUseCase
+import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveDontAskCheckboxValueUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetCurrentUserProfileUuidUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetShouldShowGuestDialogUseCase
 import dev.gitlive.firebase.auth.AuthCredential
@@ -39,37 +37,29 @@ class SignInViewModel(
     private val authFormValidationUseCases: LoginValidateFormUseCase,
     private val resetPasswordUseCase: ResetPasswordUseCase,
     private val setShouldShowGuestDialogUseCase: SetShouldShowGuestDialogUseCase,
-    val observeShouldShowGuestDialog: ObserveShouldShowGuestDialogUseCase,
+    val observeDontAskCheckboxValueUseCase: ObserveDontAskCheckboxValueUseCase,
     val setCurrentUserProfileUuidUseCase: SetCurrentUserProfileUuidUseCase,
     private val unifiedSignInUseCase: UnifiedSignInUseCase,
     private val socialClients: Map<ProviderType, SocialUIClient>,
     private val defaultErrorMessageMapper: ErrorMessageMapper,
     externalScope: CoroutineScope? = null
 ) : ViewModel() {
+
     private val scope = externalScope ?: viewModelScope
-    private val _oneTimeEventChannel = Channel<AuthUiEventModel>()
-    val oneTimeEventChannelFlow = _oneTimeEventChannel.receiveAsFlow()
+    private val _events: Channel<UiEvent> = Channel(Channel.BUFFERED)
+    val events = _events.receiveAsFlow()
     private val _formDataFlow = MutableStateFlow(SignInFormStateModel())
     val formDataFlow = _formDataFlow.asStateFlow()
-    val openResetDialog = MutableStateFlow(false)
 
     @VisibleForTesting
     internal var isSignIn = false
+    private val _signInState: MutableStateFlow<UiState<Unit>> =
+        MutableStateFlow(UiState.Success(Unit))
+    val signInState: StateFlow<UiState<Unit>> = _signInState.asStateFlow()
 
-    private val _resetPasswordState: MutableStateFlow<ResetPasswordEvent> =
-        MutableStateFlow(ResetPasswordEvent.Idle)
-    val resetPasswordState: StateFlow<ResetPasswordEvent> = _resetPasswordState.asStateFlow()
-
-    private val _signInState: MutableStateFlow<SignInEvent> =
-        MutableStateFlow(SignInEvent.Idle)
-    val signInState: StateFlow<SignInEvent> = _signInState.asStateFlow()
-
-    private val _isGuestLoading = MutableStateFlow(false)
-    val isGuestLoading: StateFlow<Boolean> = _isGuestLoading.asStateFlow()
-
-    val shouldShowGuestDialog = observeShouldShowGuestDialog().stateIn(
+    val dontAskCheckboxValue = observeDontAskCheckboxValueUseCase().stateIn(
         scope,
-        SharingStarted.Eagerly, true
+        SharingStarted.Eagerly, false
     )
 
     // Mutex to prevent concurrent social sign-in attempts
@@ -96,21 +86,12 @@ class SignInViewModel(
                 validateInput()
             }
 
-            AuthenticationUIEvent.OnForgotPasswordClicked ->
-                openResetDialog.update { true }
-
-            AuthenticationUIEvent.HideForgotPasswordDialog ->
-                openResetDialog.update { false }
-
-            is AuthenticationUIEvent.OnContinueAsGuestConfirmed ->
+            is AuthenticationUIEvent.SaveShowGuestDialogValue -> {
                 scope.launch {
-                    when (setCurrentUserProfileUuidUseCase()) {
-                        is AppResult.Success ->
-                            setShouldShowGuestDialogUseCase(shouldShow = !event.dontAskAgain)
-
-                        is AppResult.Failure -> {}
-                    }
+                    // event.showGuestDialog = valeur de la checkbox "ne plus demander"
+                    setShouldShowGuestDialogUseCase(shouldShow = event.showGuestDialog)
                 }
+            }
 
             AuthenticationUIEvent.OnGoogleButtonClicked ->
                 scope.launch {
@@ -141,10 +122,7 @@ class SignInViewModel(
                     )
                 }
 
-            AuthenticationUIEvent.OnResetSignInState -> resetSignInState()
-
-            AuthenticationUIEvent.OnScreenChanged -> resetForm()
-
+            AuthenticationUIEvent.OnScreenChanged -> _formDataFlow.update { SignInFormStateModel() }
             else -> Unit
         }
     }
@@ -162,18 +140,17 @@ class SignInViewModel(
         authFormValidationUseCases.validateEmail(emailReset).successful
 
     private suspend fun signInUnified(params: UnifiedSignInUseCase.Params) {
-        _signInState.update { SignInEvent.Loading }
+        _signInState.update { UiState.Loading }
 
         unifiedSignInUseCase(params)
-            .onFailure {
-                resetSignInState()
-                val uiError = defaultErrorMessageMapper.toUIText(it)
-                sendOnce(AuthUiEventModel.ShowError(uiError))
+            .onFailure { error ->
+                _signInState.update { UiState.Success(Unit) }
+                sendEvent(UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(error)))
             }
             .onSuccess { result ->
                 setCurrentUserProfileUuidUseCase(result.uid)
-                resetSignInState()
-                sendOnce(AuthUiEventModel.OnSignInSuccess)
+                _signInState.update { UiState.Success(Unit) }
+                sendEvent(UiEvent.NavigateToRoute("movies"))
             }
     }
 
@@ -181,7 +158,6 @@ class SignInViewModel(
         providerType: ProviderType,
         fetchedCredential: AuthCredential? = null
     ) {
-        // Try to acquire the mutex, if already locked, return immediately (prevents double-click)
         if (!signingMutex.tryLock()) return
 
         try {
@@ -201,11 +177,7 @@ class SignInViewModel(
                     )
                 )
             } else {
-                sendOnce(
-                    AuthUiEventModel.ShowError(
-                        UIText.Plain("Unable to get credentials")
-                    )
-                )
+                sendEvent(UiEvent.ShowSnackBar(UIText.Plain("Unable to get credentials")))
             }
         } finally {
             signingMutex.unlock()
@@ -214,34 +186,23 @@ class SignInViewModel(
 
     private suspend fun resetPassword() {
         if (!formDataFlow.value.submitEmailReset) return
-        _resetPasswordState.update { ResetPasswordEvent.Loading }
+        _signInState.update { UiState.Loading }
 
-        val email = formDataFlow.value.emailReset
-
-        resetPasswordUseCase(Parameters.StringParam(email))
-            .onFailure {
-                resetResetState()
-                val uiError = defaultErrorMessageMapper.toUIText(it)
-                sendOnce(AuthUiEventModel.ShowError(uiError))
+        resetPasswordUseCase(Parameters.StringParam(formDataFlow.value.emailReset))
+            .onFailure { error ->
+                _signInState.update { UiState.Success(Unit) }
+                sendEvent(UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(error)))
             }
             .onSuccess {
-                resetResetState()
-                _formDataFlow.update { it.copy(emailReset = "") }
-                sendOnce(AuthUiEventModel.OnResetPasswordSuccess)
+                _signInState.update { UiState.Success(Unit) }
+                sendEvent(UiEvent.CloseDialog("reset_password"))
             }
-    }
-
-    fun resetSignInState() = _signInState.update { SignInEvent.Idle }
-    fun resetResetState() = _resetPasswordState.update { ResetPasswordEvent.Idle }
-
-    fun resetForm() {
-        _formDataFlow.update { SignInFormStateModel() }
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    private suspend fun sendOnce(event: AuthUiEventModel) {
-        if (!_oneTimeEventChannel.isClosedForSend) {
-            _oneTimeEventChannel.send(event)
+    private fun sendEvent(event: UiEvent) {
+        if (!_events.isClosedForSend) {
+            _events.trySend(event)
         }
     }
 }

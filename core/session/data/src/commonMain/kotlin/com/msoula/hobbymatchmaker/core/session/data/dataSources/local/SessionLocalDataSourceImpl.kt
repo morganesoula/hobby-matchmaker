@@ -23,8 +23,8 @@ class SessionLocalDataSourceImpl(
         val IS_CONNECTED_KEY =
             booleanPreferencesKey("is_connected_key")
 
-        val SHOULD_SHOW_GUEST_DIALOG_KEY =
-            booleanPreferencesKey("should_show_guest_dialog_key")
+        val DONT_ASK_CHECKBOX_VALUE =
+            booleanPreferencesKey("dont_ask_checkbox_value_key")
 
         val USER_PROFILE_UUID =
             stringPreferencesKey("user_profile_uuid")
@@ -46,12 +46,12 @@ class SessionLocalDataSourceImpl(
 
     override suspend fun setShouldShowGuestDialog(shouldShow: Boolean): AppResult<Unit, AppError> =
         safeLocalWrite {
-            dataStore.edit { it[SHOULD_SHOW_GUEST_DIALOG_KEY] = shouldShow }
+            dataStore.edit { it[DONT_ASK_CHECKBOX_VALUE] = shouldShow }
         }
 
-    override fun observeShouldShowGuestDialog(): Flow<Boolean> = dataStore.data
+    override fun observeDontAskCheckboxValue(): Flow<Boolean> = dataStore.data
         .catch { if (it is IOException) emit(emptyPreferences()) else throw it }
-        .map { preferences -> preferences[SHOULD_SHOW_GUEST_DIALOG_KEY] ?: true }
+        .map { preferences -> preferences[DONT_ASK_CHECKBOX_VALUE] ?: false }
 
     override suspend fun setCurrentUid(currentUid: String): AppResult<Unit, AppError> =
         safeLocalWrite {

@@ -73,22 +73,24 @@ fun AppNavHost(
                     parametersOf(socialClients)
                 }
 
-                val shouldShowGuestWarning by signInViewModel
-                    .shouldShowGuestDialog
+                val dontAskCheckboxValue by signInViewModel
+                    .dontAskCheckboxValue
                     .collectAsState(initial = false)
 
                 SignInScreenContent(
-                    redirectToSignUpScreen = { nav.navigate(SignUp) },
-                    redirectToMovieScreen = {
-                        nav.navigate(Movies) {
-                            popUpTo<Auth> { inclusive = true }
-                            launchSingleTop = true
+                    onNavigate = { route ->
+                        when (route) {
+                            "movies" -> nav.navigate(Movies) {
+                                popUpTo<Auth> { inclusive = true }
+                                launchSingleTop = true
+                            }
+
+                            "sign_up" -> nav.navigate(SignUp)
                         }
                     },
                     signInViewModel = signInViewModel,
-                    oneTimeEventChannelFlow = signInViewModel.oneTimeEventChannelFlow,
-                    facebookUIClient = facebookUIClient,
-                    shouldShowGuestWarning = shouldShowGuestWarning
+                    dontAskCheckboxValue = dontAskCheckboxValue,
+                    facebookUIClient = facebookUIClient
                 )
             }
 

@@ -10,7 +10,7 @@ val coreModuleSignInViewModel = module {
         SignInViewModel(
             authFormValidationUseCases = get(),
             resetPasswordUseCase = get(),
-            observeShouldShowGuestDialog = get(),
+            observeDontAskCheckboxValueUseCase = get(),
             setShouldShowGuestDialogUseCase = get(),
             setCurrentUserProfileUuidUseCase = get(),
             unifiedSignInUseCase = get(),

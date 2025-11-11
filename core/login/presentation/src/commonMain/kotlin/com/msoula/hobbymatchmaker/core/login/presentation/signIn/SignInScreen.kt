@@ -1,17 +1,21 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.signIn
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,12 +26,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.common.Logger
-import com.msoula.hobbymatchmaker.core.design.CallOnceEffect
-import com.msoula.hobbymatchmaker.core.design.ObserveEvents
 import com.msoula.hobbymatchmaker.core.design.Res
-import com.msoula.hobbymatchmaker.core.design.SnackEffect
+import com.msoula.hobbymatchmaker.core.design.atoms.LoadingOverlay
 import com.msoula.hobbymatchmaker.core.design.atoms.PrimaryAlertDialog
 import com.msoula.hobbymatchmaker.core.design.atoms.PrimaryTextField
+import com.msoula.hobbymatchmaker.core.design.atoms.StateContainer
 import com.msoula.hobbymatchmaker.core.design.cancel
 import com.msoula.hobbymatchmaker.core.design.continue_as_guest_create_redirect_button
 import com.msoula.hobbymatchmaker.core.design.continue_as_guest_dialog_text
@@ -35,7 +38,6 @@ import com.msoula.hobbymatchmaker.core.design.continue_as_guest_dialog_title
 import com.msoula.hobbymatchmaker.core.design.continue_as_guest_dont_ask_again
 import com.msoula.hobbymatchmaker.core.design.continue_as_guest_validation_button
 import com.msoula.hobbymatchmaker.core.design.continue_with_rs
-import com.msoula.hobbymatchmaker.core.design.forgot_password
 import com.msoula.hobbymatchmaker.core.design.forgot_password_title
 import com.msoula.hobbymatchmaker.core.design.molecules.LabeledDivider
 import com.msoula.hobbymatchmaker.core.design.organisms.AuthenticationScreenBottom
@@ -44,127 +46,59 @@ import com.msoula.hobbymatchmaker.core.design.organisms.SignInForm
 import com.msoula.hobbymatchmaker.core.design.organisms.SignInSocialMedia
 import com.msoula.hobbymatchmaker.core.design.reset_password
 import com.msoula.hobbymatchmaker.core.design.templates.SignInLayout
-import com.msoula.hobbymatchmaker.core.design.util.UIText
-import com.msoula.hobbymatchmaker.core.design.your_email
+import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
+import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient
-import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthUiEventModel
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
-import com.msoula.hobbymatchmaker.core.login.presentation.models.ResetPasswordEvent
-import com.msoula.hobbymatchmaker.core.login.presentation.models.SignInEvent
-import kotlinx.coroutines.flow.Flow
+import com.msoula.hobbymatchmaker.core.design.util.UiState
+import com.msoula.hobbymatchmaker.core.design.your_email
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun SignInScreenContent(
     signInViewModel: SignInViewModel,
-    redirectToMovieScreen: () -> Unit,
-    redirectToSignUpScreen: () -> Unit,
-    oneTimeEventChannelFlow: Flow<AuthUiEventModel>,
-    shouldShowGuestWarning: Boolean,
+    onNavigate: (String) -> Unit,
+    dontAskCheckboxValue: Boolean,
     facebookUIClient: FacebookUIClient
 ) {
-    val resetPasswordState by signInViewModel.resetPasswordState.collectAsState()
     val signInState by signInViewModel.signInState.collectAsState()
-    val openResetDialog by signInViewModel.openResetDialog.collectAsState()
-    val signInFormState by signInViewModel.formDataFlow.collectAsState()
-    val isGuestLoading by signInViewModel.isGuestLoading.collectAsState()
+    val formState by signInViewModel.formDataFlow.collectAsState()
 
     val snackBarHostState = remember { SnackbarHostState() }
-    var showGuestDialog by rememberSaveable { mutableStateOf(false) }
-    var dontAskGuestDialog by rememberSaveable { mutableStateOf(false) }
 
-    ObserveEvents(oneTimeEventChannelFlow) { event ->
-        when (event) {
-            is AuthUiEventModel.ShowError ->
-                SnackEffect(snackBarHostState, event.error, event)
+    var displayResetPasswordDialog by rememberSaveable { mutableStateOf(false) }
+    var displayGuestDialog by rememberSaveable { mutableStateOf(false) }
+    var localCheckboxValue by rememberSaveable { mutableStateOf(false) }
 
-            is AuthUiEventModel.OnSignInSuccess ->
-                CallOnceEffect(event) {
-                    redirectToMovieScreen()
-                    signInViewModel.onEvent(AuthenticationUIEvent.OnResetSignInState)
+    LaunchedEffect(signInViewModel.events) {
+        signInViewModel.events.collect { event ->
+            when (event) {
+                is UiEvent.ShowSnackBar ->
+                    snackBarHostState.showSnackbar(event.message.toString())
+
+                is UiEvent.NavigateToRoute -> onNavigate(event.route)
+
+                is UiEvent.OpenDialog ->
+                    when (event.dialogPurpose) {
+                        else -> {}
+                    }
+
+                is UiEvent.CloseDialog -> {
+                    when (event.dialogName) {
+                        "reset_password" -> {
+                            displayResetPasswordDialog = false
+                            snackBarHostState.showSnackbar(getString(Res.string.reset_password))
+                        }
+                    }
                 }
 
-            is AuthUiEventModel.OnResetPasswordSuccess -> {
-                signInViewModel.onEvent(AuthenticationUIEvent.HideForgotPasswordDialog)
-                SnackEffect(
-                    snackBarHostState,
-                    UIText.Resource(Res.string.reset_password),
-                    event
-                )
+                else -> Unit
             }
-
-            else -> Unit
         }
     }
 
-    SignInLayout(
-        topBar = { AuthenticationScreenTop(isSignInScreen = true) },
-        form = {
-            SignInForm(
-                email = signInFormState.email,
-                password = signInFormState.password,
-                loading = signInState == SignInEvent.Loading,
-                enabled = signInFormState.submit,
-                onEmailChanged = {
-                    signInViewModel.onEvent(AuthenticationUIEvent.OnEmailChanged(it))
-                },
-                onPasswordChanged = {
-                    signInViewModel.onEvent(AuthenticationUIEvent.OnPasswordChanged(it))
-                },
-                onForgotPasswordClicked = {
-                    signInViewModel.onEvent(AuthenticationUIEvent.OnForgotPasswordClicked)
-                },
-                onFinish = {
-                    signInViewModel.onEvent(AuthenticationUIEvent.OnSignIn)
-                }
-            )
-        },
-        divider = { LabeledDivider(label = stringResource(Res.string.continue_with_rs)) },
-        socialMediaSection = {
-            SignInSocialMedia(
-                onGoogleClick = {
-                    signInViewModel.onEvent(AuthenticationUIEvent.OnGoogleButtonClicked)
-                },
-                onAppleClick = {
-                    signInViewModel.onEvent(AuthenticationUIEvent.OnAppleButtonClicked)
-                },
-                onFacebookClick = {
-                    if (facebookUIClient.hasValidToken()) {
-                        return@SignInSocialMedia
-                    }
-
-                    facebookUIClient.registerCallback(
-                        onSuccess = { credential, _ ->
-                            signInViewModel.onEvent(
-                                AuthenticationUIEvent.OnFacebookButtonClicked(
-                                    credential
-                                )
-                            )
-                        },
-                        onError = { Logger.d("Error fetching Facebook credentials") }
-                    )
-                    facebookUIClient.logIn()
-                }
-            )
-        },
-        bottomSection = {
-            AuthenticationScreenBottom(
-                isSignInScreen = true,
-                onNavigateToOppositeScreen = redirectToSignUpScreen,
-                onContinueAsGuest = {
-                    if (shouldShowGuestWarning) {
-                        showGuestDialog = true
-                    } else {
-                        signInViewModel.onEvent(
-                            AuthenticationUIEvent.OnContinueAsGuestConfirmed(true)
-                        )
-                        redirectToMovieScreen()
-                    }
-                },
-                isGuestLoading = isGuestLoading,
-                guestButtonEnabled = true
-            )
-        },
+    Scaffold(
         snackbarHost = {
             SnackbarHost(
                 hostState = snackBarHostState,
@@ -176,21 +110,108 @@ fun SignInScreenContent(
                     ) { Text(text = data.visuals.message) }
                 }
             )
-        },
-        overlayContent = { paddingValues ->
-            if (openResetDialog) {
+        }
+    ) { padding ->
+        Box(
+            modifier = Modifier.padding(
+                top = CustomSize.Sixteen,
+                start = CustomSize.Sixteen,
+                end = CustomSize.Sixteen
+            )
+        ) {
+            StateContainer(
+                state = signInState,
+                onLoading = { LoadingOverlay(signInState is UiState.Loading) },
+                onEmpty = { },
+                onError = { error, hint -> },
+                onSuccess = {
+                    SignInLayout(
+                        padding = padding,
+                        topBar = { AuthenticationScreenTop(isSignInScreen = true) },
+                        form = {
+                            SignInForm(
+                                email = formState.email,
+                                password = formState.password,
+                                loading = signInState is UiState.Loading,
+                                enabled = formState.submit,
+                                onEmailChanged = {
+                                    signInViewModel.onEvent(AuthenticationUIEvent.OnEmailChanged(it))
+                                },
+                                onPasswordChanged = {
+                                    signInViewModel.onEvent(
+                                        AuthenticationUIEvent.OnPasswordChanged(
+                                            it
+                                        )
+                                    )
+                                },
+                                onForgotPasswordClicked = { displayResetPasswordDialog = true },
+                                onFinish = {
+                                    signInViewModel.onEvent(AuthenticationUIEvent.OnSignIn)
+                                }
+                            )
+                        },
+                        divider = { LabeledDivider(label = stringResource(Res.string.continue_with_rs)) },
+                        socialMediaSection = {
+                            SignInSocialMedia(
+                                onGoogleClick = {
+                                    signInViewModel.onEvent(AuthenticationUIEvent.OnGoogleButtonClicked)
+                                },
+                                onAppleClick = {
+                                    signInViewModel.onEvent(AuthenticationUIEvent.OnAppleButtonClicked)
+                                },
+                                onFacebookClick = {
+                                    if (facebookUIClient.hasValidToken()) {
+                                        return@SignInSocialMedia
+                                    }
+
+                                    facebookUIClient.registerCallback(
+                                        onSuccess = { credential, _ ->
+                                            signInViewModel.onEvent(
+                                                AuthenticationUIEvent.OnFacebookButtonClicked(
+                                                    credential
+                                                )
+                                            )
+                                        },
+                                        onError = { Logger.d("Error fetching Facebook credentials") }
+                                    )
+                                    facebookUIClient.logIn()
+                                }
+                            )
+                        },
+                        bottomSection = {
+                            AuthenticationScreenBottom(
+                                isSignInScreen = true,
+                                onNavigateToOppositeScreen = { onNavigate("sign_up") },
+                                onContinueAsGuest = {
+                                    if (!dontAskCheckboxValue) {
+                                        // Réinitialiser la valeur locale du checkbox à chaque ouverture
+                                        localCheckboxValue = false
+                                        displayGuestDialog = true
+                                    } else {
+                                        onNavigate("movies")
+                                    }
+                                },
+                                guestButtonEnabled = true
+                            )
+                        }
+                    )
+                }
+            )
+
+            if (displayResetPasswordDialog) {
                 PrimaryAlertDialog(
-                    paddingValues = paddingValues,
-                    title = stringResource(Res.string.forgot_password),
+                    paddingValues = padding,
+                    title = stringResource(Res.string.forgot_password_title),
                     confirmButtonText = stringResource(Res.string.reset_password),
                     cancelButtonText = stringResource(Res.string.cancel),
-                    isEnabled = signInFormState.submitEmailReset,
-                    isLoading = resetPasswordState == ResetPasswordEvent.Loading,
-                    onDismiss = { signInViewModel.onEvent(AuthenticationUIEvent.HideForgotPasswordDialog) },
+                    isEnabled = formState.submitEmailReset,
+                    isLoading = false,
+                    onCancel = { displayResetPasswordDialog = false },
+                    onDismiss = { displayResetPasswordDialog = false },
                     onConfirm = { signInViewModel.onEvent(AuthenticationUIEvent.OnResetPasswordConfirmed) }
                 ) {
                     PrimaryTextField(
-                        text = stringResource(Res.string.forgot_password_title),
+                        text = formState.emailReset,
                         label = stringResource(Res.string.your_email),
                         contentDescription = stringResource(Res.string.your_email),
                         singleLine = true,
@@ -205,26 +226,28 @@ fun SignInScreenContent(
                 }
             }
 
-            if (showGuestDialog) {
+            if (displayGuestDialog) {
                 PrimaryAlertDialog(
-                    paddingValues = paddingValues,
+                    paddingValues = padding,
                     title = stringResource(Res.string.continue_as_guest_dialog_title),
                     confirmButtonText = stringResource(Res.string.continue_as_guest_validation_button),
-                    cancelButtonText = stringResource(
-                        Res.string.continue_as_guest_create_redirect_button
-                    ),
+                    cancelButtonText = stringResource(Res.string.continue_as_guest_create_redirect_button),
                     isEnabled = true,
                     isLoading = false,
+                    onCancel = {
+                        displayGuestDialog = false
+                        onNavigate("sign_up")
+                    },
                     onDismiss = {
-                        showGuestDialog = false
-                        redirectToSignUpScreen()
+                        displayGuestDialog = false
                     },
                     onConfirm = {
-                        showGuestDialog = false
+                        // Sauvegarder la préférence à chaque validation
                         signInViewModel.onEvent(
-                            AuthenticationUIEvent.OnContinueAsGuestConfirmed(dontAskGuestDialog)
+                            AuthenticationUIEvent.SaveShowGuestDialogValue(localCheckboxValue)
                         )
-                        redirectToMovieScreen()
+                        displayGuestDialog = false
+                        onNavigate("movies")
                     }
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -235,13 +258,14 @@ fun SignInScreenContent(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Checkbox(
-                                checked = dontAskGuestDialog,
-                                onCheckedChange = { dontAskGuestDialog = it })
+                                checked = localCheckboxValue,
+                                onCheckedChange = { localCheckboxValue = it }
+                            )
                             Text(stringResource(Res.string.continue_as_guest_dont_ask_again))
                         }
                     }
                 }
             }
         }
-    )
+    }
 }

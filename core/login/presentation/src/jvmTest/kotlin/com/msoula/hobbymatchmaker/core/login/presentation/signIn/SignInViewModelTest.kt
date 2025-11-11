@@ -13,9 +13,7 @@ import com.msoula.hobbymatchmaker.core.common.UIText
 import com.msoula.hobbymatchmaker.core.login.domain.useCases.ValidateEmailUseCase
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthUiEventModel
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
-import com.msoula.hobbymatchmaker.core.login.presentation.models.ResetPasswordEvent
-import com.msoula.hobbymatchmaker.core.login.presentation.models.SignInEvent
-import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveShouldShowGuestDialogUseCase
+import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveDontAskCheckboxValueUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetShouldShowGuestDialogUseCase
 import dev.gitlive.firebase.auth.AuthCredential
 import io.kotest.core.spec.style.FunSpec
@@ -50,7 +48,7 @@ class SignInViewModelTest : FunSpec({
     val pwdValidator = ValidatePasswordUseCase()
     lateinit var resetPasswordUC: ResetPasswordUseCase
     lateinit var setGuestDialogUC: SetShouldShowGuestDialogUseCase
-    lateinit var observeGuestDialogUC: ObserveShouldShowGuestDialogUseCase
+    lateinit var observeGuestDialogUC: ObserveDontAskCheckboxValueUseCase
     lateinit var unifiedSignInUC: UnifiedSignInUseCase
     lateinit var googleClient: SocialUIClient
     lateinit var appleClient: SocialUIClient
@@ -95,7 +93,7 @@ class SignInViewModelTest : FunSpec({
             authFormValidationUseCases = authValidationUC,
             resetPasswordUseCase = resetPasswordUC,
             setShouldShowGuestDialogUseCase = setGuestDialogUC,
-            observeShouldShowGuestDialog = observeGuestDialogUC,
+            observeDontAskCheckboxValue = observeGuestDialogUC,
             unifiedSignInUseCase = unifiedSignInUC,
             socialClients = socialClients,
             defaultErrorMessageMapper = errorMapper,

@@ -1,5 +1,6 @@
 package com.msoula.hobbymatchmaker.core.design.organisms
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.MainTitle
@@ -14,13 +15,15 @@ import org.jetbrains.compose.resources.stringResource
 fun AuthenticationScreenTop(
     isSignInScreen: Boolean
 ) {
-    MainTitle(
-        text = if (isSignInScreen) stringResource(Res.string.welcome_back_title)
-        else stringResource(Res.string.welcome_title)
-    )
+    Column {
+        MainTitle(
+            text = if (isSignInScreen) stringResource(Res.string.welcome_back_title)
+            else stringResource(Res.string.welcome_title)
+        )
 
-    MediumTitle(
-        text = if (isSignInScreen) stringResource(Res.string.welcome_back_subtitle)
-        else stringResource(Res.string.welcome_subtitle)
-    )
+        MediumTitle(
+            text = if (isSignInScreen) stringResource(Res.string.welcome_back_subtitle)
+            else stringResource(Res.string.welcome_subtitle)
+        )
+    }
 }

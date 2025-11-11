@@ -12,7 +12,7 @@ interface SessionRepository {
         AppResult<Unit, AppError>
 
     suspend fun setShouldShowGuestDialog(shouldShow: Boolean): AppResult<Unit, AppError>
-    fun observeShouldShowGuestDialog(): Flow<Boolean>
+    fun observeDontAskCheckboxValue(): Flow<Boolean>
     suspend fun setCurrentUserUid(uid: String): AppResult<Unit, AppError>
     fun observeCurrentUserUid(): Flow<String>
     suspend fun getCurrentUserUid(): String

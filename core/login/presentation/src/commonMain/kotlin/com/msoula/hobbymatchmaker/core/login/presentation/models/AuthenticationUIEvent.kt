@@ -16,17 +16,12 @@ sealed interface AuthenticationUIEvent {
     data object OnAppleButtonClicked : AuthenticationUIEvent
 
     data class OnFacebookButtonClicked(val credential: AuthCredential) : AuthenticationUIEvent
-    data class OnContinueAsGuestConfirmed(val dontAskAgain: Boolean) : AuthenticationUIEvent
 
-    data object HideForgotPasswordDialog : AuthenticationUIEvent
-
-    data object OnForgotPasswordClicked : AuthenticationUIEvent
+    data class SaveShowGuestDialogValue(val showGuestDialog: Boolean) : AuthenticationUIEvent
 
     data object OnResetPasswordConfirmed : AuthenticationUIEvent
 
     data object OnScreenChanged : AuthenticationUIEvent
-
-    data object OnResetSignInState : AuthenticationUIEvent
 
     data object OnSignUp : AuthenticationUIEvent
 
