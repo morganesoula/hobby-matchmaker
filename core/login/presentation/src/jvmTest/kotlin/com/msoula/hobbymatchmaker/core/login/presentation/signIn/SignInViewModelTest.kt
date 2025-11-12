@@ -14,7 +14,7 @@ import com.msoula.hobbymatchmaker.core.login.domain.useCases.ValidateEmailUseCas
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthUiEventModel
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveDontAskCheckboxValueUseCase
-import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetShouldShowGuestDialogUseCase
+import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetDontAskGuestDialogUseCase
 import dev.gitlive.firebase.auth.AuthCredential
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.booleans.shouldBeFalse
@@ -47,7 +47,7 @@ class SignInViewModelTest : FunSpec({
     val emailValidator = ValidateEmailUseCase()
     val pwdValidator = ValidatePasswordUseCase()
     lateinit var resetPasswordUC: ResetPasswordUseCase
-    lateinit var setGuestDialogUC: SetShouldShowGuestDialogUseCase
+    lateinit var setGuestDialogUC: SetDontAskGuestDialogUseCase
     lateinit var observeGuestDialogUC: ObserveDontAskCheckboxValueUseCase
     lateinit var unifiedSignInUC: UnifiedSignInUseCase
     lateinit var googleClient: SocialUIClient
@@ -92,7 +92,7 @@ class SignInViewModelTest : FunSpec({
         return SignInViewModel(
             authFormValidationUseCases = authValidationUC,
             resetPasswordUseCase = resetPasswordUC,
-            setShouldShowGuestDialogUseCase = setGuestDialogUC,
+            setDontAskGuestDialogUseCase = setGuestDialogUC,
             observeDontAskCheckboxValue = observeGuestDialogUC,
             unifiedSignInUseCase = unifiedSignInUC,
             socialClients = socialClients,

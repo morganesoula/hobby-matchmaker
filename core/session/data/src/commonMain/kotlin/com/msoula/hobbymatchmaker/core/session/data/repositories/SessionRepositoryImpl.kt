@@ -20,8 +20,8 @@ class SessionRepositoryImpl(
     override suspend fun createUser(user: SessionUserDomainModel) =
         sessionRemoteDataSource.createUser(user.toUserFireStoreModel())
 
-    override suspend fun setShouldShowGuestDialog(shouldShow: Boolean) =
-        sessionLocalDataSource.setShouldShowGuestDialog(shouldShow)
+    override suspend fun setDontAskGuestDialogValue(dontAsk: Boolean) =
+        sessionLocalDataSource.setDontAskGuestValue(dontAsk)
 
     override fun observeDontAskCheckboxValue(): Flow<Boolean> =
         sessionLocalDataSource.observeDontAskCheckboxValue()

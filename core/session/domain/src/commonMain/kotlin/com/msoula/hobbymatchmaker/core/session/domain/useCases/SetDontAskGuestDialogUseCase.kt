@@ -4,10 +4,10 @@ import com.msoula.hobbymatchmaker.core.session.domain.repositories.SessionReposi
 import kotlin.uuid.ExperimentalUuidApi
 
 @OptIn(ExperimentalUuidApi::class)
-class SetShouldShowGuestDialogUseCase(
+class SetDontAskGuestDialogUseCase(
     private val sessionRepository: SessionRepository
 ) {
-    suspend operator fun invoke(shouldShow: Boolean) =
-        sessionRepository.setShouldShowGuestDialog(shouldShow)
+    suspend operator fun invoke(dontAsk: Boolean) =
+        sessionRepository.setDontAskGuestDialogValue(dontAsk)
 
 }

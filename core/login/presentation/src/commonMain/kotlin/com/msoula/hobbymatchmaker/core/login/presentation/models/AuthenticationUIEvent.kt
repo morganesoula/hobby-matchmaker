@@ -17,7 +17,7 @@ sealed interface AuthenticationUIEvent {
 
     data class OnFacebookButtonClicked(val credential: AuthCredential) : AuthenticationUIEvent
 
-    data class SaveShowGuestDialogValue(val showGuestDialog: Boolean) : AuthenticationUIEvent
+    data class SaveDontAskGuestDialogValue(val dontAskGuestDialog: Boolean) : AuthenticationUIEvent
 
     data object OnResetPasswordConfirmed : AuthenticationUIEvent
 

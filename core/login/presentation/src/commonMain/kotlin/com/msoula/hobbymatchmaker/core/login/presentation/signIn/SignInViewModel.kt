@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ResetPasswordUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.UnifiedSignInUseCase
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
@@ -18,17 +19,15 @@ import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationU
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.models.SignInFormStateModel
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveDontAskCheckboxValueUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetCurrentUserProfileUuidUseCase
-import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetShouldShowGuestDialogUseCase
+import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetDontAskGuestDialogUseCase
 import dev.gitlive.firebase.auth.AuthCredential
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -36,7 +35,7 @@ import kotlinx.coroutines.sync.Mutex
 class SignInViewModel(
     private val authFormValidationUseCases: LoginValidateFormUseCase,
     private val resetPasswordUseCase: ResetPasswordUseCase,
-    private val setShouldShowGuestDialogUseCase: SetShouldShowGuestDialogUseCase,
+    private val setDontAskGuestDialogUseCase: SetDontAskGuestDialogUseCase,
     val observeDontAskCheckboxValueUseCase: ObserveDontAskCheckboxValueUseCase,
     val setCurrentUserProfileUuidUseCase: SetCurrentUserProfileUuidUseCase,
     private val unifiedSignInUseCase: UnifiedSignInUseCase,
@@ -57,13 +56,19 @@ class SignInViewModel(
         MutableStateFlow(UiState.Success(Unit))
     val signInState: StateFlow<UiState<Unit>> = _signInState.asStateFlow()
 
-    val dontAskCheckboxValue = observeDontAskCheckboxValueUseCase().stateIn(
-        scope,
-        SharingStarted.Eagerly, false
-    )
+    private val _dontAskCheckboxValue = MutableStateFlow(false)
+    val dontAskCheckboxValue: StateFlow<Boolean> = _dontAskCheckboxValue.asStateFlow()
 
-    // Mutex to prevent concurrent social sign-in attempts
     private val signingMutex = Mutex()
+
+    init {
+        scope.launch {
+            observeDontAskCheckboxValueUseCase().collect { value ->
+                Logger.d("SignInViewModel - dontAskCheckboxValue collected from DataStore: $value")
+                _dontAskCheckboxValue.value = value
+            }
+        }
+    }
 
     fun onEvent(event: AuthenticationUIEvent) {
         when (event) {
@@ -86,10 +91,10 @@ class SignInViewModel(
                 validateInput()
             }
 
-            is AuthenticationUIEvent.SaveShowGuestDialogValue -> {
+            is AuthenticationUIEvent.SaveDontAskGuestDialogValue -> {
+                Logger.d("Saving new value in VM for dontAsk: ${event.dontAskGuestDialog}")
                 scope.launch {
-                    // event.showGuestDialog = valeur de la checkbox "ne plus demander"
-                    setShouldShowGuestDialogUseCase(shouldShow = event.showGuestDialog)
+                    setDontAskGuestDialogUseCase(dontAsk = event.dontAskGuestDialog)
                 }
             }
 

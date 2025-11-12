@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveIsConnectedUseCase
-import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveDontAskCheckboxValueUseCase
 import com.msoula.hobbymatchmaker.core.splashscreen.presentation.model.SplashUiState
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.SyncLocalFavoritesToCloudUseCase
 import kotlinx.coroutines.delay
@@ -17,7 +16,6 @@ import kotlinx.coroutines.withTimeout
 
 class SplashViewModel(
     private val observeIsConnectedUseCase: ObserveIsConnectedUseCase,
-    private val observeShouldShowGuestDialogUseCase: ObserveDontAskCheckboxValueUseCase,
     private val syncLocalFavoritesToCloudUseCase: SyncLocalFavoritesToCloudUseCase
 ) : ViewModel() {
 
@@ -28,14 +26,11 @@ class SplashViewModel(
         viewModelScope.launch {
             try {
                 val shouldSkipAuth = withTimeout(3_000) { observeIsConnectedUseCase().first() }
-                val shouldShowGuestDialog =
-                    withTimeout(3_000) { observeShouldShowGuestDialogUseCase().first() }
-
-                val goToMovies = shouldSkipAuth || !shouldShowGuestDialog
+                Logger.d("SplashViewModel - shouldSkipAuth: $shouldSkipAuth")
 
                 delay(1_000)
 
-                if (goToMovies) {
+                if (shouldSkipAuth) {
                     runCatching { syncLocalFavoritesToCloudUseCase() }
                         .onFailure { Logger.w("Splash sync failed - ${it.message}") }
                     _state.update { SplashUiState.GoToMovies }

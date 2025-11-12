@@ -11,6 +11,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SignInScreenContent
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SignInViewModel
@@ -73,10 +74,6 @@ fun AppNavHost(
                     parametersOf(socialClients)
                 }
 
-                val dontAskCheckboxValue by signInViewModel
-                    .dontAskCheckboxValue
-                    .collectAsState(initial = false)
-
                 SignInScreenContent(
                     onNavigate = { route ->
                         when (route) {
@@ -89,7 +86,6 @@ fun AppNavHost(
                         }
                     },
                     signInViewModel = signInViewModel,
-                    dontAskCheckboxValue = dontAskCheckboxValue,
                     facebookUIClient = facebookUIClient
                 )
             }

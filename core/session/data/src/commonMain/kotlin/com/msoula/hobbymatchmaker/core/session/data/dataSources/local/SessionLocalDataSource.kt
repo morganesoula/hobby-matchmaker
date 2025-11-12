@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface SessionLocalDataSource {
     suspend fun setIsConnected(isConnected: Boolean): AppResult<Unit, AppError>
     fun observeIsConnected(): Flow<Boolean>
-    suspend fun setShouldShowGuestDialog(shouldShow: Boolean): AppResult<Unit, AppError>
+    suspend fun setDontAskGuestValue(dontAsk: Boolean): AppResult<Unit, AppError>
     fun observeDontAskCheckboxValue(): Flow<Boolean>
     fun observeCurrentUid(): Flow<String>
     suspend fun setCurrentUid(currentUid: String): AppResult<Unit, AppError>

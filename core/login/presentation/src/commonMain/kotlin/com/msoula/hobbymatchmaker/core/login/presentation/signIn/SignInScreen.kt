@@ -59,7 +59,6 @@ import org.jetbrains.compose.resources.stringResource
 fun SignInScreenContent(
     signInViewModel: SignInViewModel,
     onNavigate: (String) -> Unit,
-    dontAskCheckboxValue: Boolean,
     facebookUIClient: FacebookUIClient
 ) {
     val signInState by signInViewModel.signInState.collectAsState()
@@ -70,6 +69,15 @@ fun SignInScreenContent(
     var displayResetPasswordDialog by rememberSaveable { mutableStateOf(false) }
     var displayGuestDialog by rememberSaveable { mutableStateOf(false) }
     var localCheckboxValue by rememberSaveable { mutableStateOf(false) }
+
+    val dontAskCheckboxValue by signInViewModel.dontAskCheckboxValue.collectAsState()
+
+    // Synchroniser la checkbox locale avec la valeur du DataStore quand le dialog s'ouvre
+    LaunchedEffect(displayGuestDialog) {
+        if (displayGuestDialog) {
+            localCheckboxValue = dontAskCheckboxValue
+        }
+    }
 
     LaunchedEffect(signInViewModel.events) {
         signInViewModel.events.collect { event ->
@@ -183,12 +191,11 @@ fun SignInScreenContent(
                                 isSignInScreen = true,
                                 onNavigateToOppositeScreen = { onNavigate("sign_up") },
                                 onContinueAsGuest = {
-                                    if (!dontAskCheckboxValue) {
-                                        // Réinitialiser la valeur locale du checkbox à chaque ouverture
-                                        localCheckboxValue = false
-                                        displayGuestDialog = true
-                                    } else {
+                                    Logger.d("Continue as guest clicked - dontAskCheckboxValue: $dontAskCheckboxValue")
+                                    if (dontAskCheckboxValue) {
                                         onNavigate("movies")
+                                    } else {
+                                        displayGuestDialog = true
                                     }
                                 },
                                 guestButtonEnabled = true
@@ -242,10 +249,6 @@ fun SignInScreenContent(
                         displayGuestDialog = false
                     },
                     onConfirm = {
-                        // Sauvegarder la préférence à chaque validation
-                        signInViewModel.onEvent(
-                            AuthenticationUIEvent.SaveShowGuestDialogValue(localCheckboxValue)
-                        )
                         displayGuestDialog = false
                         onNavigate("movies")
                     }
@@ -259,7 +262,13 @@ fun SignInScreenContent(
                         ) {
                             Checkbox(
                                 checked = localCheckboxValue,
-                                onCheckedChange = { localCheckboxValue = it }
+                                onCheckedChange = {
+                                    Logger.d("Checkbox value: $it")
+                                    localCheckboxValue = it
+                                    signInViewModel.onEvent(
+                                        AuthenticationUIEvent.SaveDontAskGuestDialogValue(it)
+                                    )
+                                }
                             )
                             Text(stringResource(Res.string.continue_as_guest_dont_ask_again))
                         }

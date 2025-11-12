@@ -6,7 +6,7 @@ import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveSessionSta
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveDontAskCheckboxValueUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetCurrentUserProfileUuidUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetIsConnectedUseCase
-import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetShouldShowGuestDialogUseCase
+import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetDontAskGuestDialogUseCase
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 
@@ -14,7 +14,7 @@ val coreModuleSessionDomain = module {
     factoryOf(::ObserveIsConnectedUseCase)
     factoryOf(::SetIsConnectedUseCase)
     factoryOf(::CreateUserUseCase)
-    factoryOf(::SetShouldShowGuestDialogUseCase)
+    factoryOf(::SetDontAskGuestDialogUseCase)
     factoryOf(::ObserveDontAskCheckboxValueUseCase)
     factoryOf(::SetCurrentUserProfileUuidUseCase)
     factoryOf(::ObserveSessionStateUseCase)

@@ -11,7 +11,7 @@ interface SessionRepository {
     suspend fun createUser(user: SessionUserDomainModel):
         AppResult<Unit, AppError>
 
-    suspend fun setShouldShowGuestDialog(shouldShow: Boolean): AppResult<Unit, AppError>
+    suspend fun setDontAskGuestDialogValue(dontAsk: Boolean): AppResult<Unit, AppError>
     fun observeDontAskCheckboxValue(): Flow<Boolean>
     suspend fun setCurrentUserUid(uid: String): AppResult<Unit, AppError>
     fun observeCurrentUserUid(): Flow<String>
