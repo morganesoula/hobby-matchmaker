@@ -8,21 +8,18 @@ import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
+import com.msoula.hobbymatchmaker.core.design.util.EventHandler
+import com.msoula.hobbymatchmaker.core.design.util.UiEvent
+import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.core.login.domain.useCases.LoginValidateFormUseCase
-import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthUiEventModel
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
-import com.msoula.hobbymatchmaker.core.login.presentation.models.SignUpEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.signUp.models.SignUpStateModel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
@@ -36,12 +33,15 @@ class SignUpViewModel(
 ) : ViewModel() {
     private val scope = externalScope ?: viewModelScope
 
+    private val eventHandler = EventHandler()
+    val events = eventHandler.events
+
     private val _formDataFlow = MutableStateFlow(SignUpStateModel())
     val formDataFlow = _formDataFlow.asStateFlow()
-    private val _oneTimeEventChannel = Channel<AuthUiEventModel>()
-    val oneTimeEventChannelFlow = _oneTimeEventChannel.receiveAsFlow()
-    private val _signUpState: MutableStateFlow<SignUpEvent> = MutableStateFlow(SignUpEvent.Idle)
-    val signUpState: StateFlow<SignUpEvent> = _signUpState.asStateFlow()
+
+    private val _signUpState: MutableStateFlow<UiState<Unit>> =
+        MutableStateFlow(UiState.Success(Unit))
+    val signUpState = _signUpState.asStateFlow()
 
     init {
         scope.launch {
@@ -93,7 +93,7 @@ class SignUpViewModel(
 
     @VisibleForTesting
     internal fun createFirebaseAccount() = scope.launch {
-        _signUpState.update { SignUpEvent.Loading }
+        _signUpState.update { UiState.Loading }
 
         signUpUseCase(
             Parameters.DoubleStringParam(
@@ -103,22 +103,23 @@ class SignUpViewModel(
         )
             .onFailure { error ->
                 resetSignUpState()
-                val error = defaultErrorMessageMapper.toUIText(error)
-                sendOnce(AuthUiEventModel.ShowError(error))
+                eventHandler.sendEvent(
+                    UiEvent.ShowSnackBar(
+                        defaultErrorMessageMapper.toUIText(error)
+                    )
+                )
             }
             .onSuccess {
                 resetSignUpState()
-                sendOnce(AuthUiEventModel.OnSignUpSuccess)
+                eventHandler.sendEvent(UiEvent.NavigateToRoute("movies"))
             }
     }
 
     private fun resetForm() = _formDataFlow.update { SignUpStateModel() }
-    private fun resetSignUpState() = _signUpState.update { SignUpEvent.Idle }
+    private fun resetSignUpState() = _signUpState.update { UiState.Success(Unit) }
 
-    @OptIn(DelicateCoroutinesApi::class)
-    private suspend fun sendOnce(event: AuthUiEventModel) {
-        if (!_oneTimeEventChannel.isClosedForSend) {
-            _oneTimeEventChannel.send(event)
-        }
+    override fun onCleared() {
+        super.onCleared()
+        eventHandler.close()
     }
 }

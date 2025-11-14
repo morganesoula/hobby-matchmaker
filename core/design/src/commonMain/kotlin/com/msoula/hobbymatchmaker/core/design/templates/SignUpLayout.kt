@@ -2,11 +2,11 @@ package com.msoula.hobbymatchmaker.core.design.templates
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWeight1
@@ -16,15 +16,11 @@ import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 @Composable
 fun SignUpLayout(
     modifier: Modifier = Modifier,
+    paddingValues: PaddingValues,
     topBar: @Composable () -> Unit,
     form: @Composable () -> Unit,
-    bottomSection: @Composable () -> Unit,
-    snackbarHost: @Composable () -> Unit,
-    loadingOverlay: @Composable () -> Unit = {}
+    bottomSection: @Composable () -> Unit
 ) {
-    Scaffold(
-        snackbarHost = snackbarHost
-    ) { paddingValues ->
         Box(
             modifier.fillMaxSize()
                 .padding(
@@ -46,8 +42,5 @@ fun SignUpLayout(
                 SpacerWeight1()
                 bottomSection()
             }
-
-            loadingOverlay()
         }
-    }
 }

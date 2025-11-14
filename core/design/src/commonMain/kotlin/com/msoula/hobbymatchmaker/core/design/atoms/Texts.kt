@@ -114,3 +114,8 @@ fun UIText.asString(): String = when (this) {
     is UIText.Plain -> value
     is UIText.Resource -> stringResource(res, *args.toTypedArray())
 }
+
+suspend fun UIText.asStringSuspend(): String = when (this) {
+    is UIText.Plain -> value
+    is UIText.Resource -> org.jetbrains.compose.resources.getString(res, *args.toTypedArray())
+}

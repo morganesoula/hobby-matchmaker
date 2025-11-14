@@ -31,6 +31,7 @@ import com.msoula.hobbymatchmaker.core.design.atoms.LoadingOverlay
 import com.msoula.hobbymatchmaker.core.design.atoms.PrimaryAlertDialog
 import com.msoula.hobbymatchmaker.core.design.atoms.PrimaryTextField
 import com.msoula.hobbymatchmaker.core.design.atoms.StateContainer
+import com.msoula.hobbymatchmaker.core.design.atoms.asStringSuspend
 import com.msoula.hobbymatchmaker.core.design.cancel
 import com.msoula.hobbymatchmaker.core.design.continue_as_guest_create_redirect_button
 import com.msoula.hobbymatchmaker.core.design.continue_as_guest_dialog_text
@@ -72,7 +73,6 @@ fun SignInScreenContent(
 
     val dontAskCheckboxValue by signInViewModel.dontAskCheckboxValue.collectAsState()
 
-    // Synchroniser la checkbox locale avec la valeur du DataStore quand le dialog s'ouvre
     LaunchedEffect(displayGuestDialog) {
         if (displayGuestDialog) {
             localCheckboxValue = dontAskCheckboxValue
@@ -83,7 +83,7 @@ fun SignInScreenContent(
         signInViewModel.events.collect { event ->
             when (event) {
                 is UiEvent.ShowSnackBar ->
-                    snackBarHostState.showSnackbar(event.message.toString())
+                    snackBarHostState.showSnackbar(event.message.asStringSuspend())
 
                 is UiEvent.NavigateToRoute -> onNavigate(event.route)
 
@@ -130,8 +130,8 @@ fun SignInScreenContent(
             StateContainer(
                 state = signInState,
                 onLoading = { LoadingOverlay(signInState is UiState.Loading) },
-                onEmpty = { },
-                onError = { error, hint -> },
+                onEmpty = {},
+                onError = { _, _ -> },
                 onSuccess = {
                     SignInLayout(
                         padding = padding,

@@ -12,6 +12,7 @@ import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.connection_issue
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
+import com.msoula.hobbymatchmaker.core.design.util.EventHandler
 import com.msoula.hobbymatchmaker.core.design.util.RetryPolicy
 import com.msoula.hobbymatchmaker.core.design.util.UIErrorHint
 import com.msoula.hobbymatchmaker.core.design.util.UIText
@@ -26,13 +27,9 @@ import com.msoula.hobbymatchmaker.features.movies.presentation.mappers.toMovieUi
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiModel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -51,9 +48,9 @@ class MovieViewModel(
 ) : ViewModel() {
 
     private val scope = externalScope ?: viewModelScope
-    private val _events: Channel<UiEvent> = Channel(Channel.BUFFERED)
-    val events: Flow<UiEvent> = _events.receiveAsFlow()
-
+    private val eventHandler = EventHandler()
+    val events = eventHandler.events
+    
     private val language = getDeviceLocale()
 
     private val _screenState = MutableStateFlow<UiState<List<MovieUiModel>>>(UiState.Loading)
@@ -95,14 +92,14 @@ class MovieViewModel(
         scope.launch {
             logOutUseCase()
                 .onFailure { error ->
-                    sendEvent(
+                    eventHandler.sendEvent(
                         UiEvent.ShowSnackBar(
                             defaultMessageMapper.toUIText(error)
                         )
                     )
                 }
                 .onSuccess {
-                    sendEvent(UiEvent.NavigateToRoute("sign_in"))
+                    eventHandler.sendEvent(UiEvent.NavigateToRoute("sign_in"))
                 }
         }
     }
@@ -133,9 +130,9 @@ class MovieViewModel(
         }
 
         if (hasLocal || hasConnectivity) {
-            sendEvent(UiEvent.NavigateToDetail(movieId))
+            eventHandler.sendEvent(UiEvent.NavigateToDetail(movieId))
         } else {
-            sendEvent(
+            eventHandler.sendEvent(
                 UiEvent.ShowSnackBar(
                     UIText.Resource(Res.string.connection_issue)
                 )
@@ -146,7 +143,7 @@ class MovieViewModel(
     private suspend fun toggleFavorite(movieId: Long, isFavorite: Boolean) {
         fetchFirebaseUserInfo()
             .onFailure { error ->
-                sendEvent(
+                eventHandler.sendEvent(
                     UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
                 )
             }
@@ -158,17 +155,15 @@ class MovieViewModel(
 
                 setMovieFavoriteUseCase(uid, movieId, isFavorite)
                     .onFailure { error ->
-                        sendEvent(
+                        eventHandler.sendEvent(
                             UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
                         )
                     }
             }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
-    private suspend fun sendEvent(event: UiEvent) {
-        if (!_events.isClosedForSend) {
-            _events.send(event)
-        }
+    override fun onCleared() {
+        super.onCleared()
+        eventHandler.close()
     }
 }

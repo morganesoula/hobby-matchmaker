@@ -25,6 +25,7 @@ actual val coreModuleNetworkPlatformSpecific = module {
                         println("Ktor log: $message")
                     }
                 }
+                //TODO Switch to NONE once you want to release
                 level = LogLevel.ALL
             }
 

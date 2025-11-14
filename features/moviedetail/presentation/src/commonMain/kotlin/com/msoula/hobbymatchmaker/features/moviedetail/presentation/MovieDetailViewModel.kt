@@ -11,6 +11,7 @@ import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.connection_issue
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
+import com.msoula.hobbymatchmaker.core.design.util.EventHandler
 import com.msoula.hobbymatchmaker.core.design.util.RetryPolicy
 import com.msoula.hobbymatchmaker.core.design.util.UIErrorHint
 import com.msoula.hobbymatchmaker.core.design.util.UIText
@@ -24,12 +25,9 @@ import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.Movie
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.toMovieDetailUiModel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -43,9 +41,8 @@ class MovieDetailViewModel(
 ) : ViewModel() {
     val scope = externalScope ?: viewModelScope
 
-    private val _events: Channel<UiEvent> = Channel(Channel.BUFFERED)
-    val events = _events.receiveAsFlow()
-
+    private val eventHandler = EventHandler()
+    val events = eventHandler.events
     private val _screenState = MutableStateFlow<UiState<MovieDetailUiModel>>(UiState.Loading)
     val screenState = _screenState.asStateFlow()
 
@@ -106,26 +103,24 @@ class MovieDetailViewModel(
     internal suspend fun onPlayTrailerClicked(movieId: Long, isVideoURIknown: Boolean) {
         if (isVideoURIknown) {
             if (connectivityCheck.hasActiveConnection()) {
-                sendEvent(UiEvent.OnDataReady(currentMovie?.videoKey.orEmpty()))
+                eventHandler.sendEvent(UiEvent.OnDataReady(currentMovie?.videoKey.orEmpty()))
             } else {
-                sendEvent(UiEvent.ShowSnackBar(UIText.Resource(Res.string.connection_issue)))
+                eventHandler.sendEvent(UiEvent.ShowSnackBar(UIText.Resource(Res.string.connection_issue)))
             }
             return
         }
 
         manageMovieTrailerUseCase(movieId, language)
             .onFailure { error ->
-                sendEvent(UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(error)))
+                eventHandler.sendEvent(UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(error)))
             }
             .onSuccess { data ->
-                sendEvent(UiEvent.OnDataReady(data.videoURI))
+                eventHandler.sendEvent(UiEvent.OnDataReady(data.videoURI))
             }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
-    private fun sendEvent(event: UiEvent) {
-        if (!_events.isClosedForSend) {
-            _events.trySend(event)
-        }
+    override fun onCleared() {
+        super.onCleared()
+        eventHandler.close()
     }
 }

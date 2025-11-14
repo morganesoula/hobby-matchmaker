@@ -11,7 +11,6 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
-import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SignInScreenContent
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SignInViewModel
@@ -94,15 +93,18 @@ fun AppNavHost(
                 val signUpViewModel = koinViewModel<SignUpViewModel>()
 
                 SignUpScreenContent(
-                    oneTimeEventChannelFlow = signUpViewModel.oneTimeEventChannelFlow,
-                    redirectToSignInScreen = { nav.popBackStack() },
-                    redirectToMovieScreen = {
-                        nav.navigate(Movies) {
-                            popUpTo<Auth> { inclusive = true }
-                            launchSingleTop = true
+                    signUpViewModel = signUpViewModel,
+                    onNavigate = { route ->
+                        when (route) {
+                            "movies" -> {
+                                nav.navigate(Movies) {
+                                    popUpTo<Auth> { inclusive = true }
+                                    launchSingleTop = true
+                                }
+                            }
+                            "sign_in" -> { nav.popBackStack() }
                         }
-                    },
-                    signUpViewModel = signUpViewModel
+                    }
                 )
             }
         }

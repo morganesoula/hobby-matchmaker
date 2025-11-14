@@ -28,6 +28,7 @@ import com.msoula.hobbymatchmaker.core.design.atoms.EmptyStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.MovieDetailLoadingScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.StateContainer
+import com.msoula.hobbymatchmaker.core.design.atoms.asStringSuspend
 import com.msoula.hobbymatchmaker.core.design.molecules.BackNavigationTopBar
 import com.msoula.hobbymatchmaker.core.design.no_data
 import com.msoula.hobbymatchmaker.core.design.organisms.ActorSection
@@ -50,7 +51,7 @@ fun MovieDetailContent(
         movieDetailViewModel.events.collect { event ->
             when (event) {
                 is UiEvent.ShowSnackBar ->
-                    snackBarHostState.showSnackbar(event.message.toString())
+                    snackBarHostState.showSnackbar(event.message.asStringSuspend())
 
                 else -> {}
             }

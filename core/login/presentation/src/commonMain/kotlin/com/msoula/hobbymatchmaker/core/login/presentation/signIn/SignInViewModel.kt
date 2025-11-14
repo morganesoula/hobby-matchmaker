@@ -11,6 +11,7 @@ import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
+import com.msoula.hobbymatchmaker.core.design.util.EventHandler
 import com.msoula.hobbymatchmaker.core.design.util.UIText
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.design.util.UiState
@@ -22,12 +23,9 @@ import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetCurrentUserPro
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetDontAskGuestDialogUseCase
 import dev.gitlive.firebase.auth.AuthCredential
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -45,16 +43,16 @@ class SignInViewModel(
 ) : ViewModel() {
 
     private val scope = externalScope ?: viewModelScope
-    private val _events: Channel<UiEvent> = Channel(Channel.BUFFERED)
-    val events = _events.receiveAsFlow()
+    private val eventHandler = EventHandler()
+    val events = eventHandler.events
     private val _formDataFlow = MutableStateFlow(SignInFormStateModel())
     val formDataFlow = _formDataFlow.asStateFlow()
-
-    @VisibleForTesting
-    internal var isSignIn = false
     private val _signInState: MutableStateFlow<UiState<Unit>> =
         MutableStateFlow(UiState.Success(Unit))
     val signInState: StateFlow<UiState<Unit>> = _signInState.asStateFlow()
+
+    @VisibleForTesting
+    internal var isSignIn = false
 
     private val _dontAskCheckboxValue = MutableStateFlow(false)
     val dontAskCheckboxValue: StateFlow<Boolean> = _dontAskCheckboxValue.asStateFlow()
@@ -150,12 +148,12 @@ class SignInViewModel(
         unifiedSignInUseCase(params)
             .onFailure { error ->
                 _signInState.update { UiState.Success(Unit) }
-                sendEvent(UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(error)))
+                eventHandler.sendEvent(UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(error)))
             }
             .onSuccess { result ->
                 setCurrentUserProfileUuidUseCase(result.uid)
                 _signInState.update { UiState.Success(Unit) }
-                sendEvent(UiEvent.NavigateToRoute("movies"))
+                eventHandler.sendEvent(UiEvent.NavigateToRoute("movies"))
             }
     }
 
@@ -182,7 +180,7 @@ class SignInViewModel(
                     )
                 )
             } else {
-                sendEvent(UiEvent.ShowSnackBar(UIText.Plain("Unable to get credentials")))
+                eventHandler.sendEvent(UiEvent.ShowSnackBar(UIText.Plain("Unable to get credentials")))
             }
         } finally {
             signingMutex.unlock()
@@ -196,18 +194,16 @@ class SignInViewModel(
         resetPasswordUseCase(Parameters.StringParam(formDataFlow.value.emailReset))
             .onFailure { error ->
                 _signInState.update { UiState.Success(Unit) }
-                sendEvent(UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(error)))
+                eventHandler.sendEvent(UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(error)))
             }
             .onSuccess {
                 _signInState.update { UiState.Success(Unit) }
-                sendEvent(UiEvent.CloseDialog("reset_password"))
+                eventHandler.sendEvent(UiEvent.CloseDialog("reset_password"))
             }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
-    private fun sendEvent(event: UiEvent) {
-        if (!_events.isClosedForSend) {
-            _events.trySend(event)
-        }
+    override fun onCleared() {
+        super.onCleared()
+        eventHandler.close()
     }
 }
