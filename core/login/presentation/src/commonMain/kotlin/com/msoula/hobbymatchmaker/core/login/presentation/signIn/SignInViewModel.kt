@@ -62,7 +62,6 @@ class SignInViewModel(
     init {
         scope.launch {
             observeDontAskCheckboxValueUseCase().collect { value ->
-                Logger.d("SignInViewModel - dontAskCheckboxValue collected from DataStore: $value")
                 _dontAskCheckboxValue.value = value
             }
         }

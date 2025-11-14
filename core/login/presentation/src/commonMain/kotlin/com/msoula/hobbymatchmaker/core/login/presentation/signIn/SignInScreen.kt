@@ -191,7 +191,6 @@ fun SignInScreenContent(
                                 isSignInScreen = true,
                                 onNavigateToOppositeScreen = { onNavigate("sign_up") },
                                 onContinueAsGuest = {
-                                    Logger.d("Continue as guest clicked - dontAskCheckboxValue: $dontAskCheckboxValue")
                                     if (dontAskCheckboxValue) {
                                         onNavigate("movies")
                                     } else {

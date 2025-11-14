@@ -12,7 +12,7 @@ import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfi
 fun BioBlock(
     mode: ProfileMode,
     bio: String?,
-    onEvent: (UserProfileUiEventModel) -> Unit
+    onBioChanged: (String) -> Unit
 ) {
     if (mode == ProfileMode.View) {
         if (!bio.isNullOrBlank()) {
@@ -26,7 +26,7 @@ fun BioBlock(
     } else {
         OutlinedTextField(
             value = bio!!,
-            onValueChange = { onEvent(UserProfileUiEventModel.OnBioChanged(it)) },
+            onValueChange = { onBioChanged(it) },
             label = { Text("Short bio") },
             minLines = 3
         )

@@ -33,8 +33,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-typealias MovieUiStateModel = UiState<List<MovieUiModel>>
-
 @OptIn(ExperimentalCoroutinesApi::class)
 class MovieViewModel(
     private val setMovieFavoriteUseCase: SetMovieFavoriteUseCase,
@@ -50,7 +48,7 @@ class MovieViewModel(
     private val scope = externalScope ?: viewModelScope
     private val eventHandler = EventHandler()
     val events = eventHandler.events
-    
+
     private val language = getDeviceLocale()
 
     private val _screenState = MutableStateFlow<UiState<List<MovieUiModel>>>(UiState.Loading)

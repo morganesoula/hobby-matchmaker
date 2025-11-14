@@ -18,13 +18,13 @@ import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfi
 fun AvatarBlock(
     mode: ProfileMode,
     avatarUrl: String?,
-    onEvent: (UserProfileUiEventModel) -> Unit
+    onAvatarClicked: () -> Unit
 ) {
     Box(Modifier.size(96.dp)) {
         CircularAvatar(avatarUrl)
         if (mode == ProfileMode.Edit) {
             SmallFloatingActionButton(
-                onClick = { onEvent(UserProfileUiEventModel.OnPickAvatarClicked) },
+                onClick = { onAvatarClicked() },
                 modifier = Modifier.align(Alignment.BottomEnd)
             ) {}
         }

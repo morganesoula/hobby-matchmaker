@@ -3,8 +3,14 @@ package com.msoula.hobbymatchmaker.core.design.atoms
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -53,4 +59,23 @@ fun MovieListLoadingScreen(
 @Composable
 fun MovieDetailLoadingScreen() {
     LoadingOverlay(true)
+}
+
+@Composable
+fun ProfileLoadingScreen(modifier: Modifier = Modifier) {
+    Column(
+        modifier
+            .fillMaxSize()
+    ) {
+        LoadingCircularProgress()
+        /* ShimmerCircle(modifier = modifier.size(96.dp).align(Alignment.CenterHorizontally))
+        Spacer(modifier.height(12.dp))
+        ShimmerRectangle(
+            widthFraction = 0.5f,
+            height = 20.dp,
+            modifier = modifier.align(Alignment.CenterHorizontally)
+        )
+        Spacer(modifier.height(24.dp))
+        ShimmerCard(height = 120.dp) */
+    }
 }

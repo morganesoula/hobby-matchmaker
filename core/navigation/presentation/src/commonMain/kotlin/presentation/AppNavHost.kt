@@ -102,7 +102,10 @@ fun AppNavHost(
                                     launchSingleTop = true
                                 }
                             }
-                            "sign_in" -> { nav.popBackStack() }
+
+                            "sign_in" -> {
+                                nav.popBackStack()
+                            }
                         }
                     }
                 )
@@ -122,11 +125,7 @@ fun AppNavHost(
                             launchSingleTop = true
                         }
 
-                        "profile" -> nav.navigate(Profile) {
-                            popUpTo<Movies> { inclusive = true }
-                            launchSingleTop = true
-                        }
-
+                        "profile" -> nav.navigate(Profile)
                         else -> return@MovieContent
                     }
                 },
@@ -153,16 +152,25 @@ fun AppNavHost(
         }
 
         composable<Profile> {
-            val profileViewModel = koinViewModel<UserProfileViewModel>()
-            val userProfileState by profileViewModel.currentUserProfileState.collectAsState()
+            val userProfileViewModel = koinViewModel<UserProfileViewModel>()
 
             UserProfileContent(
-                state = userProfileState,
-                onEvent = profileViewModel::onEvent,
-                navigateToSignUpScreen = {
-                    nav.navigate(Auth) {
-                        popUpTo<Profile> { inclusive = true }
-                        launchSingleTop = true
+                viewModel = userProfileViewModel,
+                onNavigate = { route ->
+                    when (route) {
+                        "sign_up" -> {
+                            nav.navigate(Auth) {
+                                popUpTo<Profile> { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        }
+
+                        "movies" -> {
+                            nav.navigate(Movies) {
+                                popUpTo<Profile> { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        }
                     }
                 }
             )

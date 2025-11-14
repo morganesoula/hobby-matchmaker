@@ -20,7 +20,8 @@ import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfi
 fun ProfileHeaderSection(
     mode: ProfileMode,
     user: UserProfileUiModel?,
-    onEvent: (UserProfileUiEventModel) -> Unit,
+    onAvatarClicked: () -> Unit,
+    onBioChanged: (String) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -31,7 +32,7 @@ fun ProfileHeaderSection(
         AvatarBlock(
             mode = mode,
             avatarUrl = user?.avatarUrl,
-            onEvent = onEvent
+            onAvatarClicked = onAvatarClicked
         )
 
         Spacer(Modifier.height(12.dp))
@@ -47,7 +48,7 @@ fun ProfileHeaderSection(
         BioBlock(
             mode = mode,
             bio = user?.bio,
-            onEvent = onEvent
+            onBioChanged = onBioChanged
         )
     }
 }

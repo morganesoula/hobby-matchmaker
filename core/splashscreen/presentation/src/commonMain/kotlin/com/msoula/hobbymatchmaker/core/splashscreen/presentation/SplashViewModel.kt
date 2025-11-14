@@ -26,7 +26,6 @@ class SplashViewModel(
         viewModelScope.launch {
             try {
                 val shouldSkipAuth = withTimeout(3_000) { observeIsConnectedUseCase().first() }
-                Logger.d("SplashViewModel - shouldSkipAuth: $shouldSkipAuth")
 
                 delay(1_000)
 

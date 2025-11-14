@@ -1,34 +1,33 @@
 package com.msoula.hobbymatchmaker.features.profile.presentation
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PersonOutline
-import androidx.compose.material.icons.outlined.ErrorOutline
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import com.msoula.hobbymatchmaker.core.design.atoms.ShimmerCard
-import com.msoula.hobbymatchmaker.core.design.atoms.ShimmerCircle
-import com.msoula.hobbymatchmaker.core.design.atoms.ShimmerRectangle
-import com.msoula.hobbymatchmaker.core.design.atoms.asString
+import com.msoula.hobbymatchmaker.core.common.isIosPlatform
+import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
+import com.msoula.hobbymatchmaker.core.design.atoms.ProfileLoadingScreen
+import com.msoula.hobbymatchmaker.core.design.molecules.BackNavigationTopBar
+import com.msoula.hobbymatchmaker.core.design.templates.CompleteProfileLayout
+import com.msoula.hobbymatchmaker.core.design.templates.GuestProfileLayout
+import com.msoula.hobbymatchmaker.core.design.templates.IncompleteProfileLayout
+import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
+import com.msoula.hobbymatchmaker.core.design.util.RetryPolicy
+import com.msoula.hobbymatchmaker.core.design.util.UIErrorHint
+import com.msoula.hobbymatchmaker.features.profile.presentation.components.EditBottomBar
 import com.msoula.hobbymatchmaker.features.profile.presentation.components.ProfileHeaderSection
 import com.msoula.hobbymatchmaker.features.profile.presentation.components.ProfileInterestsSection
 import com.msoula.hobbymatchmaker.features.profile.presentation.components.ProfileSocialSection
@@ -42,149 +41,127 @@ import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfi
 @Composable
 fun UserProfileContent(
     modifier: Modifier = Modifier,
-    state: UserProfileUiStateModel,
-    onEvent: (UserProfileUiEventModel) -> Unit,
-    navigateToSignUpScreen: () -> Unit
+    viewModel: UserProfileViewModel,
+    onNavigate: (String) -> Unit
 ) {
-    when (state) {
-        is UserProfileUiStateModel.Success ->
-            UserProfileScreenContent(
-                mode = ProfileMode.View,
-                //userProfile = fakeUserProfile(),
-                userProfile = state.userProfile,
-                onEvent = onEvent
-            )
+    val profileState by viewModel.screenState.collectAsState()
+    val isEditMode by viewModel.isEditMode.collectAsState()
+    val editableProfile by viewModel.editableProfile.collectAsState()
 
-        is UserProfileUiStateModel.Error ->
-            UserProfileErrorScreen(error = state.errorMessage.asString())
-
-        is UserProfileUiStateModel.Loading ->
-            UserProfileLoadingScreen()
-
-        is UserProfileUiStateModel.Guest ->
-            UserProfileGuestScreen(navigateToSignUpScreen = navigateToSignUpScreen)
-
-        is UserProfileUiStateModel.Incomplete ->
-            UserProfileScreenContent(
-                mode = ProfileMode.View,
-                userProfile = null,
-                onEvent = onEvent
-            )
-    }
-}
-
-@Composable
-fun UserProfileScreenContent(
-    modifier: Modifier = Modifier,
-    mode: ProfileMode,
-    userProfile: UserProfileUiModel?,
-    onEvent: (UserProfileUiEventModel) -> Unit
-) {
-    val scrollState = rememberScrollState()
-
-    Scaffold {
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-                .background(
-                    Brush.verticalGradient(
-                        listOf(
-                            MaterialTheme.colorScheme.primary.copy(alpha = .85f),
-                            MaterialTheme.colorScheme.surface
-                        )
-                    )
+    Scaffold(
+        topBar = {
+            if (isIosPlatform()) {
+                BackNavigationTopBar(onBack = { onNavigate("movies") })
+            }
+        },
+        bottomBar = {
+            if (isEditMode && profileState is UserProfileUiStateModel.Success) {
+                EditBottomBar(
+                    canSave = true,
+                    onSave = {
+                        viewModel.onEvent(UserProfileUiEventModel.OnSaveClicked)
+                    },
+                    onSkip = {
+                        viewModel.onEvent(UserProfileUiEventModel.OnSkipClicked)
+                    }
                 )
-                .padding(bottom = 24.dp)
-        ) {
-            ProfileHeaderSection(mode, userProfile, onEvent)
-            Spacer(Modifier.height(12.dp))
-            ProfileStatsSection(mode = mode, user = userProfile)
-            Spacer(Modifier.height(16.dp))
-            ProfileInterestsSection(mode, userProfile)
-            Spacer(Modifier.height(16.dp))
-            ProfileSocialSection(mode, userProfile)
+            }
+        },
+        floatingActionButton = {
+            if (!isEditMode && profileState is UserProfileUiStateModel.Success) {
+                FloatingActionButton(
+                    onClick = {
+                        viewModel.onEvent(UserProfileUiEventModel.OnEditModeToggled)
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Edit profile"
+                    )
+                }
+            }
         }
-    }
-}
+    ) { padding ->
+        when (profileState) {
+            is UserProfileUiStateModel.Loading -> ProfileLoadingScreen()
 
-@Composable
-fun UserProfileGuestScreen(
-    modifier: Modifier = Modifier,
-    navigateToSignUpScreen: () -> Unit
-) {
-    Column(
-        modifier
-            .fillMaxSize()
-            .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Icon(
-            Icons.Default.PersonOutline,
-            contentDescription = null,
-            modifier = modifier.size(96.dp),
-            tint = Color.Gray
-        )
-        Spacer(modifier.height(16.dp))
-        Text(
-            "You're browsing as a guest!",
-            style = MaterialTheme.typography.titleMedium,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier.height(8.dp))
-        Text(
-            "Create an account to build your profile and connect with others.",
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier.height(24.dp))
-        Button(onClick = { navigateToSignUpScreen() }) {
-            Text("Create My Profile")
+            is UserProfileUiStateModel.Error -> {
+                val error = (profileState as UserProfileUiStateModel.Error)
+                ErrorStateScreen(
+                    error = error.errorMessage,
+                    hint = UIErrorHint(retry = RetryPolicy.Manual),
+                    onRetry = {}
+                )
+            }
+
+            is UserProfileUiStateModel.Success -> {
+                val displayProfile = if (isEditMode) {
+                    editableProfile ?: (profileState as UserProfileUiStateModel.Success).userProfile
+                } else {
+                    (profileState as UserProfileUiStateModel.Success).userProfile
+                }
+
+                val mode = if (isEditMode) ProfileMode.Edit else ProfileMode.View
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .background(
+                            Brush.verticalGradient(
+                                listOf(
+                                    MaterialTheme.colorScheme.primary.copy(alpha = .85f),
+                                    MaterialTheme.colorScheme.surface
+                                )
+                            )
+                        )
+                        .padding(
+                            top = padding.calculateTopPadding(),
+                            bottom = padding.calculateBottomPadding() + CustomSize.TwentyFour
+                        )
+                ) {
+                    CompleteProfileLayout(
+                        headerSection = {
+                            ProfileHeaderSection(
+                                mode,
+                                displayProfile,
+                                onAvatarClicked = {
+                                    viewModel.onEvent(
+                                        UserProfileUiEventModel.OnPickAvatarClicked
+                                    )
+                                },
+                                onBioChanged = { bio ->
+                                    viewModel.onEvent(
+                                        UserProfileUiEventModel.OnBioChanged(bio)
+                                    )
+                                }
+                            )
+                        },
+                        statsSection = {
+                            ProfileStatsSection(mode, displayProfile)
+                        },
+                        interestsSection = {
+                            ProfileInterestsSection(
+                                mode = mode,
+                                user = displayProfile
+                            )
+                        },
+                        socialSection = {
+                            ProfileSocialSection(
+                                mode = mode,
+                                user = displayProfile
+                            )
+                        }
+                    )
+                }
+            }
+
+            is UserProfileUiStateModel.Guest ->
+                GuestProfileLayout()
+
+            is UserProfileUiStateModel.Incomplete ->
+                IncompleteProfileLayout()
         }
-    }
-}
-
-@Composable
-fun UserProfileLoadingScreen(modifier: Modifier = Modifier) {
-    Column(
-        modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp)
-    ) {
-        ShimmerCircle(modifier = modifier.size(96.dp).align(Alignment.CenterHorizontally))
-        Spacer(modifier.height(12.dp))
-        ShimmerRectangle(
-            widthFraction = 0.5f,
-            height = 20.dp,
-            modifier = modifier.align(Alignment.CenterHorizontally)
-        )
-        Spacer(modifier.height(24.dp))
-        ShimmerCard(height = 120.dp)
-    }
-}
-
-@Composable
-fun UserProfileErrorScreen(
-    modifier: Modifier = Modifier,
-    error: String
-) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Icon(
-            Icons.Outlined.ErrorOutline,
-            contentDescription = null,
-            tint = Color(0xFFFF9800),
-            modifier = modifier.size(72.dp)
-        )
-        Spacer(modifier.height(16.dp))
-        Text(error, textAlign = TextAlign.Center)
-        Spacer(modifier.height(24.dp))
     }
 }
 

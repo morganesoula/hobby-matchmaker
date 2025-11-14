@@ -43,7 +43,6 @@ fun MovieDetailContent(
     movieDetailViewModel: MovieDetailViewModel,
     onNavigate: (String) -> Unit
 ) {
-
     val movieDetailState by movieDetailViewModel.screenState.collectAsState()
     val snackBarHostState = remember { SnackbarHostState() }
 
