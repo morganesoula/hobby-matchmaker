@@ -16,4 +16,5 @@ interface SessionRepository {
     suspend fun setCurrentUserUid(uid: String): AppResult<Unit, AppError>
     fun observeCurrentUserUid(): Flow<String>
     suspend fun getCurrentUserUid(): String
+    suspend fun clearCurrentUserUid(): AppResult<Unit, AppError>
 }

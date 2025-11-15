@@ -12,4 +12,5 @@ interface SessionLocalDataSource {
     fun observeCurrentUid(): Flow<String>
     suspend fun setCurrentUid(currentUid: String): AppResult<Unit, AppError>
     suspend fun getCurrentUserUid(): String
+    suspend fun clearCurrentUserUid(): AppResult<Unit, AppError>
 }

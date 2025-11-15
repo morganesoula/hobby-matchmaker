@@ -65,20 +65,25 @@ fun MovieContent(
         topBar = {
             NavigationTopBar(
                 redirectToProfile = { onNavigate("profile") },
-                redirectToSignIn = { onNavigate("sign_in") }
+                redirectToSignIn = {
+                    movieViewModel.logOut()
+                    onNavigate("sign_in")
+                }
             )
         },
-        snackbarHost = { SnackbarHost(snackBarHostState) { data ->
-            Snackbar(
-                modifier = modifier.semantics { liveRegion = LiveRegionMode.Polite }
-                    .padding(horizontal = 16.dp).fillMaxWidth(),
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text(text = data.visuals.message)
+        snackbarHost = {
+            SnackbarHost(snackBarHostState) { data ->
+                Snackbar(
+                    modifier = modifier.semantics { liveRegion = LiveRegionMode.Polite }
+                        .padding(horizontal = 16.dp).fillMaxWidth(),
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(text = data.visuals.message)
+                }
             }
-        } }
+        }
     ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
             StateContainer(

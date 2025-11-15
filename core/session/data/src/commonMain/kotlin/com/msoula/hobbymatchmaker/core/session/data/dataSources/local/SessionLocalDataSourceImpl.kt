@@ -9,7 +9,6 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
-import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.session.data.dataSources.local.helpers.safeLocalWrite
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -65,4 +64,13 @@ class SessionLocalDataSourceImpl(
 
     override suspend fun getCurrentUserUid(): String =
         dataStore.data.first()[USER_PROFILE_UUID] ?: ""
+
+    override suspend fun clearCurrentUserUid(): AppResult<Unit, AppError> =
+        safeLocalWrite {
+            dataStore.edit { preferences ->
+                if (preferences.contains(USER_PROFILE_UUID)) {
+                    preferences.remove(USER_PROFILE_UUID)
+                }
+            }
+        }
 }

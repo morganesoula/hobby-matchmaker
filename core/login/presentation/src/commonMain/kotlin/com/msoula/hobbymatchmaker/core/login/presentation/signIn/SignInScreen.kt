@@ -192,7 +192,8 @@ fun SignInScreenContent(
                                 onNavigateToOppositeScreen = { onNavigate("sign_up") },
                                 onContinueAsGuest = {
                                     if (dontAskCheckboxValue) {
-                                        onNavigate("movies")
+                                        Logger.d("Continue as guest clicked - setting account as guest")
+                                        signInViewModel.onEvent(AuthenticationUIEvent.SetAccountAsGuest)
                                     } else {
                                         displayGuestDialog = true
                                     }
@@ -249,7 +250,7 @@ fun SignInScreenContent(
                     },
                     onConfirm = {
                         displayGuestDialog = false
-                        onNavigate("movies")
+                        signInViewModel.onEvent(AuthenticationUIEvent.SetAccountAsGuest)
                     }
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {

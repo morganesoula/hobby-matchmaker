@@ -114,6 +114,25 @@ class SignInViewModel(
                 scope.launch { resetPassword() }
             }
 
+            AuthenticationUIEvent.SetAccountAsGuest -> {
+                Logger.d("Setting account as Guest inside SignInViewModel")
+                scope.launch {
+                    setCurrentUserProfileUuidUseCase()
+                        .onSuccess {
+                            eventHandler.sendEvent(UiEvent.NavigateToRoute("movies"))
+                        }
+                        .onFailure { error ->
+                            eventHandler.sendEvent(
+                                UiEvent.ShowSnackBar(
+                                    defaultErrorMessageMapper.toUIText(
+                                        error
+                                    )
+                                )
+                            )
+                        }
+                }
+            }
+
             AuthenticationUIEvent.OnSignIn ->
                 scope.launch {
                     signInUnified(
@@ -150,6 +169,7 @@ class SignInViewModel(
                 eventHandler.sendEvent(UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(error)))
             }
             .onSuccess { result ->
+                Logger.d("Signed in with uid:${result.uid}")
                 setCurrentUserProfileUuidUseCase(result.uid)
                 _signInState.update { UiState.Success(Unit) }
                 eventHandler.sendEvent(UiEvent.NavigateToRoute("movies"))

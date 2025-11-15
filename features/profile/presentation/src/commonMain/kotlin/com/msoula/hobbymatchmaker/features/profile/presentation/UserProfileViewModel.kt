@@ -52,6 +52,7 @@ class UserProfileViewModel(
             observeSessionStateUseCase(),
             observeCurrentUserProfileStateUseCase()
         ) { session, profile ->
+            Logger.d("Session: $session, Profile: $profile")
             when (session) {
                 is SessionState.Guest -> {
                     when (profile) {

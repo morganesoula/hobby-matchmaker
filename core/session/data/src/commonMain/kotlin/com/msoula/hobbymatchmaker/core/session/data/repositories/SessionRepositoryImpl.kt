@@ -1,5 +1,7 @@
 package com.msoula.hobbymatchmaker.core.session.data.repositories
 
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.session.data.dataSources.local.SessionLocalDataSource
 import com.msoula.hobbymatchmaker.core.session.data.dataSources.remote.SessionRemoteDataSource
 import com.msoula.hobbymatchmaker.core.session.data.dataSources.remote.mappers.toUserFireStoreModel
@@ -34,4 +36,7 @@ class SessionRepositoryImpl(
 
     override suspend fun getCurrentUserUid() =
         sessionLocalDataSource.getCurrentUserUid()
+
+    override suspend fun clearCurrentUserUid(): AppResult<Unit, AppError> =
+        sessionLocalDataSource.clearCurrentUserUid()
 }

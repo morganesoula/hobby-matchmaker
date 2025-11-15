@@ -89,7 +89,7 @@ fun AuthenticationScreenBottom(
     // "Continue as Guest" button (only on SignIn screen)
     if (isSignInScreen) {
         OutlinedButton(
-            onClick = onContinueAsGuest,
+            onClick = { onContinueAsGuest() },
             enabled = guestButtonEnabled,
             modifier = Modifier
                 .fillMaxWidth()

@@ -6,6 +6,7 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.models.AuthState
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfo
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutUseCase
 import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.getDeviceLocale
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
@@ -97,6 +98,7 @@ class MovieViewModel(
                     )
                 }
                 .onSuccess {
+                    Logger.d("Successfully logged out")
                     eventHandler.sendEvent(UiEvent.NavigateToRoute("sign_in"))
                 }
         }
