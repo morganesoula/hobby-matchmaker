@@ -57,23 +57,19 @@ class UserProfileViewModel(
                 is SessionState.Guest -> {
                     when (profile) {
                         is ProfileState.Present -> {
-                            Logger.d("Guest profile present")
                             UserProfileUiStateModel.Success(
                                 profile.profile.toUserProfileUiModel()
                             )
                         }
 
-                        is ProfileState.Incomplete -> {
-                            Logger.d("Guest profile incomplete")
+                        is ProfileState.Incomplete ->
                             UserProfileUiStateModel.Guest(session.uid)
-                        }
                     }
                 }
 
                 is SessionState.Authenticated -> {
                     when (profile) {
                         is ProfileState.Present -> {
-                            Logger.d("User profile present")
                             val uiModel = profile.profile.toUserProfileUiModel()
 
                             if (_editableProfile.value == null) {
@@ -84,10 +80,9 @@ class UserProfileViewModel(
                         }
 
 
-                        is ProfileState.Incomplete -> {
-                            Logger.d("User profile incomplete")
+                        is ProfileState.Incomplete ->
                             UserProfileUiStateModel.Incomplete(session.uid)
-                        }
+
                     }
                 }
 

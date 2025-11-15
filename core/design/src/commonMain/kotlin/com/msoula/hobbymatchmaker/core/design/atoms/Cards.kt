@@ -77,6 +77,23 @@ fun MovieGenericCard(
 }
 
 @Composable
+fun GenericCard(
+    modifier: Modifier = Modifier,
+    containerColor: Color,
+    content: @Composable () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = CustomSize.TwentyFour),
+        shape = RoundedCornerShape(CustomSize.Sixteen),
+        colors = CardDefaults.cardColors(containerColor = containerColor)
+    ) {
+        content()
+    }
+}
+
+@Composable
 fun ShimmerCircle(
     modifier: Modifier = Modifier,
     size: Dp = 96.dp,

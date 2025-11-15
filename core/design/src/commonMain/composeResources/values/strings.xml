@@ -106,8 +106,22 @@
     <string name="authentication_unknown">Echec de la connexion. Ressayez !</string>
     <string name="authentication_invalid_credentials">Identifiants incorrects.</string>
 
+    // PROFILE
     <string name="movies_liked_count_title">Films aimés</string>
     <string name="social_members_count_title">Connexions</string>
     <string name="user_profile_interests_title">Intérêts</string>
     <string name="user_profile_social_circle_main_title">Mon cercle social</string>
+
+    <string name="guest_header_title">Bienvenue sur HobbyMatchMaker</string>
+    <string name="guest_header_description">Connectez-vous à d'autres personnes pour partagez vos passions</string>
+    <string name="guest_discover_feature_title">Découvrez des Passions Communes</string>
+    <string name="guest_discover_feature_description">Soyez notifiez lorsque vous et votre cercle aimez le même film</string>
+    <string name="guest_build_circle_feature_title">Définissez Votre Cercle</string>
+    <string name="guest_build_circle_feature_description">Ajoutez jusqu'à 5 personnes à votre cercle social et restez connectés</string>
+    <string name="guest_share_interests_feature_title">Partagez Vos Passions</string>
+    <string name="guest_share_interests_feature_description">Indiquez vos passions et connectez vous à des gens qui vous ressemblent</string>
+    <string name="guest_redirect_title">Prêt à commencer ?</string>
+    <string name="guest_redirect_description">Rejoignez HobbyMatchMaker et lancez vous dans l'aventure</string>
+    <string name="guest_redirect_sign_up_button_text">Inscrivez-vous dès maintenant !</string>
+    "
 </resources>

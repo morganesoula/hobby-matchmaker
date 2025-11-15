@@ -107,8 +107,21 @@
     <string name="authentication_unknown">Sign-in failed. Try again!</string>
     <string name="authentication_invalid_credentials">Invalid credentials.</string>
 
+    // Profile
     <string name="movies_liked_count_title">Movies Liked</string>
     <string name="social_members_count_title">Connections</string>
     <string name="user_profile_interests_title">Interests in Life</string>
     <string name="user_profile_social_circle_main_title">My Social Circle</string>
+
+    <string name="guest_header_title">Welcome to HobbyMatchMaker</string>
+    <string name="guest_header_description">Connect with people who share your passions</string>
+    <string name="guest_discover_feature_title">Discover Shared Interests</string>
+    <string name="guest_discover_feature_description">Get notified when you and your connections both like the same movie</string>
+    <string name="guest_build_circle_feature_title">Build Your Circle</string>
+    <string name="guest_build_circle_feature_description">Add up to 5 people to your social circle and stay connected</string>
+    <string name="guest_share_interests_feature_title">Share Your Interests</string>
+    <string name="guest_share_interests_feature_description">Showcase your hobbies and connect with like-minded people</string>
+    <string name="guest_redirect_title">Ready to Get Started?</string>
+    <string name="guest_redirect_description">Join HobbyMatchMaker and start connecting!</string>
+    <string name="guest_redirect_sign_up_button_text">Sign Up Now</string>
 </resources>

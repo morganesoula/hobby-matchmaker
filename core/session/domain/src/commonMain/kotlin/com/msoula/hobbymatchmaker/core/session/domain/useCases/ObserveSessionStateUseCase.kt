@@ -11,7 +11,6 @@ class ObserveSessionStateUseCase(
 ) {
     operator fun invoke(): Flow<SessionState?> =
         sessionRepository.observeCurrentUserUid().map { uid ->
-            Logger.d("Inside observeSessionStateUseCase with uid:$uid")
             when {
                 uid.isEmpty() -> null
                 uid.startsWith("guest:") -> SessionState.Guest(uid)

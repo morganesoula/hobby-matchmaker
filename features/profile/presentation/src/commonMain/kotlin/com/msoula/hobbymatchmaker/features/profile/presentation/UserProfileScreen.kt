@@ -1,30 +1,37 @@
 package com.msoula.hobbymatchmaker.features.profile.presentation
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Movie
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import com.msoula.hobbymatchmaker.core.common.isIosPlatform
+import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.ProfileLoadingScreen
+import com.msoula.hobbymatchmaker.core.design.guest_build_circle_feature_description
+import com.msoula.hobbymatchmaker.core.design.guest_build_circle_feature_title
+import com.msoula.hobbymatchmaker.core.design.guest_discover_feature_description
+import com.msoula.hobbymatchmaker.core.design.guest_discover_feature_title
+import com.msoula.hobbymatchmaker.core.design.guest_redirect_description
+import com.msoula.hobbymatchmaker.core.design.guest_redirect_sign_up_button_text
+import com.msoula.hobbymatchmaker.core.design.guest_redirect_title
+import com.msoula.hobbymatchmaker.core.design.guest_share_interests_feature_description
+import com.msoula.hobbymatchmaker.core.design.guest_share_interests_feature_title
+import com.msoula.hobbymatchmaker.core.design.icons.Sparkle
 import com.msoula.hobbymatchmaker.core.design.molecules.BackNavigationTopBar
+import com.msoula.hobbymatchmaker.core.design.molecules.FeatureProfileCard
+import com.msoula.hobbymatchmaker.core.design.molecules.FeatureProfileCardWithButton
+import com.msoula.hobbymatchmaker.core.design.organisms.GenericProfileBackground
 import com.msoula.hobbymatchmaker.core.design.templates.CompleteProfileLayout
 import com.msoula.hobbymatchmaker.core.design.templates.GuestProfileLayout
 import com.msoula.hobbymatchmaker.core.design.templates.IncompleteProfileLayout
-import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.util.RetryPolicy
 import com.msoula.hobbymatchmaker.core.design.util.UIErrorHint
 import com.msoula.hobbymatchmaker.features.profile.presentation.components.EditBottomBar
@@ -37,6 +44,7 @@ import com.msoula.hobbymatchmaker.features.profile.presentation.models.SocialMem
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiEventModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiStateModel
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun UserProfileContent(
@@ -103,22 +111,8 @@ fun UserProfileContent(
 
                 val mode = if (isEditMode) ProfileMode.Edit else ProfileMode.View
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                        .background(
-                            Brush.verticalGradient(
-                                listOf(
-                                    MaterialTheme.colorScheme.primary.copy(alpha = .85f),
-                                    MaterialTheme.colorScheme.surface
-                                )
-                            )
-                        )
-                        .padding(
-                            top = padding.calculateTopPadding(),
-                            bottom = padding.calculateBottomPadding() + CustomSize.TwentyFour
-                        )
+                GenericProfileBackground(
+                    padding = padding
                 ) {
                     CompleteProfileLayout(
                         headerSection = {
@@ -156,8 +150,44 @@ fun UserProfileContent(
                 }
             }
 
-            is UserProfileUiStateModel.Guest ->
-                GuestProfileLayout()
+            is UserProfileUiStateModel.Guest -> {
+                GenericProfileBackground(
+                    padding = padding
+                ) {
+                    GuestProfileLayout(
+                        guestHeader = {},
+                        guestDiscoverFeature = {
+                            FeatureProfileCard(
+                                icon = Icons.Default.Movie,
+                                titleFeature = stringResource(Res.string.guest_discover_feature_title),
+                                descriptionFeature = stringResource(Res.string.guest_discover_feature_description)
+                            )
+                        },
+                        guestBuildCircleFeature = {
+                            FeatureProfileCard(
+                                icon = Icons.Default.People,
+                                titleFeature = stringResource(Res.string.guest_build_circle_feature_title),
+                                descriptionFeature = stringResource(Res.string.guest_build_circle_feature_description)
+                            )
+                        },
+                        guestSharedInterestsFeature = {
+                            FeatureProfileCard(
+                                icon = Sparkle,
+                                titleFeature = stringResource(Res.string.guest_share_interests_feature_title),
+                                descriptionFeature = stringResource(Res.string.guest_share_interests_feature_description)
+                            )
+                        },
+                        guestRedirectFeature = {
+                            FeatureProfileCardWithButton(
+                                titleFeature = stringResource(Res.string.guest_redirect_title),
+                                descriptionFeature = stringResource(Res.string.guest_redirect_description),
+                                buttonText = stringResource(Res.string.guest_redirect_sign_up_button_text),
+                                onClick = { onNavigate("sign_up") }
+                            )
+                        }
+                    )
+                }
+            }
 
             is UserProfileUiStateModel.Incomplete ->
                 IncompleteProfileLayout()
