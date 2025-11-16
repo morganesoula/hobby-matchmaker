@@ -2,8 +2,11 @@ package com.msoula.hobbymatchmaker.features.profile.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutUseCase
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.Logger
+import com.msoula.hobbymatchmaker.core.common.onFailure
+import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.design.util.EventHandler
 import com.msoula.hobbymatchmaker.core.design.util.UIText
@@ -32,6 +35,7 @@ import kotlinx.coroutines.launch
 class UserProfileViewModel(
     observeCurrentUserProfileStateUseCase: ObserveCurrentUserProfileStateUseCase,
     observeSessionStateUseCase: ObserveSessionStateUseCase,
+    private val logOutUseCase: LogOutUseCase,
     private val defaultMessageMapper: ErrorMessageMapper,
     externalScope: CoroutineScope? = null
 ) : ViewModel() {
@@ -129,6 +133,8 @@ class UserProfileViewModel(
             UserProfileUiEventModel.OnSkipClicked -> exitEditMode()
 
             UserProfileUiEventModel.OnEditModeToggled -> toggleEditMode()
+
+            UserProfileUiEventModel.OnSignUpButtonClicked -> logOut()
         }
     }
 
@@ -166,5 +172,22 @@ class UserProfileViewModel(
     override fun onCleared() {
         super.onCleared()
         eventHandler.close()
+    }
+
+    private fun logOut() {
+        scope.launch {
+            logOutUseCase()
+                .onFailure { error ->
+                    eventHandler.sendEvent(
+                        UiEvent.ShowSnackBar(
+                            defaultMessageMapper.toUIText(error)
+                        )
+                    )
+                }
+                .onSuccess {
+                    Logger.d("Successfully logged out")
+                    eventHandler.sendEvent(UiEvent.NavigateToRoute("sign_up"))
+                }
+        }
     }
 }

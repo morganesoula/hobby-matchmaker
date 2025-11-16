@@ -2,7 +2,8 @@ package com.msoula.hobbymatchmaker.core.design.templates
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight4
+import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
+import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight32
 
 @Composable
 fun GuestProfileLayout(
@@ -14,11 +15,12 @@ fun GuestProfileLayout(
     guestRedirectFeature: @Composable () -> Unit
 ) {
     guestHeader()
+    SpacerHeight32()
     guestDiscoverFeature()
-    SpacerHeight4()
+    SpacerHeight16()
     guestBuildCircleFeature()
-    SpacerHeight4()
+    SpacerHeight16()
     guestSharedInterestsFeature()
-    SpacerHeight4()
+    SpacerHeight16()
     guestRedirectFeature()
 }

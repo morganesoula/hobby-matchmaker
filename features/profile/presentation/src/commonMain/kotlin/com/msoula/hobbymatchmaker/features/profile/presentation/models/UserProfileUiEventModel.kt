@@ -8,4 +8,5 @@ sealed interface UserProfileUiEventModel {
     data object OnSaveClicked : UserProfileUiEventModel
     data object OnSkipClicked : UserProfileUiEventModel
     data object OnEditModeToggled : UserProfileUiEventModel
+    data object OnSignUpButtonClicked : UserProfileUiEventModel
 }

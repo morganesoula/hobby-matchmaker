@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.People
@@ -34,6 +35,7 @@ import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.ic_movie_clapper_board
 import com.msoula.hobbymatchmaker.core.design.ic_no_image_found_playstore
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
+import com.msoula.hobbymatchmaker.core.design.theme.IconSize
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -131,3 +133,55 @@ fun Modifier.shimmerEffect(): Modifier =
                 size = it.size
             }
     }
+
+@Composable
+fun CircleWithIcon(
+    modifier: Modifier = Modifier,
+    backgroundColor: Color,
+    icon: ImageVector,
+    iconTint: Color,
+    contentDescription: String? = null
+) {
+    Box(
+        modifier = modifier
+            .size(CustomSize.NinetySix)
+            .background(
+                color = backgroundColor,
+                shape = CircleShape
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = contentDescription,
+            tint = iconTint,
+            modifier = Modifier.size(IconSize.FortyEight)
+        )
+    }
+}
+
+@Composable
+fun RectangleWithIcon(
+    modifier: Modifier = Modifier,
+    backgroundColor: Color,
+    icon: ImageVector,
+    iconTint: Color,
+    contentDescription: String? = null
+) {
+    Box(
+        modifier = modifier
+            .size(CustomSize.FortyEight)
+            .background(
+                color = backgroundColor,
+                shape = RoundedCornerShape(CustomSize.Eight)
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = contentDescription,
+            tint = iconTint,
+            modifier = Modifier.size(IconSize.TwentyFour)
+        )
+    }
+}

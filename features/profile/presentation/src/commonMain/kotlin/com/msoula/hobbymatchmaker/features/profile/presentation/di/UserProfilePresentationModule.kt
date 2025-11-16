@@ -10,6 +10,7 @@ val featuresModuleUserProfilePresentation = module {
             get(),
             get(),
             get(),
+            get(),
             null
         )
     }

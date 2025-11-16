@@ -2,12 +2,11 @@ package com.msoula.hobbymatchmaker.features.profile.presentation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Movie
-import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -19,21 +18,27 @@ import com.msoula.hobbymatchmaker.core.design.guest_build_circle_feature_descrip
 import com.msoula.hobbymatchmaker.core.design.guest_build_circle_feature_title
 import com.msoula.hobbymatchmaker.core.design.guest_discover_feature_description
 import com.msoula.hobbymatchmaker.core.design.guest_discover_feature_title
+import com.msoula.hobbymatchmaker.core.design.guest_header_description
+import com.msoula.hobbymatchmaker.core.design.guest_header_title
 import com.msoula.hobbymatchmaker.core.design.guest_redirect_description
 import com.msoula.hobbymatchmaker.core.design.guest_redirect_sign_up_button_text
 import com.msoula.hobbymatchmaker.core.design.guest_redirect_title
 import com.msoula.hobbymatchmaker.core.design.guest_share_interests_feature_description
 import com.msoula.hobbymatchmaker.core.design.guest_share_interests_feature_title
+import com.msoula.hobbymatchmaker.core.design.icons.Film
+import com.msoula.hobbymatchmaker.core.design.icons.Person
 import com.msoula.hobbymatchmaker.core.design.icons.Sparkle
 import com.msoula.hobbymatchmaker.core.design.molecules.BackNavigationTopBar
 import com.msoula.hobbymatchmaker.core.design.molecules.FeatureProfileCard
 import com.msoula.hobbymatchmaker.core.design.molecules.FeatureProfileCardWithButton
 import com.msoula.hobbymatchmaker.core.design.organisms.GenericProfileBackground
+import com.msoula.hobbymatchmaker.core.design.organisms.GuestProfileHeader
 import com.msoula.hobbymatchmaker.core.design.templates.CompleteProfileLayout
 import com.msoula.hobbymatchmaker.core.design.templates.GuestProfileLayout
 import com.msoula.hobbymatchmaker.core.design.templates.IncompleteProfileLayout
 import com.msoula.hobbymatchmaker.core.design.util.RetryPolicy
 import com.msoula.hobbymatchmaker.core.design.util.UIErrorHint
+import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.features.profile.presentation.components.EditBottomBar
 import com.msoula.hobbymatchmaker.features.profile.presentation.components.ProfileHeaderSection
 import com.msoula.hobbymatchmaker.features.profile.presentation.components.ProfileInterestsSection
@@ -55,6 +60,15 @@ fun UserProfileContent(
     val profileState by viewModel.screenState.collectAsState()
     val isEditMode by viewModel.isEditMode.collectAsState()
     val editableProfile by viewModel.editableProfile.collectAsState()
+
+    LaunchedEffect(viewModel.events) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is UiEvent.NavigateToRoute -> onNavigate(event.route)
+                else -> Unit
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -155,17 +169,23 @@ fun UserProfileContent(
                     padding = padding
                 ) {
                     GuestProfileLayout(
-                        guestHeader = {},
+                        guestHeader = {
+                            GuestProfileHeader(
+                                icon = Film,
+                                titleHeader = stringResource(Res.string.guest_header_title),
+                                descriptionHeader = stringResource(Res.string.guest_header_description)
+                            )
+                        },
                         guestDiscoverFeature = {
                             FeatureProfileCard(
-                                icon = Icons.Default.Movie,
+                                icon = Film,
                                 titleFeature = stringResource(Res.string.guest_discover_feature_title),
                                 descriptionFeature = stringResource(Res.string.guest_discover_feature_description)
                             )
                         },
                         guestBuildCircleFeature = {
                             FeatureProfileCard(
-                                icon = Icons.Default.People,
+                                icon = Person,
                                 titleFeature = stringResource(Res.string.guest_build_circle_feature_title),
                                 descriptionFeature = stringResource(Res.string.guest_build_circle_feature_description)
                             )
