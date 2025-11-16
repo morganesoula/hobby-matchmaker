@@ -123,5 +123,6 @@
     <string name="guest_redirect_title">Prêt à commencer ?</string>
     <string name="guest_redirect_description">Rejoignez HobbyMatchMaker et lancez vous dans l'aventure</string>
     <string name="guest_redirect_sign_up_button_text">Inscrivez-vous dès maintenant !</string>
-    "
+
+    <string name="authentified_edit_button_title">Editez mon profil</string>
 </resources>

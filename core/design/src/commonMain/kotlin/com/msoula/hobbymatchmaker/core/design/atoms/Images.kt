@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.ic_movie_clapper_board
 import com.msoula.hobbymatchmaker.core.design.ic_no_image_found_playstore
+import com.msoula.hobbymatchmaker.core.design.icons.Camera
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.IconSize
 import org.jetbrains.compose.resources.painterResource
@@ -183,5 +185,34 @@ fun RectangleWithIcon(
             tint = iconTint,
             modifier = Modifier.size(IconSize.TwentyFour)
         )
+    }
+}
+
+@Composable
+fun CircleWithCustomPhoto(
+    modifier: Modifier = Modifier,
+    contentDescription: String? = null,
+    image: ImageVector? = null,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = modifier
+            .size(CustomSize.NinetySix)
+            .background(
+                color = MaterialTheme.colorScheme.onSurface,
+                shape = CircleShape
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        IconButton(
+            onClick = { onClick() }
+        ) {
+            Icon(
+                imageVector = image ?: Camera,
+                contentDescription = contentDescription,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(IconSize.FortyEight)
+            )
+        }
     }
 }

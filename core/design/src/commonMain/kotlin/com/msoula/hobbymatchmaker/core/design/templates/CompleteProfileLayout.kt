@@ -1,18 +1,19 @@
 package com.msoula.hobbymatchmaker.core.design.templates
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
-import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
 
 @Composable
 fun CompleteProfileLayout(
+    modifier: Modifier = Modifier,
     headerSection: @Composable () -> Unit,
     statsSection: @Composable () -> Unit,
     interestsSection: @Composable () -> Unit,
     socialSection: @Composable () -> Unit
 ) {
     headerSection()
-    SpacerHeight8()
+    SpacerHeight16()
     statsSection()
     SpacerHeight16()
     interestsSection()

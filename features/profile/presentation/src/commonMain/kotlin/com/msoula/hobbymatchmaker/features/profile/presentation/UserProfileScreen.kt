@@ -31,20 +31,18 @@ import com.msoula.hobbymatchmaker.core.design.icons.Sparkle
 import com.msoula.hobbymatchmaker.core.design.molecules.BackNavigationTopBar
 import com.msoula.hobbymatchmaker.core.design.molecules.FeatureProfileCard
 import com.msoula.hobbymatchmaker.core.design.molecules.FeatureProfileCardWithButton
+import com.msoula.hobbymatchmaker.core.design.organisms.AuthentifiedProfileHeader
 import com.msoula.hobbymatchmaker.core.design.organisms.GenericProfileBackground
 import com.msoula.hobbymatchmaker.core.design.organisms.GuestProfileHeader
+import com.msoula.hobbymatchmaker.core.design.organisms.ProfileInterestsSection
+import com.msoula.hobbymatchmaker.core.design.organisms.ProfileSocialSection
+import com.msoula.hobbymatchmaker.core.design.organisms.ProfileStatsSection
 import com.msoula.hobbymatchmaker.core.design.templates.CompleteProfileLayout
 import com.msoula.hobbymatchmaker.core.design.templates.GuestProfileLayout
-import com.msoula.hobbymatchmaker.core.design.templates.IncompleteProfileLayout
 import com.msoula.hobbymatchmaker.core.design.util.RetryPolicy
 import com.msoula.hobbymatchmaker.core.design.util.UIErrorHint
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
-import com.msoula.hobbymatchmaker.features.profile.presentation.components.EditBottomBar
-import com.msoula.hobbymatchmaker.features.profile.presentation.components.ProfileHeaderSection
-import com.msoula.hobbymatchmaker.features.profile.presentation.components.ProfileInterestsSection
-import com.msoula.hobbymatchmaker.features.profile.presentation.components.ProfileSocialSection
-import com.msoula.hobbymatchmaker.features.profile.presentation.components.ProfileStatsSection
-import com.msoula.hobbymatchmaker.features.profile.presentation.models.ProfileMode
+import com.msoula.hobbymatchmaker.features.profile.presentation.mappers.toProfileSocialMembers
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.SocialMemberUiModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiEventModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiModel
@@ -59,7 +57,6 @@ fun UserProfileContent(
 ) {
     val profileState by viewModel.screenState.collectAsState()
     val isEditMode by viewModel.isEditMode.collectAsState()
-    val editableProfile by viewModel.editableProfile.collectAsState()
 
     LaunchedEffect(viewModel.events) {
         viewModel.events.collect { event ->
@@ -74,19 +71,6 @@ fun UserProfileContent(
         topBar = {
             if (isIosPlatform()) {
                 BackNavigationTopBar(onBack = { onNavigate("movies") })
-            }
-        },
-        bottomBar = {
-            if (isEditMode && profileState is UserProfileUiStateModel.Success) {
-                EditBottomBar(
-                    canSave = true,
-                    onSave = {
-                        viewModel.onEvent(UserProfileUiEventModel.OnSaveClicked)
-                    },
-                    onSkip = {
-                        viewModel.onEvent(UserProfileUiEventModel.OnSkipClicked)
-                    }
-                )
             }
         },
         floatingActionButton = {
@@ -117,47 +101,35 @@ fun UserProfileContent(
             }
 
             is UserProfileUiStateModel.Success -> {
-                val displayProfile = if (isEditMode) {
-                    editableProfile ?: (profileState as UserProfileUiStateModel.Success).userProfile
-                } else {
-                    (profileState as UserProfileUiStateModel.Success).userProfile
-                }
-
-                val mode = if (isEditMode) ProfileMode.Edit else ProfileMode.View
-
                 GenericProfileBackground(
                     padding = padding
                 ) {
+                    //val profile = (profileState as UserProfileUiStateModel.Success).userProfile
+                    val profile = fakeUserProfile()
+
                     CompleteProfileLayout(
                         headerSection = {
-                            ProfileHeaderSection(
-                                mode,
-                                displayProfile,
-                                onAvatarClicked = {
-                                    viewModel.onEvent(
-                                        UserProfileUiEventModel.OnPickAvatarClicked
-                                    )
-                                },
-                                onBioChanged = { bio ->
-                                    viewModel.onEvent(
-                                        UserProfileUiEventModel.OnBioChanged(bio)
-                                    )
-                                }
+                            AuthentifiedProfileHeader(
+                                fullName = "Test name",
+                                biography = profile.bio ?: "",
+                                onAvatarClicked = {},
+                                onEditProfileClicked = {}
                             )
                         },
                         statsSection = {
-                            ProfileStatsSection(mode, displayProfile)
+                            ProfileStatsSection(
+                                moviesLikedCount = profile.moviesLikedCount,
+                                socialMembersCount = profile.socialMembersCount
+                            )
                         },
                         interestsSection = {
                             ProfileInterestsSection(
-                                mode = mode,
-                                user = displayProfile
+                                interests = profile.interests
                             )
                         },
                         socialSection = {
                             ProfileSocialSection(
-                                mode = mode,
-                                user = displayProfile
+                                socialMembers = profile.socialMembers.map { it.toProfileSocialMembers() }
                             )
                         }
                     )
@@ -210,7 +182,39 @@ fun UserProfileContent(
             }
 
             is UserProfileUiStateModel.Incomplete ->
-                IncompleteProfileLayout()
+                GenericProfileBackground(
+                    padding = padding
+                ) {
+                    //val profile = (profileState as UserProfileUiStateModel.Success).userProfile
+                    val profile = fakeUserProfile()
+
+                    CompleteProfileLayout(
+                        headerSection = {
+                            AuthentifiedProfileHeader(
+                                fullName = "Test name",
+                                biography = profile.bio ?: "",
+                                onAvatarClicked = {},
+                                onEditProfileClicked = {}
+                            )
+                        },
+                        statsSection = {
+                            ProfileStatsSection(
+                                moviesLikedCount = profile.moviesLikedCount,
+                                socialMembersCount = profile.socialMembersCount
+                            )
+                        },
+                        interestsSection = {
+                            ProfileInterestsSection(
+                                interests = profile.interests
+                            )
+                        },
+                        socialSection = {
+                            ProfileSocialSection(
+                                socialMembers = profile.socialMembers.map { it.toProfileSocialMembers() }
+                            )
+                        }
+                    )
+                }
         }
     }
 }

@@ -29,6 +29,11 @@ fun SpacerHeight32(modifier: Modifier = Modifier) {
 }
 
 @Composable
+fun SpacerWidth4(modifier: Modifier = Modifier) {
+    Spacer(modifier = modifier.width(CustomSize.Four))
+}
+
+@Composable
 fun SpacerWidth8(modifier: Modifier = Modifier) {
     Spacer(modifier = modifier.width(CustomSize.Eight))
 }

@@ -124,4 +124,6 @@
     <string name="guest_redirect_title">Ready to Get Started?</string>
     <string name="guest_redirect_description">Join HobbyMatchMaker and start connecting!</string>
     <string name="guest_redirect_sign_up_button_text">Sign Up Now</string>
+
+    <string name="authentified_edit_button_title">Edit Profile</string>
 </resources>

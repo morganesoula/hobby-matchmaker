@@ -1,4 +1,4 @@
-package com.msoula.hobbymatchmaker.features.profile.presentation.components
+package com.msoula.hobbymatchmaker.core.design.organisms
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -11,55 +11,51 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.People
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
+import com.msoula.hobbymatchmaker.core.design.atoms.GenericCard
+import com.msoula.hobbymatchmaker.core.design.icons.Film
 import com.msoula.hobbymatchmaker.core.design.movies_liked_count_title
 import com.msoula.hobbymatchmaker.core.design.social_members_count_title
-import com.msoula.hobbymatchmaker.features.profile.presentation.models.ProfileMode
-import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiModel
+import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ProfileStatsSection(
-    mode: ProfileMode,
-    user: UserProfileUiModel?
+    modifier: Modifier = Modifier,
+    moviesLikedCount: Int,
+    socialMembersCount: Int
 ) {
-    Card(
-        modifier = Modifier
+    GenericCard(
+        modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(6.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onSurface)
+            .padding(horizontal = CustomSize.TwentyFour),
+        containerColor = MaterialTheme.colorScheme.surfaceContainer
     ) {
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(vertical = 16.dp),
+                .padding(vertical = CustomSize.Sixteen),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             StatItem(
-                icon = Icons.Default.Movie,
-                value = "${user?.moviesLikedCount}",
+                icon = Film,
+                value = moviesLikedCount.toString(),
                 label = stringResource(Res.string.movies_liked_count_title)
             )
 
             StatItem(
                 icon = Icons.Default.People,
-                value = "${user?.socialMembersCount}/5",
+                value = "$socialMembersCount/5",
                 label = stringResource(Res.string.social_members_count_title)
             )
         }
@@ -76,16 +72,25 @@ fun StatItem(
 
     Row(
         Modifier
-            .background(color.copy(alpha = .15f), RoundedCornerShape(8.dp))
-            .padding(all = 8.dp),
+            .background(color.copy(alpha = .15f), RoundedCornerShape(CustomSize.Eight))
+            .padding(all = CustomSize.Eight),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(24.dp))
-        Spacer(Modifier.width(8.dp))
+        Icon(
+            icon,
+            contentDescription = null,
+            tint = color,
+            modifier = Modifier.size(CustomSize.TwentyFour)
+        )
+        Spacer(Modifier.width(CustomSize.Eight))
         Column(
             horizontalAlignment = Alignment.Start
         ) {
-            Text(value, fontWeight = FontWeight.Medium, color = Color.Black)
+            Text(
+                value,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
             Text(
                 label,
                 style = MaterialTheme.typography.labelSmall,
