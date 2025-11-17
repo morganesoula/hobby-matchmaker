@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.CircleWithCustomPhoto
 import com.msoula.hobbymatchmaker.core.design.atoms.CircleWithIcon
+import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight4
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
 import com.msoula.hobbymatchmaker.core.design.authentified_edit_button_title
@@ -82,7 +83,6 @@ fun AuthentifiedProfileHeader(
     modifier: Modifier = Modifier,
     fullName: String,
     biography: String,
-    onAvatarClicked: () -> Unit,
     onEditProfileClicked: () -> Unit
 ) {
     Box(
@@ -97,9 +97,7 @@ fun AuthentifiedProfileHeader(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            CircleWithCustomPhoto(
-                onClick = onAvatarClicked
-            )
+            CircleWithCustomPhoto()
             SpacerHeight8()
             Text(
                 text = fullName,
@@ -111,10 +109,10 @@ fun AuthentifiedProfileHeader(
             Text(
                 text = biography,
                 color = MaterialTheme.colorScheme.onPrimary,
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center
             )
-            SpacerHeight8()
+            SpacerHeight16()
 
             Button(
                 onClick = { onEditProfileClicked() },

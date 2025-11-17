@@ -31,6 +31,7 @@ internal fun KotlinMultiplatformExtension.configureCompose(
         implementation(compose.components.resources)
         implementation(compose.material3)
         implementation(compose.materialIconsExtended)
+        implementation(compose.components.uiToolingPreview)
 
         // Firebase - FireStore
         if (config.useFirebase) {

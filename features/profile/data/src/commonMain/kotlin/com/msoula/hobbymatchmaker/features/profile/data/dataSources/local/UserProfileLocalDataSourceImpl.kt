@@ -1,5 +1,8 @@
 package com.msoula.hobbymatchmaker.features.profile.data.dataSources.local
 
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.core.common.safeCallStorage
 import com.msoula.hobbymatchmaker.core.database.services.UserProfileDAO
 import com.msoula.hobbymatchmaker.core.session.data.dataSources.local.SessionLocalDataSource
 import com.msoula.hobbymatchmaker.features.profile.data.dataSources.mappers.toUserProfileDataEntity
@@ -24,11 +27,8 @@ class UserProfileLocalDataSourceImpl(
             )
         }
 
-    override suspend fun insertUserProfile(userProfile: UserProfileLocalDataModel) {
-        userProfileDAO.insertUserProfile(userProfile.toUserProfileDataEntity())
-    }
-
-    override suspend fun updateUserProfile(userProfile: UserProfileLocalDataModel) {
-        userProfileDAO.updateExistingUserProfile(userProfile.toUserProfileDataEntity())
-    }
+    override suspend fun updateUserProfile(userProfile: UserProfileLocalDataModel): AppResult<Unit, AppError> =
+        safeCallStorage {
+            userProfileDAO.updateExistingUserProfile(userProfile.toUserProfileDataEntity())
+        }
 }

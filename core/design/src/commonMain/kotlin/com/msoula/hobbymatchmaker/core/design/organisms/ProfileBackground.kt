@@ -12,7 +12,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 
 @Composable
@@ -25,14 +24,7 @@ fun GenericProfileBackground(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        MaterialTheme.colorScheme.primary.copy(alpha = .85f),
-                        MaterialTheme.colorScheme.surface
-                    )
-                )
-            )
+            .background(MaterialTheme.colorScheme.background)
             .padding(
                 top = padding.calculateTopPadding(),
                 bottom = padding.calculateBottomPadding() + CustomSize.TwentyFour

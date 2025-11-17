@@ -1,11 +1,19 @@
 package com.msoula.hobbymatchmaker.core.design.templates
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
 
 @Composable
-fun IncompleteProfileLayout() {
-    Text(text = "Incomplete profile at the moment", modifier = Modifier.fillMaxSize())
+fun IncompleteProfileLayout(
+    modifier: Modifier = Modifier,
+    editPhotoProfileSection: @Composable () -> Unit,
+    editBasicInformationSection: @Composable () -> Unit,
+    editInterestsSection: @Composable () -> Unit
+) {
+    editPhotoProfileSection()
+    SpacerHeight16()
+    editBasicInformationSection()
+    SpacerHeight16()
+    editInterestsSection()
 }

@@ -27,6 +27,9 @@ kotlin {
         androidMain.dependencies {
             // Media player
             implementation(libs.findLibrary("youtube-player").get())
+
+            // Preview
+            implementation(compose.uiTooling)
         }
     }
 }

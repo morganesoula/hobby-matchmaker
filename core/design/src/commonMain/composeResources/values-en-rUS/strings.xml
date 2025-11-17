@@ -126,4 +126,13 @@
     <string name="guest_redirect_sign_up_button_text">Sign Up Now</string>
 
     <string name="authentified_edit_button_title">Edit Profile</string>
+    <string name="authentified_no_social_members_description">No social members yet</string>
+
+    <string name="edit_profile_save_button_title">Save</string>
+    <string name="edit_profile_edit_photo_title">Tap to change profile picture</string>
+    <string name="edit_profile_basic_information_title">Basic Information</string>
+    <string name="edit_profile_basic_information_name_title">Name</string>
+    <string name="edit_profile_basic_information_bio_title">Bio</string>
+    <string name="edit_profile_add_interests_title">Add Interest</string>
+    <string name="edit_profile_add_interests_hint">E.g. Hiking, Gaming...</string>
 </resources>

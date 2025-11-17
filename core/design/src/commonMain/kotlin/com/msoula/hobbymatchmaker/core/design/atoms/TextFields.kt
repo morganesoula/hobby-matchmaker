@@ -32,18 +32,19 @@ import com.msoula.hobbymatchmaker.core.design.theme.IconSize
 fun PrimaryTextField(
     modifier: Modifier = Modifier,
     text: String,
-    label: String,
     contentDescription: String,
     singleLine: Boolean,
     onValueChanged: (String) -> Unit,
     icon: ImageVector? = null,
+    label: String? = null,
     keyboardOptions: KeyboardOptions? = null,
     keyboardActions: KeyboardActions? = null
 ) {
     OutlinedTextField(
+        modifier = modifier,
         value = text,
         onValueChange = { onValueChanged(it) },
-        label = { Text(text = label) },
+        label = { label?.let { Text(text = it) } },
         leadingIcon = {
             icon?.let {
                 Icon(
@@ -51,13 +52,9 @@ fun PrimaryTextField(
                     contentDescription = contentDescription,
                     modifier = Modifier.size(IconSize.Sixteen)
                 )
-            }
+            } ?: Unit
         },
         singleLine = singleLine,
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .padding(horizontal = CustomSize.Sixteen, vertical = CustomSize.Eight),
         colors = HMMTextFieldColors(),
         keyboardOptions = keyboardOptions ?: KeyboardOptions.Default,
         keyboardActions = keyboardActions ?: rememberSubmitKeyBoardActions {}

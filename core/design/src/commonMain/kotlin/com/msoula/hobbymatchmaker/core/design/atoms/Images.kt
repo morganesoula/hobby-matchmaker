@@ -5,15 +5,16 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,15 +31,18 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.ic_movie_clapper_board
 import com.msoula.hobbymatchmaker.core.design.ic_no_image_found_playstore
-import com.msoula.hobbymatchmaker.core.design.icons.Camera
+import com.msoula.hobbymatchmaker.core.design.icons.Delete
+import com.msoula.hobbymatchmaker.core.design.icons.Hide_image
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.IconSize
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun ActorIcon(
@@ -191,28 +195,52 @@ fun RectangleWithIcon(
 @Composable
 fun CircleWithCustomPhoto(
     modifier: Modifier = Modifier,
+    backgroundColor: Color? = null,
+    borderColor: Color? = null,
     contentDescription: String? = null,
-    image: ImageVector? = null,
-    onClick: () -> Unit
+    image: ImageVector? = null
 ) {
     Box(
         modifier = modifier
             .size(CustomSize.NinetySix)
             .background(
-                color = MaterialTheme.colorScheme.onSurface,
+                color = backgroundColor ?: MaterialTheme.colorScheme.onSurface,
                 shape = CircleShape
-            ),
+            )
+            .border(2.dp, borderColor ?: MaterialTheme.colorScheme.surface, CircleShape),
         contentAlignment = Alignment.Center
     ) {
-        IconButton(
-            onClick = { onClick() }
-        ) {
-            Icon(
-                imageVector = image ?: Camera,
-                contentDescription = contentDescription,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(IconSize.FortyEight)
-            )
-        }
+        Icon(
+            imageVector = image ?: Hide_image,
+            contentDescription = contentDescription,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(IconSize.FortyEight).padding(CustomSize.Four)
+        )
     }
+}
+
+@Composable
+fun FormIcon(
+    modifier: Modifier = Modifier,
+    icon: ImageVector,
+    size: Dp,
+    tint: Color,
+    contentDescription: String? = null
+) {
+    Icon(
+        imageVector = icon,
+        contentDescription = contentDescription,
+        modifier = modifier.size(size = size),
+        tint = tint
+    )
+}
+
+@Preview
+@Composable
+fun FormIconPreview() {
+    FormIcon(
+        icon = Delete,
+        size = IconSize.TwentyFour,
+        tint = MaterialTheme.colorScheme.primary
+    )
 }

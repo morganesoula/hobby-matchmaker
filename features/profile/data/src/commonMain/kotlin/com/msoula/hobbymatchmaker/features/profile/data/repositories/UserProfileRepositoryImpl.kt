@@ -3,6 +3,8 @@ package com.msoula.hobbymatchmaker.features.profile.data.repositories
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.features.profile.data.dataSources.local.SocialLocalDataSource
 import com.msoula.hobbymatchmaker.features.profile.data.dataSources.local.UserProfileLocalDataSource
+import com.msoula.hobbymatchmaker.features.profile.data.dataSources.mappers.toUserProfileLocalDataModel
+import com.msoula.hobbymatchmaker.features.profile.data.dataSources.mappers.toUserProfileRemoteDataModel
 import com.msoula.hobbymatchmaker.features.profile.data.dataSources.remote.SocialRemoteDataSource
 import com.msoula.hobbymatchmaker.features.profile.data.dataSources.remote.UserProfileRemoteDataSource
 import com.msoula.hobbymatchmaker.features.profile.domain.models.UserProfileDomainModel
@@ -55,4 +57,7 @@ class UserProfileRepositoryImpl(
     override suspend fun refreshUserProfile(userProfileDomainModel: UserProfileDomainModel) {
         TODO("Not yet implemented")
     }
+
+    override suspend fun updateUserProfile(userProfileDomainModel: UserProfileDomainModel) =
+        userProfileLocalDataSource.updateUserProfile(userProfileDomainModel.toUserProfileLocalDataModel())
 }

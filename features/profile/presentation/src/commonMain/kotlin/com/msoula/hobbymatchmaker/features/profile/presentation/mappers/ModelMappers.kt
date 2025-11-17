@@ -22,3 +22,14 @@ fun UserSummaryDomainModel.toSocialMemberUiModel(): SocialMemberUiModel =
         name = this.name,
         avatarUrl = this.avatarUrl
     )
+
+fun UserProfileUiModel.toUserProfileDomainModel(uid: String): UserProfileDomainModel =
+    UserProfileDomainModel(
+        uid = uid,
+        name = this.name,
+        avatarUrl = this.avatarUrl,
+        bio = this.bio,
+        interests = this.interests ?: emptyList(),
+        likedMoviesCount = this.moviesLikedCount,
+        socialCircle = this.socialMembers.map { model -> model.toUserSummaryDomainModel() }
+    )
