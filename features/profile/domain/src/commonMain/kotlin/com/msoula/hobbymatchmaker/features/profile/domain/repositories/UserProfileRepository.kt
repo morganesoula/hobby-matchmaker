@@ -8,5 +8,5 @@ import kotlinx.coroutines.flow.Flow
 interface UserProfileRepository {
     fun observeCurrentUserProfile(): Flow<UserProfileDomainModel?>
     suspend fun refreshUserProfile(userProfileDomainModel: UserProfileDomainModel)
-    suspend fun updateUserProfile(userProfileDomainModel: UserProfileDomainModel): AppResult<Unit, AppError>
+    suspend fun upsertUserProfile(userProfileDomainModel: UserProfileDomainModel): AppResult<Unit, AppError>
 }

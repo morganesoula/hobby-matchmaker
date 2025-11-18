@@ -52,6 +52,7 @@ fun InterestDeletableBlock(
 ) {
     FlowRow(
         modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(CustomSize.Four),
         horizontalArrangement = Arrangement.spacedBy(CustomSize.Eight)
     ) {
         interests?.forEach { tag ->
@@ -92,7 +93,7 @@ fun InterestDeletableBlock(
 @Composable
 fun InterestDeletableBlockPreview() {
     InterestDeletableBlock(
-        interests = listOf("Chat", "Chien", "Lapin"),
+        interests = listOf("Chat", "Chien", "Lapin", "Renard", "Randonnée"),
         onDeleteClicked = {}
     )
 }

@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -19,6 +20,7 @@ import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.ProfileLoadingScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.asStringSuspend
+import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_requirements_no_number
 import com.msoula.hobbymatchmaker.core.design.guest_build_circle_feature_description
 import com.msoula.hobbymatchmaker.core.design.guest_build_circle_feature_title
 import com.msoula.hobbymatchmaker.core.design.guest_discover_feature_description
@@ -37,6 +39,7 @@ import com.msoula.hobbymatchmaker.core.design.molecules.BackNavigationTopBar
 import com.msoula.hobbymatchmaker.core.design.molecules.EditProfileTopBar
 import com.msoula.hobbymatchmaker.core.design.molecules.FeatureProfileCard
 import com.msoula.hobbymatchmaker.core.design.molecules.FeatureProfileCardWithButton
+import com.msoula.hobbymatchmaker.core.design.molecules.ValidationRequirement
 import com.msoula.hobbymatchmaker.core.design.organisms.AuthentifiedProfileHeader
 import com.msoula.hobbymatchmaker.core.design.organisms.GenericProfileBackground
 import com.msoula.hobbymatchmaker.core.design.organisms.GuestProfileHeader
@@ -47,15 +50,13 @@ import com.msoula.hobbymatchmaker.core.design.organisms.ProfileInterestsSection
 import com.msoula.hobbymatchmaker.core.design.organisms.ProfileSocialSection
 import com.msoula.hobbymatchmaker.core.design.organisms.ProfileStatsSection
 import com.msoula.hobbymatchmaker.core.design.templates.CompleteProfileLayout
+import com.msoula.hobbymatchmaker.core.design.templates.EditableProfileLayout
 import com.msoula.hobbymatchmaker.core.design.templates.GuestProfileLayout
-import com.msoula.hobbymatchmaker.core.design.templates.IncompleteProfileLayout
 import com.msoula.hobbymatchmaker.core.design.util.RetryPolicy
 import com.msoula.hobbymatchmaker.core.design.util.UIErrorHint
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.features.profile.presentation.mappers.toProfileSocialMembers
-import com.msoula.hobbymatchmaker.features.profile.presentation.models.SocialMemberUiModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiEventModel
-import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiStateModel
 import org.jetbrains.compose.resources.stringResource
 
@@ -67,7 +68,27 @@ fun UserProfileContent(
 ) {
     val profileState by viewModel.screenState.collectAsState()
     val isEditMode by viewModel.isEditMode.collectAsState()
+    val editableProfile by viewModel.editableProfile.collectAsState()
     val snackBarHostState = remember { SnackbarHostState() }
+
+    val noNumberRequirement = stringResource(Res.string.edit_profile_basic_information_requirements_no_number)
+
+    val requirements = remember(editableProfile) {
+        derivedStateOf {
+            listOf(
+                ValidationRequirement(
+                    text = noNumberRequirement,
+                    isValid = editableProfile?.name?.all { !it.isDigit() } == true
+                )
+            )
+        }
+    }
+
+    val enableSaveTopBarButton by remember(requirements.value) {
+        derivedStateOf {
+            requirements.value.all { it.isValid }
+        }
+    }
 
     LaunchedEffect(viewModel.events) {
         viewModel.events.collect { event ->
@@ -107,7 +128,8 @@ fun UserProfileContent(
                 EditProfileTopBar(
                     isIOS = isIosPlatform(),
                     onBack = { viewModel.closeEdition() },
-                    onSave = { viewModel.onEvent(UserProfileUiEventModel.OnSaveClicked) }
+                    onSave = { viewModel.onEvent(UserProfileUiEventModel.OnSaveClicked) },
+                    enableSave = enableSaveTopBarButton
                 )
             } else {
                 if (isIosPlatform()) {
@@ -130,46 +152,47 @@ fun UserProfileContent(
 
             is UserProfileUiStateModel.Success -> {
                 if (isEditMode) {
-                    GenericProfileBackground(
-                        padding = padding
-                    ) {
-                        val profile = (profileState as UserProfileUiStateModel.Success).userProfile
-
-                        IncompleteProfileLayout(
-                            editPhotoProfileSection = {
-                                ProfileEditProfilePicture()
-                            },
-                            editBasicInformationSection = {
-                                ProfileEditInformationForm(
-                                    name = profile.name,
-                                    onNameChanged = { name ->
-                                        viewModel.onEvent(
-                                            UserProfileUiEventModel.OnNameChanged(
-                                                name
+                    editableProfile?.let { currentEditableProfile ->
+                        GenericProfileBackground(
+                            padding = padding
+                        ) {
+                            EditableProfileLayout(
+                                editPhotoProfileSection = {
+                                    ProfileEditProfilePicture()
+                                },
+                                editBasicInformationSection = {
+                                    ProfileEditInformationForm(
+                                        name = currentEditableProfile.name,
+                                        onNameChanged = { name ->
+                                            viewModel.onEvent(
+                                                UserProfileUiEventModel.OnNameChanged(
+                                                    name
+                                                )
                                             )
-                                        )
-                                    },
-                                    bio = profile.bio,
-                                    onBioChanged = { bio ->
-                                        viewModel.onEvent(
-                                            UserProfileUiEventModel.OnBioChanged(
-                                                bio
+                                        },
+                                        bio = currentEditableProfile.bio,
+                                        onBioChanged = { bio ->
+                                            viewModel.onEvent(
+                                                UserProfileUiEventModel.OnBioChanged(
+                                                    bio
+                                                )
                                             )
-                                        )
-                                    }
-                                )
-                            },
-                            editInterestsSection = {
-                                ProfileEditInterestsForm(
-                                    interests = profile.interests ?: emptyList(),
-                                    onInterestChanged = {
-                                        viewModel.onEvent(
-                                            UserProfileUiEventModel.OnInterestsChanged(it)
-                                        )
-                                    }
-                                )
-                            }
-                        )
+                                        },
+                                        requirements = requirements.value
+                                    )
+                                },
+                                editInterestsSection = {
+                                    ProfileEditInterestsForm(
+                                        interests = currentEditableProfile.interests ?: emptyList(),
+                                        onInterestChanged = {
+                                            viewModel.onEvent(
+                                                UserProfileUiEventModel.OnInterestsChanged(it)
+                                            )
+                                        }
+                                    )
+                                }
+                            )
+                        }
                     }
                 } else {
                     GenericProfileBackground(
@@ -180,7 +203,7 @@ fun UserProfileContent(
                         CompleteProfileLayout(
                             headerSection = {
                                 AuthentifiedProfileHeader(
-                                    fullName = "Test name",
+                                    fullName = profile.name,
                                     biography = profile.bio ?: "",
                                     onEditProfileClicked = {
                                         viewModel.onEvent(UserProfileUiEventModel.OnEditModeClicked)
@@ -255,30 +278,3 @@ fun UserProfileContent(
         }
     }
 }
-
-private fun fakeUserProfile() =
-    UserProfileUiModel(
-        name = "Morgane",
-        avatarUrl = null,
-        bio = "Test bio pour des activités :)",
-        interests = listOf("Cats", "Gaming", "Book"),
-        moviesLikedCount = 5,
-        socialMembersCount = 3,
-        socialMembers = listOf(
-            SocialMemberUiModel(
-                uid = "1234",
-                name = "Maxime",
-                avatarUrl = ""
-            ),
-            SocialMemberUiModel(
-                uid = "12345",
-                name = "Soizic",
-                avatarUrl = ""
-            ),
-            SocialMemberUiModel(
-                uid = "123456",
-                name = "KitKat",
-                avatarUrl = ""
-            )
-        ),
-    )

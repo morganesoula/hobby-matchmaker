@@ -28,18 +28,36 @@ class UserProfileDAOImpl(
         )
     }
 
+    override suspend fun upsertUserProfile(userProfile: UserProfileDataEntity) {
+        database.transaction {
+            val existingUserProfile =
+                database.hmm_databaseQueries.selectUserById(userProfile.uid).executeAsOneOrNull()
 
-    override suspend fun updateExistingUserProfile(userProfile: UserProfileDataEntity) {
-        database.hmm_databaseQueries.updateUserProfile(
-            userProfile.name,
-            userProfile.avatarUrl,
-            userProfile.bio,
-            userProfile.interests,
-            userProfile.likedCount.toLong(),
-            userProfile.circleCount.toLong(),
-            Clock.System.now().toEpochMilliseconds(),
-            userProfile.uid.toString()
-        )
+            if (existingUserProfile == null) {
+                database.hmm_databaseQueries.insertUserProfile(
+                    uid = userProfile.uid,
+                    name = userProfile.name,
+                    avatar_url = userProfile.avatarUrl,
+                    bio = userProfile.bio,
+                    interests_json = userProfile.interests,
+                    liked_count = userProfile.likedCount.toLong(),
+                    circle_count = userProfile.circleCount.toLong(),
+                    updated_at = Clock.System.now().toEpochMilliseconds()
+                )
+            } else {
+                database.hmm_databaseQueries.updateUserProfile(
+                    userProfile.name,
+                    userProfile.avatarUrl,
+                    userProfile.bio,
+                    userProfile.interests,
+                    userProfile.likedCount.toLong(),
+                    userProfile.circleCount.toLong(),
+                    Clock.System.now().toEpochMilliseconds(),
+                    userProfile.uid
+                )
+            }
+        }
+
     }
 
     override fun observeUserProfile(uid: String): Flow<UserProfileDataEntity?> {

@@ -130,8 +130,11 @@
     <string name="edit_profile_save_button_title">Enregistrer</string>
     <string name="edit_profile_edit_photo_title">Tapez pour changer votre photo</string>
     <string name="edit_profile_basic_information_title">Informations</string>
+    <string name="edit_profile_basic_information_requirements_title">Condition:</string>
+    <string name="edit_profile_basic_information_requirements_no_number">Pas de nombre autorisé</string>
     <string name="edit_profile_basic_information_name_title">Nom</string>
     <string name="edit_profile_basic_information_bio_title">Bio</string>
     <string name="edit_profile_add_interests_title">Ajoutez des intérêts</string>
+    <string name="edit_profile_add_interests_description">Astuce: Séparez vos intérêts par des virgules pour en ajouter plusieurs à la fois</string>
     <string name="edit_profile_add_interests_hint">Ex: Randonnée, Jeux vidéos...</string>
 </resources>

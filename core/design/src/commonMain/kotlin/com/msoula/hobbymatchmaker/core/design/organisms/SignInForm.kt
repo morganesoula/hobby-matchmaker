@@ -4,10 +4,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -26,13 +22,16 @@ import androidx.compose.ui.text.style.TextDecoration
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.PasswordTextField
 import com.msoula.hobbymatchmaker.core.design.atoms.PrimaryButton
-import com.msoula.hobbymatchmaker.core.design.atoms.PrimaryTextField
+import com.msoula.hobbymatchmaker.core.design.atoms.PrimaryTextFieldWithIcon
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
 import com.msoula.hobbymatchmaker.core.design.atoms.rememberSubmitKeyBoardActions
 import com.msoula.hobbymatchmaker.core.design.email
 import com.msoula.hobbymatchmaker.core.design.forgot_password
 import com.msoula.hobbymatchmaker.core.design.hide_password
+import com.msoula.hobbymatchmaker.core.design.icons.Alternate_email
+import com.msoula.hobbymatchmaker.core.design.icons.Visibility
+import com.msoula.hobbymatchmaker.core.design.icons.Visibility_off
 import com.msoula.hobbymatchmaker.core.design.log_in
 import com.msoula.hobbymatchmaker.core.design.password
 import com.msoula.hobbymatchmaker.core.design.show_password
@@ -53,13 +52,13 @@ fun SignInForm(
     var hiddenPassword by remember { mutableStateOf(true) }
 
     // Email
-    PrimaryTextField(
+    PrimaryTextFieldWithIcon(
         text = email.trimEnd(),
         label = stringResource(Res.string.email),
         contentDescription = stringResource(Res.string.email),
         singleLine = true,
         onValueChanged = onEmailChanged,
-        icon = Icons.Default.Email
+        icon = Alternate_email
     )
 
     SpacerHeight8()
@@ -84,7 +83,7 @@ fun SignInForm(
                         stringResource(Res.string.hide_password)
                     }
                 Icon(
-                    imageVector = if (hiddenPassword) Icons.Default.Visibility else Icons.Filled.VisibilityOff,
+                    imageVector = if (hiddenPassword) Visibility else Visibility_off,
                     contentDescription = description
                 )
             }

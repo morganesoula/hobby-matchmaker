@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,10 +18,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.GenericCard
 import com.msoula.hobbymatchmaker.core.design.icons.Film
+import com.msoula.hobbymatchmaker.core.design.icons.Person
 import com.msoula.hobbymatchmaker.core.design.movies_liked_count_title
 import com.msoula.hobbymatchmaker.core.design.social_members_count_title
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
@@ -54,7 +52,7 @@ fun ProfileStatsSection(
             )
 
             StatItem(
-                icon = Icons.Default.People,
+                icon = Person,
                 value = "$socialMembersCount/5",
                 label = stringResource(Res.string.social_members_count_title)
             )

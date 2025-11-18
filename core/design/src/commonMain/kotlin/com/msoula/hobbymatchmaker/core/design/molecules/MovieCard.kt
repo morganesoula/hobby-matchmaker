@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -49,12 +47,13 @@ import coil3.network.ktor3.KtorNetworkFetcherFactory
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.msoula.hobbymatchmaker.core.common.Logger
-import com.msoula.hobbymatchmaker.core.design.atoms.FavoriteButton
-import com.msoula.hobbymatchmaker.core.design.atoms.MovieGenericCard
-import com.msoula.hobbymatchmaker.core.design.atoms.RatingChip
 import com.msoula.hobbymatchmaker.core.design.atoms.ErrorPosterPlaceholder
+import com.msoula.hobbymatchmaker.core.design.atoms.FavoriteButton
 import com.msoula.hobbymatchmaker.core.design.atoms.HMMShimmerEffect
 import com.msoula.hobbymatchmaker.core.design.atoms.LoadingPosterPlaceholder
+import com.msoula.hobbymatchmaker.core.design.atoms.MovieGenericCard
+import com.msoula.hobbymatchmaker.core.design.atoms.RatingChip
+import com.msoula.hobbymatchmaker.core.design.icons.Heart
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
@@ -186,7 +185,7 @@ fun MovieCard(
 
             if (showBigHeart) {
                 Icon(
-                    imageVector = Icons.Default.Favorite,
+                    imageVector = Heart,
                     contentDescription = "heart icon",
                     tint = MaterialTheme.colorScheme.error.copy(alpha = 0.8f),
                     modifier = Modifier

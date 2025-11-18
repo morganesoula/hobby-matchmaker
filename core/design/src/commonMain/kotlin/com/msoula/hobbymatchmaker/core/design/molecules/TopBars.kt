@@ -4,10 +4,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.Announcement
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,8 +19,12 @@ import androidx.compose.ui.graphics.Color
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWidth4
 import com.msoula.hobbymatchmaker.core.design.cancel
+import com.msoula.hobbymatchmaker.core.design.icons.Arrow_back
+import com.msoula.hobbymatchmaker.core.design.icons.Logout
+import com.msoula.hobbymatchmaker.core.design.icons.Person
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,28 +40,28 @@ fun NavigationTopBar(
             containerColor = Color.Transparent, scrolledContainerColor = Color.Transparent
         ),
         actions = {
-            Row {
+            Row(
+                modifier = Modifier.padding(end = CustomSize.Four)
+            ) {
                 IconButton(
-                    onClick = { redirectToProfile() },
-                    content = {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.Announcement,
-                            contentDescription = "Profile",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                )
+                    onClick = { redirectToProfile() }
+                ) {
+                    Icon(
+                        imageVector = Person,
+                        contentDescription = "Profile",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
 
                 IconButton(
-                    onClick = { redirectToSignIn() },
-                    content = {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.Logout,
-                            contentDescription = "Logout",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                )
+                    onClick = { redirectToSignIn() }
+                ) {
+                    Icon(
+                        imageVector = Logout,
+                        contentDescription = "Logout",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
         }
     )
@@ -86,7 +86,7 @@ fun BackNavigationTopBar(
                 onClick = { onBack() },
                 content = {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                        imageVector = Arrow_back,
                         contentDescription = "Back",
                         tint = MaterialTheme.colorScheme.onSurface
                     )
@@ -101,6 +101,7 @@ fun BackNavigationTopBar(
 fun EditProfileTopBar(
     modifier: Modifier = Modifier,
     isIOS: Boolean,
+    enableSave: Boolean,
     onBack: () -> Unit,
     onSave: () -> Unit
 ) {
@@ -115,7 +116,11 @@ fun EditProfileTopBar(
         actions = {
             Button(
                 onClick = { onSave() },
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onPrimary)
+                enabled = enableSave,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.onPrimary,
+                    disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = .4f)
+                )
             ) {
                 Text(
                     text = "Save",
@@ -131,7 +136,7 @@ fun EditProfileTopBar(
                 IconButton(onClick = { onBack() }) {
                     Row {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                            imageVector = Arrow_back,
                             contentDescription = "Back"
                         )
                         SpacerWidth4()
@@ -143,5 +148,14 @@ fun EditProfileTopBar(
                 }
             }
         }
+    )
+}
+
+@Preview
+@Composable
+fun NavigationTopBarPreview() {
+    NavigationTopBar(
+        redirectToProfile = {},
+        redirectToSignIn = {}
     )
 }

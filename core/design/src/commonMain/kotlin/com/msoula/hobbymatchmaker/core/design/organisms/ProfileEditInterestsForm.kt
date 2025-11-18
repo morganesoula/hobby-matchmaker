@@ -3,7 +3,9 @@ package com.msoula.hobbymatchmaker.core.design.organisms
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -22,12 +24,16 @@ import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.FormIcon
 import com.msoula.hobbymatchmaker.core.design.atoms.GenericCard
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
+import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWidth4
+import com.msoula.hobbymatchmaker.core.design.edit_profile_add_interests_description
 import com.msoula.hobbymatchmaker.core.design.edit_profile_add_interests_hint
 import com.msoula.hobbymatchmaker.core.design.edit_profile_add_interests_title
 import com.msoula.hobbymatchmaker.core.design.icons.Add
+import com.msoula.hobbymatchmaker.core.design.icons.Lightbulb
 import com.msoula.hobbymatchmaker.core.design.icons.Sparkle
 import com.msoula.hobbymatchmaker.core.design.molecules.InterestDeletableBlock
+import com.msoula.hobbymatchmaker.core.design.molecules.TipTextField
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.HMMTextFieldColors
 import com.msoula.hobbymatchmaker.core.design.theme.IconSize
@@ -42,6 +48,23 @@ fun ProfileEditInterestsForm(
     onInterestChanged: (List<String>) -> Unit
 ) {
     var currentInterestInput by remember { mutableStateOf("") }
+
+    fun validateAndAddInterests(input: String): List<String> {
+        val tags = input.split(",")
+            .map { it.trim() }
+            .filter { tag ->
+                tag.isNotBlank() &&
+                    tag.any { it.isLetter() } &&
+                    !interests.contains(tag.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() })
+            }
+            .distinct()
+            .take(5 - interests.size)
+            .map { text ->
+                text.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+            }
+
+        return tags
+    }
 
     GenericCard(
         modifier = modifier.padding(start = CustomSize.Eight, end = CustomSize.Eight),
@@ -70,9 +93,18 @@ fun ProfileEditInterestsForm(
                 text = stringResource(Res.string.edit_profile_add_interests_title),
                 style = MaterialTheme.typography.titleSmall
             )
+            SpacerHeight8()
+
+            TipTextField(
+                hintText = stringResource(Res.string.edit_profile_add_interests_description),
+                icon = Lightbulb
+            )
+
+            SpacerHeight8()
 
             Row(
-                horizontalArrangement = Arrangement.Start,
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedTextField(
@@ -80,24 +112,25 @@ fun ProfileEditInterestsForm(
                     onValueChange = { currentInterestInput = it },
                     label = { Text(text = stringResource(Res.string.edit_profile_add_interests_hint)) },
                     singleLine = true,
-                    modifier = modifier
-                        .weight(1f)
-                        .padding(horizontal = CustomSize.Sixteen, vertical = CustomSize.Eight),
                     colors = HMMTextFieldColors()
                 )
 
                 IconButton(
+                    modifier = Modifier.wrapContentSize(),
                     onClick = {
-                        if (currentInterestInput.isNotBlank()) {
-                            onInterestChanged(interests + currentInterestInput.trim())
+                        val validTags = validateAndAddInterests(currentInterestInput)
+                        if (validTags.isNotEmpty()) {
+                            onInterestChanged(interests + validTags)
                             currentInterestInput = ""
                         }
                     },
                     colors = IconButtonDefaults.iconButtonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                        disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = .2f)
                     ),
-                    shape = RoundedCornerShape(CustomSize.Eight)
+                    shape = RoundedCornerShape(CustomSize.Eight),
+                    enabled = interests.size < 5 && currentInterestInput.isNotBlank()
                 ) {
                     Icon(
                         imageVector = Add,

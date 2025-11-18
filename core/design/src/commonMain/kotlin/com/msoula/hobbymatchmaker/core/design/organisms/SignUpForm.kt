@@ -1,11 +1,6 @@
 package com.msoula.hobbymatchmaker.core.design.organisms
 
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.People
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -24,13 +19,17 @@ import androidx.compose.ui.text.input.VisualTransformation
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.PasswordTextField
 import com.msoula.hobbymatchmaker.core.design.atoms.PrimaryButton
-import com.msoula.hobbymatchmaker.core.design.atoms.PrimaryTextField
+import com.msoula.hobbymatchmaker.core.design.atoms.PrimaryTextFieldWithIcon
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
 import com.msoula.hobbymatchmaker.core.design.atoms.rememberSubmitKeyBoardActions
 import com.msoula.hobbymatchmaker.core.design.email
 import com.msoula.hobbymatchmaker.core.design.firstname
 import com.msoula.hobbymatchmaker.core.design.hide_password
+import com.msoula.hobbymatchmaker.core.design.icons.Alternate_email
+import com.msoula.hobbymatchmaker.core.design.icons.Person
+import com.msoula.hobbymatchmaker.core.design.icons.Visibility
+import com.msoula.hobbymatchmaker.core.design.icons.Visibility_off
 import com.msoula.hobbymatchmaker.core.design.password
 import com.msoula.hobbymatchmaker.core.design.show_password
 import com.msoula.hobbymatchmaker.core.design.sign_up
@@ -54,13 +53,13 @@ fun SignUpForm(
     var hiddenPassword by remember { mutableStateOf(true) }
 
     // Name
-    PrimaryTextField(
+    PrimaryTextFieldWithIcon(
         text = name,
         label = stringResource(Res.string.firstname),
         contentDescription = stringResource(Res.string.firstname),
         singleLine = true,
         onValueChanged = onNameChanged,
-        icon = Icons.Default.People,
+        icon = Person,
         keyboardOptions = KeyboardOptions(
             capitalization = KeyboardCapitalization.Sentences,
             imeAction = ImeAction.Next
@@ -71,7 +70,7 @@ fun SignUpForm(
     SpacerHeight8()
 
     // Email
-    PrimaryTextField(
+    PrimaryTextFieldWithIcon(
         text = email,
         modifier = modifier.onFocusChanged {
             emailTipVisibility.value = it.isFocused
@@ -80,7 +79,7 @@ fun SignUpForm(
         contentDescription = stringResource(Res.string.email),
         singleLine = true,
         onValueChanged = onEmailChanged,
-        icon = Icons.Default.Email,
+        icon = Alternate_email,
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Email,
             imeAction = ImeAction.Next,
@@ -111,7 +110,7 @@ fun SignUpForm(
                         stringResource(Res.string.hide_password)
                     }
                 Icon(
-                    imageVector = if (hiddenPassword) Icons.Default.Visibility else Icons.Filled.VisibilityOff,
+                    imageVector = if (hiddenPassword) Visibility else Visibility_off,
                     contentDescription = description
                 )
             }

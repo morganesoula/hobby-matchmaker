@@ -8,9 +8,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,6 +22,8 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import com.msoula.hobbymatchmaker.core.design.icons.Lock
 import com.msoula.hobbymatchmaker.core.design.theme.CustomFontSize
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.HMMTextFieldColors
@@ -32,10 +33,49 @@ import com.msoula.hobbymatchmaker.core.design.theme.IconSize
 fun PrimaryTextField(
     modifier: Modifier = Modifier,
     text: String,
-    contentDescription: String,
     singleLine: Boolean,
     onValueChanged: (String) -> Unit,
-    icon: ImageVector? = null,
+    label: String? = null,
+    keyboardOptions: KeyboardOptions? = null,
+    keyboardActions: KeyboardActions? = null,
+    showSupportingText: Boolean = false
+) {
+    val maxChar = 120
+
+    OutlinedTextField(
+        modifier = modifier,
+        value = text,
+        onValueChange = {
+            if (it.length <= maxChar) {
+                onValueChanged(it)
+            }
+        },
+        label = { label?.let { Text(text = it) } },
+        singleLine = singleLine,
+        colors = HMMTextFieldColors(),
+        keyboardOptions = keyboardOptions ?: KeyboardOptions.Default,
+        keyboardActions = keyboardActions ?: rememberSubmitKeyBoardActions {},
+        supportingText = {
+            if (showSupportingText) {
+                Text(
+                    text = "${text.length}/$maxChar",
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.End,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    )
+}
+
+@Composable
+fun PrimaryTextFieldWithIcon(
+    modifier: Modifier = Modifier,
+    text: String,
+    contentDescription: String,
+    singleLine: Boolean,
+    icon: ImageVector,
+    onValueChanged: (String) -> Unit,
     label: String? = null,
     keyboardOptions: KeyboardOptions? = null,
     keyboardActions: KeyboardActions? = null
@@ -46,13 +86,11 @@ fun PrimaryTextField(
         onValueChange = { onValueChanged(it) },
         label = { label?.let { Text(text = it) } },
         leadingIcon = {
-            icon?.let {
-                Icon(
-                    imageVector = it,
-                    contentDescription = contentDescription,
-                    modifier = Modifier.size(IconSize.Sixteen)
-                )
-            } ?: Unit
+            Icon(
+                imageVector = icon,
+                contentDescription = contentDescription,
+                modifier = Modifier.size(IconSize.Sixteen)
+            )
         },
         singleLine = singleLine,
         colors = HMMTextFieldColors(),
@@ -60,6 +98,7 @@ fun PrimaryTextField(
         keyboardActions = keyboardActions ?: rememberSubmitKeyBoardActions {}
     )
 }
+
 
 @Composable
 fun PasswordTextField(
@@ -82,7 +121,7 @@ fun PasswordTextField(
         visualTransformation = visualTransformation,
         leadingIcon = {
             Icon(
-                Icons.Default.Lock,
+                Lock,
                 contentDescription = contentDescription,
                 modifier = modifier.size(IconSize.Sixteen)
             )

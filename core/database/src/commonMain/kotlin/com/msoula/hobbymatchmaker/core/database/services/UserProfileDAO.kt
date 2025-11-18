@@ -5,6 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserProfileDAO {
     suspend fun insertUserProfile(userProfile: UserProfileDataEntity)
-    suspend fun updateExistingUserProfile(userProfile: UserProfileDataEntity)
+    suspend fun upsertUserProfile(userProfile: UserProfileDataEntity)
     fun observeUserProfile(uid: String): Flow<UserProfileDataEntity?>
 }

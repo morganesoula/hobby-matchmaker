@@ -7,5 +7,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserProfileLocalDataSource {
     fun observeCurrentUserProfile(): Flow<UserProfileLocalDataModel?>
-    suspend fun updateUserProfile(userProfile: UserProfileLocalDataModel): AppResult<Unit, AppError>
+    suspend fun upsertUserProfile(userProfile: UserProfileLocalDataModel): AppResult<Unit, AppError>
 }

@@ -21,8 +21,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -54,14 +52,15 @@ import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWidth8
 import com.msoula.hobbymatchmaker.core.design.atoms.StatusChip
 import com.msoula.hobbymatchmaker.core.design.atoms.VideoPlayer
 import com.msoula.hobbymatchmaker.core.design.ic_no_image_found_playstore
+import com.msoula.hobbymatchmaker.core.design.icons.Play_arrow
 import com.msoula.hobbymatchmaker.core.design.molecules.MovieInformationMetaPill
 import com.msoula.hobbymatchmaker.core.design.molecules.MovieOverviewExpandable
 import com.msoula.hobbymatchmaker.core.design.molecules.MovieTitleMetaPill
-import org.jetbrains.compose.resources.painterResource
 import com.msoula.hobbymatchmaker.core.design.molecules.rememberCoilImageLoader
 import com.msoula.hobbymatchmaker.core.design.play_icon_accessibility
 import com.msoula.hobbymatchmaker.core.design.play_trailer
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -113,11 +112,11 @@ fun MovieDetailInformation(
                                 request: ImageRequest,
                                 result: SuccessResult
                             ) {
-                                Logger.d("✅ detail bg loaded: ${request.data}")
+                                Logger.d("detail bg loaded: ${request.data}")
                             }
 
                             override fun onError(request: ImageRequest, result: ErrorResult) {
-                                Logger.e("❌ detail bg error: ${request.data} → ${result.throwable.message}")
+                                Logger.e("detail bg error: ${request.data} → ${result.throwable.message}")
                             }
                         }
                     )
@@ -192,7 +191,7 @@ fun MovieDetailInformation(
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                imageVector = Icons.Default.PlayArrow,
+                                imageVector = Play_arrow,
                                 contentDescription = stringResource(
                                     Res.string.play_icon_accessibility
                                 ),

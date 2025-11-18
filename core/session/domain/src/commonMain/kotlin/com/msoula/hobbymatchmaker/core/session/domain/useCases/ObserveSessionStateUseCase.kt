@@ -1,6 +1,5 @@
 package com.msoula.hobbymatchmaker.core.session.domain.useCases
 
-import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.session.domain.models.SessionState
 import com.msoula.hobbymatchmaker.core.session.domain.repositories.SessionRepository
 import kotlinx.coroutines.flow.Flow

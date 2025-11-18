@@ -49,10 +49,10 @@ import com.msoula.hobbymatchmaker.core.design.reset_password
 import com.msoula.hobbymatchmaker.core.design.templates.SignInLayout
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
-import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient
-import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.core.design.your_email
+import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient
+import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 
@@ -220,7 +220,6 @@ fun SignInScreenContent(
                     PrimaryTextField(
                         text = formState.emailReset,
                         label = stringResource(Res.string.your_email),
-                        contentDescription = stringResource(Res.string.your_email),
                         singleLine = true,
                         onValueChanged = {
                             signInViewModel.onEvent(

@@ -25,6 +25,7 @@ import com.msoula.hobbymatchmaker.core.design.atoms.GenericCard
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWidth4
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWidth8
+import com.msoula.hobbymatchmaker.core.design.authentified_no_social_members_description
 import com.msoula.hobbymatchmaker.core.design.icons.Heart
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.IconSize
@@ -107,7 +108,7 @@ fun ProfileSocialSection(
                 }
             } else {
                 Text(
-                    text = "No social members yet",
+                    text = stringResource(Res.string.authentified_no_social_members_description),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

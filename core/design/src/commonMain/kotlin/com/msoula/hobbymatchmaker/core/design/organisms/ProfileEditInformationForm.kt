@@ -3,18 +3,25 @@ package com.msoula.hobbymatchmaker.core.design.organisms
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.GenericCard
 import com.msoula.hobbymatchmaker.core.design.atoms.PrimaryTextField
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
+import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight4
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_bio_title
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_name_title
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_title
+import com.msoula.hobbymatchmaker.core.design.molecules.ValidationRequirement
+import com.msoula.hobbymatchmaker.core.design.molecules.ValidationRequirementsList
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -25,7 +32,8 @@ fun ProfileEditInformationForm(
     name: String,
     onNameChanged: (String) -> Unit,
     onBioChanged: (String) -> Unit,
-    bio: String? = null
+    bio: String? = null,
+    requirements: List<ValidationRequirement> = emptyList()
 ) {
     GenericCard(
         modifier = modifier
@@ -47,11 +55,25 @@ fun ProfileEditInformationForm(
             PrimaryTextField(
                 modifier = Modifier.fillMaxWidth(),
                 text = name,
-                contentDescription = stringResource(Res.string.edit_profile_basic_information_name_title),
                 singleLine = true,
-                onValueChanged = { onNameChanged(it) }
+                onValueChanged = onNameChanged,
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Sentences,
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Next
+                )
             )
-            SpacerHeight8()
+            SpacerHeight4()
+
+            if (requirements.isNotEmpty()) {
+                ValidationRequirementsList(
+                    requirements = requirements,
+                    title = "Conditions de validation"
+                )
+
+                SpacerHeight8()
+            }
+
             Text(
                 text = stringResource(Res.string.edit_profile_basic_information_bio_title),
                 color = MaterialTheme.colorScheme.onSurface
@@ -59,9 +81,13 @@ fun ProfileEditInformationForm(
             PrimaryTextField(
                 modifier = Modifier.fillMaxWidth(),
                 text = bio ?: "",
-                contentDescription = stringResource(Res.string.edit_profile_basic_information_bio_title),
                 singleLine = false,
-                onValueChanged = { onBioChanged(it) }
+                onValueChanged = onBioChanged,
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Sentences,
+                    imeAction = ImeAction.Next
+                ),
+                showSupportingText = true
             )
         }
     }

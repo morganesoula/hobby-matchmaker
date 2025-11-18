@@ -5,7 +5,7 @@ import androidx.compose.ui.Modifier
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
 
 @Composable
-fun IncompleteProfileLayout(
+fun EditableProfileLayout(
     modifier: Modifier = Modifier,
     editPhotoProfileSection: @Composable () -> Unit,
     editBasicInformationSection: @Composable () -> Unit,

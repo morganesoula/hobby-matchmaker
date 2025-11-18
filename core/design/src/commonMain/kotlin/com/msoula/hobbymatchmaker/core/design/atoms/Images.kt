@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -39,6 +37,7 @@ import com.msoula.hobbymatchmaker.core.design.ic_movie_clapper_board
 import com.msoula.hobbymatchmaker.core.design.ic_no_image_found_playstore
 import com.msoula.hobbymatchmaker.core.design.icons.Delete
 import com.msoula.hobbymatchmaker.core.design.icons.Hide_image
+import com.msoula.hobbymatchmaker.core.design.icons.Person
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.IconSize
 import org.jetbrains.compose.resources.painterResource
@@ -51,7 +50,7 @@ fun ActorIcon(
     imageVector: ImageVector? = null
 ) {
     Icon(
-        imageVector = imageVector ?: Icons.Default.People,
+        imageVector = imageVector ?: Person,
         contentDescription = contentDescription,
         tint = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = modifier.size(CustomSize.ThirtyTwo)

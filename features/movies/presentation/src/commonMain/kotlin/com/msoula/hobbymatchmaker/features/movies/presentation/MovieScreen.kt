@@ -30,10 +30,10 @@ import com.msoula.hobbymatchmaker.core.design.atoms.MovieListLoadingScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.StateContainer
 import com.msoula.hobbymatchmaker.core.design.atoms.asStringSuspend
 import com.msoula.hobbymatchmaker.core.design.molecules.NavigationTopBar
-import com.msoula.hobbymatchmaker.core.design.organisms.MovieCarousel
-import com.msoula.hobbymatchmaker.core.design.util.UIText
 import com.msoula.hobbymatchmaker.core.design.no_data
 import com.msoula.hobbymatchmaker.core.design.not_found
+import com.msoula.hobbymatchmaker.core.design.organisms.MovieCarousel
+import com.msoula.hobbymatchmaker.core.design.util.UIText
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.features.movies.presentation.mappers.toCarouselItems
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel

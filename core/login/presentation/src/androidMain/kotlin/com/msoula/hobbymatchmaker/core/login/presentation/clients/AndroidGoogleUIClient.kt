@@ -74,7 +74,7 @@ class AndroidGoogleUIClient(
 
             Pair(authCredential, email)
         } else {
-            Logger.e("❌ Unexpected credential type: ${credential::class.simpleName}")
+            Logger.e("Unexpected credential type: ${credential::class.simpleName}")
             throw InvalidCredentialError("Received an invalid credential type")
         }
     }

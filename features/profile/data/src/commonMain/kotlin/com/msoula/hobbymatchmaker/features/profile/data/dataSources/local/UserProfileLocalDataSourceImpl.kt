@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.features.profile.data.dataSources.local
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.safeCallStorage
 import com.msoula.hobbymatchmaker.core.database.services.UserProfileDAO
 import com.msoula.hobbymatchmaker.core.session.data.dataSources.local.SessionLocalDataSource
@@ -22,13 +23,16 @@ class UserProfileLocalDataSourceImpl(
     override fun observeCurrentUserProfile(): Flow<UserProfileLocalDataModel?> =
         flow {
             val uid = sessionLocalDataSource.observeCurrentUid().first()
+            Logger.d("DataSourceImpl with uid: $uid")
             emitAll(
                 userProfileDAO.observeUserProfile(uid).map { it?.toUserProfileLocalDataModel() }
             )
         }
 
-    override suspend fun updateUserProfile(userProfile: UserProfileLocalDataModel): AppResult<Unit, AppError> =
-        safeCallStorage {
-            userProfileDAO.updateExistingUserProfile(userProfile.toUserProfileDataEntity())
+    override suspend fun upsertUserProfile(userProfile: UserProfileLocalDataModel): AppResult<Unit, AppError> {
+        val uid = sessionLocalDataSource.observeCurrentUid().first()
+        return safeCallStorage {
+            userProfileDAO.upsertUserProfile(userProfile.toUserProfileDataEntity().copy(uid = uid))
         }
+    }
 }

@@ -14,7 +14,7 @@ import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.session.domain.models.SessionState
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveSessionStateUseCase
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.ObserveCurrentUserProfileStateUseCase
-import com.msoula.hobbymatchmaker.features.profile.domain.useCases.UpdateUserProfileUseCase
+import com.msoula.hobbymatchmaker.features.profile.domain.useCases.UpsertUserProfileUseCase
 import com.msoula.hobbymatchmaker.features.profile.presentation.mappers.toUserProfileDomainModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.mappers.toUserProfileUiModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiEventModel
@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 class UserProfileViewModel(
     observeCurrentUserProfileStateUseCase: ObserveCurrentUserProfileStateUseCase,
     observeSessionStateUseCase: ObserveSessionStateUseCase,
-    private val updateUserProfileUseCase: UpdateUserProfileUseCase,
+    private val upsertUserProfileUseCase: UpsertUserProfileUseCase,
     private val logOutUseCase: LogOutUseCase,
     private val defaultMessageMapper: ErrorMessageMapper,
     externalScope: CoroutineScope? = null
@@ -55,6 +55,8 @@ class UserProfileViewModel(
     private val _editableProfile = MutableStateFlow<UserProfileUiModel?>(null)
     val editableProfile = _editableProfile.asStateFlow()
 
+    private val _originalProfile = MutableStateFlow<UserProfileUiModel?>(null)
+
     val screenState: StateFlow<UserProfileUiStateModel> =
         combine(
             observeSessionStateUseCase(),
@@ -62,8 +64,18 @@ class UserProfileViewModel(
         ) { session, profile ->
             when (session) {
                 is SessionState.Authenticated -> {
+                    Logger.d("Is Authenticated with uid: ${profile.uid}")
                     currentUserUid = profile.uid
-                    UserProfileUiStateModel.Success(profile.toUserProfileUiModel())
+                    val uiModel = profile.toUserProfileUiModel()
+
+                    if (!_isEditMode.value) {
+                        _originalProfile.update { uiModel }
+                        _editableProfile.update { uiModel }
+                    }
+
+                    Logger.d("User profile loaded - $uiModel")
+
+                    UserProfileUiStateModel.Success(uiModel)
                 }
 
                 is SessionState.Guest -> {
@@ -101,13 +113,11 @@ class UserProfileViewModel(
                 }
             }
 
-            is UserProfileUiEventModel.OnBioChanged -> {
+            is UserProfileUiEventModel.OnBioChanged ->
                 _editableProfile.update { current -> current?.copy(bio = event.value) }
-            }
 
-            is UserProfileUiEventModel.OnNameChanged -> {
+            is UserProfileUiEventModel.OnNameChanged ->
                 _editableProfile.update { current -> current?.copy(name = event.value) }
-            }
 
             is UserProfileUiEventModel.OnInterestsChanged -> {
                 _editableProfile.update { current -> current?.copy(interests = event.value) }
@@ -121,12 +131,16 @@ class UserProfileViewModel(
         }
     }
 
-    private fun toggleEditMode() = _isEditMode.update { true }
+    private fun toggleEditMode() {
+        _editableProfile.update { current -> current }
+        _isEditMode.update { true }
+    }
 
     private fun saveProfile() {
         scope.launch {
             _editableProfile.value?.let {
-                updateUserProfileUseCase(
+                Logger.d("CurrentUserUid: $currentUserUid")
+                upsertUserProfileUseCase(
                     it.toUserProfileDomainModel(currentUserUid ?: "")
                 )
                     .onSuccess {
@@ -168,6 +182,7 @@ class UserProfileViewModel(
     }
 
     fun closeEdition() {
+        _editableProfile.update { _originalProfile.value }
         _isEditMode.update { false }
     }
 }

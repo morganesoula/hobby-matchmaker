@@ -14,8 +14,6 @@ import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClie
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.GoogleUIClientImpl
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SocialUIClient
 import com.msoula.hobbymatchmaker.presentation.navigation.App
-import org.koin.compose.viewmodel.koinActivityViewModel
-import org.koin.dsl.koinApplication
 
 class MainActivity : ComponentActivity() {
     private val callbackManager = CallbackManager.Factory.create()
