@@ -69,8 +69,7 @@ fun ProfileEditInformationForm(
             if (requirements.isNotEmpty()) {
                 if (requirements.any { !it.isValid }) {
                     ValidationRequirementsList(
-                        requirements = requirements,
-                        title = stringResource(Res.string.edit_profile_basic_information_requirements_title)
+                        requirements = requirements
                     )
 
                     SpacerHeight8()

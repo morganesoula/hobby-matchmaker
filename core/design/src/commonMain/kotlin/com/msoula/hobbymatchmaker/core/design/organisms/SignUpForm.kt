@@ -32,6 +32,8 @@ import com.msoula.hobbymatchmaker.core.design.icons.Alternate_email
 import com.msoula.hobbymatchmaker.core.design.icons.Person
 import com.msoula.hobbymatchmaker.core.design.icons.Visibility
 import com.msoula.hobbymatchmaker.core.design.icons.Visibility_off
+import com.msoula.hobbymatchmaker.core.design.molecules.ValidationRequirement
+import com.msoula.hobbymatchmaker.core.design.molecules.ValidationRequirementsList
 import com.msoula.hobbymatchmaker.core.design.password
 import com.msoula.hobbymatchmaker.core.design.show_password
 import com.msoula.hobbymatchmaker.core.design.sign_up
@@ -46,18 +48,28 @@ fun SignUpForm(
     password: String,
     loading: Boolean,
     enabled: Boolean,
+    nameRequirement: List<ValidationRequirement> = emptyList(),
+    emailRequirement: List<ValidationRequirement> = emptyList(),
+    passwordRequirement: List<ValidationRequirement> = emptyList(),
     onNameChanged: (String) -> Unit,
     onEmailChanged: (String) -> Unit,
     onPasswordChanged: (String) -> Unit,
     onFinish: () -> Unit
 ) {
-    val emailTipVisibility = rememberSaveable { mutableStateOf(false) }
-    val passwordTipVisibility = rememberSaveable { mutableStateOf(false) }
     var hiddenPassword by remember { mutableStateOf(true) }
+
+    val passwordFieldFocused = rememberSaveable { mutableStateOf(false) }
+    val emailFieldFocused = rememberSaveable { mutableStateOf(false) }
+    val nameFieldFocused = rememberSaveable { mutableStateOf(false) }
 
     // Name
     PrimaryTextFieldWithIcon(
-        modifier = modifier.fillMaxWidth().padding(horizontal = CustomSize.Sixteen),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = CustomSize.Sixteen)
+            .onFocusChanged {
+                nameFieldFocused.value = it.isFocused
+            },
         text = name,
         label = stringResource(Res.string.firstname),
         contentDescription = stringResource(Res.string.firstname),
@@ -71,6 +83,14 @@ fun SignUpForm(
         keyboardActions = null
     )
 
+    if (nameRequirement.isNotEmpty() && nameFieldFocused.value) {
+        if (nameRequirement.any { !it.isValid }) {
+            ValidationRequirementsList(
+                requirements = nameRequirement
+            )
+        }
+    }
+
     SpacerHeight8()
 
     // Email
@@ -80,7 +100,7 @@ fun SignUpForm(
             .fillMaxWidth()
             .padding(horizontal = CustomSize.Sixteen)
             .onFocusChanged {
-                emailTipVisibility.value = it.isFocused
+                emailFieldFocused.value = it.isFocused
             },
         label = stringResource(Res.string.email),
         contentDescription = stringResource(Res.string.email),
@@ -95,10 +115,22 @@ fun SignUpForm(
         keyboardActions = null
     )
 
+    if (emailRequirement.isNotEmpty() && emailFieldFocused.value) {
+        if (emailRequirement.any { !it.isValid }) {
+            ValidationRequirementsList(
+                requirements = emailRequirement
+            )
+        }
+    }
+
     SpacerHeight8()
 
     // Password
     PasswordTextField(
+        modifier = modifier
+            .onFocusChanged {
+                passwordFieldFocused.value = it.isFocused
+            },
         text = password,
         label = stringResource(Res.string.password),
         contentDescription = stringResource(Res.string.password),
@@ -123,6 +155,16 @@ fun SignUpForm(
             }
         }
     )
+
+    if (passwordRequirement.isNotEmpty() && passwordFieldFocused.value) {
+        if (passwordRequirement.any { !it.isValid }) {
+            ValidationRequirementsList(
+                requirements = passwordRequirement
+            )
+
+            SpacerHeight8()
+        }
+    }
 
     SpacerHeight16()
 

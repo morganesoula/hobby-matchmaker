@@ -1,11 +1,8 @@
 package com.msoula.hobbymatchmaker.core.design.atoms
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
@@ -13,7 +10,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -24,7 +20,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import com.msoula.hobbymatchmaker.core.design.icons.Lock
-import com.msoula.hobbymatchmaker.core.design.theme.CustomFontSize
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.HMMTextFieldColors
 import com.msoula.hobbymatchmaker.core.design.theme.IconSize
@@ -99,7 +94,6 @@ fun PrimaryTextFieldWithIcon(
     )
 }
 
-
 @Composable
 fun PasswordTextField(
     modifier: Modifier = Modifier,
@@ -128,38 +122,13 @@ fun PasswordTextField(
         },
         trailingIcon = trailingIcon,
         singleLine = true,
+        colors = HMMTextFieldColors(),
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Password,
             imeAction = ImeAction.Done
         ),
         keyboardActions = keyboardActions ?: KeyboardActions.Default
     )
-}
-
-
-@Composable
-fun TextFieldHelper(
-    modifier: Modifier = Modifier,
-    isVisible: MutableState<Boolean>,
-    titleHint: String,
-    hint: String,
-) {
-    if (isVisible.value) {
-        Row(
-            modifier =
-                modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight(),
-            horizontalArrangement = Arrangement.Center,
-        ) {
-            Text(text = titleHint, fontSize = CustomFontSize.Twelve)
-            Text(
-                text = hint,
-                fontSize = CustomFontSize.Twelve,
-            )
-        }
-        SpacerHeight4()
-    }
 }
 
 @Composable

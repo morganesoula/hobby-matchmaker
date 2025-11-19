@@ -17,11 +17,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
+import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_requirements_title
 import com.msoula.hobbymatchmaker.core.design.icons.Check2Circle
 import com.msoula.hobbymatchmaker.core.design.icons.XCircle
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.IconSize
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun TipTextField(
@@ -95,8 +98,7 @@ fun ValidationRequirementItem(
 @Composable
 fun ValidationRequirementsList(
     requirements: List<ValidationRequirement>,
-    modifier: Modifier = Modifier,
-    title: String = "Conditions requises"
+    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
@@ -108,7 +110,7 @@ fun ValidationRequirementsList(
             .padding(CustomSize.Sixteen)
     ) {
         Text(
-            text = title,
+            text = stringResource(Res.string.edit_profile_basic_information_requirements_title),
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

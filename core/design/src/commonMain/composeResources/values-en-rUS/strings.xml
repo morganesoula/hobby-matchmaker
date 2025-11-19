@@ -19,7 +19,12 @@
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="at_least">At least:&#160;</string>
-    <string name="password_hint"> 8 characters • 1 number • 1 uppercase \n• 1 lowercase • 1 special character</string>
+    <string name="email_validation_correct_format">Must be a valid email address</string>
+    <string name="email_validation_no_spaces">Must not contain spaces</string>
+    <string name="password_validation_eight_characters">8 characters at least</string>
+    <string name="password_validation_one_number">1 number at least</string>
+    <string name="password_validation_one_upper_case">1 uppercase at least</string>
+    <string name="password_validation_one_special_character">1 special character at least</string>
     <string name="sign_up">Sign Up</string>
     <string name="already_a_member">Already using HobbyMatchMaker? </string>
     <string name="already_a_member_connect">Log in</string>
