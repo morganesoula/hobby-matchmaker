@@ -1,5 +1,7 @@
 package com.msoula.hobbymatchmaker.core.design.organisms
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,6 +35,7 @@ import com.msoula.hobbymatchmaker.core.design.icons.Visibility_off
 import com.msoula.hobbymatchmaker.core.design.password
 import com.msoula.hobbymatchmaker.core.design.show_password
 import com.msoula.hobbymatchmaker.core.design.sign_up
+import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -54,6 +57,7 @@ fun SignUpForm(
 
     // Name
     PrimaryTextFieldWithIcon(
+        modifier = modifier.fillMaxWidth().padding(horizontal = CustomSize.Sixteen),
         text = name,
         label = stringResource(Res.string.firstname),
         contentDescription = stringResource(Res.string.firstname),
@@ -72,9 +76,12 @@ fun SignUpForm(
     // Email
     PrimaryTextFieldWithIcon(
         text = email,
-        modifier = modifier.onFocusChanged {
-            emailTipVisibility.value = it.isFocused
-        },
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = CustomSize.Sixteen)
+            .onFocusChanged {
+                emailTipVisibility.value = it.isFocused
+            },
         label = stringResource(Res.string.email),
         contentDescription = stringResource(Res.string.email),
         singleLine = true,

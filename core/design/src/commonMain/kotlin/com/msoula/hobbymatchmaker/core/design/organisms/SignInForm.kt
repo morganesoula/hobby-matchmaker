@@ -40,6 +40,7 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun SignInForm(
+    modifier: Modifier = Modifier,
     email: String,
     password: String,
     loading: Boolean,
@@ -53,6 +54,7 @@ fun SignInForm(
 
     // Email
     PrimaryTextFieldWithIcon(
+        modifier = modifier.fillMaxWidth().padding(horizontal = CustomSize.Sixteen),
         text = email.trimEnd(),
         label = stringResource(Res.string.email),
         contentDescription = stringResource(Res.string.email),

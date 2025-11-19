@@ -19,6 +19,7 @@ import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight4
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_bio_title
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_name_title
+import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_requirements_title
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_title
 import com.msoula.hobbymatchmaker.core.design.molecules.ValidationRequirement
 import com.msoula.hobbymatchmaker.core.design.molecules.ValidationRequirementsList
@@ -66,12 +67,14 @@ fun ProfileEditInformationForm(
             SpacerHeight4()
 
             if (requirements.isNotEmpty()) {
-                ValidationRequirementsList(
-                    requirements = requirements,
-                    title = "Conditions de validation"
-                )
+                if (requirements.any { !it.isValid }) {
+                    ValidationRequirementsList(
+                        requirements = requirements,
+                        title = stringResource(Res.string.edit_profile_basic_information_requirements_title)
+                    )
 
-                SpacerHeight8()
+                    SpacerHeight8()
+                }
             }
 
             Text(
