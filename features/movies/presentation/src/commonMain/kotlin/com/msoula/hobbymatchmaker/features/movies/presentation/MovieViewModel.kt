@@ -108,7 +108,12 @@ class MovieViewModel(
         when (event) {
             is CardEventModel.OnDoubleTap -> {
                 scope.launch {
-                    toggleFavorite(event.movie.id, !event.movie.isFavorite)
+                    val currentState = _screenState.value
+                    if (currentState is UiState.Success) {
+                        val currentMovie = currentState.data.firstOrNull { it.id == event.movie.id }
+                        val newFavoriteState = !(currentMovie?.isFavorite ?: event.movie.isFavorite)
+                        toggleFavorite(event.movie.id, newFavoriteState)
+                    }
                 }
             }
 

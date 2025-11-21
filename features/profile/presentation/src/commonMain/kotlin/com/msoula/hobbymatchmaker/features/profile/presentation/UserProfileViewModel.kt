@@ -3,7 +3,6 @@ package com.msoula.hobbymatchmaker.features.profile.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutUseCase
-import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
@@ -23,19 +22,14 @@ import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class UserProfileViewModel(
-    observeCurrentUserProfileStateUseCase: ObserveCurrentUserProfileStateUseCase,
-    observeSessionStateUseCase: ObserveSessionStateUseCase,
+    private val observeCurrentUserProfileStateUseCase: ObserveCurrentUserProfileStateUseCase,
+    private val observeSessionStateUseCase: ObserveSessionStateUseCase,
     private val upsertUserProfileUseCase: UpsertUserProfileUseCase,
     private val logOutUseCase: LogOutUseCase,
     private val defaultMessageMapper: ErrorMessageMapper,
@@ -57,47 +51,43 @@ class UserProfileViewModel(
 
     private val _originalProfile = MutableStateFlow<UserProfileUiModel?>(null)
 
-    val screenState: StateFlow<UserProfileUiStateModel> =
-        combine(
-            observeSessionStateUseCase(),
-            observeCurrentUserProfileStateUseCase()
-        ) { session, profile ->
-            when (session) {
-                is SessionState.Authenticated -> {
-                    Logger.d("Is Authenticated with uid: ${profile.uid}")
-                    currentUserUid = profile.uid
-                    val uiModel = profile.toUserProfileUiModel()
+    private val _screenState = MutableStateFlow<UserProfileUiStateModel>(UserProfileUiStateModel.Loading)
+    val screenState = _screenState.asStateFlow()
 
-                    if (!_isEditMode.value) {
-                        _originalProfile.update { uiModel }
-                        _editableProfile.update { uiModel }
+    init {
+        observeProfile()
+    }
+
+    fun observeProfile() {
+        scope.launch {
+            observeSessionStateUseCase().collect { state ->
+                when (state) {
+                    is SessionState.Authenticated -> {
+                        currentUserUid = state.uid
+
+                        observeCurrentUserProfileStateUseCase(state.uid).collect { profile ->
+                            val uiModel = profile.toUserProfileUiModel()
+
+                            if (!_isEditMode.value) {
+                                _originalProfile.update { uiModel }
+                                _editableProfile.update { uiModel }
+                            }
+
+                            _screenState.update { UserProfileUiStateModel.Success(uiModel) }
+                        }
                     }
 
-                    Logger.d("User profile loaded - $uiModel")
+                    is SessionState.Guest -> {
+                        _screenState.update { UserProfileUiStateModel.Guest }
+                    }
 
-                    UserProfileUiStateModel.Success(uiModel)
+                    else -> {
+                        _screenState.update { UserProfileUiStateModel.Loading }
+                    }
                 }
-
-                is SessionState.Guest -> {
-                    currentUserUid = session.uid
-                    UserProfileUiStateModel.Guest
-                }
-
-                else -> UserProfileUiStateModel.Loading
             }
         }
-            .catch { error ->
-                emit(
-                    UserProfileUiStateModel.Error(
-                        defaultMessageMapper.toUIText(AppError.Network.Unknown(error))
-                    )
-                )
-            }
-            .stateIn(
-                scope,
-                SharingStarted.WhileSubscribed(5000),
-                UserProfileUiStateModel.Loading
-            )
+    }
 
     fun onEvent(event: UserProfileUiEventModel) {
         when (event) {
@@ -139,7 +129,6 @@ class UserProfileViewModel(
     private fun saveProfile() {
         scope.launch {
             _editableProfile.value?.let {
-                Logger.d("CurrentUserUid: $currentUserUid")
                 upsertUserProfileUseCase(
                     it.toUserProfileDomainModel(currentUserUid ?: "")
                 )

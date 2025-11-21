@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.map
 class ObserveCurrentUserProfileStateUseCase(
     private val userProfileRepository: UserProfileRepository
 ) {
-    operator fun invoke(): Flow<UserProfileDomainModel> =
-        userProfileRepository.observeCurrentUserProfile()
+    operator fun invoke(uid: String): Flow<UserProfileDomainModel> =
+        userProfileRepository.observeCurrentUserProfile(uid)
             .map {
                 it ?: UserProfileDomainModel.empty()
             }

@@ -6,6 +6,6 @@ import com.msoula.hobbymatchmaker.features.profile.data.models.UserProfileLocalD
 import kotlinx.coroutines.flow.Flow
 
 interface UserProfileLocalDataSource {
-    fun observeCurrentUserProfile(): Flow<UserProfileLocalDataModel?>
+    fun observeCurrentUserProfile(uid: String): Flow<UserProfileLocalDataModel?>
     suspend fun upsertUserProfile(userProfile: UserProfileLocalDataModel): AppResult<Unit, AppError>
 }

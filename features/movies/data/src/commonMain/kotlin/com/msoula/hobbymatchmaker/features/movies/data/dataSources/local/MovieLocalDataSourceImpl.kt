@@ -13,6 +13,10 @@ class MovieLocalDataSourceImpl(private val movieDAO: MovieDAOImpl) : MovieLocalD
         return movieDAO.observeMovies()
     }
 
+    override fun observeMoviesLikedCount(): Flow<Long> {
+        return movieDAO.observeMoviesFavoriteCount()
+    }
+
     override suspend fun updateMovieWithFavoriteValue(
         id: Long,
         isFavorite: Boolean
@@ -33,16 +37,18 @@ class MovieLocalDataSourceImpl(private val movieDAO: MovieDAOImpl) : MovieLocalD
         movieDAO.updateMovieCover(coverFileName, localCoverFilePath, movieId)
     }
 
-    override suspend fun upsertAll(movies: List<Movie>): AppResult<Unit, AppError> = safeCallStorage {
-        movieDAO.upsertMovies(movies)
-    }
+    override suspend fun upsertAll(movies: List<Movie>): AppResult<Unit, AppError> =
+        safeCallStorage {
+            movieDAO.upsertMovies(movies)
+        }
 
     override suspend fun isMovieSynopsisAvailable(movieId: Long): AppResult<Boolean, AppError> =
         safeCallStorage {
             movieDAO.isMovieSynopsisAvailable(movieId)
         }
 
-    override suspend fun getFavoriteLocalMovieIds(): AppResult<List<Long>, AppError> = safeCallStorage {
-        movieDAO.getFavoriteLocalMovieIds()
-    }
+    override suspend fun getFavoriteLocalMovieIds(): AppResult<List<Long>, AppError> =
+        safeCallStorage {
+            movieDAO.getFavoriteLocalMovieIds()
+        }
 }

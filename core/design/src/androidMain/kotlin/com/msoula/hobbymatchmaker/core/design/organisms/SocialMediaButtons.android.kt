@@ -1,6 +1,7 @@
 package com.msoula.hobbymatchmaker.core.design.organisms
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -37,8 +38,8 @@ internal actual fun SocialMediaButtonsPlatformSpecific(
             text = stringResource(Res.string.sign_in_with_google),
             contentDescription = stringResource(Res.string.google_alt),
             painter = painterResource(Res.drawable.google_logo),
-            containerColor = MaterialTheme.colorScheme.onSurface,
-            contentColor = Color.Black,
+            containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSurface else Color.White,
+            contentColor = if (isSystemInDarkTheme()) Color.Black else MaterialTheme.colorScheme.onSurface,
             borderStroke = BorderStroke(1.dp, Color.LightGray),
             onClick = onGoogleClick,
             loading = loading

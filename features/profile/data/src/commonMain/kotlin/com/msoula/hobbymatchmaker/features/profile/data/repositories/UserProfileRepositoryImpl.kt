@@ -1,6 +1,7 @@
 package com.msoula.hobbymatchmaker.features.profile.data.repositories
 
 import com.msoula.hobbymatchmaker.core.common.Logger
+import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.MovieLocalDataSource
 import com.msoula.hobbymatchmaker.features.profile.data.dataSources.local.SocialLocalDataSource
 import com.msoula.hobbymatchmaker.features.profile.data.dataSources.local.UserProfileLocalDataSource
 import com.msoula.hobbymatchmaker.features.profile.data.dataSources.mappers.toUserProfileLocalDataModel
@@ -19,27 +20,28 @@ class UserProfileRepositoryImpl(
     private val userProfileLocalDataSource: UserProfileLocalDataSource,
     private val socialLocalDataSource: SocialLocalDataSource,
     private val userProfileRemoteDataSource: UserProfileRemoteDataSource,
-    private val socialRemoteDataSource: SocialRemoteDataSource
+    private val socialRemoteDataSource: SocialRemoteDataSource,
+    private val movieLocalDataSource: MovieLocalDataSource
 ) : UserProfileRepository {
 
-    override fun observeCurrentUserProfile(): Flow<UserProfileDomainModel?> =
+    override fun observeCurrentUserProfile(uid: String): Flow<UserProfileDomainModel?> =
         combine(
-            userProfileLocalDataSource.observeCurrentUserProfile(),
+            userProfileLocalDataSource.observeCurrentUserProfile(uid),
+            movieLocalDataSource.observeMoviesLikedCount(),
             socialLocalDataSource.observeSocialCircle()
                 .onStart { emit(emptyList()) }
-        ) { profile, members ->
+        ) { profile, count, members ->
             if (profile == null) {
                 Logger.d("No profile found in local storage")
                 null
             } else {
-                Logger.d("Inside repoImpl with profile: $profile and members: $members")
                 UserProfileDomainModel(
                     uid = profile.uid,
                     name = profile.name,
                     avatarUrl = profile.avatarUrl,
                     bio = profile.bio,
                     interests = profile.interests,
-                    likedMoviesCount = profile.likedCount,
+                    likedMoviesCount = count.toInt(),
                     socialCircle =
                         members.map {
                             UserSummaryDomainModel(

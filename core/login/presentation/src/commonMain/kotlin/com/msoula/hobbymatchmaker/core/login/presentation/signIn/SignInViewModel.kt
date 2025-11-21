@@ -164,15 +164,15 @@ class SignInViewModel(
         _signInState.update { UiState.Loading }
 
         unifiedSignInUseCase(params)
-            .onFailure { error ->
-                _signInState.update { UiState.Success(Unit) }
-                eventHandler.sendEvent(UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(error)))
-            }
             .onSuccess { result ->
                 Logger.d("Signed in with uid:${result.uid}")
                 setCurrentUserProfileUuidUseCase(result.uid)
                 _signInState.update { UiState.Success(Unit) }
                 eventHandler.sendEvent(UiEvent.NavigateToRoute("movies"))
+            }
+            .onFailure { error ->
+                _signInState.update { UiState.Success(Unit) }
+                eventHandler.sendEvent(UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(error)))
             }
     }
 

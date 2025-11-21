@@ -9,6 +9,7 @@ kotlin {
         commonMain.dependencies {
             // Modules
             implementation(project(Modules.COMMON))
+            implementation(project(Modules.PROFILE_DOMAIN))
             implementation(project(Modules.SESSION_DOMAIN))
         }
 

@@ -101,6 +101,10 @@ class SignUpViewModel(
                 formDataFlow.value.password
             )
         )
+            .onSuccess {
+                resetSignUpState()
+                eventHandler.sendEvent(UiEvent.NavigateToRoute("movies"))
+            }
             .onFailure { error ->
                 resetSignUpState()
                 eventHandler.sendEvent(
@@ -108,10 +112,6 @@ class SignUpViewModel(
                         defaultErrorMessageMapper.toUIText(error)
                     )
                 )
-            }
-            .onSuccess {
-                resetSignUpState()
-                eventHandler.sendEvent(UiEvent.NavigateToRoute("movies"))
             }
     }
 

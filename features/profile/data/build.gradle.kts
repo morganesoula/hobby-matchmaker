@@ -16,6 +16,7 @@ kotlin {
             // Modules
             implementation(project(Modules.COMMON))
             implementation(project(Modules.DATABASE))
+            implementation(project(Modules.MOVIE_DATA))
             implementation(project(Modules.NETWORK))
             implementation(project(Modules.PROFILE_DOMAIN))
             implementation(project(Modules.SESSION_DATA))

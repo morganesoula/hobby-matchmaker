@@ -6,12 +6,10 @@ import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.common.safeFirebaseCall
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.MovieRemoteModel
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.services.TMDBKtorService
-import com.msoula.hobbymatchmaker.features.movies.domain.repositories.ImageRepository
 import dev.gitlive.firebase.firestore.FieldValue
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 
 class MovieRemoteDataSourceImpl(
-    private val imageRepository: ImageRepository,
     private val firestore: FirebaseFirestore,
     private val tmdbKtorService: TMDBKtorService
 ) : MovieRemoteDataSource {

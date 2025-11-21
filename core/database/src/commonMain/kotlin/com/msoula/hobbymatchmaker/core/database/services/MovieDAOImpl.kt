@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.core.database.services
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
+import app.cash.sqldelight.coroutines.mapToOne
 import com.msoula.hobbymatchmaker.core.database.Actor
 import com.msoula.hobbymatchmaker.core.database.HMMDatabase
 import com.msoula.hobbymatchmaker.core.database.Movie
@@ -249,5 +250,11 @@ class MovieDAOImpl(private val database: HMMDatabase) : MovieDAO {
 
     override suspend fun getFavoriteLocalMovieIds(): List<Long> {
         return database.hmm_databaseQueries.getFavoriteIds().executeAsList()
+    }
+
+    override fun observeMoviesFavoriteCount(): Flow<Long> {
+        return database.hmm_databaseQueries.observeMoviesFavoriteCount().asFlow().mapToOne(
+            Dispatchers.IO
+        )
     }
 }

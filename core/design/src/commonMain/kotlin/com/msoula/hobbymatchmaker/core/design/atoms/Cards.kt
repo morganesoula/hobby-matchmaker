@@ -108,23 +108,6 @@ fun ShimmerCircle(
 }
 
 @Composable
-fun ShimmerRectangle(
-    modifier: Modifier = Modifier,
-    widthFraction: Float = 1f,
-    height: Dp = 16.dp,
-    cornerRadius: Dp = 8.dp
-) {
-    val brush = rememberShimmerBrush()
-    Box(
-        modifier = modifier
-            .fillMaxWidth(widthFraction)
-            .height(height)
-            .clip(RoundedCornerShape(cornerRadius))
-            .background(brush)
-    )
-}
-
-@Composable
 fun ShimmerCard(
     modifier: Modifier = Modifier,
     height: Dp = 120.dp,
