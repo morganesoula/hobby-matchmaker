@@ -8,6 +8,7 @@ import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfi
 fun UserProfileDomainModel.toUserProfileUiModel(): UserProfileUiModel =
     UserProfileUiModel(
         name = this.name,
+        pseudo = this.pseudo,
         avatarUrl = this.avatarUrl,
         bio = this.bio,
         interests = this.interests,
@@ -20,6 +21,7 @@ fun UserSummaryDomainModel.toSocialMemberUiModel(): SocialMemberUiModel =
     SocialMemberUiModel(
         uid = this.uid,
         name = this.name,
+        pseudo = this.pseudo,
         avatarUrl = this.avatarUrl
     )
 
@@ -27,6 +29,7 @@ fun UserProfileUiModel.toUserProfileDomainModel(uid: String): UserProfileDomainM
     UserProfileDomainModel(
         uid = uid,
         name = this.name,
+        pseudo = this.pseudo,
         avatarUrl = this.avatarUrl,
         bio = this.bio,
         interests = this.interests ?: emptyList(),

@@ -8,6 +8,7 @@ val featuresModuleUserProfilePresentation = module {
     viewModel {
         UserProfileViewModel(
             observeCurrentUserProfileStateUseCase = get(),
+            checkIfPseudoIsAvailable = get(),
             observeSessionStateUseCase = get(),
             upsertUserProfileUseCase = get(),
             logOutUseCase = get(),

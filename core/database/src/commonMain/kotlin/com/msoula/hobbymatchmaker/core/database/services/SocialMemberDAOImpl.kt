@@ -20,6 +20,7 @@ class SocialMemberDAOImpl(
             uid = socialCircleMemberDataEntity.uid,
             member_uid = socialCircleMemberDataEntity.memberUid,
             member_name = socialCircleMemberDataEntity.memberName,
+            member_pseudo = socialCircleMemberDataEntity.memberPseudo,
             member_avatar_url = socialCircleMemberDataEntity.memberAvatarUrl,
             added_at = Clock.System.now().toEpochMilliseconds()
         )
@@ -39,6 +40,7 @@ class SocialMemberDAOImpl(
                         uid = it.uid,
                         memberUid = it.member_uid,
                         memberName = it.member_name,
+                        memberPseudo = it.member_pseudo,
                         memberAvatarUrl = it.member_avatar_url
                     )
                 }

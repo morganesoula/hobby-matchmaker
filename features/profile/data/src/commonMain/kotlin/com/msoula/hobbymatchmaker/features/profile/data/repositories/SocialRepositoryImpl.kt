@@ -5,6 +5,7 @@ import com.msoula.hobbymatchmaker.features.profile.data.models.SocialMemberLocal
 import com.msoula.hobbymatchmaker.features.profile.domain.models.UserSummaryDomainModel
 import com.msoula.hobbymatchmaker.features.profile.domain.models.UserSummaryDomainModel.Companion.DEFAULT_AVATAR_URL
 import com.msoula.hobbymatchmaker.features.profile.domain.models.UserSummaryDomainModel.Companion.DEFAULT_NAME
+import com.msoula.hobbymatchmaker.features.profile.domain.models.UserSummaryDomainModel.Companion.DEFAULT_PSEUDO
 import com.msoula.hobbymatchmaker.features.profile.domain.repositories.SocialRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -23,6 +24,7 @@ class SocialRepositoryImpl(
                     UserSummaryDomainModel(
                         uid = it.memberId,
                         name = it.name ?: DEFAULT_NAME,
+                        pseudo = it.pseudo ?: DEFAULT_PSEUDO,
                         avatarUrl = it.avatarUrl ?: DEFAULT_AVATAR_URL
                     )
                 }
@@ -31,7 +33,7 @@ class SocialRepositoryImpl(
 
     override suspend fun addToCircle(memberUid: String) {
         socialLocalDataSource.addToCircle(
-            SocialMemberLocalDataModel(memberUid, null, null)
+            SocialMemberLocalDataModel(memberUid, null, null, null)
         )
     }
 

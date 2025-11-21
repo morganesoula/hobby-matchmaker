@@ -9,4 +9,5 @@ interface UserProfileRepository {
     fun observeCurrentUserProfile(uid: String): Flow<UserProfileDomainModel?>
     suspend fun refreshUserProfile(userProfileDomainModel: UserProfileDomainModel)
     suspend fun upsertUserProfile(userProfileDomainModel: UserProfileDomainModel): AppResult<Unit, AppError>
+    suspend fun checkIfPseudoIsAvailable(pseudo: String): AppResult<Boolean, AppError>
 }

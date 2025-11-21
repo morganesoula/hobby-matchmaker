@@ -1,5 +1,6 @@
 package com.msoula.hobbymatchmaker.features.profile.domain.di
 
+import com.msoula.hobbymatchmaker.features.profile.domain.useCases.CheckIfPseudoIsAvailable
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.CreateDefaultUserProfileUseCase
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.ObserveCurrentUserProfileStateUseCase
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.RefreshUserProfileUseCase
@@ -12,4 +13,5 @@ val featuresModuleUserProfileDomain = module {
     factoryOf(::ObserveCurrentUserProfileStateUseCase)
     factoryOf(::UpsertUserProfileUseCase)
     factoryOf(::CreateDefaultUserProfileUseCase)
+    factoryOf(::CheckIfPseudoIsAvailable)
 }

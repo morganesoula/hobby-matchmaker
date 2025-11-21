@@ -1,5 +1,7 @@
 package com.msoula.hobbymatchmaker.features.profile.data.repositories
 
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.MovieLocalDataSource
 import com.msoula.hobbymatchmaker.features.profile.data.dataSources.local.SocialLocalDataSource
@@ -11,6 +13,7 @@ import com.msoula.hobbymatchmaker.features.profile.domain.models.UserProfileDoma
 import com.msoula.hobbymatchmaker.features.profile.domain.models.UserSummaryDomainModel
 import com.msoula.hobbymatchmaker.features.profile.domain.models.UserSummaryDomainModel.Companion.DEFAULT_AVATAR_URL
 import com.msoula.hobbymatchmaker.features.profile.domain.models.UserSummaryDomainModel.Companion.DEFAULT_NAME
+import com.msoula.hobbymatchmaker.features.profile.domain.models.UserSummaryDomainModel.Companion.DEFAULT_PSEUDO
 import com.msoula.hobbymatchmaker.features.profile.domain.repositories.UserProfileRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -38,6 +41,7 @@ class UserProfileRepositoryImpl(
                 UserProfileDomainModel(
                     uid = profile.uid,
                     name = profile.name,
+                    pseudo = profile.pseudo,
                     avatarUrl = profile.avatarUrl,
                     bio = profile.bio,
                     interests = profile.interests,
@@ -47,6 +51,7 @@ class UserProfileRepositoryImpl(
                             UserSummaryDomainModel(
                                 uid = it.memberId,
                                 name = it.name ?: DEFAULT_NAME,
+                                pseudo = it.pseudo ?: DEFAULT_PSEUDO,
                                 avatarUrl = it.avatarUrl ?: DEFAULT_AVATAR_URL
                             )
                         }
@@ -54,11 +59,13 @@ class UserProfileRepositoryImpl(
             }
         }
 
-
     override suspend fun refreshUserProfile(userProfileDomainModel: UserProfileDomainModel) {
         TODO("Not yet implemented")
     }
 
     override suspend fun upsertUserProfile(userProfileDomainModel: UserProfileDomainModel) =
         userProfileLocalDataSource.upsertUserProfile(userProfileDomainModel.toUserProfileLocalDataModel())
+
+    override suspend fun checkIfPseudoIsAvailable(pseudo: String): AppResult<Boolean, AppError> =
+        userProfileRemoteDataSource.checkIfPseudoIsAvailable(pseudo)
 }

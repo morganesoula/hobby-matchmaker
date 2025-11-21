@@ -3,6 +3,7 @@ package com.msoula.hobbymatchmaker.features.profile.domain.models
 data class UserProfileDomainModel(
     val uid: String,
     val name: String,
+    val pseudo: String,
     val avatarUrl: String?,
     val bio: String?,
     val interests: List<String>,
@@ -12,6 +13,7 @@ data class UserProfileDomainModel(
     companion object {
         const val DEFAULT_UID: String = ""
         const val DEFAULT_NAME = ""
+        const val DEFAULT_PSEUDO = ""
         const val DEFAULT_AVATAR_URL = ""
         const val DEFAULT_BIO = ""
         val DEFAULT_INTERESTS: List<String> = emptyList()
@@ -21,6 +23,7 @@ data class UserProfileDomainModel(
         fun empty(): UserProfileDomainModel = UserProfileDomainModel(
             uid = DEFAULT_UID,
             name = DEFAULT_NAME,
+            pseudo = DEFAULT_PSEUDO,
             avatarUrl = DEFAULT_AVATAR_URL,
             bio = DEFAULT_BIO,
             interests = DEFAULT_INTERESTS,
@@ -33,11 +36,13 @@ data class UserProfileDomainModel(
 data class UserSummaryDomainModel(
     val uid: String,
     val name: String,
+    val pseudo: String,
     val avatarUrl: String?
 ) {
     companion object {
         const val DEFAULT_UID: String = ""
         const val DEFAULT_NAME: String = ""
+        const val DEFAULT_PSEUDO: String = ""
         const val DEFAULT_AVATAR_URL: String = ""
     }
 }

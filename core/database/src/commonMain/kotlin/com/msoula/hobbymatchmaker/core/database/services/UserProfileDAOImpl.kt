@@ -19,6 +19,7 @@ class UserProfileDAOImpl(
         database.hmm_databaseQueries.insertUserProfile(
             userProfile.uid,
             userProfile.name,
+            userProfile.pseudo,
             userProfile.avatarUrl,
             userProfile.bio,
             userProfile.interests,
@@ -37,6 +38,7 @@ class UserProfileDAOImpl(
                 database.hmm_databaseQueries.insertUserProfile(
                     uid = userProfile.uid,
                     name = userProfile.name,
+                    pseudo = userProfile.pseudo,
                     avatar_url = userProfile.avatarUrl,
                     bio = userProfile.bio,
                     interests_json = userProfile.interests,
@@ -48,6 +50,7 @@ class UserProfileDAOImpl(
                 database.hmm_databaseQueries.updateUserProfile(
                     userProfile.name,
                     userProfile.avatarUrl,
+                    userProfile.pseudo,
                     userProfile.bio,
                     userProfile.interests,
                     userProfile.likedCount.toLong(),
@@ -70,6 +73,7 @@ class UserProfileDAOImpl(
                     UserProfileDataEntity(
                         uid = it.uid,
                         name = it.name,
+                        pseudo = it.pseudo,
                         avatarUrl = it.avatar_url,
                         bio = it.bio,
                         interests = it.interests_json,
@@ -78,5 +82,24 @@ class UserProfileDAOImpl(
                     )
                 }
             }
+    }
+
+    override suspend fun getUserProfileByPseudo(pseudo: String): UserProfileDataEntity? {
+        val row = database.hmm_databaseQueries
+            .selectUserByPseudo(pseudo)
+            .executeAsOneOrNull()
+
+        return row?.let {
+            UserProfileDataEntity(
+                uid = it.uid,
+                name = it.name,
+                pseudo = it.pseudo,
+                avatarUrl = it.avatar_url,
+                bio = it.bio,
+                interests = it.interests_json,
+                likedCount = it.liked_count.toInt(),
+                circleCount = it.circle_count.toInt()
+            )
+        }
     }
 }

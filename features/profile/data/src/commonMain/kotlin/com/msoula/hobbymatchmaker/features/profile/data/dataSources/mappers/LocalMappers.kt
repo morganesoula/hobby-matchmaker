@@ -8,6 +8,7 @@ fun UserProfileDataEntity.toUserProfileLocalDataModel(): UserProfileLocalDataMod
     return UserProfileLocalDataModel(
         uid = this.uid,
         name = this.name,
+        pseudo = this.pseudo,
         avatarUrl = this.avatarUrl,
         bio = this.bio,
         interests = this.interests,
@@ -20,6 +21,7 @@ fun UserProfileLocalDataModel.toUserProfileDataEntity(): UserProfileDataEntity {
     return UserProfileDataEntity(
         uid = this.uid,
         name = this.name,
+        pseudo = this.pseudo,
         avatarUrl = this.avatarUrl,
         bio = this.bio,
         interests = this.interests,
@@ -32,6 +34,7 @@ fun UserProfileDomainModel.toUserProfileLocalDataModel(): UserProfileLocalDataMo
     return UserProfileLocalDataModel(
         uid = this.uid,
         name = this.name,
+        pseudo = this.pseudo,
         avatarUrl = this.avatarUrl,
         bio = this.bio,
         interests = this.interests,

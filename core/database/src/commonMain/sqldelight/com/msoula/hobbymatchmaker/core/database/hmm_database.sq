@@ -40,6 +40,7 @@ CREATE TABLE movie_actor_cross_ref (
 CREATE TABLE user_profile (
     uid TEXT NOT NULL PRIMARY KEY,
     name TEXT NOT NULL,
+    pseudo TEXT NOT NULL,
     avatar_url TEXT,
     bio TEXT,
     interests_json TEXT AS List<String> NOT NULL,
@@ -52,6 +53,7 @@ CREATE TABLE social_circle_member (
     uid TEXT NOT NULL,
     member_uid TEXT NOT NULL,
     member_name TEXT,
+    member_pseudo TEXT,
     member_avatar_url TEXT,
     added_at INTEGER NOT NULL,
     PRIMARY KEY (uid, member_uid),
@@ -160,10 +162,16 @@ SELECT *
 FROM user_profile
 WHERE uid = ?;
 
+selectUserByPseudo:
+SELECT *
+FROM user_profile
+WHERE pseudo = ?;
+
 selectUserProfileWIthMembersById:
 SELECT
 up.uid AS uid,
 up.name AS name,
+up.pseudo AS pseudo,
 up.avatar_url AS avatar_url,
 up.bio AS bio,
 up.interests_json AS interests_json,
@@ -171,6 +179,7 @@ up.liked_count AS liked_count,
 up.circle_count AS circle_count,
 scm.member_uid AS member_uid,
 scm.member_name AS member_name,
+scm.member_pseudo AS member_pseudo,
 scm.member_avatar_url AS member_avatar_url,
 scm.added_at AS member_added_at
 FROM user_profile up
@@ -180,13 +189,14 @@ WHERE up.uid = ?;
 
 insertUserProfile:
 INSERT INTO user_profile(
-uid, name, avatar_url, bio, interests_json, liked_count, circle_count, updated_at
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+uid, name, pseudo, avatar_url, bio, interests_json, liked_count, circle_count, updated_at
+) VALUES (?, ?, ?,?, ?, ?, ?, ?, ?);
 
 updateUserProfile:
 UPDATE user_profile SET
     name = :name,
     avatar_url = :avatar_url,
+    pseudo = :pseudo,
     bio = :bio,
     interests_json = :interests_json,
     liked_count = :liked_count,
@@ -198,8 +208,8 @@ deleteUserProfileById:
 DELETE FROM user_profile WHERE uid = ?;
 
 insertSocialMember:
-INSERT INTO social_circle_member (uid, member_uid, member_name, member_avatar_url, added_at)
-VALUES (?, ?, ?, ?, ?);
+INSERT INTO social_circle_member (uid, member_uid, member_name, member_pseudo, member_avatar_url, added_at)
+VALUES (?, ?, ?, ?, ?, ?);
 
 deleteSocialMember:
 DELETE FROM social_circle_member WHERE uid = ? AND member_uid = ?;

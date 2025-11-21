@@ -7,4 +7,5 @@ interface UserProfileDAO {
     suspend fun insertUserProfile(userProfile: UserProfileDataEntity)
     suspend fun upsertUserProfile(userProfile: UserProfileDataEntity)
     fun observeUserProfile(uid: String): Flow<UserProfileDataEntity?>
+    suspend fun getUserProfileByPseudo(pseudo: String): UserProfileDataEntity?
 }

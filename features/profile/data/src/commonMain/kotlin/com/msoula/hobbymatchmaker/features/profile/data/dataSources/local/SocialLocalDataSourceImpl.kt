@@ -26,6 +26,7 @@ class SocialLocalDataSourceImpl(
                                 SocialMemberLocalDataModel(
                                     memberId = it.memberUid,
                                     name = it.memberName,
+                                    pseudo = it.memberPseudo,
                                     avatarUrl = it.memberAvatarUrl
                                 )
                             }
@@ -47,7 +48,8 @@ class SocialLocalDataSourceImpl(
                 uid = uid,
                 memberUid = member.memberId,
                 memberName = member.name,
-                memberAvatarUrl = member.avatarUrl
+                memberAvatarUrl = member.avatarUrl,
+                memberPseudo = member.pseudo
             )
         )
     }

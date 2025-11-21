@@ -5,7 +5,7 @@ import com.msoula.hobbymatchmaker.features.profile.domain.models.UserProfileDoma
 
 fun UserProfileDomainModel.toUserProfileRemoteDataModel(): UserProfileRemoteDataModel {
     return UserProfileRemoteDataModel(
-        uid = this.uid.toString()
+        uid = this.uid
     )
 }
 
@@ -13,6 +13,7 @@ fun UserProfileRemoteDataModel.toUserProfileDomainModel(): UserProfileDomainMode
     return UserProfileDomainModel(
         uid = this.uid,
         name = "",
+        pseudo = "",
         avatarUrl = "",
         bio = "",
         interests = emptyList(),

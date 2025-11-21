@@ -12,6 +12,7 @@ import com.msoula.hobbymatchmaker.core.design.util.EventHandler
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.session.domain.models.SessionState
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveSessionStateUseCase
+import com.msoula.hobbymatchmaker.features.profile.domain.useCases.CheckIfPseudoIsAvailable
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.ObserveCurrentUserProfileStateUseCase
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.UpsertUserProfileUseCase
 import com.msoula.hobbymatchmaker.features.profile.presentation.mappers.toUserProfileDomainModel
@@ -31,6 +32,7 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalCoroutinesApi::class)
 class UserProfileViewModel(
     private val observeCurrentUserProfileStateUseCase: ObserveCurrentUserProfileStateUseCase,
+    private val checkIfPseudoIsAvailable: CheckIfPseudoIsAvailable,
     private val observeSessionStateUseCase: ObserveSessionStateUseCase,
     private val upsertUserProfileUseCase: UpsertUserProfileUseCase,
     private val logOutUseCase: LogOutUseCase,
@@ -107,6 +109,24 @@ class UserProfileViewModel(
 
             is UserProfileUiEventModel.OnAvatarSelected -> {
                 onAvatarSelected(event.path)
+            }
+
+            is UserProfileUiEventModel.OnPseudoChanged -> {
+                _editableProfile.update { current -> current?.copy(pseudo = event.value) }
+            }
+
+            UserProfileUiEventModel.OnPseudoDefined -> {
+                _editableProfile.value?.let {
+                    scope.launch {
+                        checkIfPseudoIsAvailable(it.pseudo)
+                            .onSuccess {
+                                //TODO
+                            }
+                            .onFailure {
+                                //TODO
+                            }
+                    }
+                }
             }
 
             UserProfileUiEventModel.OnSaveClicked -> saveProfile()

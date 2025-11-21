@@ -8,6 +8,7 @@ fun SocialMemberUiModel.toProfileSocialMembers(): ProfileSocialMembers {
     return ProfileSocialMembers(
         uid = uid,
         name = name,
+        pseudo = pseudo,
         avatarUrl = avatarUrl
     )
 }
@@ -16,5 +17,6 @@ fun SocialMemberUiModel.toUserSummaryDomainModel(): UserSummaryDomainModel =
     UserSummaryDomainModel(
         uid = uid,
         name = name,
+        pseudo = pseudo,
         avatarUrl = avatarUrl
     )
