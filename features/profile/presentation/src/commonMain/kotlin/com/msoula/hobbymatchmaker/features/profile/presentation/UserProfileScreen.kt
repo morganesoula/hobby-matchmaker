@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.isIosPlatform
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
@@ -58,6 +59,10 @@ import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.features.profile.presentation.mappers.toProfileSocialMembers
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiEventModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiStateModel
+import io.github.vinceglb.filekit.dialogs.FileKitMode
+import io.github.vinceglb.filekit.dialogs.FileKitType
+import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.path
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -71,7 +76,8 @@ fun UserProfileContent(
     val editableProfile by viewModel.editableProfile.collectAsState()
     val snackBarHostState = remember { SnackbarHostState() }
 
-    val noNumberRequirement = stringResource(Res.string.edit_profile_basic_information_requirements_no_number)
+    val noNumberRequirement =
+        stringResource(Res.string.edit_profile_basic_information_requirements_no_number)
 
     val requirements = remember(editableProfile) {
         derivedStateOf {
@@ -88,6 +94,15 @@ fun UserProfileContent(
         derivedStateOf {
             requirements.value.all { it.isValid }
         }
+    }
+
+    val avatarLauncher = rememberFilePickerLauncher(
+        type = FileKitType.Image,
+        mode = FileKitMode.Single
+    ) { image ->
+        image?.let {
+            viewModel.onEvent(UserProfileUiEventModel.OnAvatarSelected(it.path))
+        } ?: Logger.d("No image found in the gallery")
     }
 
     LaunchedEffect(viewModel.events) {
@@ -158,7 +173,10 @@ fun UserProfileContent(
                         ) {
                             EditableProfileLayout(
                                 editPhotoProfileSection = {
-                                    ProfileEditProfilePicture()
+                                    ProfileEditProfilePicture(
+                                        customAvatarPath = currentEditableProfile.avatarUrl,
+                                        onAvatarClicked = { avatarLauncher.launch() }
+                                    )
                                 },
                                 editBasicInformationSection = {
                                     ProfileEditInformationForm(
@@ -205,6 +223,7 @@ fun UserProfileContent(
                                 AuthentifiedProfileHeader(
                                     fullName = profile.name,
                                     biography = profile.bio ?: "",
+                                    avatarPath = profile.avatarUrl,
                                     onEditProfileClicked = {
                                         viewModel.onEvent(UserProfileUiEventModel.OnEditModeClicked)
                                     }
@@ -240,7 +259,7 @@ fun UserProfileContent(
                             GuestProfileHeader(
                                 icon = Film,
                                 titleHeader = stringResource(Res.string.guest_header_title),
-                                descriptionHeader = stringResource(Res.string.guest_header_description)
+                                descriptionHeader = stringResource(Res.string.guest_header_description),
                             )
                         },
                         guestDiscoverFeature = {

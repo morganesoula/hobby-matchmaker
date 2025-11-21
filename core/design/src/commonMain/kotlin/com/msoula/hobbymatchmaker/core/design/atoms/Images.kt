@@ -28,10 +28,15 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
+import coil3.compose.LocalPlatformContext
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.ic_movie_clapper_board
 import com.msoula.hobbymatchmaker.core.design.ic_no_image_found_playstore
@@ -140,7 +145,7 @@ fun Modifier.shimmerEffect(): Modifier =
     }
 
 @Composable
-fun CircleWithIcon(
+fun CircleWithDefaultIcon(
     modifier: Modifier = Modifier,
     backgroundColor: Color,
     icon: ImageVector,
@@ -197,7 +202,7 @@ fun CircleWithCustomPhoto(
     backgroundColor: Color? = null,
     borderColor: Color? = null,
     contentDescription: String? = null,
-    image: ImageVector? = null
+    customAvatarPath: String? = null
 ) {
     Box(
         modifier = modifier
@@ -209,8 +214,18 @@ fun CircleWithCustomPhoto(
             .border(2.dp, borderColor ?: MaterialTheme.colorScheme.surface, CircleShape),
         contentAlignment = Alignment.Center
     ) {
-        Icon(
-            imageVector = image ?: Hide_image,
+        customAvatarPath?.let {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalPlatformContext.current)
+                    .data(it)
+                    .crossfade(true)
+                    .build(),
+                modifier = Modifier.clip(CircleShape),
+                contentDescription = contentDescription,
+                contentScale = ContentScale.Crop
+            )
+        } ?: Icon(
+            imageVector = Hide_image,
             contentDescription = contentDescription,
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(IconSize.FortyEight).padding(CustomSize.Four)

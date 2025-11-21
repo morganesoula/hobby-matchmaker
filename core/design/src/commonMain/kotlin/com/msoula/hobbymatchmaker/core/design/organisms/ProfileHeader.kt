@@ -23,7 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.CircleWithCustomPhoto
-import com.msoula.hobbymatchmaker.core.design.atoms.CircleWithIcon
+import com.msoula.hobbymatchmaker.core.design.atoms.CircleWithDefaultIcon
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight4
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
@@ -51,7 +51,7 @@ fun GuestProfileHeader(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            CircleWithIcon(
+            CircleWithDefaultIcon(
                 backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = .5f),
                 icon = icon,
                 iconTint = MaterialTheme.colorScheme.onSurface
@@ -83,6 +83,7 @@ fun AuthentifiedProfileHeader(
     modifier: Modifier = Modifier,
     fullName: String,
     biography: String,
+    avatarPath: String? = null,
     onEditProfileClicked: () -> Unit
 ) {
     Box(
@@ -97,7 +98,9 @@ fun AuthentifiedProfileHeader(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            CircleWithCustomPhoto()
+            CircleWithCustomPhoto(
+                customAvatarPath = avatarPath
+            )
             SpacerHeight8()
             Text(
                 text = fullName,

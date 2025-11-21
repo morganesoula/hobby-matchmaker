@@ -11,6 +11,7 @@ val featuresModuleUserProfilePresentation = module {
             observeSessionStateUseCase = get(),
             upsertUserProfileUseCase = get(),
             logOutUseCase = get(),
+            imageFileManager = get(),
             defaultMessageMapper = get(),
             externalScope = null
         )

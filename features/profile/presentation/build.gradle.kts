@@ -10,6 +10,9 @@ multiplatformConfig {
 kotlin {
     sourceSets {
         commonMain.dependencies {
+            // Images
+            implementation(libs.findLibrary("file-kit-core").get())
+            implementation(libs.findLibrary("file-kit-compose").get())
             // Modules
             implementation(project(Modules.AUTHENTICATION_DOMAIN))
             implementation(project(Modules.COMMON))

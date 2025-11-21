@@ -6,7 +6,10 @@ import dev.gitlive.firebase.firestore.firestore
 import org.koin.dsl.module
 
 val coreModuleCommon = module {
+    includes(platformModule)
     single<FirebaseFirestore> {
         Firebase.firestore
     }
 }
+
+expect val platformModule: org.koin.core.module.Module

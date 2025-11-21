@@ -9,12 +9,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.CircleWithCustomPhoto
@@ -28,7 +28,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun ProfileEditProfilePicture(
     modifier: Modifier = Modifier,
-    customAvatar: ImageVector? = null
+    customAvatarPath: String? = null,
+    onAvatarClicked: () -> Unit
 ) {
     GenericCard(
         modifier = modifier.padding(
@@ -45,24 +46,28 @@ fun ProfileEditProfilePicture(
         ) {
             Box {
                 CircleWithCustomPhoto(
-                    image = customAvatar,
+                    customAvatarPath = customAvatarPath,
                     borderColor = MaterialTheme.colorScheme.primary,
                     backgroundColor = MaterialTheme.colorScheme.surface
                 )
 
-                Icon(
-                    imageVector = Camera,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .border(
-                            2.dp,
-                            MaterialTheme.colorScheme.primary, CircleShape
-                        )
-                        .background(MaterialTheme.colorScheme.primary, CircleShape)
-                        .padding(CustomSize.Four),
-                    tint = MaterialTheme.colorScheme.onPrimary
-                )
+                IconButton(
+                    onClick = { onAvatarClicked() },
+                    modifier = Modifier.align(Alignment.BottomEnd)
+                ) {
+                    Icon(
+                        imageVector = Camera,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .border(
+                                2.dp,
+                                MaterialTheme.colorScheme.primary, CircleShape
+                            )
+                            .background(MaterialTheme.colorScheme.primary, CircleShape)
+                            .padding(CustomSize.Eight),
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
             }
 
             Text(text = stringResource(Res.string.edit_profile_edit_photo_title))
@@ -73,5 +78,5 @@ fun ProfileEditProfilePicture(
 @Preview
 @Composable
 fun ProfileEditProfilePicturePreview() {
-    ProfileEditProfilePicture()
+    ProfileEditProfilePicture(onAvatarClicked = {})
 }

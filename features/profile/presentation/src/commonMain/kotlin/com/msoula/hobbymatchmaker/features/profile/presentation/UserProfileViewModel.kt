@@ -3,12 +3,12 @@ package com.msoula.hobbymatchmaker.features.profile.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutUseCase
-import com.msoula.hobbymatchmaker.core.common.Logger
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.ImageFileManager
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.design.util.EventHandler
-import com.msoula.hobbymatchmaker.core.design.util.UIText
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.session.domain.models.SessionState
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveSessionStateUseCase
@@ -25,6 +25,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class UserProfileViewModel(
@@ -32,6 +34,7 @@ class UserProfileViewModel(
     private val observeSessionStateUseCase: ObserveSessionStateUseCase,
     private val upsertUserProfileUseCase: UpsertUserProfileUseCase,
     private val logOutUseCase: LogOutUseCase,
+    private val imageFileManager: ImageFileManager,
     private val defaultMessageMapper: ErrorMessageMapper,
     externalScope: CoroutineScope? = null
 ) : ViewModel() {
@@ -51,7 +54,8 @@ class UserProfileViewModel(
 
     private val _originalProfile = MutableStateFlow<UserProfileUiModel?>(null)
 
-    private val _screenState = MutableStateFlow<UserProfileUiStateModel>(UserProfileUiStateModel.Loading)
+    private val _screenState =
+        MutableStateFlow<UserProfileUiStateModel>(UserProfileUiStateModel.Loading)
     val screenState = _screenState.asStateFlow()
 
     init {
@@ -91,18 +95,6 @@ class UserProfileViewModel(
 
     fun onEvent(event: UserProfileUiEventModel) {
         when (event) {
-            UserProfileUiEventModel.OnPickAvatarClicked -> {
-                scope.launch {
-                    eventHandler.sendEvent(
-                        UiEvent.ShowSnackBar(
-                            UIText.Plain(
-                                "Avatar selection not implemented yet"
-                            )
-                        )
-                    )
-                }
-            }
-
             is UserProfileUiEventModel.OnBioChanged ->
                 _editableProfile.update { current -> current?.copy(bio = event.value) }
 
@@ -111,6 +103,10 @@ class UserProfileViewModel(
 
             is UserProfileUiEventModel.OnInterestsChanged -> {
                 _editableProfile.update { current -> current?.copy(interests = event.value) }
+            }
+
+            is UserProfileUiEventModel.OnAvatarSelected -> {
+                onAvatarSelected(event.path)
             }
 
             UserProfileUiEventModel.OnSaveClicked -> saveProfile()
@@ -164,7 +160,6 @@ class UserProfileViewModel(
                     )
                 }
                 .onSuccess {
-                    Logger.d("Successfully logged out")
                     eventHandler.sendEvent(UiEvent.NavigateToRoute("sign_up"))
                 }
         }
@@ -173,5 +168,32 @@ class UserProfileViewModel(
     fun closeEdition() {
         _editableProfile.update { _originalProfile.value }
         _isEditMode.update { false }
+    }
+
+    @OptIn(ExperimentalTime::class)
+    private fun onAvatarSelected(avatarPath: String) {
+        scope.launch {
+            val fileName = "avatar_${currentUserUid}_${Clock.System.now()}.jpg"
+            val internalPath = imageFileManager.copyImageToInternalStorage(avatarPath, fileName)
+
+            if (internalPath != null) {
+                // Delete old avatar if it exists
+                _editableProfile.value?.avatarUrl?.let { oldPath ->
+                    if (oldPath.startsWith("/data/") || oldPath.contains("/files/avatars/")) {
+                        imageFileManager.deleteImageFromInternalStorage(oldPath)
+                    }
+                }
+
+                _editableProfile.update { current -> current?.copy(avatarUrl = internalPath) }
+            } else {
+                eventHandler.sendEvent(
+                    UiEvent.ShowSnackBar(
+                        defaultMessageMapper.toUIText(
+                            AppError.Storage.WriteFailed
+                        )
+                    )
+                )
+            }
+        }
     }
 }
