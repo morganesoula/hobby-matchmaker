@@ -19,7 +19,6 @@ class SignInUseCase(
             .signInWithEmailAndPassword(parameters.firstValue, parameters.secondValue)
             .flatMapSuspend { success ->
                 setIsConnectedUseCase(true).mapSuccess {
-                    Logger.d("SignInUseCase with success:$success")
                     SignInSuccess(
                         success
                     )

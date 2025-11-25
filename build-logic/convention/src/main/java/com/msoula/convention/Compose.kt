@@ -44,6 +44,9 @@ internal fun KotlinMultiplatformExtension.configureCompose(
         implementation(libs.findLibrary("koin-compose").get())
         implementation(libs.findLibrary("koin-compose-viewmodel").get())
 
+        // Kotzilla
+        implementation(libs.findLibrary("kotzilla-sdk").get())
+
         // Navigation
         implementation(libs.findLibrary("compose-navigation").get())
     }

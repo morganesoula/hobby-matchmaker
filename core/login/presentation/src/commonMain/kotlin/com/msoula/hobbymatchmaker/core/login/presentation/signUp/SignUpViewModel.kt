@@ -3,15 +3,15 @@ package com.msoula.hobbymatchmaker.core.login.presentation.signUp
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignUpUseCase
-import com.msoula.hobbymatchmaker.core.common.Parameters
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.design.util.EventHandler
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.design.util.UiState
-import com.msoula.hobbymatchmaker.core.login.domain.useCases.LoginValidateFormUseCase
+import com.msoula.hobbymatchmaker.core.login.presentation.interactors.SignUpInteractor
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.signUp.models.SignUpStateModel
 import kotlinx.coroutines.CoroutineScope
@@ -26,8 +26,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(FlowPreview::class)
 class SignUpViewModel(
-    private val loginValidateFormUseCase: LoginValidateFormUseCase,
-    private val signUpUseCase: SignUpUseCase,
+    private val signUpInteractor: SignUpInteractor,
     private val defaultErrorMessageMapper: ErrorMessageMapper,
     externalScope: CoroutineScope? = null
 ) : ViewModel() {
@@ -65,7 +64,15 @@ class SignUpViewModel(
             is AuthenticationUIEvent.OnPasswordChanged ->
                 _formDataFlow.update { it.copy(password = event.password.trim()) }
 
-            AuthenticationUIEvent.OnSignUp -> createFirebaseAccount()
+            AuthenticationUIEvent.OnSignUp -> scope.launch {
+                doSignIn {
+                    signUpInteractor.createAccount(
+                        formDataFlow.value.email,
+                        formDataFlow.value.password
+                    )
+                }
+            }
+
             AuthenticationUIEvent.OnScreenChanged -> resetForm()
 
             else -> Unit
@@ -74,49 +81,42 @@ class SignUpViewModel(
 
     @VisibleForTesting
     internal fun validateInput(formState: SignUpStateModel) {
-        val emailResult = loginValidateFormUseCase.validateEmail(formState.email)
-        val passwordResult =
-            loginValidateFormUseCase.validatePassword(formState.password)
-        val firstNameResult =
-            loginValidateFormUseCase.validateFirstName(formState.firstName)
+        val email = formState.email
+        val password = formState.password
+        val firstName = formState.firstName
 
-        val results = listOf(emailResult, passwordResult, firstNameResult).any { !it.successful }
+        val firstNameValidation = signUpInteractor.validateFirstName(firstName)
+        val valid = signUpInteractor
+            .validateCredentials(email, password) && firstNameValidation.successful
 
         _formDataFlow.update {
             it.copy(
-                submit = !results,
-                signUpError = if (formState.firstName.isNotEmpty()) firstNameResult.errorMessage
+                submit = valid,
+                signUpError = if (formState.firstName.isNotEmpty()) firstNameValidation.errorMessage
                     ?: "" else ""
             )
         }
     }
 
-    @VisibleForTesting
-    internal fun createFirebaseAccount() = scope.launch {
+    private suspend fun doSignIn(
+        action: suspend () -> AppResult<Unit, AppError>
+    ) {
         _signUpState.update { UiState.Loading }
 
-        signUpUseCase(
-            Parameters.DoubleStringParam(
-                formDataFlow.value.email,
-                formDataFlow.value.password
-            )
-        )
+        action()
             .onSuccess {
-                resetSignUpState()
+                _signUpState.update { UiState.Success(Unit) }
                 eventHandler.sendEvent(UiEvent.NavigateToRoute("movies"))
             }
             .onFailure { error ->
-                resetSignUpState()
+                _signUpState.update { UiState.Success(Unit) }
                 eventHandler.sendEvent(
-                    UiEvent.ShowSnackBar(
-                        defaultErrorMessageMapper.toUIText(error)
-                    )
+                    UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(error))
                 )
             }
     }
 
     private fun resetForm() = _formDataFlow.update { SignUpStateModel() }
-    private fun resetSignUpState() = _signUpState.update { UiState.Success(Unit) }
 
     override fun onCleared() {
         super.onCleared()

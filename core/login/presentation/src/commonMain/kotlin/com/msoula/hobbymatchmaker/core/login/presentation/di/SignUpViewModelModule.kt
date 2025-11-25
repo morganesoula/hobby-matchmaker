@@ -7,8 +7,7 @@ import org.koin.dsl.module
 val coreModuleSignUpViewModel = module {
     viewModel {
         SignUpViewModel(
-            loginValidateFormUseCase = get(),
-            signUpUseCase = get(),
+            signUpInteractor = get(),
             defaultErrorMessageMapper = get()
         )
     }

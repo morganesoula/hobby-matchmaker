@@ -17,7 +17,7 @@ import io.ktor.serialization.kotlinx.json.json
 import org.koin.dsl.module
 
 actual val coreModuleNetworkPlatformSpecific = module {
-    single<HttpClient> {
+    single<HttpClient>(createdAtStart = true) {
         HttpClient(Darwin) {
             install(Logging) {
                 logger = object : Logger {

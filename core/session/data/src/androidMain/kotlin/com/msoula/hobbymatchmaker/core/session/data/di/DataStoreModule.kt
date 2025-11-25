@@ -8,5 +8,5 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 actual val coreModuleSessionDataPlatformSpecific = module {
-    single { SessionLocalDataSourceImpl(createDataStore(androidContext())) } bind SessionLocalDataSource::class
+    single(createdAtStart = true) { SessionLocalDataSourceImpl(createDataStore(androidContext())) } bind SessionLocalDataSource::class
 }

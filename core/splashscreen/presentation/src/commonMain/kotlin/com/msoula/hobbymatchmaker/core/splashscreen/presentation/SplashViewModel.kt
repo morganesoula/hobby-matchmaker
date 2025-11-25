@@ -16,8 +16,9 @@ import kotlinx.coroutines.withTimeout
 
 class SplashViewModel(
     private val observeIsConnectedUseCase: ObserveIsConnectedUseCase,
-    private val syncLocalFavoritesToCloudUseCase: SyncLocalFavoritesToCloudUseCase
+    syncLocalFavoritesToCloudUseCase: Lazy<SyncLocalFavoritesToCloudUseCase>
 ) : ViewModel() {
+    private val syncLocalFavoritesToCloudUseCase by syncLocalFavoritesToCloudUseCase
 
     private val _state = MutableStateFlow<SplashUiState>(SplashUiState.Loading)
     val state = _state.asStateFlow()
@@ -30,9 +31,12 @@ class SplashViewModel(
                 delay(1_000)
 
                 if (shouldSkipAuth) {
-                    runCatching { syncLocalFavoritesToCloudUseCase() }
-                        .onFailure { Logger.w("Splash sync failed - ${it.message}") }
                     _state.update { SplashUiState.GoToMovies }
+
+                    launch {
+                        runCatching { syncLocalFavoritesToCloudUseCase() }
+                            .onFailure { Logger.w("Splash sync failed - ${it.message}") }
+                    }
                 } else {
                     _state.update { SplashUiState.GoToAuth }
                 }

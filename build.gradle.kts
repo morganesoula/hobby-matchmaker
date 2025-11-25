@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.detekt) apply false
     alias(libs.plugins.kover) apply false
     alias(libs.plugins.spm.kmp) apply false
+    alias(libs.plugins.kotzilla) apply false
 }
 
 val projectStructure = file(projectDir)

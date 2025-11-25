@@ -38,7 +38,7 @@ val coreModuleNetwork = module {
         }
     }
 
-    single<HttpClient> {
+    single<HttpClient>(createdAtStart = true) {
         HttpClient(CIO) {
             install(Logging) {
                 logger = object : Logger {

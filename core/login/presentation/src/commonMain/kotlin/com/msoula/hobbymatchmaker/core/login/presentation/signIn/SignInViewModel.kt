@@ -4,39 +4,26 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
-import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ResetPasswordUseCase
-import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.UnifiedSignInUseCase
-import com.msoula.hobbymatchmaker.core.common.Logger
-import com.msoula.hobbymatchmaker.core.common.Parameters
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.design.util.EventHandler
-import com.msoula.hobbymatchmaker.core.design.util.UIText
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.design.util.UiState
-import com.msoula.hobbymatchmaker.core.login.domain.useCases.LoginValidateFormUseCase
+import com.msoula.hobbymatchmaker.core.login.presentation.interactors.SignInInteractor
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.models.SignInFormStateModel
-import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveDontAskCheckboxValueUseCase
-import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetCurrentUserProfileUuidUseCase
-import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetDontAskGuestDialogUseCase
-import dev.gitlive.firebase.auth.AuthCredential
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
 
 class SignInViewModel(
-    private val authFormValidationUseCases: LoginValidateFormUseCase,
-    private val resetPasswordUseCase: ResetPasswordUseCase,
-    private val setDontAskGuestDialogUseCase: SetDontAskGuestDialogUseCase,
-    val observeDontAskCheckboxValueUseCase: ObserveDontAskCheckboxValueUseCase,
-    val setCurrentUserProfileUuidUseCase: SetCurrentUserProfileUuidUseCase,
-    private val unifiedSignInUseCase: UnifiedSignInUseCase,
+    private val signInInteractor: SignInInteractor,
     private val socialClients: Map<ProviderType, SocialUIClient>,
     private val defaultErrorMessageMapper: ErrorMessageMapper,
     externalScope: CoroutineScope? = null
@@ -57,11 +44,9 @@ class SignInViewModel(
     private val _dontAskCheckboxValue = MutableStateFlow(false)
     val dontAskCheckboxValue: StateFlow<Boolean> = _dontAskCheckboxValue.asStateFlow()
 
-    private val signingMutex = Mutex()
-
     init {
         scope.launch {
-            observeDontAskCheckboxValueUseCase().collect { value ->
+            signInInteractor.observeDontAsk().collect { value ->
                 _dontAskCheckboxValue.value = value
             }
         }
@@ -89,59 +74,56 @@ class SignInViewModel(
             }
 
             is AuthenticationUIEvent.SaveDontAskGuestDialogValue -> {
-                Logger.d("Saving new value in VM for dontAsk: ${event.dontAskGuestDialog}")
                 scope.launch {
-                    setDontAskGuestDialogUseCase(dontAsk = event.dontAskGuestDialog)
+                    signInInteractor.setDontAsk(event.dontAskGuestDialog)
                 }
             }
 
-            AuthenticationUIEvent.OnGoogleButtonClicked ->
-                scope.launch {
-                    launchSocialSignIn(ProviderType.GOOGLE)
+            AuthenticationUIEvent.OnGoogleButtonClicked -> scope.launch {
+                doSignIn {
+                    signInInteractor.signInSocial(
+                        ProviderType.GOOGLE,
+                        credentialProvider = { socialClients[ProviderType.GOOGLE]!!.getCredential() }
+                    )
                 }
+            }
 
-            AuthenticationUIEvent.OnAppleButtonClicked ->
-                scope.launch {
-                    launchSocialSignIn(ProviderType.APPLE)
+            AuthenticationUIEvent.OnAppleButtonClicked -> scope.launch {
+                doSignIn {
+                    signInInteractor.signInSocial(
+                        ProviderType.APPLE,
+                        { socialClients[ProviderType.APPLE]!!.getCredential() }
+                    )
                 }
+            }
 
-            is AuthenticationUIEvent.OnFacebookButtonClicked ->
-                scope.launch {
-                    launchSocialSignIn(ProviderType.FACEBOOK, event.credential)
+            is AuthenticationUIEvent.OnFacebookButtonClicked -> scope.launch {
+                doSignIn {
+                    signInInteractor.signInSocial(
+                        ProviderType.FACEBOOK,
+                        credentialProvider = { event.credential }
+                    )
                 }
+            }
 
             AuthenticationUIEvent.OnResetPasswordConfirmed -> {
                 scope.launch { resetPassword() }
             }
 
-            AuthenticationUIEvent.SetAccountAsGuest -> {
-                Logger.d("Setting account as Guest inside SignInViewModel")
-                scope.launch {
-                    setCurrentUserProfileUuidUseCase()
-                        .onSuccess {
-                            eventHandler.sendEvent(UiEvent.NavigateToRoute("movies"))
-                        }
-                        .onFailure { error ->
-                            eventHandler.sendEvent(
-                                UiEvent.ShowSnackBar(
-                                    defaultErrorMessageMapper.toUIText(
-                                        error
-                                    )
-                                )
-                            )
-                        }
+            AuthenticationUIEvent.SetAccountAsGuest -> scope.launch {
+                doSignIn {
+                    signInInteractor.signInAsGuest()
                 }
             }
 
-            AuthenticationUIEvent.OnSignIn ->
-                scope.launch {
-                    signInUnified(
-                        UnifiedSignInUseCase.Params.EmailPassword(
-                            email = formDataFlow.value.email,
-                            password = formDataFlow.value.password
-                        )
+            AuthenticationUIEvent.OnSignIn -> scope.launch {
+                doSignIn {
+                    signInInteractor.signInEmail(
+                        formDataFlow.value.email,
+                        formDataFlow.value.password
                     )
                 }
+            }
 
             AuthenticationUIEvent.OnScreenChanged -> _formDataFlow.update { SignInFormStateModel() }
             else -> Unit
@@ -149,75 +131,52 @@ class SignInViewModel(
     }
 
     private fun validateInput() {
-        val emailResult = authFormValidationUseCases.validateEmail(formDataFlow.value.email)
-        val passwordResult =
-            authFormValidationUseCases.validatePassword(formDataFlow.value.password)
-        val hasError = listOf(emailResult, passwordResult).any { !it.successful }
+        val email = formDataFlow.value.email
+        val password = formDataFlow.value.password
+        val valid = signInInteractor.validateCredentials(email, password)
 
-        _formDataFlow.update { it.copy(submit = !hasError) }
+        _formDataFlow.update { it.copy(submit = valid) }
     }
 
     private fun validateEmailReset(emailReset: String): Boolean =
-        authFormValidationUseCases.validateEmail(emailReset).successful
-
-    private suspend fun signInUnified(params: UnifiedSignInUseCase.Params) {
-        _signInState.update { UiState.Loading }
-
-        unifiedSignInUseCase(params)
-            .onSuccess { result ->
-                Logger.d("Signed in with uid:${result.uid}")
-                setCurrentUserProfileUuidUseCase(result.uid)
-                _signInState.update { UiState.Success(Unit) }
-                eventHandler.sendEvent(UiEvent.NavigateToRoute("movies"))
-            }
-            .onFailure { error ->
-                _signInState.update { UiState.Success(Unit) }
-                eventHandler.sendEvent(UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(error)))
-            }
-    }
-
-    private suspend fun launchSocialSignIn(
-        providerType: ProviderType,
-        fetchedCredential: AuthCredential? = null
-    ) {
-        if (!signingMutex.tryLock()) return
-
-        try {
-            val client = socialClients[providerType]
-            if (fetchedCredential != null) {
-                signInUnified(
-                    UnifiedSignInUseCase.Params.SocialProvider(
-                        providerType = providerType,
-                        credentialProvider = { fetchedCredential }
-                    )
-                )
-            } else if (client != null) {
-                signInUnified(
-                    UnifiedSignInUseCase.Params.SocialProvider(
-                        providerType = providerType,
-                        credentialProvider = { client.getCredential() }
-                    )
-                )
-            } else {
-                eventHandler.sendEvent(UiEvent.ShowSnackBar(UIText.Plain("Unable to get credentials")))
-            }
-        } finally {
-            signingMutex.unlock()
-        }
-    }
+        signInInteractor.authFormValidationUseCases.validateEmail(emailReset).successful
 
     private suspend fun resetPassword() {
         if (!formDataFlow.value.submitEmailReset) return
         _signInState.update { UiState.Loading }
 
-        resetPasswordUseCase(Parameters.StringParam(formDataFlow.value.emailReset))
-            .onFailure { error ->
-                _signInState.update { UiState.Success(Unit) }
-                eventHandler.sendEvent(UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(error)))
-            }
+        signInInteractor.resetPassword(formDataFlow.value.emailReset)
             .onSuccess {
                 _signInState.update { UiState.Success(Unit) }
                 eventHandler.sendEvent(UiEvent.CloseDialog("reset_password"))
+            }
+            .onFailure { error ->
+                _signInState.update { UiState.Success(Unit) }
+                eventHandler.sendEvent(
+                    UiEvent.ShowSnackBar(
+                        defaultErrorMessageMapper.toUIText(
+                            error
+                        )
+                    )
+                )
+            }
+    }
+
+    private suspend fun doSignIn(
+        action: suspend () -> AppResult<Unit, AppError>
+    ) {
+        _signInState.update { UiState.Loading }
+
+        action()
+            .onSuccess {
+                _signInState.update { UiState.Success(Unit) }
+                eventHandler.sendEvent(UiEvent.NavigateToRoute("movies"))
+            }
+            .onFailure { error ->
+                _signInState.update { UiState.Success(Unit) }
+                eventHandler.sendEvent(
+                    UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(error))
+                )
             }
     }
 

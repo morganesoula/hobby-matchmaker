@@ -23,6 +23,7 @@ class ApplicationConventionPlugin : Plugin<Project> {
                 apply("org.jetbrains.kotlin.multiplatform")
                 apply("org.jetbrains.compose")
                 apply("org.jetbrains.kotlin.plugin.compose")
+                apply("io.kotzilla.kotzilla-plugin")
             }
 
             val compose = extensions.getByType(ComposeExtension::class.java).dependencies

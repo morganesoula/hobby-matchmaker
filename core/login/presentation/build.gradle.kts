@@ -35,6 +35,7 @@ kotlin {
             implementation(project(Modules.COMMON))
             implementation(project(Modules.DESIGN))
             implementation(project(Modules.LOGIN_DOMAIN))
+            implementation(project(Modules.PROFILE_DOMAIN))
             implementation(project(Modules.SESSION_DOMAIN))
         }
 

@@ -27,6 +27,9 @@ internal fun KotlinMultiplatformExtension.configureMultiplatform(
         // Koin
         api(libs.findLibrary("koin-core").get())
 
+        // Kotzilla
+        implementation(libs.findLibrary("kotzilla-sdk").get())
+
         // Navigation
         implementation(libs.findLibrary("compose-navigation").get())
 

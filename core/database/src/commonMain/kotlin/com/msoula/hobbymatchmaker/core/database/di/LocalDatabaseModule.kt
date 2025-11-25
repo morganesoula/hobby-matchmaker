@@ -18,8 +18,8 @@ import org.koin.dsl.module
 
 val coreModuleDAO = module {
     includes(coreModuleDatabasePlatformSpecific)
-    single<SqlDriver> { get<DriverFactory>().createDRiver() }
-    single<HMMDatabase> {
+    single<SqlDriver>(createdAtStart = true) { get<DriverFactory>().createDRiver() }
+    single<HMMDatabase>(createdAtStart = true) {
         val driver = get<SqlDriver>()
         driver.execute(null, "PRAGMA foreign_keys=ON", 0)
 

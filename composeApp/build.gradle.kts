@@ -106,6 +106,11 @@ android {
             "FIREBASE_API_KEY",
             "\"${secretProperties["firebase_api_key"]}\""
         )
+        buildConfigField(
+            "String",
+            "KOTZILLA_KEY",
+            "\"${secretProperties["kotzilla_key"]}\""
+        )
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true

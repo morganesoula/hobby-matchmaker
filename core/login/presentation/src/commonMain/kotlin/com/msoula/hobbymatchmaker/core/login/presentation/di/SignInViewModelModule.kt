@@ -9,12 +9,7 @@ import org.koin.dsl.module
 val coreModuleSignInViewModel = module {
     viewModel { (socialClients: Map<ProviderType, SocialUIClient>) ->
         SignInViewModel(
-            authFormValidationUseCases = get(),
-            resetPasswordUseCase = get(),
-            observeDontAskCheckboxValueUseCase = get(),
-            setDontAskGuestDialogUseCase = get(),
-            setCurrentUserProfileUuidUseCase = get(),
-            unifiedSignInUseCase = get(),
+            signInInteractor = get(),
             socialClients = socialClients,
             defaultErrorMessageMapper = get()
         )

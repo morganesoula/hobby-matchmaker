@@ -6,6 +6,7 @@ import com.msoula.hobbymatchmaker.presentation.navigation.appModule
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.initialize
+import io.kotzilla.sdk.analytics.koin.analytics
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import timber.log.Timber
@@ -20,6 +21,11 @@ class HobbyMatchMakerApplication : Application() {
             modules(
                 appModule() + coreCommonAndroidSavedStateHandle
             )
+
+            analytics {
+                setApiKey(BuildConfig.KOTZILLA_KEY)
+                setVersion("1.0.0")
+            }
         }
     }
 

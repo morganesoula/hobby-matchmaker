@@ -16,7 +16,7 @@ import org.koin.dsl.module
 val featuresModuleMovieData = module {
     includes(featuresModuleMovieDataPlatformSpecific)
     singleOf(::MovieRemoteDataSourceImpl) bind MovieRemoteDataSource::class
-    singleOf(::MovieLocalDataSourceImpl) bind MovieLocalDataSource::class
+    single<MovieLocalDataSource>(createdAtStart = true) { MovieLocalDataSourceImpl(get()) }
     singleOf(::MovieRepositoryImpl) bind MovieRepository::class
 
     single<TMDBKtorService> { TMDBKtorServiceImpl(get()) }
