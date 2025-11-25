@@ -10,15 +10,18 @@ import com.msoula.hobbymatchmaker.core.login.domain.useCases.LoginValidateFormUs
 import kotlinx.coroutines.flow.Flow
 
 class SignInInteractor(
-    val authFormValidationUseCases: LoginValidateFormUseCase,
-    val resetPasswordUseCase: ResetPasswordUseCase,
-    val sessionManager: SessionManager,
-    val authenticationManager: AuthenticationManager
+    private val authFormValidationUseCases: LoginValidateFormUseCase,
+    private val resetPasswordUseCase: ResetPasswordUseCase,
+    private val sessionManager: SessionManager,
+    private val authenticationManager: AuthenticationManager
 ) {
 
     fun validateCredentials(email: String, password: String): Boolean =
         authFormValidationUseCases.validateEmail(email).successful &&
             authFormValidationUseCases.validatePassword(password).successful
+
+    fun validateEmail(email: String): Boolean =
+        authFormValidationUseCases.validateEmail(email).successful
 
     suspend fun resetPassword(email: String): AppResult<Unit, AppError> =
         resetPasswordUseCase(Parameters.StringParam(email))

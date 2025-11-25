@@ -17,6 +17,7 @@ class AuthenticationManager(
     private val signInUseCase: SignInUseCase,
     private val signInWithSocialProviderUseCase: SignInWithSocialProviderUseCase,
     private val setIsConnectedUseCase: SetIsConnectedUseCase,
+    private val sessionManager: SessionManager
 ) {
     sealed interface Params {
         data class EmailPassword(val email: String, val password: String) : Params
@@ -45,6 +46,9 @@ class AuthenticationManager(
         }
 
         return setIsConnectedUseCase(true)
+            .flatMapSuspend {
+                sessionManager.setCurrentUserProfileUuid(uid)
+            }
             .flatMapSuspend {
                 createDefaultUserProfileUseCase(uid, "")
                     .mapSuccess { SignInSuccess(uid = uid) }

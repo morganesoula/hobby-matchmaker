@@ -2,9 +2,7 @@ package com.msoula.hobbymatchmaker.features.profile.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutUseCase
-import com.msoula.hobbymatchmaker.core.common.AppError
-import com.msoula.hobbymatchmaker.core.common.ImageFileManager
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
@@ -12,9 +10,8 @@ import com.msoula.hobbymatchmaker.core.design.util.EventHandler
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.session.domain.models.SessionState
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveSessionStateUseCase
-import com.msoula.hobbymatchmaker.features.profile.domain.useCases.CheckIfPseudoIsAvailable
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.ObserveCurrentUserProfileStateUseCase
-import com.msoula.hobbymatchmaker.features.profile.domain.useCases.UpsertUserProfileUseCase
+import com.msoula.hobbymatchmaker.features.profile.presentation.interactors.UserProfileInteractor
 import com.msoula.hobbymatchmaker.features.profile.presentation.mappers.toUserProfileDomainModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.mappers.toUserProfileUiModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiEventModel
@@ -26,17 +23,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class UserProfileViewModel(
+    private val interactor: UserProfileInteractor,
     private val observeCurrentUserProfileStateUseCase: ObserveCurrentUserProfileStateUseCase,
-    private val checkIfPseudoIsAvailable: CheckIfPseudoIsAvailable,
     private val observeSessionStateUseCase: ObserveSessionStateUseCase,
-    private val upsertUserProfileUseCase: UpsertUserProfileUseCase,
-    private val logOutUseCase: LogOutUseCase,
-    private val imageFileManager: ImageFileManager,
     private val defaultMessageMapper: ErrorMessageMapper,
     externalScope: CoroutineScope? = null
 ) : ViewModel() {
@@ -69,6 +62,7 @@ class UserProfileViewModel(
             observeSessionStateUseCase().collect { state ->
                 when (state) {
                     is SessionState.Authenticated -> {
+                        Logger.d("UserProfileViewModel", "Authenticated session")
                         currentUserUid = state.uid
 
                         observeCurrentUserProfileStateUseCase(state.uid).collect { profile ->
@@ -79,16 +73,19 @@ class UserProfileViewModel(
                                 _editableProfile.update { uiModel }
                             }
 
+                            Logger.d("UserProfileViewModel", "Success with uid: $currentUserUid")
                             _screenState.update { UserProfileUiStateModel.Success(uiModel) }
                         }
                     }
 
                     is SessionState.Guest -> {
+                        Logger.d("UserProfileViewModel", "Guest session")
                         _screenState.update { UserProfileUiStateModel.Guest }
                     }
 
-                    else -> {
-                        _screenState.update { UserProfileUiStateModel.Loading }
+                    null -> {
+                        Logger.d("UserProfileViewModel", "No session found (null state)")
+                        _screenState.update { UserProfileUiStateModel.Guest }
                     }
                 }
             }
@@ -118,7 +115,7 @@ class UserProfileViewModel(
             UserProfileUiEventModel.OnPseudoDefined -> {
                 _editableProfile.value?.let {
                     scope.launch {
-                        checkIfPseudoIsAvailable(it.pseudo)
+                        interactor.checkPseudoAvailable(it.pseudo)
                             .onSuccess {
                                 //TODO
                             }
@@ -144,23 +141,20 @@ class UserProfileViewModel(
 
     private fun saveProfile() {
         scope.launch {
-            _editableProfile.value?.let {
-                upsertUserProfileUseCase(
-                    it.toUserProfileDomainModel(currentUserUid ?: "")
-                )
-                    .onSuccess {
-                        eventHandler.sendEvent(UiEvent.OnDataReady("profile_updated"))
-                    }
-                    .onFailure { error ->
-                        eventHandler.sendEvent(
-                            UiEvent.ShowSnackBar(
-                                defaultMessageMapper.toUIText(
-                                    error
-                                )
-                            )
-                        )
-                    }
-            }
+            val uid = currentUserUid ?: return@launch
+            val editable = _editableProfile.value ?: return@launch
+
+            interactor.saveProfile(uid, editable.toUserProfileDomainModel(uid))
+                .onSuccess {
+                    eventHandler.sendEvent(
+                        UiEvent.OnDataReady("profile_updated")
+                    )
+                }
+                .onFailure { error ->
+                    eventHandler.sendEvent(
+                        UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
+                    )
+                }
         }
     }
 
@@ -171,16 +165,16 @@ class UserProfileViewModel(
 
     private fun logOut() {
         scope.launch {
-            logOutUseCase()
-                .onFailure { error ->
+            interactor.logOut()
+                .onSuccess {
                     eventHandler.sendEvent(
-                        UiEvent.ShowSnackBar(
-                            defaultMessageMapper.toUIText(error)
-                        )
+                        UiEvent.NavigateToRoute("sign_up")
                     )
                 }
-                .onSuccess {
-                    eventHandler.sendEvent(UiEvent.NavigateToRoute("sign_up"))
+                .onFailure { error ->
+                    eventHandler.sendEvent(
+                        UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
+                    )
                 }
         }
     }
@@ -193,27 +187,18 @@ class UserProfileViewModel(
     @OptIn(ExperimentalTime::class)
     private fun onAvatarSelected(avatarPath: String) {
         scope.launch {
-            val fileName = "avatar_${currentUserUid}_${Clock.System.now()}.jpg"
-            val internalPath = imageFileManager.copyImageToInternalStorage(avatarPath, fileName)
+            val uid = currentUserUid ?: return@launch
+            val old = _editableProfile.value?.avatarUrl
 
-            if (internalPath != null) {
-                // Delete old avatar if it exists
-                _editableProfile.value?.avatarUrl?.let { oldPath ->
-                    if (oldPath.startsWith("/data/") || oldPath.contains("/files/avatars/")) {
-                        imageFileManager.deleteImageFromInternalStorage(oldPath)
-                    }
+            interactor.saveAvatar(uid, old, avatarPath)
+                .onSuccess { newPath ->
+                    _editableProfile.update { it?.copy(avatarUrl = newPath) }
                 }
-
-                _editableProfile.update { current -> current?.copy(avatarUrl = internalPath) }
-            } else {
-                eventHandler.sendEvent(
-                    UiEvent.ShowSnackBar(
-                        defaultMessageMapper.toUIText(
-                            AppError.Storage.WriteFailed
-                        )
+                .onFailure { error ->
+                    eventHandler.sendEvent(
+                        UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
                     )
-                )
-            }
+                }
         }
     }
 }

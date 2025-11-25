@@ -139,7 +139,7 @@ class SignInViewModel(
     }
 
     private fun validateEmailReset(emailReset: String): Boolean =
-        signInInteractor.authFormValidationUseCases.validateEmail(emailReset).successful
+        signInInteractor.validateEmail(emailReset)
 
     private suspend fun resetPassword() {
         if (!formDataFlow.value.submitEmailReset) return
