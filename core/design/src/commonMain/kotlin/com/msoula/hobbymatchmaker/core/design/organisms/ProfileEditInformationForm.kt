@@ -19,6 +19,7 @@ import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight4
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_bio_title
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_name_title
+import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_pseudo_title
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_requirements_title
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_title
 import com.msoula.hobbymatchmaker.core.design.molecules.ValidationRequirement
@@ -31,7 +32,9 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun ProfileEditInformationForm(
     modifier: Modifier = Modifier,
     name: String,
+    pseudo: String,
     onNameChanged: (String) -> Unit,
+    onPseudoChanged: (String) -> Unit,
     onBioChanged: (String) -> Unit,
     bio: String? = null,
     requirements: List<ValidationRequirement> = emptyList()
@@ -76,6 +79,21 @@ fun ProfileEditInformationForm(
                 }
             }
 
+            SpacerHeight8()
+            Text(
+                text = stringResource(Res.string.edit_profile_basic_information_pseudo_title),
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            PrimaryTextField(
+                modifier = Modifier.fillMaxWidth(),
+                text = pseudo,
+                singleLine = true,
+                onValueChanged = onPseudoChanged,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Next
+                )
+            )
             Text(
                 text = stringResource(Res.string.edit_profile_basic_information_bio_title),
                 color = MaterialTheme.colorScheme.onSurface
@@ -100,7 +118,9 @@ fun ProfileEditInformationForm(
 fun EditInformationPreview() {
     ProfileEditInformationForm(
         name = "Test nom",
+        pseudo = "Test pseudo",
         onNameChanged = {},
+        onPseudoChanged = {},
         bio = "Test bio sur une seule ligne ou peut-être plusieurs, qui sait",
         onBioChanged = {}
     )

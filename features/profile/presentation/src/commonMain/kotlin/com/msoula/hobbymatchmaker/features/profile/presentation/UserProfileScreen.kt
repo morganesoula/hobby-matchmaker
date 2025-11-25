@@ -188,6 +188,14 @@ fun UserProfileContent(
                                                 )
                                             )
                                         },
+                                        pseudo = currentEditableProfile.pseudo,
+                                        onPseudoChanged = { pseudo ->
+                                            viewModel.onEvent(
+                                                UserProfileUiEventModel.OnPseudoChanged(
+                                                    pseudo
+                                                )
+                                            )
+                                        },
                                         bio = currentEditableProfile.bio,
                                         onBioChanged = { bio ->
                                             viewModel.onEvent(
