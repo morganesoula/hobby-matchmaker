@@ -19,7 +19,7 @@ import org.koin.dsl.module
 val featuresModuleUserProfileData = module {
     single<UserProfileLocalDataSource>(createdAtStart = true) { UserProfileLocalDataSourceImpl(get()) }
     singleOf(::UserProfileRemoteDataSourceImpl) bind UserProfileRemoteDataSource::class
-    single<SocialLocalDataSource>(createdAtStart = true) { SocialLocalDataSourceImpl(get(), get()) }
+    single<SocialLocalDataSource> { SocialLocalDataSourceImpl(get(), get()) }
     singleOf(::SocialRemoteDataSourceImpl) bind SocialRemoteDataSource::class
     single<UserProfileRepository>(createdAtStart = true) { UserProfileRepositoryImpl(get(), get(), get(), get(), get()) }
     singleOf(::SocialRepositoryImpl) bind SocialRepository::class

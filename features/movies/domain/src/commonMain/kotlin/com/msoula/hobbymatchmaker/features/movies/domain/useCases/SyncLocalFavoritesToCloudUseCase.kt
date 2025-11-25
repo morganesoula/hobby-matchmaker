@@ -34,12 +34,11 @@ class SyncLocalFavoritesToCloudUseCase(
             is AppResult.Failure -> Logger.w("Skip sync favorites: ${favorites.error}")
             is AppResult.Success -> {
                 when (val push =
-                    movieRepository.syncUserFavoritesRemote(uid ?: "", favorites.data)) {
+                    movieRepository.syncUserFavoritesRemote(uid, favorites.data)) {
                     is AppResult.Failure -> Logger.w("Favorite remote movie push failed, will sync later — $push")
                     is AppResult.Success -> Unit
                 }
             }
-
         }
     }
 }

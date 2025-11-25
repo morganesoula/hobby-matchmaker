@@ -1,5 +1,7 @@
 package com.msoula.hobbymatchmaker.core.network.di
 
+import com.msoula.hobbymatchmaker.core.network.IOSNetworkConnectivityChecker
+import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
 import com.msoula.hobbymatchmaker.core.network.Utility
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.darwin.Darwin
@@ -17,6 +19,8 @@ import io.ktor.serialization.kotlinx.json.json
 import org.koin.dsl.module
 
 actual val coreModuleNetworkPlatformSpecific = module {
+    single<NetworkConnectivityChecker> { IOSNetworkConnectivityChecker() }
+
     single<HttpClient>(createdAtStart = true) {
         HttpClient(Darwin) {
             install(Logging) {

@@ -6,6 +6,7 @@ import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMovi
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.SetMovieFavoriteUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.SyncLocalFavoritesToCloudUseCase
 import org.koin.core.module.dsl.factoryOf
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 val featuresModuleMovieDomain = module {

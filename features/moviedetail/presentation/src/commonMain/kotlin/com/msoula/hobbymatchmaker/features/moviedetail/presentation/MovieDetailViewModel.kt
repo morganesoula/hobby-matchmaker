@@ -1,41 +1,32 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.presentation
 
-import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
-import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.getDeviceLocale
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
-import com.msoula.hobbymatchmaker.core.design.Res
-import com.msoula.hobbymatchmaker.core.design.connection_issue
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.design.util.EventHandler
 import com.msoula.hobbymatchmaker.core.design.util.RetryPolicy
 import com.msoula.hobbymatchmaker.core.design.util.UIErrorHint
-import com.msoula.hobbymatchmaker.core.design.util.UIText
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.design.util.UiState
-import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ManageMovieTrailerUseCase
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieDetailUseCase
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieSuccess
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.interactors.MovieDetailInteractor
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiEventModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.toMovieDetailUiModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MovieDetailViewModel(
     private val movieId: Long,
-    private val observeMovieDetailUseCase: ObserveMovieDetailUseCase,
-    private val manageMovieTrailerUseCase: ManageMovieTrailerUseCase,
-    private val connectivityCheck: NetworkConnectivityChecker,
+    private val interactor: MovieDetailInteractor,
     private val defaultErrorMessageMapper: ErrorMessageMapper,
     externalScope: CoroutineScope? = null
 ) : ViewModel() {
@@ -46,8 +37,8 @@ class MovieDetailViewModel(
     private val _screenState = MutableStateFlow<UiState<MovieDetailUiModel>>(UiState.Loading)
     val screenState = _screenState.asStateFlow()
 
-    private var currentMovie: MovieDetailUiModel? = MovieDetailUiModel()
     private val language = getDeviceLocale()
+    private var currentMovie: MovieDetailUiModel? = MovieDetailUiModel()
 
     init {
         observeMovieDetail()
@@ -55,69 +46,59 @@ class MovieDetailViewModel(
 
     fun observeMovieDetail() {
         scope.launch {
-            observeMovieDetailUseCase(movieId, language)
-                .onStart {
-                    Logger.d("Inside MovieDetailVM with movieId: $movieId")
-                }
-                .collect { result ->
-                    _screenState.update {
-                        when (result) {
-                            is AppResult.Success -> {
-                                when (val payload = result.data) {
-                                    is ObserveMovieSuccess.Success -> {
-                                        currentMovie = payload.data.toMovieDetailUiModel()
-                                        UiState.Success(requireNotNull(currentMovie))
-                                    }
-
-                                    is ObserveMovieSuccess.DataLoadedInDB -> UiState.Loading
-                                }
-                            }
-
-                            is AppResult.Failure -> UiState.Error(
-                                error = defaultErrorMessageMapper.toUIText(result.error),
-                                hint = UIErrorHint(retry = RetryPolicy.Manual)
-                            )
-                        }
+            interactor.observeMovieDetail(movieId, language).collect { result ->
+                _screenState.update {
+                    when (result) {
+                        is AppResult.Success -> mapDetailSuccess(result.data)
+                        is AppResult.Failure -> mapError(result.error)
                     }
-
                 }
+            }
         }
     }
 
     fun onEvent(event: MovieDetailUiEventModel) {
         when (event) {
-            is MovieDetailUiEventModel.OnPlayMovieTrailerClicked -> {
-                scope.launch {
-                    onPlayTrailerClicked(
-                        event.movieId,
-                        event.isVideoURIknown
-                    )
-                }
-            }
+            is MovieDetailUiEventModel.OnPlayMovieTrailerClicked ->
+                scope.launch { playTrailer(event.isVideoURIknown) }
 
             else -> Unit
         }
     }
 
-    @VisibleForTesting
-    internal suspend fun onPlayTrailerClicked(movieId: Long, isVideoURIknown: Boolean) {
-        if (isVideoURIknown) {
-            if (connectivityCheck.hasActiveConnection()) {
-                eventHandler.sendEvent(UiEvent.OnDataReady(currentMovie?.videoKey.orEmpty()))
-            } else {
-                eventHandler.sendEvent(UiEvent.ShowSnackBar(UIText.Resource(Res.string.connection_issue)))
-            }
+    private suspend fun playTrailer(isVideoUriKnown: Boolean) {
+        if (interactor.canPlayTrailerDirectly(isVideoUriKnown)) {
+            eventHandler.sendEvent(UiEvent.OnDataReady(currentMovie?.videoKey.orEmpty()))
             return
         }
 
-        manageMovieTrailerUseCase(movieId, language)
+        interactor.fetchTrailer(movieId, language)
+            .onSuccess { eventHandler.sendEvent(UiEvent.OnDataReady(it)) }
             .onFailure { error ->
-                eventHandler.sendEvent(UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(error)))
-            }
-            .onSuccess { data ->
-                eventHandler.sendEvent(UiEvent.OnDataReady(data.videoURI))
+                eventHandler.sendEvent(
+                    UiEvent.ShowSnackBar(
+                        defaultErrorMessageMapper.toUIText(error)
+                    )
+                )
             }
     }
+
+    private suspend fun mapDetailSuccess(success: ObserveMovieSuccess): UiState<MovieDetailUiModel> =
+        when (success) {
+            is ObserveMovieSuccess.Success -> {
+                val uiModel = success.data.toMovieDetailUiModel()
+                currentMovie = uiModel
+                UiState.Success(uiModel)
+            }
+
+            is ObserveMovieSuccess.DataLoadedInDB -> UiState.Loading
+        }
+
+    private fun mapError(error: AppError) =
+        UiState.Error(
+            error = defaultErrorMessageMapper.toUIText(error),
+            hint = UIErrorHint(retry = RetryPolicy.Manual)
+        )
 
     override fun onCleared() {
         super.onCleared()
