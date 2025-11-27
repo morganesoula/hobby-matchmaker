@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.features.profile.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
@@ -48,6 +49,9 @@ class UserProfileViewModel(
     val editableProfile = _editableProfile.asStateFlow()
 
     private val _originalProfile = MutableStateFlow<UserProfileUiModel?>(null)
+
+    private val _isPseudoAvailable = MutableStateFlow<Boolean?>(null)
+    val isPseudoAvailable = _isPseudoAvailable.asStateFlow()
 
     private val _screenState =
         MutableStateFlow<UserProfileUiStateModel>(UserProfileUiStateModel.Loading)
@@ -110,18 +114,23 @@ class UserProfileViewModel(
 
             is UserProfileUiEventModel.OnPseudoChanged -> {
                 _editableProfile.update { current -> current?.copy(pseudo = event.value) }
+                _isPseudoAvailable.update { null }
             }
 
             UserProfileUiEventModel.OnPseudoDefined -> {
                 _editableProfile.value?.let {
                     scope.launch {
-                        interactor.checkPseudoAvailable(it.pseudo)
-                            .onSuccess {
-                                //TODO
-                            }
-                            .onFailure {
-                                //TODO
-                            }
+                        if (it.pseudo != _originalProfile.value?.pseudo)
+                            interactor.checkPseudoAvailable(it.pseudo)
+                                .onSuccess { available ->
+                                    _isPseudoAvailable.update { available }
+                                }
+                                .onFailure { error ->
+                                    _isPseudoAvailable.update { null }
+                                    eventHandler.sendEvent(
+                                        UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
+                                    )
+                                }
                     }
                 }
             }
@@ -144,11 +153,20 @@ class UserProfileViewModel(
             val uid = currentUserUid ?: return@launch
             val editable = _editableProfile.value ?: return@launch
 
-            interactor.saveProfile(uid, editable.toUserProfileDomainModel(uid))
+            val profile = editable.toUserProfileDomainModel(uid)
+
+            interactor.saveProfile(uid, profile)
                 .onSuccess {
                     eventHandler.sendEvent(
                         UiEvent.OnDataReady("profile_updated")
                     )
+
+                    launch {
+                        interactor.syncProfile(profile)
+                            .onFailure {
+                                Logger.e("Failed to sync profile remotely - ${profile.uid}")
+                            }
+                    }
                 }
                 .onFailure { error ->
                     eventHandler.sendEvent(
@@ -182,6 +200,7 @@ class UserProfileViewModel(
     fun closeEdition() {
         _editableProfile.update { _originalProfile.value }
         _isEditMode.update { false }
+        _isPseudoAvailable.update { null }
     }
 
     @OptIn(ExperimentalTime::class)

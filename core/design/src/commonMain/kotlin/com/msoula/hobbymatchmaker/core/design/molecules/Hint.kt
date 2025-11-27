@@ -15,12 +15,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_requirements_title
 import com.msoula.hobbymatchmaker.core.design.icons.Check2Circle
+import com.msoula.hobbymatchmaker.core.design.icons.PersonExclamation
 import com.msoula.hobbymatchmaker.core.design.icons.XCircle
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.IconSize
@@ -35,7 +37,8 @@ fun TipTextField(
     Row(
         modifier = modifier
             .background(
-                MaterialTheme.colorScheme.primary.copy(alpha = .1f), RoundedCornerShape(
+                MaterialTheme.colorScheme.primary.copy(alpha = .1f),
+                RoundedCornerShape(
                     CustomSize.Eight
                 )
             )
@@ -51,10 +54,52 @@ fun TipTextField(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            modifier = Modifier.padding(start = CustomSize.Sixteen).size(IconSize.Sixteen)
+            modifier = Modifier.padding(start = CustomSize.Sixteen).size(IconSize.Sixteen),
+            tint = MaterialTheme.colorScheme.primary
         )
         Text(
             text = hintText,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(
+                vertical = CustomSize.Sixteen,
+                horizontal = CustomSize.Sixteen
+            ),
+            style = MaterialTheme.typography.bodySmall
+        )
+    }
+}
+
+@Composable
+fun WarningTextField(
+    modifier: Modifier = Modifier,
+    warningText: String
+) {
+    Row(
+        modifier = modifier
+            .background(
+                MaterialTheme.colorScheme.errorContainer,
+                RoundedCornerShape(
+                    CustomSize.Eight
+                )
+            )
+            .border(
+                1.dp,
+                MaterialTheme.colorScheme.error,
+                RoundedCornerShape(CustomSize.Eight)
+            )
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = PersonExclamation,
+            contentDescription = null,
+            modifier = Modifier.padding(start = CustomSize.Sixteen).size(IconSize.Sixteen),
+            tint = MaterialTheme.colorScheme.onErrorContainer
+        )
+        Text(
+            text = warningText,
+            color = MaterialTheme.colorScheme.onErrorContainer,
             modifier = Modifier.padding(
                 vertical = CustomSize.Sixteen,
                 horizontal = CustomSize.Sixteen

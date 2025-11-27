@@ -139,6 +139,9 @@
     <string name="edit_profile_basic_information_name_title">Name</string>
     <string name="edit_profile_basic_information_requirements_title">Requirements:</string>
     <string name="edit_profile_basic_information_requirements_no_number">No numbers allowed</string>
+    <string name="edit_profile_basic_information_pseudo_title">Pseudo</string>
+    <string name="edit_profile_basic_information_pseudo_not_available">This username is not available. Please choose another.</string>
+    <string name="edit_profile_basic_information_pseudo_hint">Tip: This unique username will allow you to be added by other users of HobbyMatchMaker !</string>
     <string name="edit_profile_basic_information_bio_title">Bio</string>
     <string name="edit_profile_add_interests_title">Add Interest</string>
     <string name="edit_profile_add_interests_description">Tip: Separate your interests with commas to add multiple tags at once</string>

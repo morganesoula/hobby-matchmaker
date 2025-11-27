@@ -74,6 +74,7 @@ fun UserProfileContent(
     val profileState by viewModel.screenState.collectAsState()
     val isEditMode by viewModel.isEditMode.collectAsState()
     val editableProfile by viewModel.editableProfile.collectAsState()
+    val isPseudoAvailable by viewModel.isPseudoAvailable.collectAsState()
     val snackBarHostState = remember { SnackbarHostState() }
 
     val noNumberRequirement =
@@ -196,6 +197,10 @@ fun UserProfileContent(
                                                 )
                                             )
                                         },
+                                        onPseudoFocusLost = {
+                                            viewModel.onEvent(UserProfileUiEventModel.OnPseudoDefined)
+                                        },
+                                        isPseudoAvailable = isPseudoAvailable,
                                         bio = currentEditableProfile.bio,
                                         onBioChanged = { bio ->
                                             viewModel.onEvent(
@@ -204,7 +209,7 @@ fun UserProfileContent(
                                                 )
                                             )
                                         },
-                                        requirements = requirements.value
+                                        nameRequirements = requirements.value
                                     )
                                 },
                                 editInterestsSection = {
