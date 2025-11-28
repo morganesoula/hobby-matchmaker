@@ -1,21 +1,26 @@
 package com.msoula.hobbymatchmaker.features.profile.data.dataSources.remote
 
-import kotlinx.coroutines.flow.Flow
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.core.common.safeFirebaseCall
+import dev.gitlive.firebase.firestore.FirebaseFirestore
 
-class SocialRemoteDataSourceImpl: SocialRemoteDataSource {
-    override fun observeSocialCircleCount(): Flow<Int> {
-        TODO("Not yet implemented")
-    }
+class SocialRemoteDataSourceImpl(
+    private val firestore: FirebaseFirestore
+) : SocialRemoteDataSource {
+    override suspend fun searchUsersByPseudo(pseudo: String): AppResult<List<String>, AppError> =
+        safeFirebaseCall {
+            val searchTerm = pseudo.trim().lowercase()
 
-    override fun observeSocialCircle(): Flow<List<String>> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun addToCircle(memberUid: String) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun removeFromCircle(memberUid: String) {
-        TODO("Not yet implemented")
-    }
+            firestore.collection("users")
+                .get()
+                .documents
+                .map { document ->
+                    document.get<String>("information.pseudo")
+                }
+                .filter { userPseudo ->
+                    userPseudo.lowercase().contains(searchTerm)
+                }
+                .take(10)
+        }
 }

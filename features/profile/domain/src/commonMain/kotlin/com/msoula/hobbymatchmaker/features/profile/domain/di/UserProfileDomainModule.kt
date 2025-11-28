@@ -3,6 +3,7 @@ package com.msoula.hobbymatchmaker.features.profile.domain.di
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.CheckIfPseudoIsAvailable
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.CreateDefaultUserProfileUseCase
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.ObserveCurrentUserProfileStateUseCase
+import com.msoula.hobbymatchmaker.features.profile.domain.useCases.SearchUsersByPseudoUseCase
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.SyncUserProfileUseCase
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.UpsertUserProfileUseCase
 import org.koin.core.module.dsl.factoryOf
@@ -14,4 +15,5 @@ val featuresModuleUserProfileDomain = module {
     factoryOf(::UpsertUserProfileUseCase)
     factoryOf(::CreateDefaultUserProfileUseCase)
     factoryOf(::CheckIfPseudoIsAvailable)
+    factoryOf(::SearchUsersByPseudoUseCase)
 }

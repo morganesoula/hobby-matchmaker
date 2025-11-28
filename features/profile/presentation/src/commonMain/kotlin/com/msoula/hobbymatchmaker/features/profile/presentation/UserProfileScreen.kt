@@ -230,6 +230,7 @@ fun UserProfileContent(
                         padding = padding
                     ) {
                         val profile = (profileState as UserProfileUiStateModel.Success).userProfile
+                        val searchedPseudos = viewModel.usersByPseudo.collectAsState()
 
                         CompleteProfileLayout(
                             headerSection = {
@@ -255,7 +256,11 @@ fun UserProfileContent(
                             },
                             socialSection = {
                                 ProfileSocialSection(
-                                    socialMembers = profile.socialMembers.map { it.toProfileSocialMembers() }
+                                    socialMembers = profile.socialMembers.map { it.toProfileSocialMembers() },
+                                    onSearchPeople = {
+                                        viewModel.onEvent(UserProfileUiEventModel.OnSearchPeople(it))
+                                    },
+                                    searchResult = searchedPseudos.value
                                 )
                             }
                         )

@@ -1,10 +1,8 @@
 package com.msoula.hobbymatchmaker.features.profile.data.dataSources.remote
 
-import kotlinx.coroutines.flow.Flow
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 
 interface SocialRemoteDataSource {
-    fun observeSocialCircleCount(): Flow<Int>
-    fun observeSocialCircle(): Flow<List<String>>
-    suspend fun addToCircle(memberUid: String)
-    suspend fun removeFromCircle(memberUid: String)
+    suspend fun searchUsersByPseudo(pseudo: String): AppResult<List<String>, AppError>
 }

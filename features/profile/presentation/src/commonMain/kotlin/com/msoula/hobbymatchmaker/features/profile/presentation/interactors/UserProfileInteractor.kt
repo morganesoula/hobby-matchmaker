@@ -6,6 +6,7 @@ import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.ImageFileManager
 import com.msoula.hobbymatchmaker.features.profile.domain.models.UserProfileDomainModel
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.CheckIfPseudoIsAvailable
+import com.msoula.hobbymatchmaker.features.profile.domain.useCases.SearchUsersByPseudoUseCase
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.SyncUserProfileUseCase
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.UpsertUserProfileUseCase
 import kotlin.time.Clock
@@ -18,7 +19,8 @@ class UserProfileInteractor(
     private val upsertUser: UpsertUserProfileUseCase,
     private val syncUser: SyncUserProfileUseCase,
     private val imageManager: ImageFileManager,
-    private val logOutUseCase: LogOutUseCase
+    private val logOutUseCase: LogOutUseCase,
+    private val searchUsers: SearchUsersByPseudoUseCase
 ) {
 
     suspend fun checkPseudoAvailable(pseudo: String) = checkPseudo(pseudo)
@@ -51,4 +53,6 @@ class UserProfileInteractor(
     }
 
     suspend fun logOut() = logOutUseCase()
+
+    suspend fun searchUsersPseudo(pseudo: String) = searchUsers(pseudo)
 }

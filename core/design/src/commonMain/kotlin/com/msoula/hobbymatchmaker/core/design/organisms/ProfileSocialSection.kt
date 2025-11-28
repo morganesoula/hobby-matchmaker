@@ -2,17 +2,26 @@ package com.msoula.hobbymatchmaker.core.design.organisms
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,14 +32,22 @@ import coil3.compose.SubcomposeAsyncImage
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.GenericCard
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
+import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWidth4
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWidth8
 import com.msoula.hobbymatchmaker.core.design.authentified_no_social_members_description
+import com.msoula.hobbymatchmaker.core.design.cancel
 import com.msoula.hobbymatchmaker.core.design.icons.Heart
+import com.msoula.hobbymatchmaker.core.design.icons.Person_add
+import com.msoula.hobbymatchmaker.core.design.molecules.PseudoSearchBar
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.IconSize
+import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_main_add_people_form_title
+import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_main_add_people_text_button
 import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_main_title
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import kotlin.collections.emptyList
 
 data class ProfileSocialMembers(
     val uid: String,
@@ -41,8 +58,13 @@ data class ProfileSocialMembers(
 
 @Composable
 fun ProfileSocialSection(
-    socialMembers: List<ProfileSocialMembers>?
+    socialMembers: List<ProfileSocialMembers>?,
+    onSearchPeople: (pseudo: String) -> Unit,
+    searchResult: List<String> = emptyList()
 ) {
+    val textFieldState = rememberTextFieldState()
+    var displayAddPeopleForm by rememberSaveable { mutableStateOf(false) }
+
     GenericCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -50,20 +72,101 @@ fun ProfileSocialSection(
         containerColor = MaterialTheme.colorScheme.surfaceContainer
     ) {
         Column(Modifier.padding(CustomSize.Sixteen)) {
-            Row {
-                Icon(
-                    imageVector = Heart,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(IconSize.TwentyFour)
-                )
-                SpacerWidth4()
-                Text(
-                    text = stringResource(Res.string.user_profile_social_circle_main_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Heart,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(IconSize.TwentyFour)
+                    )
+                    SpacerWidth4()
+                    Text(
+                        text = stringResource(Res.string.user_profile_social_circle_main_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onBackground,
+                    )
+                }
+
+                if (!displayAddPeopleForm) {
+                    Button(
+                        onClick = { displayAddPeopleForm = true },
+                        modifier = Modifier.wrapContentWidth(),
+                        shape = RoundedCornerShape(CustomSize.Sixteen)
+                    ) {
+                        Icon(
+                            imageVector = Person_add,
+                            contentDescription = stringResource(
+                                Res.string.user_profile_social_circle_main_add_people_text_button
+                            ),
+                            modifier = Modifier.size(IconSize.Sixteen)
+                        )
+
+                        SpacerWidth4()
+
+                        Text(
+                            text = stringResource(
+                                Res.string.user_profile_social_circle_main_add_people_text_button
+                            )
+                        )
+                    }
+                }
+            }
+
+            if (displayAddPeopleForm) {
+                SpacerHeight16()
+                GenericCard(
+                    Modifier
+                        .border(
+                            1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(
+                                CustomSize.Sixteen
+                            )
+                        ),
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                ) {
+                    Column {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Person_add,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(IconSize.TwentyFour)
+                            )
+                            SpacerWidth8()
+                            Text(
+                                text = stringResource(Res.string.user_profile_social_circle_main_add_people_form_title),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
+
+                        PseudoSearchBar(
+                            textFieldState = textFieldState,
+                            onSearch = onSearchPeople,
+                            searchResults = searchResult
+                        )
+
+                        SpacerHeight8()
+
+                        Button(
+                            onClick = { displayAddPeopleForm = false },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(CustomSize.Sixteen)
+                        ) {
+                            Text(text = stringResource(Res.string.cancel))
+                        }
+                    }
+                }
+                SpacerHeight16()
             }
 
             SpacerHeight16()
@@ -116,4 +219,13 @@ fun ProfileSocialSection(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun ProfileSocialSectionPreview() {
+    ProfileSocialSection(
+        socialMembers = emptyList(),
+        onSearchPeople = {}
+    )
 }

@@ -116,6 +116,9 @@
     <string name="social_members_count_title">Connexions</string>
     <string name="user_profile_interests_title">Intérêts</string>
     <string name="user_profile_social_circle_main_title">Mon cercle social</string>
+    <string name="user_profile_social_circle_main_add_people_text_button">Inviter</string>
+    <string name="user_profile_social_circle_main_add_people_form_title">Ajouter un membre</string>
+    <string name="user_profile_social_circle_main_add_people_form_field_hint">Entrez un pseudo...</string>
 
     <string name="guest_header_title">Bienvenue sur HobbyMatchMaker</string>
     <string name="guest_header_description">Connectez-vous à d'autres personnes pour partagez vos passions</string>

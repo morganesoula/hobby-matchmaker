@@ -1,6 +1,9 @@
 package com.msoula.hobbymatchmaker.features.profile.data.repositories
 
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.features.profile.data.dataSources.local.SocialLocalDataSource
+import com.msoula.hobbymatchmaker.features.profile.data.dataSources.remote.SocialRemoteDataSource
 import com.msoula.hobbymatchmaker.features.profile.data.models.SocialMemberLocalDataModel
 import com.msoula.hobbymatchmaker.features.profile.domain.models.UserSummaryDomainModel
 import com.msoula.hobbymatchmaker.features.profile.domain.models.UserSummaryDomainModel.Companion.DEFAULT_AVATAR_URL
@@ -11,7 +14,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class SocialRepositoryImpl(
-    private val socialLocalDataSource: SocialLocalDataSource
+    private val socialLocalDataSource: SocialLocalDataSource,
+    private val socialRemoteDataSource: SocialRemoteDataSource
 ) : SocialRepository {
 
     override fun observeSocialCircleCount(): Flow<Int> =
@@ -40,4 +44,7 @@ class SocialRepositoryImpl(
     override suspend fun removeFromCircle(memberUid: String) {
         socialLocalDataSource.removeFromCircle(memberUid)
     }
+
+    override suspend fun searchUsersByPseudo(pseudo: String): AppResult<List<String>, AppError> =
+        socialRemoteDataSource.searchUsersByPseudo(pseudo)
 }

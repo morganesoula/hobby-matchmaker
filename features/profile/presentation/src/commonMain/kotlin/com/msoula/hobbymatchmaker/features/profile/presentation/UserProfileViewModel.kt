@@ -2,7 +2,6 @@ package com.msoula.hobbymatchmaker.features.profile.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
@@ -52,6 +51,12 @@ class UserProfileViewModel(
 
     private val _isPseudoAvailable = MutableStateFlow<Boolean?>(null)
     val isPseudoAvailable = _isPseudoAvailable.asStateFlow()
+
+    private val _enableSave = MutableStateFlow<Boolean?>(true)
+    val enableSave = _enableSave.asStateFlow()
+
+    private val _usersByPseudo = MutableStateFlow(emptyList<String>())
+    val usersByPseudo = _usersByPseudo.asStateFlow()
 
     private val _screenState =
         MutableStateFlow<UserProfileUiStateModel>(UserProfileUiStateModel.Loading)
@@ -117,12 +122,22 @@ class UserProfileViewModel(
                 _isPseudoAvailable.update { null }
             }
 
+            is UserProfileUiEventModel.OnSearchPeople -> {
+                scope.launch {
+                    searchUsers(event.value)
+                }
+            }
+
             UserProfileUiEventModel.OnPseudoDefined -> {
                 _editableProfile.value?.let {
                     scope.launch {
                         if (it.pseudo != _originalProfile.value?.pseudo)
                             interactor.checkPseudoAvailable(it.pseudo)
                                 .onSuccess { available ->
+                                    if (!available) {
+                                        _enableSave.update { false }
+                                    }
+
                                     _isPseudoAvailable.update { available }
                                 }
                                 .onFailure { error ->
@@ -195,6 +210,23 @@ class UserProfileViewModel(
                     )
                 }
         }
+    }
+
+    private suspend fun searchUsers(pseudo: String) {
+        interactor.searchUsersPseudo(pseudo)
+            .onSuccess { list ->
+                if (list.isNotEmpty()) {
+                    // TODO Remove current user pseudo from the list
+                    _usersByPseudo.update { list }
+                } else {
+                    _usersByPseudo.update { emptyList() }
+                }
+            }
+            .onFailure { error ->
+                eventHandler.sendEvent(
+                    UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
+                )
+            }
     }
 
     fun closeEdition() {
