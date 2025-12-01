@@ -3,7 +3,6 @@ package com.msoula.hobbymatchmaker.core.authentication.domain.useCases
 import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.AuthenticationRepository
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
-import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.flatMapSuspend
 import com.msoula.hobbymatchmaker.core.common.mapSuccess

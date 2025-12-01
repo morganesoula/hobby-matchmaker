@@ -20,7 +20,6 @@ import com.msoula.hobbymatchmaker.core.design.atoms.PrimaryTextField
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight4
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
-import com.msoula.hobbymatchmaker.core.design.edit_profile_add_interests_description
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_bio_title
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_name_title
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_pseudo_hint
@@ -28,7 +27,6 @@ import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_pse
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_pseudo_title
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_title
 import com.msoula.hobbymatchmaker.core.design.icons.Lightbulb
-import com.msoula.hobbymatchmaker.core.design.icons.PersonExclamation
 import com.msoula.hobbymatchmaker.core.design.molecules.TipTextField
 import com.msoula.hobbymatchmaker.core.design.molecules.ValidationRequirement
 import com.msoula.hobbymatchmaker.core.design.molecules.ValidationRequirementsList

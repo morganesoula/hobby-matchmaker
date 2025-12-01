@@ -38,6 +38,10 @@ youtube = "13.0.0"
 jetbrainsKotlinJvm = "2.2.21"
 uiTooling = "1.9.4"
 uuid = "0.8.4"
+junit = "4.13.2"
+junitVersion = "1.3.0"
+espressoCore = "3.7.0"
+material = "1.10.0"
 
 [libraries]
 activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
@@ -98,6 +102,10 @@ turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 youtube-player = { module = "com.pierfrancescosoffritti.androidyoutubeplayer:core", version.ref = "youtube" }
 ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [bundles]
 ktor = ["ktor-client-core", "ktor-client-logging", "ktor-client-negotiation", "ktor-serialization-json"]
@@ -125,3 +133,4 @@ hobbymatchmaker-buildlogic-multiplatform-test = { id = "hobbymatchmaker.buildlog
 kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinGradlePlugin" }

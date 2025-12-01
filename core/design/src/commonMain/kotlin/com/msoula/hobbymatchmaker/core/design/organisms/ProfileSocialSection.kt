@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -47,7 +48,6 @@ import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_main_ad
 import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_main_title
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import kotlin.collections.emptyList
 
 data class ProfileSocialMembers(
     val uid: String,
@@ -60,10 +60,12 @@ data class ProfileSocialMembers(
 fun ProfileSocialSection(
     socialMembers: List<ProfileSocialMembers>?,
     onSearchPeople: (pseudo: String) -> Unit,
-    searchResult: List<String> = emptyList()
+    searchResult: List<String> = emptyList(),
+    onInviteToSocialCircle: (pseudo: String) -> Unit
 ) {
     val textFieldState = rememberTextFieldState()
-    var displayAddPeopleForm by rememberSaveable { mutableStateOf(false) }
+    var displayAddPeopleForm by rememberSaveable { mutableStateOf(true) }
+    var pseudoSelectedTmp by remember { mutableStateOf("") }
 
     GenericCard(
         modifier = Modifier
@@ -152,8 +154,26 @@ fun ProfileSocialSection(
                         PseudoSearchBar(
                             textFieldState = textFieldState,
                             onSearch = onSearchPeople,
-                            searchResults = searchResult
+                            searchResults = searchResult,
+                            onPseudoSelected = { pseudo ->
+                                pseudoSelectedTmp = pseudo
+                            }
                         )
+
+                        if (pseudoSelectedTmp.isNotEmpty()) {
+                            SpacerHeight8()
+
+                            Button(
+                                onClick = {
+                                    displayAddPeopleForm = false
+                                    onInviteToSocialCircle(pseudoSelectedTmp)
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(CustomSize.Sixteen)
+                            ) {
+                                Text(text = stringResource(Res.string.user_profile_social_circle_main_add_people_text_button))
+                            }
+                        }
 
                         SpacerHeight8()
 
@@ -226,6 +246,7 @@ fun ProfileSocialSection(
 fun ProfileSocialSectionPreview() {
     ProfileSocialSection(
         socialMembers = emptyList(),
-        onSearchPeople = {}
+        onSearchPeople = {},
+        onInviteToSocialCircle = {}
     )
 }

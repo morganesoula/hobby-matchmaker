@@ -4,5 +4,5 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 
 interface SocialRemoteDataSource {
-    suspend fun searchUsersByPseudo(pseudo: String): AppResult<List<String>, AppError>
+    suspend fun searchUsersByPseudo(pseudo: String, currentUserUid: String? = null): AppResult<List<String>, AppError>
 }

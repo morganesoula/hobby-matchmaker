@@ -260,7 +260,12 @@ fun UserProfileContent(
                                     onSearchPeople = {
                                         viewModel.onEvent(UserProfileUiEventModel.OnSearchPeople(it))
                                     },
-                                    searchResult = searchedPseudos.value
+                                    searchResult = searchedPseudos.value,
+                                    onInviteToSocialCircle = {
+                                        viewModel.onEvent(
+                                            UserProfileUiEventModel.OnInviteToSocialCircle(it)
+                                        )
+                                    }
                                 )
                             }
                         )

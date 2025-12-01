@@ -128,6 +128,12 @@ class UserProfileViewModel(
                 }
             }
 
+            is UserProfileUiEventModel.OnInviteToSocialCircle -> {
+                scope.launch {
+                    inviteToSocialCircle(event.value)
+                }
+            }
+
             UserProfileUiEventModel.OnPseudoDefined -> {
                 _editableProfile.value?.let {
                     scope.launch {
@@ -213,14 +219,9 @@ class UserProfileViewModel(
     }
 
     private suspend fun searchUsers(pseudo: String) {
-        interactor.searchUsersPseudo(pseudo)
+        interactor.searchUsersPseudo(pseudo, currentUserUid)
             .onSuccess { list ->
-                if (list.isNotEmpty()) {
-                    // TODO Remove current user pseudo from the list
-                    _usersByPseudo.update { list }
-                } else {
-                    _usersByPseudo.update { emptyList() }
-                }
+                _usersByPseudo.update { list }
             }
             .onFailure { error ->
                 eventHandler.sendEvent(
@@ -251,5 +252,18 @@ class UserProfileViewModel(
                     )
                 }
         }
+    }
+
+    private suspend fun inviteToSocialCircle(pseudo: String) {
+        interactor.inviteToSocialCircle(currentUserUid, pseudo)
+            .onSuccess {
+                // TODO -- Continue
+                eventHandler.sendEvent(UiEvent.OnDataReady("invitation_sent"))
+            }
+            .onFailure { error ->
+                eventHandler.sendEvent(
+                    UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
+                )
+            }
     }
 }

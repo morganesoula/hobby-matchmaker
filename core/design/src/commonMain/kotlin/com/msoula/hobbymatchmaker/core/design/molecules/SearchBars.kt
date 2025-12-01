@@ -5,6 +5,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.TextFieldState
@@ -37,13 +39,15 @@ fun PseudoSearchBar(
     textFieldState: TextFieldState,
     onSearch: (String) -> Unit,
     searchResults: List<String>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onPseudoSelected: (pseudo: String) -> Unit
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
 
     Box(
         modifier
             .fillMaxWidth()
+            .heightIn(max = 400.dp)
             .semantics { isTraversalGroup = true }
     ) {
         SearchBar(
@@ -54,7 +58,12 @@ fun PseudoSearchBar(
             inputField = {
                 SearchBarDefaults.InputField(
                     query = textFieldState.text.toString(),
-                    onQueryChange = { textFieldState.edit { replace(0, length, it) } },
+                    onQueryChange = { query ->
+                        textFieldState.edit { replace(0, length, query) }
+                        if (query.isNotEmpty()) {
+                            onSearch(query)
+                        }
+                    },
                     onSearch = {
                         onSearch(textFieldState.text.toString())
                         expanded = false
@@ -77,7 +86,11 @@ fun PseudoSearchBar(
             expanded = expanded,
             onExpandedChange = { expanded = it }
         ) {
-            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+            ) {
                 searchResults.forEach { result ->
                     ListItem(
                         headlineContent = { Text(text = result) },
@@ -85,8 +98,10 @@ fun PseudoSearchBar(
                             .clickable {
                                 textFieldState.edit { replace(0, length, result) }
                                 expanded = false
+                                onPseudoSelected(result)
                             }
                             .fillMaxWidth()
+                            .wrapContentHeight()
                     )
                 }
             }

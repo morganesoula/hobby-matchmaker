@@ -8,7 +8,11 @@ import kotlinx.coroutines.flow.Flow
 interface SocialRepository {
     fun observeSocialCircleCount(): Flow<Int>
     fun observeSocialCircle(): Flow<List<UserSummaryDomainModel>>
+    suspend fun inviteToCircle(currentUserUid: String?, pseudo: String): AppResult<Unit, AppError>
     suspend fun addToCircle(memberUid: String)
     suspend fun removeFromCircle(memberUid: String)
-    suspend fun searchUsersByPseudo(pseudo: String): AppResult<List<String>, AppError>
+    suspend fun searchUsersByPseudo(
+        pseudo: String,
+        currentUserUid: String? = null
+    ): AppResult<List<String>, AppError>
 }

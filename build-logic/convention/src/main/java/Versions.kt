@@ -34,5 +34,8 @@ object Modules {
     const val PROFILE_PRESENTATION = ":features:profile:presentation"
     const val SESSION_DATA = ":core:session:data"
     const val SESSION_DOMAIN = ":core:session:domain"
+    const val SOCIAL_DATA = ":features:social:data"
+    const val SOCIAL_DOMAIN = ":features:social:domain"
+    const val SOCIAL_PRESENTATION = ":features:social:presentation"
     const val SPLASHSCREEN_PRESENTATION = ":core:splashscreen:presentation"
 }

@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.features.profile.domain.di
 
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.CheckIfPseudoIsAvailable
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.CreateDefaultUserProfileUseCase
+import com.msoula.hobbymatchmaker.features.profile.domain.useCases.InviteToSocialCircleUseCase
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.ObserveCurrentUserProfileStateUseCase
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.SearchUsersByPseudoUseCase
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.SyncUserProfileUseCase
@@ -16,4 +17,5 @@ val featuresModuleUserProfileDomain = module {
     factoryOf(::CreateDefaultUserProfileUseCase)
     factoryOf(::CheckIfPseudoIsAvailable)
     factoryOf(::SearchUsersByPseudoUseCase)
+    factoryOf(::InviteToSocialCircleUseCase)
 }

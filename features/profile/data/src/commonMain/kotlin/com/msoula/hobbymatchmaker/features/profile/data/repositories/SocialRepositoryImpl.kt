@@ -45,6 +45,16 @@ class SocialRepositoryImpl(
         socialLocalDataSource.removeFromCircle(memberUid)
     }
 
-    override suspend fun searchUsersByPseudo(pseudo: String): AppResult<List<String>, AppError> =
-        socialRemoteDataSource.searchUsersByPseudo(pseudo)
+    override suspend fun searchUsersByPseudo(
+        pseudo: String,
+        currentUserUid: String?
+    ): AppResult<List<String>, AppError> =
+        socialRemoteDataSource.searchUsersByPseudo(pseudo, currentUserUid)
+
+    override suspend fun inviteToCircle(
+        currentUserUid: String?,
+        pseudo: String
+    ): AppResult<Unit, AppError> {
+        TODO("Not yet implemented")
+    }
 }
