@@ -10,8 +10,8 @@
     "sourceSetName": "iosMain"
   },
   {
-    "moduleId": "org.jetbrains.kotlinx:atomicfu:0.27.0",
-    "file": "/Users/morganesoula/StudioProjects/hobby-matchmaker/.kotlin/metadata/kotlinTransformedCInteropMetadataLibraries/org.jetbrains.kotlinx-atomicfu-0.27.0-iosMain-cinterop/org.jetbrains.kotlinx_atomicfu-cinterop-interop-WOkCig.klib",
+    "moduleId": "org.jetbrains.kotlinx:atomicfu:0.29.0",
+    "file": "/Users/morganesoula/StudioProjects/hobby-matchmaker/.kotlin/metadata/kotlinTransformedCInteropMetadataLibraries/org.jetbrains.kotlinx-atomicfu-0.29.0-iosMain-cinterop/org.jetbrains.kotlinx_atomicfu-cinterop-interop-kCq7Ng.klib",
     "sourceSetName": "iosMain"
   },
   {
@@ -20,8 +20,8 @@
     "sourceSetName": "iosMain"
   },
   {
-    "moduleId": "org.jetbrains.compose.ui:ui-uikit:1.9.2",
-    "file": "/Users/morganesoula/StudioProjects/hobby-matchmaker/.kotlin/metadata/kotlinTransformedCInteropMetadataLibraries/org.jetbrains.compose.ui-ui-uikit-1.9.2-uikitMain-cinterop/org.jetbrains.compose.ui_ui-uikit-cinterop-utils-c6AlBg.klib",
+    "moduleId": "org.jetbrains.compose.ui:ui-uikit:1.9.3",
+    "file": "/Users/morganesoula/StudioProjects/hobby-matchmaker/.kotlin/metadata/kotlinTransformedCInteropMetadataLibraries/org.jetbrains.compose.ui-ui-uikit-1.9.3-uikitMain-cinterop/org.jetbrains.compose.ui_ui-uikit-cinterop-utils-c6AlBg.klib",
     "sourceSetName": "uikitMain"
   }
 ]
