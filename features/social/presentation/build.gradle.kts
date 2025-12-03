@@ -6,7 +6,9 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-
+            implementation(project(Modules.COMMON))
+            implementation(project(Modules.DESIGN))
+            implementation(project(Modules.SOCIAL_DOMAIN))
         }
     }
 }

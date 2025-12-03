@@ -55,9 +55,6 @@ class UserProfileViewModel(
     private val _enableSave = MutableStateFlow<Boolean?>(true)
     val enableSave = _enableSave.asStateFlow()
 
-    private val _usersByPseudo = MutableStateFlow(emptyList<String>())
-    val usersByPseudo = _usersByPseudo.asStateFlow()
-
     private val _screenState =
         MutableStateFlow<UserProfileUiStateModel>(UserProfileUiStateModel.Loading)
     val screenState = _screenState.asStateFlow()
@@ -120,18 +117,6 @@ class UserProfileViewModel(
             is UserProfileUiEventModel.OnPseudoChanged -> {
                 _editableProfile.update { current -> current?.copy(pseudo = event.value) }
                 _isPseudoAvailable.update { null }
-            }
-
-            is UserProfileUiEventModel.OnSearchPeople -> {
-                scope.launch {
-                    searchUsers(event.value)
-                }
-            }
-
-            is UserProfileUiEventModel.OnInviteToSocialCircle -> {
-                scope.launch {
-                    inviteToSocialCircle(event.value)
-                }
             }
 
             UserProfileUiEventModel.OnPseudoDefined -> {
@@ -218,18 +203,6 @@ class UserProfileViewModel(
         }
     }
 
-    private suspend fun searchUsers(pseudo: String) {
-        interactor.searchUsersPseudo(pseudo, currentUserUid)
-            .onSuccess { list ->
-                _usersByPseudo.update { list }
-            }
-            .onFailure { error ->
-                eventHandler.sendEvent(
-                    UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
-                )
-            }
-    }
-
     fun closeEdition() {
         _editableProfile.update { _originalProfile.value }
         _isEditMode.update { false }
@@ -252,18 +225,5 @@ class UserProfileViewModel(
                     )
                 }
         }
-    }
-
-    private suspend fun inviteToSocialCircle(pseudo: String) {
-        interactor.inviteToSocialCircle(currentUserUid, pseudo)
-            .onSuccess {
-                // TODO -- Continue
-                eventHandler.sendEvent(UiEvent.OnDataReady("invitation_sent"))
-            }
-            .onFailure { error ->
-                eventHandler.sendEvent(
-                    UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
-                )
-            }
     }
 }

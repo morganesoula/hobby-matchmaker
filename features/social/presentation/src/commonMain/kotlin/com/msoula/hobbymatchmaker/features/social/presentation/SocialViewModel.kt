@@ -1,0 +1,81 @@
+package com.msoula.hobbymatchmaker.features.social.presentation
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.msoula.hobbymatchmaker.core.common.onFailure
+import com.msoula.hobbymatchmaker.core.common.onSuccess
+import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
+import com.msoula.hobbymatchmaker.core.design.util.EventHandler
+import com.msoula.hobbymatchmaker.core.design.util.UiEvent
+import com.msoula.hobbymatchmaker.features.social.presentation.interactors.SocialInteractor
+import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toSocialSummaryUiModel
+import com.msoula.hobbymatchmaker.features.social.presentation.models.InviteUiModel
+import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUiEventModel
+import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUserSummaryUiModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
+class SocialViewModel(
+    private val interactor: SocialInteractor,
+    private val defaultMessageMapper: ErrorMessageMapper,
+    externalScope: CoroutineScope? = null
+) : ViewModel() {
+    private val scope = externalScope ?: viewModelScope
+    private val eventHandler = EventHandler()
+    val events = eventHandler.events
+
+    private val currentUserUid = ""
+
+    private val _searchResults = MutableStateFlow<List<SocialUserSummaryUiModel>>(emptyList())
+    val searchResults = _searchResults.asStateFlow()
+
+    private val _sentInvites = MutableStateFlow(InviteUiModel())
+    val sentInvites = _sentInvites.asStateFlow()
+
+    private val _incomingInvites = MutableStateFlow(InviteUiModel())
+    val incomingInvites = _incomingInvites.asStateFlow()
+
+    fun onEvent(event: SocialUiEventModel) {
+        when (event) {
+            is SocialUiEventModel.OnSearchPeople -> {
+                scope.launch {
+                    searchUsers(event.value)
+                }
+            }
+
+            is SocialUiEventModel.OnInviteToSocialCircle -> {
+                scope.launch {
+                    inviteToSocialCircle(event.value)
+                }
+            }
+        }
+    }
+
+    private suspend fun searchUsers(pseudo: String) {
+        interactor.searchUsers(pseudo, currentUserUid)
+            .onSuccess { list ->
+                _searchResults.update { list.map { it.toSocialSummaryUiModel() } }
+            }
+            .onFailure { error ->
+                eventHandler.sendEvent(
+                    UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
+                )
+            }
+    }
+
+    private suspend fun inviteToSocialCircle(pseudo: String) {
+        interactor.sendInvite(currentUserUid, pseudo)
+            .onSuccess {
+                // TODO -- Continue
+                eventHandler.sendEvent(UiEvent.OnDataReady("invitation_sent"))
+            }
+            .onFailure { error ->
+                eventHandler.sendEvent(
+                    UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
+                )
+            }
+    }
+}

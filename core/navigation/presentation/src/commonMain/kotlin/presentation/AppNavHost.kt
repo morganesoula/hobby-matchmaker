@@ -25,6 +25,7 @@ import com.msoula.hobbymatchmaker.features.movies.presentation.MovieContent
 import com.msoula.hobbymatchmaker.features.movies.presentation.MovieViewModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.UserProfileContent
 import com.msoula.hobbymatchmaker.features.profile.presentation.UserProfileViewModel
+import com.msoula.hobbymatchmaker.features.social.presentation.SocialViewModel
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -153,9 +154,11 @@ fun AppNavHost(
 
         composable<Profile> {
             val userProfileViewModel = koinViewModel<UserProfileViewModel>()
+            val socialViewModel = koinViewModel<SocialViewModel>()
 
             UserProfileContent(
-                viewModel = userProfileViewModel,
+                profileViewModel = userProfileViewModel,
+                socialViewModel = socialViewModel,
                 onNavigate = { route ->
                     when (route) {
                         "sign_up" -> {

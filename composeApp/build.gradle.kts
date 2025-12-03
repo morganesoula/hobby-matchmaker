@@ -52,6 +52,9 @@ kotlin {
             implementation(project(Modules.PROFILE_PRESENTATION))
             implementation(project(Modules.SESSION_DATA))
             implementation(project(Modules.SESSION_DOMAIN))
+            implementation(project(Modules.SOCIAL_DATA))
+            implementation(project(Modules.SOCIAL_DOMAIN))
+            implementation(project(Modules.SOCIAL_PRESENTATION))
             implementation(project(Modules.SPLASHSCREEN_PRESENTATION))
         }
 

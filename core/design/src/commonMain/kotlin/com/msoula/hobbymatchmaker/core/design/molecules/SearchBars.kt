@@ -29,6 +29,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
+import com.msoula.hobbymatchmaker.core.design.organisms.ProfileSocialMembers
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_main_add_people_form_field_hint
 import org.jetbrains.compose.resources.stringResource
@@ -38,7 +39,7 @@ import org.jetbrains.compose.resources.stringResource
 fun PseudoSearchBar(
     textFieldState: TextFieldState,
     onSearch: (String) -> Unit,
-    searchResults: List<String>,
+    searchResults: List<ProfileSocialMembers>,
     modifier: Modifier = Modifier,
     onPseudoSelected: (pseudo: String) -> Unit
 ) {
@@ -93,12 +94,12 @@ fun PseudoSearchBar(
             ) {
                 searchResults.forEach { result ->
                     ListItem(
-                        headlineContent = { Text(text = result) },
+                        headlineContent = { Text(text = result.pseudo) },
                         modifier = Modifier
                             .clickable {
-                                textFieldState.edit { replace(0, length, result) }
+                                textFieldState.edit { replace(0, length, result.pseudo) }
                                 expanded = false
-                                onPseudoSelected(result)
+                                onPseudoSelected(result.pseudo)
                             }
                             .fillMaxWidth()
                             .wrapContentHeight()

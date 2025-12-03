@@ -48,6 +48,7 @@ import com.msoula.hobbymatchmaker.core.design.organisms.ProfileEditInformationFo
 import com.msoula.hobbymatchmaker.core.design.organisms.ProfileEditInterestsForm
 import com.msoula.hobbymatchmaker.core.design.organisms.ProfileEditProfilePicture
 import com.msoula.hobbymatchmaker.core.design.organisms.ProfileInterestsSection
+import com.msoula.hobbymatchmaker.core.design.organisms.ProfileSocialMembers
 import com.msoula.hobbymatchmaker.core.design.organisms.ProfileSocialSection
 import com.msoula.hobbymatchmaker.core.design.organisms.ProfileStatsSection
 import com.msoula.hobbymatchmaker.core.design.templates.CompleteProfileLayout
@@ -59,6 +60,8 @@ import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.features.profile.presentation.mappers.toProfileSocialMembers
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiEventModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiStateModel
+import com.msoula.hobbymatchmaker.features.social.presentation.SocialViewModel
+import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUiEventModel
 import io.github.vinceglb.filekit.dialogs.FileKitMode
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
@@ -68,13 +71,15 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun UserProfileContent(
     modifier: Modifier = Modifier,
-    viewModel: UserProfileViewModel,
+    profileViewModel: UserProfileViewModel,
+    socialViewModel: SocialViewModel,
     onNavigate: (String) -> Unit
 ) {
-    val profileState by viewModel.screenState.collectAsState()
-    val isEditMode by viewModel.isEditMode.collectAsState()
-    val editableProfile by viewModel.editableProfile.collectAsState()
-    val isPseudoAvailable by viewModel.isPseudoAvailable.collectAsState()
+    val profileState by profileViewModel.screenState.collectAsState()
+    val isEditMode by profileViewModel.isEditMode.collectAsState()
+    val editableProfile by profileViewModel.editableProfile.collectAsState()
+    val isPseudoAvailable by profileViewModel.isPseudoAvailable.collectAsState()
+
     val snackBarHostState = remember { SnackbarHostState() }
 
     val noNumberRequirement =
@@ -102,12 +107,12 @@ fun UserProfileContent(
         mode = FileKitMode.Single
     ) { image ->
         image?.let {
-            viewModel.onEvent(UserProfileUiEventModel.OnAvatarSelected(it.path))
+            profileViewModel.onEvent(UserProfileUiEventModel.OnAvatarSelected(it.path))
         } ?: Logger.d("No image found in the gallery")
     }
 
-    LaunchedEffect(viewModel.events) {
-        viewModel.events.collect { event ->
+    LaunchedEffect(profileViewModel.events) {
+        profileViewModel.events.collect { event ->
             when (event) {
                 is UiEvent.ShowSnackBar ->
                     snackBarHostState.showSnackbar(event.message.asStringSuspend())
@@ -115,7 +120,7 @@ fun UserProfileContent(
                 is UiEvent.NavigateToRoute -> onNavigate(event.route)
                 is UiEvent.OnDataReady -> {
                     when (event.data) {
-                        "profile_updated" -> viewModel.closeEdition()
+                        "profile_updated" -> profileViewModel.closeEdition()
                     }
                 }
 
@@ -143,8 +148,8 @@ fun UserProfileContent(
             if (isEditMode) {
                 EditProfileTopBar(
                     isIOS = isIosPlatform(),
-                    onBack = { viewModel.closeEdition() },
-                    onSave = { viewModel.onEvent(UserProfileUiEventModel.OnSaveClicked) },
+                    onBack = { profileViewModel.closeEdition() },
+                    onSave = { profileViewModel.onEvent(UserProfileUiEventModel.OnSaveClicked) },
                     enableSave = enableSaveTopBarButton
                 )
             } else {
@@ -183,7 +188,7 @@ fun UserProfileContent(
                                     ProfileEditInformationForm(
                                         name = currentEditableProfile.name,
                                         onNameChanged = { name ->
-                                            viewModel.onEvent(
+                                            profileViewModel.onEvent(
                                                 UserProfileUiEventModel.OnNameChanged(
                                                     name
                                                 )
@@ -191,19 +196,19 @@ fun UserProfileContent(
                                         },
                                         pseudo = currentEditableProfile.pseudo,
                                         onPseudoChanged = { pseudo ->
-                                            viewModel.onEvent(
+                                            profileViewModel.onEvent(
                                                 UserProfileUiEventModel.OnPseudoChanged(
                                                     pseudo
                                                 )
                                             )
                                         },
                                         onPseudoFocusLost = {
-                                            viewModel.onEvent(UserProfileUiEventModel.OnPseudoDefined)
+                                            profileViewModel.onEvent(UserProfileUiEventModel.OnPseudoDefined)
                                         },
                                         isPseudoAvailable = isPseudoAvailable,
                                         bio = currentEditableProfile.bio,
                                         onBioChanged = { bio ->
-                                            viewModel.onEvent(
+                                            profileViewModel.onEvent(
                                                 UserProfileUiEventModel.OnBioChanged(
                                                     bio
                                                 )
@@ -216,7 +221,7 @@ fun UserProfileContent(
                                     ProfileEditInterestsForm(
                                         interests = currentEditableProfile.interests ?: emptyList(),
                                         onInterestChanged = {
-                                            viewModel.onEvent(
+                                            profileViewModel.onEvent(
                                                 UserProfileUiEventModel.OnInterestsChanged(it)
                                             )
                                         }
@@ -230,7 +235,7 @@ fun UserProfileContent(
                         padding = padding
                     ) {
                         val profile = (profileState as UserProfileUiStateModel.Success).userProfile
-                        val searchedPseudos = viewModel.usersByPseudo.collectAsState()
+                        val searchedPseudos by socialViewModel.searchResults.collectAsState()
 
                         CompleteProfileLayout(
                             headerSection = {
@@ -239,7 +244,7 @@ fun UserProfileContent(
                                     biography = profile.bio ?: "",
                                     avatarPath = profile.avatarUrl,
                                     onEditProfileClicked = {
-                                        viewModel.onEvent(UserProfileUiEventModel.OnEditModeClicked)
+                                        profileViewModel.onEvent(UserProfileUiEventModel.OnEditModeClicked)
                                     }
                                 )
                             },
@@ -258,12 +263,19 @@ fun UserProfileContent(
                                 ProfileSocialSection(
                                     socialMembers = profile.socialMembers.map { it.toProfileSocialMembers() },
                                     onSearchPeople = {
-                                        viewModel.onEvent(UserProfileUiEventModel.OnSearchPeople(it))
+                                        socialViewModel.onEvent(SocialUiEventModel.OnSearchPeople(it))
                                     },
-                                    searchResult = searchedPseudos.value,
+                                    searchResult = searchedPseudos.map { member ->
+                                        ProfileSocialMembers(
+                                            uid = member.uid,
+                                            name = member.name,
+                                            pseudo = member.pseudo,
+                                            avatarUrl = member.avatarUrl
+                                        )
+                                    },
                                     onInviteToSocialCircle = {
-                                        viewModel.onEvent(
-                                            UserProfileUiEventModel.OnInviteToSocialCircle(it)
+                                        socialViewModel.onEvent(
+                                            SocialUiEventModel.OnInviteToSocialCircle(it)
                                         )
                                     }
                                 )

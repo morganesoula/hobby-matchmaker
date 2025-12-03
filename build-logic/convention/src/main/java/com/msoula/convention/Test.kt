@@ -13,11 +13,7 @@ internal fun KotlinMultiplatformExtension.configureUnitTest(
 
         // Turbine
         implementation(libs.findLibrary("turbine").get())
-    }
 
-    sourceSets.jvmTest.dependencies {
-        implementation(libs.findLibrary("kotest-runner-junit5").get())
-        implementation(libs.findLibrary("mockk").get())
         implementation(libs.findLibrary("kotlinx-coroutines-test").get())
     }
 }

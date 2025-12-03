@@ -60,7 +60,7 @@ data class ProfileSocialMembers(
 fun ProfileSocialSection(
     socialMembers: List<ProfileSocialMembers>?,
     onSearchPeople: (pseudo: String) -> Unit,
-    searchResult: List<String> = emptyList(),
+    searchResult: List<ProfileSocialMembers> = emptyList(),
     onInviteToSocialCircle: (pseudo: String) -> Unit
 ) {
     val textFieldState = rememberTextFieldState()
