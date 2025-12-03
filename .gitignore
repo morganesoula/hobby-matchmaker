@@ -15,6 +15,11 @@
 *.properties
 iosApp/tmdb.plist
 **/google-services.json
+kotzilla.json
+# Kotzilla symlinks (auto-generated)
+core/**/kotzilla.json
+features/**/kotzilla.json
+composeApp/kotzilla.json
 
 # iOS
 **/*.cinteropLibraries.json

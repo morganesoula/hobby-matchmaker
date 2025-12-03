@@ -16,7 +16,25 @@ class MultiplatformMinimalistPlugin : Plugin<Project> {
             apply("com.android.library")
             apply("org.jetbrains.kotlin.multiplatform")
             apply("org.jetbrains.kotlin.plugin.serialization")
-            apply("io.kotzilla.kotzilla-plugin")
+
+            // Only apply Kotzilla if kotzilla.json exists in the module or at root
+            val moduleKotzillaFile = file("kotzilla.json")
+            val rootKotzillaFile = rootProject.file("kotzilla.json")
+            if (moduleKotzillaFile.exists() || rootKotzillaFile.exists()) {
+                apply("io.kotzilla.kotzilla-plugin")
+
+                // Create symlink if only root file exists
+                if (!moduleKotzillaFile.exists() && rootKotzillaFile.exists()) {
+                    try {
+                        java.nio.file.Files.createSymbolicLink(
+                            moduleKotzillaFile.toPath(),
+                            rootKotzillaFile.toPath()
+                        )
+                    } catch (e: Exception) {
+                        logger.warn("Could not create symlink for kotzilla.json: ${e.message}")
+                    }
+                }
+            }
         }
 
         // In order to unit test, JVM is necessary for KMP

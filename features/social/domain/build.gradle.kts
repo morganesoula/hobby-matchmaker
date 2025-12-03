@@ -6,7 +6,8 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-
+            // Modules
+            implementation(project(Modules.COMMON))
         }
     }
 }
