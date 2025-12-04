@@ -11,6 +11,7 @@ val featuresModuleSocialPresentation = module {
     viewModel {
         SocialViewModel(
             interactor = get(),
+            observeSessionStateUseCase = get(),
             defaultMessageMapper = get(),
             externalScope = null
         )

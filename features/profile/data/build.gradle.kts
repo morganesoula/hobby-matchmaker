@@ -16,12 +16,10 @@ kotlin {
             // Modules
             implementation(project(Modules.COMMON))
             implementation(project(Modules.DATABASE))
-            implementation(project(Modules.MOVIE_DATA))
+            implementation(project(Modules.MOVIE_DOMAIN))
             implementation(project(Modules.NETWORK))
             implementation(project(Modules.PROFILE_DOMAIN))
-            implementation(project(Modules.SOCIAL_DATA))
             implementation(project(Modules.SOCIAL_DOMAIN))
-            implementation(project(Modules.SESSION_DATA))
         }
     }
 }

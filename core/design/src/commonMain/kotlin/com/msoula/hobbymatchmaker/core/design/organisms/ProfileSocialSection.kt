@@ -51,7 +51,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 data class ProfileSocialMembers(
     val uid: String,
-    val name: String,
+    val name: String?,
     val pseudo: String,
     val avatarUrl: String?
 )
@@ -64,7 +64,7 @@ fun ProfileSocialSection(
     onInviteToSocialCircle: (pseudo: String) -> Unit
 ) {
     val textFieldState = rememberTextFieldState()
-    var displayAddPeopleForm by rememberSaveable { mutableStateOf(true) }
+    var displayAddPeopleForm by rememberSaveable { mutableStateOf(false) }
     var pseudoSelectedTmp by remember { mutableStateOf("") }
 
     GenericCard(
@@ -217,7 +217,7 @@ fun ProfileSocialSection(
 
                         SpacerWidth8()
                         Text(
-                            member.name,
+                            text = member.name ?: member.pseudo,
                             fontWeight = FontWeight.Medium,
                             color = MaterialTheme.colorScheme.onBackground
                         )

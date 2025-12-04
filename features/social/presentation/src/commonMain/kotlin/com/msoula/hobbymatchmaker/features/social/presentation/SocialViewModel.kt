@@ -2,11 +2,15 @@ package com.msoula.hobbymatchmaker.features.social.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.design.util.EventHandler
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
+import com.msoula.hobbymatchmaker.core.session.domain.models.SessionState
+import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveSessionStateUseCase
 import com.msoula.hobbymatchmaker.features.social.presentation.interactors.SocialInteractor
 import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toSocialSummaryUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.InviteUiModel
@@ -20,6 +24,7 @@ import kotlinx.coroutines.launch
 
 class SocialViewModel(
     private val interactor: SocialInteractor,
+    private val observeSessionStateUseCase: ObserveSessionStateUseCase,
     private val defaultMessageMapper: ErrorMessageMapper,
     externalScope: CoroutineScope? = null
 ) : ViewModel() {
@@ -27,7 +32,7 @@ class SocialViewModel(
     private val eventHandler = EventHandler()
     val events = eventHandler.events
 
-    private val currentUserUid = ""
+    private var currentUserUid: String? = null
 
     private val _searchResults = MutableStateFlow<List<SocialUserSummaryUiModel>>(emptyList())
     val searchResults = _searchResults.asStateFlow()
@@ -37,6 +42,25 @@ class SocialViewModel(
 
     private val _incomingInvites = MutableStateFlow(InviteUiModel())
     val incomingInvites = _incomingInvites.asStateFlow()
+
+    init {
+        observeSession()
+    }
+
+    private fun observeSession() {
+        scope.launch {
+            observeSessionStateUseCase().collect { state ->
+                when (state) {
+                    is SessionState.Authenticated -> currentUserUid = state.uid
+                    is SessionState.Guest -> currentUserUid = null
+                    null -> {
+                        Logger.d("SocialViewModel", "No session found")
+                        currentUserUid = null
+                    }
+                }
+            }
+        }
+    }
 
     fun onEvent(event: SocialUiEventModel) {
         when (event) {
@@ -67,9 +91,16 @@ class SocialViewModel(
     }
 
     private suspend fun inviteToSocialCircle(pseudo: String) {
-        interactor.sendInvite(currentUserUid, pseudo)
+        val uid = currentUserUid
+        if (uid == null) {
+            eventHandler.sendEvent(
+                UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(AppError.Domain.Unauthorized))
+            )
+            return
+        }
+
+        interactor.sendInvite(uid, pseudo)
             .onSuccess {
-                // TODO -- Continue
                 eventHandler.sendEvent(UiEvent.OnDataReady("invitation_sent"))
             }
             .onFailure { error ->

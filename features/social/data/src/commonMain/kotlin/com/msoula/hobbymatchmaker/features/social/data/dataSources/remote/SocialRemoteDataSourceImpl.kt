@@ -5,10 +5,12 @@ import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.safeFirebaseCall
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialInviteDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel
+import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel.Companion.DEFAULT_AVATAR_URL
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialUserSummaryDomainModel
 import dev.gitlive.firebase.firestore.Direction
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
+import com.msoula.hobbymatchmaker.core.common.Logger
 
 class SocialRemoteDataSourceImpl(
     private val firestore: FirebaseFirestore
@@ -23,19 +25,26 @@ class SocialRemoteDataSourceImpl(
 
             val endTerm = searchTerm + '\uf8ff'
 
-            val results = firestore
-                .collection("users")
-                .orderBy("information.pseudo", Direction.ASCENDING)
-                .startAt(searchTerm)
-                .endAt(endTerm)
-                .limit(20)
-                .get()
-                .documents
+            val documents = try {
+                firestore
+                    .collection("users")
+                    .orderBy("information.pseudo", Direction.ASCENDING)
+                    .startAt(searchTerm)
+                    .endAt(endTerm)
+                    .limit(20)
+                    .get()
+                    .documents
+            } catch (e: Exception) {
+                Logger.d("SocialRemoteDataSource: Error during Firestore query: ${e.message}")
+                throw e
+            }
+
+            val results = documents
                 .mapNotNull { document ->
                     val uid = document.id
-                    val userPseudo = document.get<String>("information.pseudo")
-                    val name = document.get<String>("information.name")
-                    val avatar = document.get<String>("information.avatarUrl")
+                    val userPseudo = document.get<String?>("information.pseudo")
+                    val name = document.get<String?>("information.name")
+                    val avatar = document.get<String?>("information.avatarUrl")
 
                     if (uid == ownerUid) return@mapNotNull null
 
@@ -55,7 +64,7 @@ class SocialRemoteDataSourceImpl(
                     uid = member.uid,
                     name = member.name,
                     pseudo = member.pseudo,
-                    avatarUrl = member.pseudo
+                    avatarUrl = member.avatarUrl ?: DEFAULT_AVATAR_URL
                 )
             }
         }

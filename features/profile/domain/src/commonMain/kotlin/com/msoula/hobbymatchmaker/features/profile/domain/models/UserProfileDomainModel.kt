@@ -35,7 +35,7 @@ data class UserProfileDomainModel(
 
 data class UserSummaryDomainModel(
     val uid: String,
-    val name: String,
+    val name: String?,
     val pseudo: String,
     val avatarUrl: String?
 ) {

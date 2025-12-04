@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface MovieRepository {
     fun observeMovies(): Flow<List<MovieDomainModel>>
+    fun observeMoviesLikedCount(): Flow<Long>
 
     suspend fun updateMovieFavoriteLocal(id: Long, isFavorite: Boolean): AppResult<Unit, AppError>
     suspend fun updateMovieFavoriteRemote(
