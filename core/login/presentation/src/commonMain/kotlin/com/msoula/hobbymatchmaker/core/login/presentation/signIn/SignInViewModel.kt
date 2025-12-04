@@ -169,7 +169,6 @@ class SignInViewModel(
 
         action()
             .onSuccess {
-                _signInState.update { UiState.Success(Unit) }
                 eventHandler.sendEvent(UiEvent.NavigateToRoute("movies"))
             }
             .onFailure { error ->

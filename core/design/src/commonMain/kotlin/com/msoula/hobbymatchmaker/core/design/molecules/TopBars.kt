@@ -20,7 +20,7 @@ import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWidth4
 import com.msoula.hobbymatchmaker.core.design.cancel
 import com.msoula.hobbymatchmaker.core.design.icons.Arrow_back
-import com.msoula.hobbymatchmaker.core.design.icons.Logout
+import com.msoula.hobbymatchmaker.core.design.icons.Group_add
 import com.msoula.hobbymatchmaker.core.design.icons.Person
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import org.jetbrains.compose.resources.stringResource
@@ -31,7 +31,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun NavigationTopBar(
     modifier: Modifier = Modifier,
     redirectToProfile: () -> Unit,
-    redirectToSignIn: () -> Unit
+    redirectToSocial: () -> Unit
 ) {
     TopAppBar(
         title = {},
@@ -44,21 +44,21 @@ fun NavigationTopBar(
                 modifier = Modifier.padding(end = CustomSize.Four)
             ) {
                 IconButton(
-                    onClick = { redirectToProfile() }
+                    onClick = { redirectToSocial() }
                 ) {
                     Icon(
-                        imageVector = Person,
-                        contentDescription = "Profile",
+                        imageVector = Group_add,
+                        contentDescription = "Invites",
                         tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
 
                 IconButton(
-                    onClick = { redirectToSignIn() }
+                    onClick = { redirectToProfile() }
                 ) {
                     Icon(
-                        imageVector = Logout,
-                        contentDescription = "Logout",
+                        imageVector = Person,
+                        contentDescription = "Profile",
                         tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
@@ -156,6 +156,6 @@ fun EditProfileTopBar(
 fun NavigationTopBarPreview() {
     NavigationTopBar(
         redirectToProfile = {},
-        redirectToSignIn = {}
+        redirectToSocial = {}
     )
 }

@@ -145,7 +145,7 @@ class UserProfileViewModel(
 
             UserProfileUiEventModel.OnEditModeClicked -> toggleEditMode()
 
-            UserProfileUiEventModel.OnSignUpButtonClicked -> logOut()
+            UserProfileUiEventModel.OnSignUpButtonClicked -> logOut("sign_up")
         }
     }
 
@@ -187,12 +187,14 @@ class UserProfileViewModel(
         eventHandler.close()
     }
 
-    private fun logOut() {
+    fun logOut(route: String) {
+        Logger.d("Logging out to route:$route")
         scope.launch {
             interactor.logOut()
                 .onSuccess {
+                    Logger.d("Successful logging out:$route")
                     eventHandler.sendEvent(
-                        UiEvent.NavigateToRoute("sign_up")
+                        UiEvent.NavigateToRoute(route)
                     )
                 }
                 .onFailure { error ->

@@ -19,10 +19,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.theme.CustomFontSize
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.disabledContainerColor
 import com.msoula.hobbymatchmaker.core.design.theme.onDisabledColor
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun PrimaryButton(
@@ -59,6 +61,34 @@ fun PrimaryButton(
                 textAlign = TextAlign.Center,
             )
         }
+    }
+}
+
+@Composable
+fun SecondaryButton(
+    modifier: Modifier = Modifier,
+    text: String,
+    onClick: () -> Unit
+) {
+    Button(
+        onClick = { onClick() },
+        colors = ButtonDefaults.buttonColors(
+            contentColor = MaterialTheme.colorScheme.primary.copy(alpha = .6f),
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        ),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = .6f)),
+        shape = RoundedCornerShape(CustomSize.Eight),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = CustomSize.TwentyFour),
+    ) {
+        Text(
+            text = text,
+            modifier = modifier.padding(CustomSize.Eight),
+            fontSize = CustomFontSize.Sixteen,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 
@@ -102,4 +132,10 @@ fun SocialMediaButton(
             )
         }
     }
+}
+
+@Preview
+@Composable
+fun SecondButtonPreview() {
+    SecondaryButton(text = "Sign up", onClick = {})
 }

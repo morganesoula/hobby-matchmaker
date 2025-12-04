@@ -20,6 +20,7 @@ import com.msoula.hobbymatchmaker.core.common.isIosPlatform
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.ProfileLoadingScreen
+import com.msoula.hobbymatchmaker.core.design.atoms.SecondaryButton
 import com.msoula.hobbymatchmaker.core.design.atoms.asStringSuspend
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_requirements_no_number
 import com.msoula.hobbymatchmaker.core.design.guest_build_circle_feature_description
@@ -36,6 +37,7 @@ import com.msoula.hobbymatchmaker.core.design.guest_share_interests_feature_titl
 import com.msoula.hobbymatchmaker.core.design.icons.Film
 import com.msoula.hobbymatchmaker.core.design.icons.Person
 import com.msoula.hobbymatchmaker.core.design.icons.Sparkle
+import com.msoula.hobbymatchmaker.core.design.log_out
 import com.msoula.hobbymatchmaker.core.design.molecules.BackNavigationTopBar
 import com.msoula.hobbymatchmaker.core.design.molecules.EditProfileTopBar
 import com.msoula.hobbymatchmaker.core.design.molecules.FeatureProfileCard
@@ -117,7 +119,9 @@ fun UserProfileContent(
                 is UiEvent.ShowSnackBar ->
                     snackBarHostState.showSnackbar(event.message.asStringSuspend())
 
-                is UiEvent.NavigateToRoute -> onNavigate(event.route)
+                is UiEvent.NavigateToRoute -> {
+                    onNavigate(event.route)
+                }
                 is UiEvent.OnDataReady -> {
                     when (event.data) {
                         "profile_updated" -> profileViewModel.closeEdition()
@@ -226,6 +230,14 @@ fun UserProfileContent(
                                             )
                                         }
                                     )
+                                },
+                                logOut = {
+                                    SecondaryButton(
+                                        text = stringResource(Res.string.log_out),
+                                        onClick = {
+                                            profileViewModel.logOut("sign_in")
+                                        }
+                                    )
                                 }
                             )
                         }
@@ -277,6 +289,14 @@ fun UserProfileContent(
                                         socialViewModel.onEvent(
                                             SocialUiEventModel.OnInviteToSocialCircle(it)
                                         )
+                                    }
+                                )
+                            },
+                            logOut = {
+                                SecondaryButton(
+                                    text = stringResource(Res.string.log_out),
+                                    onClick = {
+                                        profileViewModel.logOut("sign_in")
                                     }
                                 )
                             }

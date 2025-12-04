@@ -25,6 +25,7 @@ import com.msoula.hobbymatchmaker.features.movies.presentation.MovieContent
 import com.msoula.hobbymatchmaker.features.movies.presentation.MovieViewModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.UserProfileContent
 import com.msoula.hobbymatchmaker.features.profile.presentation.UserProfileViewModel
+import com.msoula.hobbymatchmaker.features.social.presentation.SocialContent
 import com.msoula.hobbymatchmaker.features.social.presentation.SocialViewModel
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -37,6 +38,7 @@ fun AppNavHost(
     socialClients: Map<ProviderType, SocialUIClient>
 ) {
     val nav = rememberNavController()
+    val socialViewModel = koinViewModel<SocialViewModel>()
 
     NavHost(
         modifier = modifier,
@@ -122,11 +124,12 @@ fun AppNavHost(
                 onNavigate = { route ->
                     when (route) {
                         "sign_in" -> nav.navigate(SignIn) {
-                            popUpTo<Movies> { inclusive = true }
+                            popUpTo(0) { inclusive = true }
                             launchSingleTop = true
                         }
 
                         "profile" -> nav.navigate(Profile)
+                        "social" -> nav.navigate(Social)
                         else -> return@MovieContent
                     }
                 },
@@ -154,16 +157,22 @@ fun AppNavHost(
 
         composable<Profile> {
             val userProfileViewModel = koinViewModel<UserProfileViewModel>()
-            val socialViewModel = koinViewModel<SocialViewModel>()
 
             UserProfileContent(
                 profileViewModel = userProfileViewModel,
                 socialViewModel = socialViewModel,
                 onNavigate = { route ->
                     when (route) {
+                        "sign_in" -> {
+                            nav.navigate(Auth) {
+                                popUpTo(0) { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        }
+
                         "sign_up" -> {
                             nav.navigate(Auth) {
-                                popUpTo<Profile> { inclusive = true }
+                                popUpTo(0) { inclusive = true }
                                 launchSingleTop = true
                             }
                         }
@@ -171,6 +180,22 @@ fun AppNavHost(
                         "movies" -> {
                             nav.navigate(Movies) {
                                 popUpTo<Profile> { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        }
+                    }
+                }
+            )
+        }
+
+        composable<Social> {
+            SocialContent(
+                socialViewModel = socialViewModel,
+                onNavigate = { route ->
+                    when (route) {
+                        "movies" -> {
+                            nav.navigate(Movies) {
+                                popUpTo<Social> { inclusive = true }
                                 launchSingleTop = true
                             }
                         }

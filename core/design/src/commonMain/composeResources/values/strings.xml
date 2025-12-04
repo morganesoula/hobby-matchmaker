@@ -112,6 +112,8 @@
     <string name="authentication_invalid_credentials">Identifiants incorrects.</string>
 
     // PROFILE
+    <string name="log_out">Déconnexion</string>
+
     <string name="movies_liked_count_title">Films aimés</string>
     <string name="social_members_count_title">Connexions</string>
     <string name="user_profile_interests_title">Intérêts</string>

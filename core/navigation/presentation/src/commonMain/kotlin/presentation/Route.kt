@@ -30,3 +30,8 @@ data class MovieDetail(val id: Long)
 @Serializable
 @SerialName("profile")
 object Profile
+
+@Serializable
+@SerialName("social")
+object Social
+

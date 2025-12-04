@@ -6,7 +6,6 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.getDeviceLocale
 import com.msoula.hobbymatchmaker.core.common.onFailure
-import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.connection_issue
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
@@ -58,20 +57,6 @@ class MovieViewModel(
                     }
                 }
             }
-        }
-    }
-
-    fun logOut() {
-        scope.launch {
-            interactor.logOut()
-                .onSuccess {
-                    eventHandler.sendEvent(UiEvent.NavigateToRoute("sign_in"))
-                }
-                .onFailure { error ->
-                    eventHandler.sendEvent(
-                        UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
-                    )
-                }
         }
     }
 

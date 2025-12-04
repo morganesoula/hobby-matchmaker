@@ -65,10 +65,7 @@ fun MovieContent(
         topBar = {
             NavigationTopBar(
                 redirectToProfile = { onNavigate("profile") },
-                redirectToSignIn = {
-                    movieViewModel.logOut()
-                    onNavigate("sign_in")
-                }
+                redirectToSocial = { onNavigate("social") }
             )
         },
         snackbarHost = {
