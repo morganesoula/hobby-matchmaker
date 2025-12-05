@@ -44,11 +44,6 @@ class MultiplatformComposeConventionPlugin : Plugin<Project> {
 
         val compose = extensions.getByType(ComposeExtension::class.java).dependencies
 
-        // In order to unit test, JVM is necessary for KMP
-        extensions.configure<KotlinMultiplatformExtension> {
-            jvm()
-        }
-
         target.afterEvaluate {
             extensions.configure<KotlinMultiplatformExtension> {
                 configureMultiplatformIos(this@with)

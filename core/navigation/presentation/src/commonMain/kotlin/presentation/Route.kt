@@ -1,5 +1,8 @@
 package com.msoula.hobbymatchmaker.core.navigation.presentation
 
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.msoula.hobbymatchmaker.core.design.icons.Inbox
+import com.msoula.hobbymatchmaker.core.design.icons.Send_to_mobile
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -35,3 +38,12 @@ object Profile
 @SerialName("social")
 object Social
 
+enum class Destination(
+    val route: String,
+    val label: String,
+    val icon: ImageVector,
+    val contentDescription: String
+) {
+    RECEIVED("invitation_received", "Received", Inbox, "Received"),
+    SENT("invitation_sent", "Sent", Send_to_mobile, "Sent")
+}

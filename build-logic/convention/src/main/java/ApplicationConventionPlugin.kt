@@ -56,7 +56,7 @@ class ApplicationConventionPlugin : Plugin<Project> {
                 into(outputDir)
 
                 doFirst {
-                    logger.lifecycle("📦 Exporting composeApp.xcframework to $outputDir")
+                    logger.lifecycle("Exporting composeApp.xcframework to $outputDir")
                 }
             }
 
@@ -77,10 +77,9 @@ class ApplicationConventionPlugin : Plugin<Project> {
                 into(outputDir)
 
                 doFirst {
-                    logger.lifecycle("🚀 Copying XCFramework only (no rebuild)")
+                    logger.lifecycle("Copying XCFramework only (no rebuild)")
                 }
             }
-
         }
     }
 }

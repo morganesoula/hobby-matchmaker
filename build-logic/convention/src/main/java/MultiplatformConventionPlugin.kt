@@ -42,11 +42,6 @@ class MultiplatformConventionPlugin : Plugin<Project> {
             }
         }
 
-        // In order to unit test, JVM is necessary for KMP
-        extensions.configure<KotlinMultiplatformExtension> {
-            jvm()
-        }
-
         target.afterEvaluate {
             extensions.configure<KotlinMultiplatformExtension> {
                 configureMultiplatformIos(this@with)

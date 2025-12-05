@@ -191,6 +191,10 @@ fun AppNavHost(
         composable<Social> {
             SocialContent(
                 socialViewModel = socialViewModel,
+                destinations = listOf(
+                    Destination.RECEIVED,
+                    Destination.SENT
+                ),
                 onNavigate = { route ->
                     when (route) {
                         "movies" -> {

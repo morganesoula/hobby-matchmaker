@@ -22,6 +22,7 @@ kotlin {
 
             // Modules
             implementation(project(Modules.COMMON))
+            implementation(project(Modules.NAVIGATION_PRESENTATION))
         }
 
         androidMain.dependencies {
