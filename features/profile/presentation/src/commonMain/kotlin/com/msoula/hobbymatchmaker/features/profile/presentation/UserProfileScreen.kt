@@ -50,7 +50,7 @@ import com.msoula.hobbymatchmaker.core.design.organisms.ProfileEditInformationFo
 import com.msoula.hobbymatchmaker.core.design.organisms.ProfileEditInterestsForm
 import com.msoula.hobbymatchmaker.core.design.organisms.ProfileEditProfilePicture
 import com.msoula.hobbymatchmaker.core.design.organisms.ProfileInterestsSection
-import com.msoula.hobbymatchmaker.core.design.organisms.ProfileSocialMembers
+import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMembers
 import com.msoula.hobbymatchmaker.core.design.organisms.ProfileSocialSection
 import com.msoula.hobbymatchmaker.core.design.organisms.ProfileStatsSection
 import com.msoula.hobbymatchmaker.core.design.templates.CompleteProfileLayout

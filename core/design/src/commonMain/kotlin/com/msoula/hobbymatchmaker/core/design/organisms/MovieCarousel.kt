@@ -15,31 +15,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.common.isIosPlatform
+import com.msoula.hobbymatchmaker.core.design.models.MovieCarouselItem
 import com.msoula.hobbymatchmaker.core.design.molecules.MovieCard
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 
-/**
- * Simple data class representing movie data for the carousel
- * This keeps the design module completely independent from feature modules
- */
-data class MovieCarouselItem(
-    val id: Long,
-    val title: String,
-    val overview: String,
-    val coverFilePath: String,
-    val note: Double,
-    val isFavorite: Boolean
-)
-
-/**
- * Carousel component displaying a horizontal scrollable list of movie cards
- *
- * @param modifier Modifier to apply to the root component
- * @param padding PaddingValues from parent Scaffold
- * @param movies List of movie items to display
- * @param onMovieSingleTap Callback when a movie card is tapped once
- * @param onMovieDoubleTap Callback when a movie card is double-tapped (favorite)
- */
 @Composable
 fun MovieCarousel(
     modifier: Modifier = Modifier,

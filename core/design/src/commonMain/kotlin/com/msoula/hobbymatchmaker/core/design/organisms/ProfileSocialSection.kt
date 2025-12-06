@@ -40,6 +40,7 @@ import com.msoula.hobbymatchmaker.core.design.authentified_no_social_members_des
 import com.msoula.hobbymatchmaker.core.design.cancel
 import com.msoula.hobbymatchmaker.core.design.icons.Heart
 import com.msoula.hobbymatchmaker.core.design.icons.Person_add
+import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMembers
 import com.msoula.hobbymatchmaker.core.design.molecules.PseudoSearchBar
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.IconSize
@@ -48,13 +49,6 @@ import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_main_ad
 import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_main_title
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-
-data class ProfileSocialMembers(
-    val uid: String,
-    val name: String?,
-    val pseudo: String,
-    val avatarUrl: String?
-)
 
 @Composable
 fun ProfileSocialSection(

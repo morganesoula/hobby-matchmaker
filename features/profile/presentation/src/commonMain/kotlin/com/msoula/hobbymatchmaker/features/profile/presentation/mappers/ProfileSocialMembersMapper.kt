@@ -1,6 +1,6 @@
 package com.msoula.hobbymatchmaker.features.profile.presentation.mappers
 
-import com.msoula.hobbymatchmaker.core.design.organisms.ProfileSocialMembers
+import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMembers
 import com.msoula.hobbymatchmaker.features.profile.domain.models.UserSummaryDomainModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.SocialMemberUiModel
 

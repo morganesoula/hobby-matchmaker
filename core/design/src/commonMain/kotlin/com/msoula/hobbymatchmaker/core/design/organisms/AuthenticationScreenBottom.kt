@@ -33,19 +33,6 @@ import com.msoula.hobbymatchmaker.core.design.new_member_clickable_part
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import org.jetbrains.compose.resources.stringResource
 
-/**
- * Bottom section of authentication screens (SignIn/SignUp).
- *
- * Displays:
- * - An annotated text linking to the opposite screen (SignIn ↔ SignUp)
- * - A "Continue as Guest" button (only on SignIn screen)
- *
- * @param modifier Modifier to be applied to the root component
- * @param isSignInScreen True for SignIn screen, false for SignUp screen
- * @param onNavigateToOppositeScreen Callback to navigate to the opposite auth screen
- * @param onContinueAsGuest Callback when guest button is clicked (only for SignIn)
- * @param guestButtonEnabled Whether the guest button is enabled
- */
 @Composable
 fun AuthenticationScreenBottom(
     modifier: Modifier = Modifier,

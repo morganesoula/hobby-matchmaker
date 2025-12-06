@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.error_issue_retry
+import com.msoula.hobbymatchmaker.core.design.models.EmptyStateConfig
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.util.RetryPolicy
 import com.msoula.hobbymatchmaker.core.design.util.UIErrorHint
@@ -107,10 +108,4 @@ fun EmptyStateScreen(config: EmptyStateConfig) {
     }
 }
 
-data class EmptyStateConfig(
-    val icon: ImageVector,
-    val title: UIText,
-    val description: UIText? = null,
-    val ctaText: UIText? = null,
-    val ctaAction: (() -> Unit)? = null
-)
+

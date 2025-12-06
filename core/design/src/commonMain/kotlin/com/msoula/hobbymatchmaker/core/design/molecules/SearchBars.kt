@@ -29,7 +29,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
-import com.msoula.hobbymatchmaker.core.design.organisms.ProfileSocialMembers
+import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMembers
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_main_add_people_form_field_hint
 import org.jetbrains.compose.resources.stringResource
@@ -108,5 +108,4 @@ fun PseudoSearchBar(
             }
         }
     }
-
 }

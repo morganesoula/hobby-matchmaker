@@ -11,10 +11,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -91,20 +89,6 @@ fun GenericCard(
             content()
         }
     }
-}
-
-@Composable
-fun ShimmerCircle(
-    modifier: Modifier = Modifier,
-    size: Dp = 96.dp,
-) {
-    val brush = rememberShimmerBrush()
-    Box(
-        modifier = modifier
-            .size(size)
-            .clip(CircleShape)
-            .background(brush)
-    )
 }
 
 @Composable

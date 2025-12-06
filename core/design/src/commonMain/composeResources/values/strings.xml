@@ -150,4 +150,17 @@
     <string name="edit_profile_add_interests_title">Ajoutez des intérêts</string>
     <string name="edit_profile_add_interests_description">Astuce: Séparez vos intérêts par des virgules pour en ajouter plusieurs à la fois</string>
     <string name="edit_profile_add_interests_hint">Ex: Randonnée, Jeux vidéos...</string>
+
+    // SOCIAL
+    <string name="social_received_requests_description">Retrouvez ici les personnes qui souhaitent vous ajouter à leur cercle social. En acceptant leur requête, vous serez notifiés lorsque vous aimez tous les deux le même film.</string>
+    <string name="social_received_requests_title">Demandes reçues</string>
+    <string name="social_received_requests_time">Il y a</string>
+    <string name="social_received_requests_common_movie">en commun</string>
+    <string name="social_received_requests_accept_button_text">Accepter</string>
+    <string name="social_received_requests_decline_button_text">Refuser</string>
+    <string name="social_sent_requests_title">Demandes envoyées</string>
+    <string name="social_sent_requests_cancel_invitation_text">Annuler l'invitation</string>
+    <string name="social_sent_requests_status_pending">En attente</string>
+    <string name="social_sent_requests_status_accepted">Acceptée</string>
+    <string name="social_sent_requests_status_declined">Refusée</string>
 </resources>

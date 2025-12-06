@@ -62,14 +62,5 @@ fun ProfileLoadingScreen(modifier: Modifier = Modifier) {
             .fillMaxSize()
     ) {
         LoadingCircularProgress()
-        /* ShimmerCircle(modifier = modifier.size(96.dp).align(Alignment.CenterHorizontally))
-        Spacer(modifier.height(12.dp))
-        ShimmerRectangle(
-            widthFraction = 0.5f,
-            height = 20.dp,
-            modifier = modifier.align(Alignment.CenterHorizontally)
-        )
-        Spacer(modifier.height(24.dp))
-        ShimmerCard(height = 120.dp) */
     }
 }

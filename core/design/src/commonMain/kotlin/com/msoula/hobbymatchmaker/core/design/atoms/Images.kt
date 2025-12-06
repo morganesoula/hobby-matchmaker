@@ -150,11 +150,12 @@ fun CircleWithDefaultIcon(
     backgroundColor: Color,
     icon: ImageVector,
     iconTint: Color,
+    size: Dp? = null,
     contentDescription: String? = null
 ) {
     Box(
         modifier = modifier
-            .size(CustomSize.NinetySix)
+            .size(size ?: CustomSize.NinetySix)
             .background(
                 color = backgroundColor,
                 shape = CircleShape

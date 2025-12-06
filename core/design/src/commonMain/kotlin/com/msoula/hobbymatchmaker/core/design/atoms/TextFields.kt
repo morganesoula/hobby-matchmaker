@@ -1,6 +1,5 @@
 package com.msoula.hobbymatchmaker.core.design.atoms
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -34,8 +33,7 @@ fun PrimaryTextField(
     label: String? = null,
     keyboardOptions: KeyboardOptions? = null,
     keyboardActions: KeyboardActions? = null,
-    showSupportingText: Boolean = false,
-    contentPadding: PaddingValues? = null
+    showSupportingText: Boolean = false
 ) {
     val maxChar = 120
 

@@ -58,7 +58,6 @@ fun ActorSection(
                     )
                 }
             }
-
         }
     }
 }
