@@ -3,7 +3,6 @@ package com.msoula.hobbymatchmaker.core.design.templates
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
-import kotlin.math.log
 
 @Composable
 fun EditableProfileLayout(

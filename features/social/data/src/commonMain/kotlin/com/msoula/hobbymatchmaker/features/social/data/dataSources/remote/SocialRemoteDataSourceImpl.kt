@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.features.social.data.dataSources.remote
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.safeFirebaseCall
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialInviteDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel
@@ -10,7 +11,6 @@ import com.msoula.hobbymatchmaker.features.social.domain.models.SocialUserSummar
 import dev.gitlive.firebase.firestore.Direction
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
-import com.msoula.hobbymatchmaker.core.common.Logger
 
 class SocialRemoteDataSourceImpl(
     private val firestore: FirebaseFirestore

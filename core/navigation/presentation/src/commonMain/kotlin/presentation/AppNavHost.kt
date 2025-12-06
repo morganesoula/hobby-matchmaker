@@ -11,6 +11,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
+import com.msoula.hobbymatchmaker.core.design.models.TabItem
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SignInScreenContent
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SignInViewModel
@@ -189,12 +190,20 @@ fun AppNavHost(
         }
 
         composable<Social> {
+            val socialTabs = listOf(
+                Destination.RECEIVED,
+                Destination.SENT
+            ).map { destination ->
+                TabItem(
+                    label = destination.label,
+                    icon = destination.icon,
+                    contentDescription = destination.contentDescription
+                )
+            }
+
             SocialContent(
                 socialViewModel = socialViewModel,
-                destinations = listOf(
-                    Destination.RECEIVED,
-                    Destination.SENT
-                ),
+                tabs = socialTabs,
                 onNavigate = { route ->
                     when (route) {
                         "movies" -> {

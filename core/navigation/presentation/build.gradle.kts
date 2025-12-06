@@ -8,6 +8,7 @@ kotlin {
             // Module
             implementation(project(Modules.AUTHENTICATION_DOMAIN))
             implementation(project(Modules.COMMON))
+            implementation(project(Modules.DESIGN))
             implementation(project(Modules.LOGIN_PRESENTATION))
             implementation(project(Modules.MOVIE_PRESENTATION))
             implementation(project(Modules.MOVIE_DETAIL_PRESENTATION))
