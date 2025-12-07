@@ -23,12 +23,12 @@ import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
-import com.msoula.hobbymatchmaker.core.design.models.EmptyStateConfig
 import com.msoula.hobbymatchmaker.core.design.atoms.EmptyStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.MovieListLoadingScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.StateContainer
 import com.msoula.hobbymatchmaker.core.design.atoms.asStringSuspend
+import com.msoula.hobbymatchmaker.core.design.models.EmptyStateConfig
 import com.msoula.hobbymatchmaker.core.design.molecules.NavigationTopBar
 import com.msoula.hobbymatchmaker.core.design.no_data
 import com.msoula.hobbymatchmaker.core.design.not_found

@@ -38,6 +38,7 @@ import com.msoula.hobbymatchmaker.core.design.icons.Film
 import com.msoula.hobbymatchmaker.core.design.icons.Person
 import com.msoula.hobbymatchmaker.core.design.icons.Sparkle
 import com.msoula.hobbymatchmaker.core.design.log_out
+import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMembers
 import com.msoula.hobbymatchmaker.core.design.molecules.BackNavigationTopBar
 import com.msoula.hobbymatchmaker.core.design.molecules.EditProfileTopBar
 import com.msoula.hobbymatchmaker.core.design.molecules.FeatureProfileCard
@@ -50,7 +51,6 @@ import com.msoula.hobbymatchmaker.core.design.organisms.ProfileEditInformationFo
 import com.msoula.hobbymatchmaker.core.design.organisms.ProfileEditInterestsForm
 import com.msoula.hobbymatchmaker.core.design.organisms.ProfileEditProfilePicture
 import com.msoula.hobbymatchmaker.core.design.organisms.ProfileInterestsSection
-import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMembers
 import com.msoula.hobbymatchmaker.core.design.organisms.ProfileSocialSection
 import com.msoula.hobbymatchmaker.core.design.organisms.ProfileStatsSection
 import com.msoula.hobbymatchmaker.core.design.templates.CompleteProfileLayout

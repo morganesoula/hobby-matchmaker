@@ -203,17 +203,7 @@ fun AppNavHost(
 
             SocialContent(
                 socialViewModel = socialViewModel,
-                tabs = socialTabs,
-                onNavigate = { route ->
-                    when (route) {
-                        "movies" -> {
-                            nav.navigate(Movies) {
-                                popUpTo<Social> { inclusive = true }
-                                launchSingleTop = true
-                            }
-                        }
-                    }
-                }
+                tabs = socialTabs
             )
         }
     }

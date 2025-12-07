@@ -37,10 +37,11 @@ class SocialViewModel(
     private val _searchResults = MutableStateFlow<List<SocialUserSummaryUiModel>>(emptyList())
     val searchResults = _searchResults.asStateFlow()
 
-    private val _sentInvites = MutableStateFlow(InviteUiModel())
+    private val _sentInvites: MutableStateFlow<List<InviteUiModel>> = MutableStateFlow(emptyList())
     val sentInvites = _sentInvites.asStateFlow()
 
-    private val _incomingInvites = MutableStateFlow(InviteUiModel())
+    private val _incomingInvites: MutableStateFlow<List<InviteUiModel>> =
+        MutableStateFlow(emptyList())
     val incomingInvites = _incomingInvites.asStateFlow()
 
     init {
@@ -75,6 +76,12 @@ class SocialViewModel(
                     inviteToSocialCircle(event.value)
                 }
             }
+
+            is SocialUiEventModel.OnAcceptInvitation -> {}
+
+            is SocialUiEventModel.OnDeclineInvitation -> {}
+
+            is SocialUiEventModel.OnCancelInvitation -> {}
         }
     }
 
