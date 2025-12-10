@@ -41,7 +41,7 @@ fun PseudoSearchBar(
     onSearch: (String) -> Unit,
     searchResults: List<ProfileSocialMembers>,
     modifier: Modifier = Modifier,
-    onPseudoSelected: (pseudo: String) -> Unit
+    onPseudoSelected: (pseudo: String, name: String?) -> Unit
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
 
@@ -99,7 +99,7 @@ fun PseudoSearchBar(
                             .clickable {
                                 textFieldState.edit { replace(0, length, result.pseudo) }
                                 expanded = false
-                                onPseudoSelected(result.pseudo)
+                                onPseudoSelected(result.pseudo, result.name)
                             }
                             .fillMaxWidth()
                             .wrapContentHeight()

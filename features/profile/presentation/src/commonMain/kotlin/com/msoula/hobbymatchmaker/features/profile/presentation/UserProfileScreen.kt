@@ -122,6 +122,7 @@ fun UserProfileContent(
                 is UiEvent.NavigateToRoute -> {
                     onNavigate(event.route)
                 }
+
                 is UiEvent.OnDataReady -> {
                     when (event.data) {
                         "profile_updated" -> profileViewModel.closeEdition()
@@ -285,9 +286,9 @@ fun UserProfileContent(
                                             avatarUrl = member.avatarUrl
                                         )
                                     },
-                                    onInviteToSocialCircle = {
+                                    onInviteToSocialCircle = { pseudo, name ->
                                         socialViewModel.onEvent(
-                                            SocialUiEventModel.OnInviteToSocialCircle(it)
+                                            SocialUiEventModel.OnInviteToSocialCircle(pseudo, name)
                                         )
                                     }
                                 )

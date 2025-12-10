@@ -4,10 +4,13 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.SocialLocalDataSource
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.SocialRemoteDataSource
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toInviteData
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toSocialInviteDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialInviteDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.repositories.SocialRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class SocialRepositoryImpl(
     private val socialLocalDataSource: SocialLocalDataSource,
@@ -22,18 +25,26 @@ class SocialRepositoryImpl(
     override fun observeSocialCircle(uid: String): Flow<List<SocialMemberDomainModel>> =
         socialLocalDataSource.observeSocialCircle()
 
-    override fun observeIncomingInvites(uid: String): Flow<List<SocialInviteDomainModel>> =
-        socialRemoteDataSource.observeIncomingInvites(uid)
+    override fun observeIncomingInvites(uid: String): Flow<List<SocialInviteDomainModel>> {
+        return socialRemoteDataSource.observeIncomingInvites(uid)
+            .map { list ->
+                list.map { invite -> invite.toSocialInviteDomainModel() }
+            }
+    }
 
-    override fun observeSentInvites(uid: String): Flow<List<SocialInviteDomainModel>> =
-        socialRemoteDataSource.observeSentInvited(uid)
 
-    override suspend fun sendInvite(fromUid: String, toPseudo: String) =
-        socialRemoteDataSource.sendInvite(fromUid, toPseudo)
+    override fun observeSentInvites(uid: String): Flow<List<SocialInviteDomainModel>> {
+        return socialRemoteDataSource.observeSentInvited(uid)
+            .map { list ->
+                list.map { invite -> invite.toSocialInviteDomainModel() }
+            }
+    }
 
-    // TODO Check here method called
+    override suspend fun sendInvite(invite: SocialInviteDomainModel) =
+        socialRemoteDataSource.sendInvite(invite.toInviteData())
+
     override suspend fun cancelInvite(inviteId: String): AppResult<Unit, AppError> =
-        socialRemoteDataSource.markInviteAsDeclined(inviteId)
+        socialRemoteDataSource.cancelInvitation(inviteId)
 
     override suspend fun acceptInvite(inviteId: String): AppResult<Unit, AppError> =
         socialRemoteDataSource.markInviteAsAccepted(inviteId)

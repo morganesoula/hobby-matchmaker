@@ -20,8 +20,8 @@ fun SocialLayout(
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues,
     tabs: List<TabItem>,
-    receivedContent: @Composable () -> Unit,
-    sentContent: @Composable () -> Unit
+    receivedContent: (@Composable () -> Unit)? = null,
+    sentContent: (@Composable () -> Unit)? = null
 ) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
 
@@ -49,8 +49,8 @@ fun SocialLayout(
         }
 
         when (selectedTabIndex) {
-            0 -> receivedContent()
-            1 -> sentContent()
+            0 -> receivedContent?.invoke()
+            1 -> sentContent?.invoke()
         }
     }
 }

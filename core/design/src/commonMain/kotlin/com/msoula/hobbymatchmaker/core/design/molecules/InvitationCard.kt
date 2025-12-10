@@ -33,35 +33,37 @@ import com.msoula.hobbymatchmaker.core.design.social_received_requests_decline_b
 import com.msoula.hobbymatchmaker.core.design.social_received_requests_time
 import com.msoula.hobbymatchmaker.core.design.social_sent_requests_cancel_invitation_text
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
+import com.msoula.hobbymatchmaker.core.design.util.asInviteStatusText
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun SentInvitationCard(
-    modifier: Modifier = Modifier,
-    invitationId: Long,
+    invitationId: String,
     guestAvatarUrl: String,
     guestName: String,
     guestPseudo: String,
     inviteStatus: String,
     inviteTime: String,
-    onCancelInvitationClick: (invitationId: Long) -> Unit = {}
+    onCancelInvitationClick: (invitationId: String) -> Unit = {}
 ) {
-    val backgroundColorStatus = when (inviteStatus) {
-        "Pending" -> MaterialTheme.colorScheme.primary.copy(alpha = .15f)
-        "Declined" -> MaterialTheme.colorScheme.error.copy(alpha = .15f)
+    val status = inviteStatus.lowercase()
+
+    val backgroundColorStatus = when (status) {
+        "pending" -> MaterialTheme.colorScheme.primary.copy(alpha = .15f)
+        "declined" -> MaterialTheme.colorScheme.error.copy(alpha = .15f)
         else -> MaterialTheme.colorScheme.tertiary.copy(alpha = .15f)
     }
 
-    val textColorStatus = when (inviteStatus) {
-        "Pending" -> MaterialTheme.colorScheme.primary
-        "Declined" -> MaterialTheme.colorScheme.error
+    val textColorStatus = when (status) {
+        "pending" -> MaterialTheme.colorScheme.primary
+        "declined" -> MaterialTheme.colorScheme.error
         else -> MaterialTheme.colorScheme.tertiary
     }
 
-    val icon = when (inviteStatus) {
-        "Pending" -> Clock
-        "Declined" -> ChromeClose
+    val icon = when (status) {
+        "pending" -> Clock
+        "declined" -> ChromeClose
         else -> Check
     }
 
@@ -86,7 +88,10 @@ fun SentInvitationCard(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(text = guestName, style = MaterialTheme.typography.bodyMedium)
+                        Text(
+                            text = guestName.ifBlank { "@$guestPseudo" },
+                            style = MaterialTheme.typography.bodyLarge
+                        )
                         Row(
                             modifier = Modifier.border(
                                 1.dp,
@@ -109,8 +114,8 @@ fun SentInvitationCard(
                             )
 
                             Text(
-                                text = inviteStatus,
-                                style = MaterialTheme.typography.labelSmall,
+                                text = inviteStatus.asInviteStatusText(),
+                                style = MaterialTheme.typography.labelMedium,
                                 color = textColorStatus
                             )
                         }
@@ -120,15 +125,19 @@ fun SentInvitationCard(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(text = "@$guestPseudo", style = MaterialTheme.typography.bodySmall)
                         Text(
-                            text = stringResource(Res.string.social_received_requests_time) + " " + inviteTime
+                            text = if (guestName.isBlank()) "" else "@$guestPseudo",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            text = inviteTime,
+                            style = MaterialTheme.typography.labelSmall
                         )
                     }
                 }
             }
 
-            if (inviteStatus == "Pending") {
+            if (inviteStatus.lowercase() == "pending") {
                 SpacerHeight4()
                 Button(
                     onClick = { onCancelInvitationClick(invitationId) },
@@ -152,13 +161,13 @@ fun SentInvitationCard(
 @Composable
 fun ReceivedInvitationCard(
     modifier: Modifier = Modifier,
-    invitationId: Long,
+    invitationId: String,
     guestAvatarUrl: String,
     guestName: String,
     guestPseudo: String,
     inviteTime: String,
-    onAcceptInvitationClick: (invitationId: Long) -> Unit = {},
-    onDeclineInvitationClick: (invitationId: Long) -> Unit = {}
+    onAcceptInvitationClick: (invitationId: String) -> Unit = {},
+    onDeclineInvitationClick: (invitationId: String) -> Unit = {}
 ) {
     GenericCard(
         containerColor = MaterialTheme.colorScheme.surfaceContainer
@@ -244,7 +253,7 @@ fun ReceivedInvitationCard(
 @Composable
 fun ReceivedInvitationCardPreview() {
     ReceivedInvitationCard(
-        invitationId = 1L,
+        invitationId = "",
         guestAvatarUrl = "",
         guestName = "Test received card",
         guestPseudo = "testCard",
@@ -256,7 +265,7 @@ fun ReceivedInvitationCardPreview() {
 @Composable
 fun SentInvitationCardPreview() {
     SentInvitationCard(
-        invitationId = 1L,
+        invitationId = "",
         guestAvatarUrl = "",
         guestName = "Test name",
         guestPseudo = "pseudo",

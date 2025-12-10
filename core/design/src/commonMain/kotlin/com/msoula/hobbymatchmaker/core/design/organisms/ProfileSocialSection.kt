@@ -55,11 +55,12 @@ fun ProfileSocialSection(
     socialMembers: List<ProfileSocialMembers>?,
     onSearchPeople: (pseudo: String) -> Unit,
     searchResult: List<ProfileSocialMembers> = emptyList(),
-    onInviteToSocialCircle: (pseudo: String) -> Unit
+    onInviteToSocialCircle: (pseudo: String, name: String?) -> Unit
 ) {
     val textFieldState = rememberTextFieldState()
     var displayAddPeopleForm by rememberSaveable { mutableStateOf(false) }
     var pseudoSelectedTmp by remember { mutableStateOf("") }
+    var associatedNameTmp by remember { mutableStateOf("") }
 
     GenericCard(
         modifier = Modifier
@@ -149,8 +150,9 @@ fun ProfileSocialSection(
                             textFieldState = textFieldState,
                             onSearch = onSearchPeople,
                             searchResults = searchResult,
-                            onPseudoSelected = { pseudo ->
+                            onPseudoSelected = { pseudo, name ->
                                 pseudoSelectedTmp = pseudo
+                                associatedNameTmp = name ?: ""
                             }
                         )
 
@@ -160,7 +162,7 @@ fun ProfileSocialSection(
                             Button(
                                 onClick = {
                                     displayAddPeopleForm = false
-                                    onInviteToSocialCircle(pseudoSelectedTmp)
+                                    onInviteToSocialCircle(pseudoSelectedTmp, associatedNameTmp)
                                 },
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(CustomSize.Sixteen)
@@ -241,6 +243,6 @@ fun ProfileSocialSectionPreview() {
     ProfileSocialSection(
         socialMembers = emptyList(),
         onSearchPeople = {},
-        onInviteToSocialCircle = {}
+        onInviteToSocialCircle = { _, _ -> }
     )
 }

@@ -4,17 +4,22 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.safeFirebaseCall
-import com.msoula.hobbymatchmaker.features.social.domain.models.SocialInviteDomainModel
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.Invite
+import com.msoula.hobbymatchmaker.features.social.domain.models.InviteStatus
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel.Companion.DEFAULT_AVATAR_URL
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialUserSummaryDomainModel
 import dev.gitlive.firebase.firestore.Direction
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 class SocialRemoteDataSourceImpl(
     private val firestore: FirebaseFirestore
 ) : SocialRemoteDataSource {
+
     override suspend fun searchUsersByPseudo(
         pseudo: String,
         ownerUid: String?
@@ -69,17 +74,52 @@ class SocialRemoteDataSourceImpl(
             }
         }
 
-    override suspend fun sendInvite(fromUid: String, toUid: String): AppResult<Unit, AppError> {
+    @OptIn(ExperimentalTime::class)
+    override suspend fun sendInvite(invite: Invite): AppResult<Unit, AppError> =
+        safeFirebaseCall {
+            firestore.collection("socialInvites").document.set(
+                mapOf(
+                    "fromUid" to invite.fromUid,
+                    "toPseudo" to invite.toPseudo,
+                    "name" to invite.name,
+                    "status" to invite.status,
+                    "createdAt" to invite.createdAt
+                ),
+                merge = true
+            )
+        }
+
+
+    override fun observeIncomingInvites(ownerUid: String): Flow<List<Invite>> {
         TODO("Not yet implemented")
     }
 
-    override fun observeIncomingInvites(ownerUid: String): Flow<List<SocialInviteDomainModel>> {
-        TODO("Not yet implemented")
-    }
+    @OptIn(ExperimentalTime::class)
+    override fun observeSentInvited(ownerUid: String): Flow<List<Invite>> =
+        firestore
+            .collection("socialInvites")
+            .where { "fromUid" equalTo ownerUid }
+            .snapshots
+            .map { querySnapshot ->
+                querySnapshot.documents.mapNotNull { document ->
+                    val fromUid = document.get<String?>("fromUid") ?: return@mapNotNull null
+                    val toPseudo = document.get<String?>("toPseudo") ?: return@mapNotNull null
+                    val name = document.get<String?>("name") ?: return@mapNotNull null
+                    val status = document.get<InviteStatus?>("status") ?: InviteStatus.PENDING
+                    val createdAtStr = document.get<String?>("createdAt") ?: return@mapNotNull null
+                    val updatedAtStr = document.get<String?>("updatedAt")
 
-    override fun observeSentInvited(ownerUid: String): Flow<List<SocialInviteDomainModel>> {
-        TODO("Not yet implemented")
-    }
+                    Invite(
+                        inviteId = document.id,
+                        fromUid = fromUid,
+                        toPseudo = toPseudo,
+                        name = name,
+                        status = status,
+                        createdAt = Instant.parse(createdAtStr),
+                        updatedAt = updatedAtStr?.let { Instant.parse(it) }
+                    )
+                }
+            }
 
     override suspend fun markInviteAsAccepted(inviteId: String): AppResult<Unit, AppError> {
         TODO("Not yet implemented")
@@ -88,6 +128,14 @@ class SocialRemoteDataSourceImpl(
     override suspend fun markInviteAsDeclined(inviteId: String): AppResult<Unit, AppError> {
         TODO("Not yet implemented")
     }
+
+    override suspend fun cancelInvitation(inviteId: String): AppResult<Unit, AppError> =
+        safeFirebaseCall {
+            firestore
+                .collection("socialInvites")
+                .document(inviteId)
+                .delete()
+        }
 
     override suspend fun addToSocialCircle(
         ownerUid: String,

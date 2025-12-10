@@ -1,9 +1,10 @@
-package com.msoula.hobbymatchmaker.features.social.domain.models
+package com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models
 
+import com.msoula.hobbymatchmaker.features.social.domain.models.InviteStatus
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
-data class SocialInviteDomainModel @OptIn(ExperimentalTime::class) constructor(
+data class Invite @OptIn(ExperimentalTime::class) constructor(
     val inviteId: String,
     val fromUid: String,
     val toPseudo: String,

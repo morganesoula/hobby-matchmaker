@@ -2,7 +2,7 @@ package com.msoula.hobbymatchmaker.core.design.models
 
 data class Invitation(
     val ownerId: String,
-    val invitationId: Long,
+    val invitationId: String,
     val invitationGuestName: String,
     val invitationGuestPseudo: String,
     val invitationGuestAvatarUrl: String,

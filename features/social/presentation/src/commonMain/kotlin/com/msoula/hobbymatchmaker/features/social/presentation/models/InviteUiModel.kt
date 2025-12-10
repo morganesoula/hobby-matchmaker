@@ -1,11 +1,13 @@
 package com.msoula.hobbymatchmaker.features.social.presentation.models
 
+import com.msoula.hobbymatchmaker.features.social.domain.models.InviteStatus
+
 data class InviteUiModel(
     val ownerId: String = "",
-    val inviteId: Long = 0L,
+    val inviteId: String = "",
     val guestName: String = "",
     val guestPseudo: String = "",
     val guestAvatarUrl: String = "",
-    val inviteTime: String = "",
-    val inviteStatus: String = ""
+    val inviteTime: Long = 0L,
+    val inviteStatus: InviteStatus = InviteStatus.PENDING
 )

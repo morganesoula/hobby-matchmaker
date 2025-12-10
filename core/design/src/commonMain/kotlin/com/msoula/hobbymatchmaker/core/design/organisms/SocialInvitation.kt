@@ -17,8 +17,8 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun ReceivedInvitationSection(
     receivedInvitation: List<Invitation>,
-    onAcceptInvitationClick: (invitationId: Long) -> Unit,
-    onDeclineInvitationClick: (invitationId: Long) -> Unit
+    onAcceptInvitationClick: (invitationId: String) -> Unit,
+    onDeclineInvitationClick: (invitationId: String) -> Unit
 ) {
     SpacerHeight4()
     TipTextField(
@@ -48,7 +48,7 @@ fun ReceivedInvitationSection(
 @Composable
 fun SentInvitationSection(
     sentInvitation: List<Invitation>,
-    onCancelInvitationClick: (invitationId: Long) -> Unit
+    onCancelInvitationClick: (invitationId: String) -> Unit
 ) {
     if (sentInvitation.isNotEmpty()) {
         LazyColumn {

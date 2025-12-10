@@ -163,4 +163,6 @@
     <string name="social_sent_requests_status_pending">Pending</string>
     <string name="social_sent_requests_status_accepted">Accepted</string>
     <string name="social_sent_requests_status_declined">Declined</string>
+    <string name="social_sent_requests_no_data_title">Oh no, you haven't invited anyone yet...</string>
+    <string name="social_sent_requests_no_data_description">Good news: add people from your profile to enjoy the full experience!</string>
 </resources>

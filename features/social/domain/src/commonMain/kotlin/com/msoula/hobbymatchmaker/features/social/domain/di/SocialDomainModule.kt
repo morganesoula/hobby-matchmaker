@@ -1,7 +1,7 @@
 package com.msoula.hobbymatchmaker.features.social.domain.di
 
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.AcceptInviteUseCase
-import com.msoula.hobbymatchmaker.features.social.domain.useCases.CancelInviteUseCase
+import com.msoula.hobbymatchmaker.features.social.domain.useCases.CancelInvitationUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.DeclineInviteUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.ObserveIncomingInvitesUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.ObserveSentInvitesUseCase
@@ -15,7 +15,7 @@ import org.koin.dsl.module
 val featuresModuleSocialDomain = module {
     factoryOf(::SearchUsersByPseudoUseCase)
     factoryOf(::AcceptInviteUseCase)
-    factoryOf(::CancelInviteUseCase)
+    factoryOf(::CancelInvitationUseCase)
     factoryOf(::DeclineInviteUseCase)
     factoryOf(::ObserveIncomingInvitesUseCase)
     factoryOf(::ObserveSentInvitesUseCase)
