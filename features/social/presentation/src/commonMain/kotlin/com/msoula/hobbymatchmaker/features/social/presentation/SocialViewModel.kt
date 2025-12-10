@@ -13,6 +13,7 @@ import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.core.session.domain.models.SessionState
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveSessionStateUseCase
+import com.msoula.hobbymatchmaker.features.social.domain.useCases.ObserveIncomingInvitesSuccess
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.ObserveSentInvitesSuccess
 import com.msoula.hobbymatchmaker.features.social.presentation.interactors.SocialInteractor
 import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toInviteUiModel
@@ -57,6 +58,7 @@ class SocialViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
     internal fun observeSessionAndInvites() {
+        // Invitations envoyées
         scope.launch {
             observeSessionStateUseCase()
                 .flatMapLatest { state ->
@@ -85,6 +87,45 @@ class SocialViewModel(
                                 when (val data = result.data) {
                                     is ObserveSentInvitesSuccess.Empty -> UiState.Empty
                                     is ObserveSentInvitesSuccess.Success -> UiState.Success(
+                                        data.invites.map { invite -> invite.toInviteUiModel() }
+                                    )
+                                }
+                            }
+
+                            is AppResult.Failure -> UiState.Error(
+                                defaultMessageMapper.toUIText(result.error)
+                            )
+                        }
+                    }
+                }
+        }
+
+        // Invitations reçues
+        scope.launch {
+            observeSessionStateUseCase()
+                .flatMapLatest { state ->
+                    when (state) {
+                        is SessionState.Authenticated -> {
+                            interactor.observeIncomingInvites(state.uid)
+                        }
+
+                        is SessionState.Guest -> {
+                            flowOf(AppResult.Success(ObserveIncomingInvitesSuccess.Empty))
+                        }
+
+                        null -> {
+                            flowOf(AppResult.Success(ObserveIncomingInvitesSuccess.Empty))
+                        }
+                    }
+                }
+                .collect { result ->
+                    _incomingInvites.update {
+                        when (result) {
+                            is AppResult.Success -> {
+                                Logger.d("Updating incomingInvites with: ${result.data}")
+                                when (val data = result.data) {
+                                    is ObserveIncomingInvitesSuccess.Empty -> UiState.Empty
+                                    is ObserveIncomingInvitesSuccess.Success -> UiState.Success(
                                         data.invites.map { invite -> invite.toInviteUiModel() }
                                     )
                                 }

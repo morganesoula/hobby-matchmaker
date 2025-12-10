@@ -25,8 +25,8 @@ class SocialRepositoryImpl(
     override fun observeSocialCircle(uid: String): Flow<List<SocialMemberDomainModel>> =
         socialLocalDataSource.observeSocialCircle()
 
-    override fun observeIncomingInvites(uid: String): Flow<List<SocialInviteDomainModel>> {
-        return socialRemoteDataSource.observeIncomingInvites(uid)
+    override fun observeIncomingInvites(ownerUid: String): Flow<List<SocialInviteDomainModel>> {
+        return socialRemoteDataSource.observeIncomingInvites(ownerUid)
             .map { list ->
                 list.map { invite -> invite.toSocialInviteDomainModel() }
             }

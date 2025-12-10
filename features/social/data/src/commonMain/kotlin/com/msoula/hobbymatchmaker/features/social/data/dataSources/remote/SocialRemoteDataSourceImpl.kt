@@ -11,7 +11,10 @@ import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDoma
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialUserSummaryDomainModel
 import dev.gitlive.firebase.firestore.Direction
 import dev.gitlive.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -90,9 +93,49 @@ class SocialRemoteDataSourceImpl(
         }
 
 
-    override fun observeIncomingInvites(ownerUid: String): Flow<List<Invite>> {
-        TODO("Not yet implemented")
-    }
+    @OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
+    override fun observeIncomingInvites(ownerUid: String): Flow<List<Invite>> =
+        firestore
+            .collection("users")
+            .document(ownerUid)
+            .snapshots
+            .flatMapLatest { userSnapshot ->
+                val pseudo = userSnapshot.get<String?>("information.pseudo")
+
+                if (pseudo == null) {
+                    Logger.d("SocialRemoteDataSource: User pseudo not found for uid: $ownerUid")
+                    return@flatMapLatest flowOf(emptyList())
+                }
+
+                firestore
+                    .collection("socialInvites")
+                    .where { "toPseudo" equalTo pseudo }
+                    .snapshots
+                    .map { querySnapshot ->
+                        querySnapshot.documents.mapNotNull { document ->
+                            val fromUid =
+                                document.get<String?>("fromUid") ?: return@mapNotNull null
+                            val toPseudo =
+                                document.get<String?>("toPseudo") ?: return@mapNotNull null
+                            val name = document.get<String?>("name") ?: return@mapNotNull null
+                            val status =
+                                document.get<InviteStatus?>("status") ?: InviteStatus.PENDING
+                            val createdAtStr =
+                                document.get<String?>("createdAt") ?: return@mapNotNull null
+                            val updatedAtStr = document.get<String?>("updatedAt")
+
+                            Invite(
+                                inviteId = document.id,
+                                fromUid = fromUid,
+                                toPseudo = toPseudo,
+                                name = name,
+                                status = status,
+                                createdAt = Instant.parse(createdAtStr),
+                                updatedAt = updatedAtStr?.let { Instant.parse(it) }
+                            )
+                        }
+                    }
+            }
 
     @OptIn(ExperimentalTime::class)
     override fun observeSentInvited(ownerUid: String): Flow<List<Invite>> =
@@ -102,11 +145,15 @@ class SocialRemoteDataSourceImpl(
             .snapshots
             .map { querySnapshot ->
                 querySnapshot.documents.mapNotNull { document ->
-                    val fromUid = document.get<String?>("fromUid") ?: return@mapNotNull null
-                    val toPseudo = document.get<String?>("toPseudo") ?: return@mapNotNull null
+                    val fromUid =
+                        document.get<String?>("fromUid") ?: return@mapNotNull null
+                    val toPseudo =
+                        document.get<String?>("toPseudo") ?: return@mapNotNull null
                     val name = document.get<String?>("name") ?: return@mapNotNull null
-                    val status = document.get<InviteStatus?>("status") ?: InviteStatus.PENDING
-                    val createdAtStr = document.get<String?>("createdAt") ?: return@mapNotNull null
+                    val status =
+                        document.get<InviteStatus?>("status") ?: InviteStatus.PENDING
+                    val createdAtStr =
+                        document.get<String?>("createdAt") ?: return@mapNotNull null
                     val updatedAtStr = document.get<String?>("updatedAt")
 
                     Invite(
