@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.CircleWithDefaultIcon
 import com.msoula.hobbymatchmaker.core.design.atoms.GenericCard
+import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight4
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWidth4
 import com.msoula.hobbymatchmaker.core.design.icons.Check
@@ -30,7 +31,6 @@ import com.msoula.hobbymatchmaker.core.design.icons.Sparkle
 import com.msoula.hobbymatchmaker.core.design.icons.Trash
 import com.msoula.hobbymatchmaker.core.design.social_received_requests_accept_button_text
 import com.msoula.hobbymatchmaker.core.design.social_received_requests_decline_button_text
-import com.msoula.hobbymatchmaker.core.design.social_received_requests_time
 import com.msoula.hobbymatchmaker.core.design.social_sent_requests_cancel_invitation_text
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.util.asInviteStatusText
@@ -39,6 +39,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun SentInvitationCard(
+    modifier: Modifier = Modifier,
     invitationId: String,
     guestAvatarUrl: String,
     guestName: String,
@@ -68,6 +69,7 @@ fun SentInvitationCard(
     }
 
     GenericCard(
+        modifier = modifier.padding(start = CustomSize.Eight, end = CustomSize.Eight),
         containerColor = MaterialTheme.colorScheme.surfaceContainer
     ) {
         Column {
@@ -115,14 +117,17 @@ fun SentInvitationCard(
 
                             Text(
                                 text = inviteStatus.asInviteStatusText(),
-                                style = MaterialTheme.typography.labelMedium,
+                                style = MaterialTheme.typography.bodyMedium,
                                 color = textColorStatus
                             )
                         }
                     }
 
+                    SpacerHeight4()
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
@@ -131,27 +136,32 @@ fun SentInvitationCard(
                         )
                         Text(
                             text = inviteTime,
-                            style = MaterialTheme.typography.labelSmall
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(end = CustomSize.Four)
                         )
                     }
                 }
             }
 
             if (inviteStatus.lowercase() == "pending") {
-                SpacerHeight4()
+                SpacerHeight16()
                 Button(
                     onClick = { onCancelInvitationClick(invitationId) },
                     shape = RoundedCornerShape(CustomSize.Eight),
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
-                    Icon(
-                        imageVector = Trash,
-                        contentDescription = ""
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Trash,
+                            contentDescription = ""
+                        )
 
-                    SpacerWidth4()
+                        SpacerWidth4()
 
-                    Text(text = stringResource(Res.string.social_sent_requests_cancel_invitation_text))
+                        Text(text = stringResource(Res.string.social_sent_requests_cancel_invitation_text))
+                    }
                 }
             }
         }
@@ -162,14 +172,16 @@ fun SentInvitationCard(
 fun ReceivedInvitationCard(
     modifier: Modifier = Modifier,
     invitationId: String,
+    guestUid: String,
     guestAvatarUrl: String,
     guestName: String,
     guestPseudo: String,
     inviteTime: String,
-    onAcceptInvitationClick: (invitationId: String) -> Unit = {},
+    onAcceptInvitationClick: (invitationId: String, guestUid: String) -> Unit = { _, _ -> },
     onDeclineInvitationClick: (invitationId: String) -> Unit = {}
 ) {
     GenericCard(
+        modifier = modifier.padding(start = CustomSize.Eight, end = CustomSize.Eight),
         containerColor = MaterialTheme.colorScheme.surfaceContainer
     ) {
         Column {
@@ -190,26 +202,29 @@ fun ReceivedInvitationCard(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(text = guestName, style = MaterialTheme.typography.bodyMedium)
-                        Text(
-                            text = stringResource(Res.string.social_received_requests_time) + " " + inviteTime
-                        )
+                        Text(text = guestName, style = MaterialTheme.typography.bodyLarge)
+                        Text(text = inviteTime, style = MaterialTheme.typography.bodyMedium)
                     }
 
-                    Text(text = "@$guestPseudo", style = MaterialTheme.typography.bodySmall)
+                    Text(text = "@$guestPseudo", style = MaterialTheme.typography.bodyMedium)
                 }
             }
 
+            SpacerHeight16()
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                horizontalArrangement = Arrangement.spacedBy(CustomSize.Eight)
             ) {
                 Button(
-                    onClick = { onAcceptInvitationClick(invitationId) },
+                    onClick = { onAcceptInvitationClick(invitationId, guestUid) },
+                    modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(CustomSize.Eight),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Row {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Icon(
                             imageVector = Check,
                             contentDescription = "Accept",
@@ -225,13 +240,16 @@ fun ReceivedInvitationCard(
 
                 Button(
                     onClick = { onDeclineInvitationClick(invitationId) },
+                    modifier = Modifier.weight(1f),
                     border = BorderStroke(
                         1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = .8f)
                     ),
                     shape = RoundedCornerShape(CustomSize.Eight),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
-                    Row {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Icon(
                             imageVector = ChromeClose,
                             contentDescription = "Decline",
@@ -254,6 +272,7 @@ fun ReceivedInvitationCard(
 fun ReceivedInvitationCardPreview() {
     ReceivedInvitationCard(
         invitationId = "",
+        guestUid = "123",
         guestAvatarUrl = "",
         guestName = "Test received card",
         guestPseudo = "testCard",

@@ -7,6 +7,7 @@ import com.msoula.hobbymatchmaker.core.database.services.SocialMemberDAO
 import com.msoula.hobbymatchmaker.core.session.data.dataSources.local.SessionLocalDataSource
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel.Companion.DEFAULT_AVATAR_URL
+import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel.Companion.DEFAULT_COMMON_MOVIES_COUNT
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel.Companion.DEFAULT_NAME
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel.Companion.DEFAULT_PSEUDO
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -33,7 +34,8 @@ class SocialLocalDataSourceImpl(
                                 uid = entity.memberUid,
                                 pseudo = entity.memberPseudo ?: DEFAULT_PSEUDO,
                                 name = entity.memberName ?: DEFAULT_NAME,
-                                avatarUrl = entity.memberAvatarUrl ?: DEFAULT_AVATAR_URL
+                                avatarUrl = entity.memberAvatarUrl ?: DEFAULT_AVATAR_URL,
+                                commonMoviesCount = DEFAULT_COMMON_MOVIES_COUNT
                             )
                         }
                     }

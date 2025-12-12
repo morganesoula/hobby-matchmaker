@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
@@ -31,7 +32,9 @@ import org.jetbrains.compose.resources.stringResource
 fun TipTextField(
     modifier: Modifier = Modifier,
     hintText: String,
-    icon: ImageVector
+    icon: ImageVector,
+    iconColor: Color? = null,
+    textColor: Color? = null
 ) {
     Row(
         modifier = modifier
@@ -54,11 +57,11 @@ fun TipTextField(
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.padding(start = CustomSize.Sixteen).size(IconSize.Sixteen),
-            tint = MaterialTheme.colorScheme.primary
+            tint = iconColor ?: MaterialTheme.colorScheme.primary
         )
         Text(
             text = hintText,
-            color = MaterialTheme.colorScheme.primary,
+            color = textColor ?: MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(
                 vertical = CustomSize.Sixteen,
                 horizontal = CustomSize.Sixteen

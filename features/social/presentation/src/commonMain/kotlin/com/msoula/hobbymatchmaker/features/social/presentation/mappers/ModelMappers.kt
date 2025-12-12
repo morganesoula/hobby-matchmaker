@@ -13,16 +13,28 @@ fun SocialMemberDomainModel.toSocialSummaryUiModel(): SocialUserSummaryUiModel =
         uid = this.uid,
         name = this.name,
         pseudo = this.pseudo,
-        avatarUrl = this.avatarUrl
+        avatarUrl = this.avatarUrl,
+        commonMoviesCount = this.commonMoviesCount
+    )
+
+fun SocialUserSummaryUiModel.toSocialMemberDomainModel(): SocialMemberDomainModel =
+    SocialMemberDomainModel(
+        uid = this.uid,
+        pseudo = this.pseudo,
+        name = this.name,
+        avatarUrl = this.avatarUrl,
+        commonMoviesCount = this.commonMoviesCount
     )
 
 @OptIn(ExperimentalTime::class)
 fun SocialInviteDomainModel.toInviteUiModel(): InviteUiModel =
     InviteUiModel(
         ownerId = this.fromUid,
+        ownerPseudo = this.toPseudo,
         inviteId = this.inviteId,
+        guestUid = this.fromUid,
         guestName = this.name ?: "",
-        guestPseudo = this.toPseudo,
+        guestPseudo = this.fromPseudo,
         guestAvatarUrl = "",
         inviteTime = this.createdAt.epochSeconds,
         inviteStatus = this.status
@@ -33,6 +45,7 @@ fun InviteUiModel.toInvitation(): Invitation =
     Invitation(
         ownerId = this.ownerId,
         invitationId = this.inviteId,
+        invitationGuestUid = this.guestUid,
         invitationGuestName = this.guestName,
         invitationGuestPseudo = this.guestPseudo,
         invitationGuestAvatarUrl = this.guestAvatarUrl,
@@ -40,6 +53,21 @@ fun InviteUiModel.toInvitation(): Invitation =
         invitationStatus = this.inviteStatus.name
     )
 
-fun List<InviteUiModel>.toListInvitation(): List<Invitation> {
+fun List<InviteUiModel>.toReceivedInvitations(): List<Invitation> {
     return map { it.toInvitation() }
+}
+
+fun List<InviteUiModel>.toSentInvitations(): List<Invitation> {
+    return map { invite ->
+        Invitation(
+            ownerId = invite.ownerId,
+            invitationId = invite.inviteId,
+            invitationGuestUid = invite.guestUid,
+            invitationGuestName = invite.guestName,
+            invitationGuestPseudo = invite.ownerPseudo,
+            invitationGuestAvatarUrl = invite.guestAvatarUrl,
+            invitationTime = invite.inviteTime.toTimeAgo(),
+            invitationStatus = invite.inviteStatus.name
+        )
+    }
 }

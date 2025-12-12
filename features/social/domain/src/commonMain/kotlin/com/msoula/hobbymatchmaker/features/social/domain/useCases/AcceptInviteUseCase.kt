@@ -5,5 +5,9 @@ import com.msoula.hobbymatchmaker.features.social.domain.repositories.SocialRepo
 class AcceptInviteUseCase(
     private val socialRepository: SocialRepository
 ) {
-    suspend operator fun invoke(inviteId: String) = socialRepository.acceptInvite(inviteId)
+    suspend operator fun invoke(
+        inviteId: String,
+        ownerUid: String,
+        guestUid: String
+    ) = socialRepository.acceptInvite(inviteId, ownerUid, guestUid)
 }

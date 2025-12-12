@@ -5,9 +5,11 @@ import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.safeFirebaseCall
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.Invite
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.SocialCircleMember
 import com.msoula.hobbymatchmaker.features.social.domain.models.InviteStatus
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel.Companion.DEFAULT_AVATAR_URL
+import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel.Companion.DEFAULT_COMMON_MOVIES_COUNT
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialUserSummaryDomainModel
 import dev.gitlive.firebase.firestore.Direction
 import dev.gitlive.firebase.firestore.FirebaseFirestore
@@ -67,15 +69,66 @@ class SocialRemoteDataSourceImpl(
                 }
                 .take(10)
 
+            //TODO Update DEFAULT_COMMON_MOVIES_COUNT?
             results.map { member ->
                 SocialMemberDomainModel(
                     uid = member.uid,
                     name = member.name,
                     pseudo = member.pseudo,
-                    avatarUrl = member.avatarUrl ?: DEFAULT_AVATAR_URL
+                    avatarUrl = member.avatarUrl ?: DEFAULT_AVATAR_URL,
+                    commonMoviesCount = DEFAULT_COMMON_MOVIES_COUNT
                 )
             }
         }
+
+    override suspend fun findUserByUid(uid: String): AppResult<SocialCircleMember, AppError> =
+        safeFirebaseCall {
+            val userDoc = firestore
+                .collection("users")
+                .document(uid)
+                .get()
+
+            if (!userDoc.exists) {
+                throw Exception("User not found with uid: $uid")
+            }
+
+            val pseudo = userDoc.get<String>("information.pseudo")
+            val name = userDoc.get<String?>("information.name")
+            val avatarUrl = userDoc.get<String?>("information.avatarUrl")
+
+            SocialCircleMember(
+                ownerUid = "",
+                uid = uid,
+                pseudo = pseudo,
+                name = name,
+                avatarUrl = avatarUrl,
+                commonMovieCount = DEFAULT_COMMON_MOVIES_COUNT
+            )
+        }
+
+    override fun observeSocialCircle(uid: String): Flow<List<SocialMemberDomainModel>> =
+        firestore
+            .collection("users")
+            .document(uid)
+            .collection("circle")
+            .snapshots
+            .map { querySnapshot ->
+                querySnapshot.documents.map { document ->
+                    val memberUid = document.id
+                    val memberPseudo = document.get<String>("memberPseudo")
+                    val memberName = document.get<String?>("username")
+                    val avatarUrl = document.get<String?>("avatarUrl")
+                    val commonMoviesCount = document.get<Int?>("commonMoviesCount")
+
+                    SocialMemberDomainModel(
+                        uid = memberUid,
+                        pseudo = memberPseudo,
+                        name = memberName,
+                        avatarUrl = avatarUrl ?: DEFAULT_AVATAR_URL,
+                        commonMoviesCount = commonMoviesCount ?: DEFAULT_COMMON_MOVIES_COUNT
+                    )
+                }
+            }
 
     @OptIn(ExperimentalTime::class)
     override suspend fun sendInvite(invite: Invite): AppResult<Unit, AppError> =
@@ -84,6 +137,7 @@ class SocialRemoteDataSourceImpl(
                 mapOf(
                     "fromUid" to invite.fromUid,
                     "toPseudo" to invite.toPseudo,
+                    "fromPseudo" to invite.fromPseudo,
                     "name" to invite.name,
                     "status" to invite.status,
                     "createdAt" to invite.createdAt
@@ -110,11 +164,14 @@ class SocialRemoteDataSourceImpl(
                 firestore
                     .collection("socialInvites")
                     .where { "toPseudo" equalTo pseudo }
+                    .where { "status" equalTo InviteStatus.PENDING }
                     .snapshots
                     .map { querySnapshot ->
                         querySnapshot.documents.mapNotNull { document ->
                             val fromUid =
                                 document.get<String?>("fromUid") ?: return@mapNotNull null
+                            val fromPseudo =
+                                document.get<String?>("fromPseudo") ?: return@mapNotNull null
                             val toPseudo =
                                 document.get<String?>("toPseudo") ?: return@mapNotNull null
                             val name = document.get<String?>("name") ?: return@mapNotNull null
@@ -127,6 +184,7 @@ class SocialRemoteDataSourceImpl(
                             Invite(
                                 inviteId = document.id,
                                 fromUid = fromUid,
+                                fromPseudo = fromPseudo,
                                 toPseudo = toPseudo,
                                 name = name,
                                 status = status,
@@ -147,6 +205,8 @@ class SocialRemoteDataSourceImpl(
                 querySnapshot.documents.mapNotNull { document ->
                     val fromUid =
                         document.get<String?>("fromUid") ?: return@mapNotNull null
+                    val fromPseudo =
+                        document.get<String?>("fromPseudo") ?: return@mapNotNull null
                     val toPseudo =
                         document.get<String?>("toPseudo") ?: return@mapNotNull null
                     val name = document.get<String?>("name") ?: return@mapNotNull null
@@ -159,6 +219,7 @@ class SocialRemoteDataSourceImpl(
                     Invite(
                         inviteId = document.id,
                         fromUid = fromUid,
+                        fromPseudo = fromPseudo,
                         toPseudo = toPseudo,
                         name = name,
                         status = status,
@@ -168,13 +229,21 @@ class SocialRemoteDataSourceImpl(
                 }
             }
 
-    override suspend fun markInviteAsAccepted(inviteId: String): AppResult<Unit, AppError> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun markInviteAsAccepted(inviteId: String): AppResult<Unit, AppError> =
+        safeFirebaseCall {
+            firestore
+                .collection("socialInvites")
+                .document(inviteId)
+                .update("status" to InviteStatus.ACCEPTED)
+        }
 
-    override suspend fun markInviteAsDeclined(inviteId: String): AppResult<Unit, AppError> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun markInviteAsDeclined(inviteId: String): AppResult<Unit, AppError> =
+        safeFirebaseCall {
+            firestore
+                .collection("socialInvites")
+                .document(inviteId)
+                .update("status" to InviteStatus.DECLINED)
+        }
 
     override suspend fun cancelInvitation(inviteId: String): AppResult<Unit, AppError> =
         safeFirebaseCall {
@@ -184,17 +253,34 @@ class SocialRemoteDataSourceImpl(
                 .delete()
         }
 
-    override suspend fun addToSocialCircle(
-        ownerUid: String,
-        memberUid: String
-    ): AppResult<Unit, AppError> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun addToSocialCircle(socialCircleMember: SocialCircleMember): AppResult<Unit, AppError> =
+        safeFirebaseCall {
+            firestore
+                .collection("users")
+                .document(socialCircleMember.ownerUid)
+                .collection("circle")
+                .document(socialCircleMember.uid)
+                .set(
+                    mapOf(
+                        "memberPseudo" to socialCircleMember.pseudo,
+                        "username" to socialCircleMember.name,
+                        "avatarUrl" to socialCircleMember.avatarUrl,
+                        "commonMoviesCount" to socialCircleMember.commonMovieCount
+                    ),
+                    merge = true
+                )
+        }
 
     override suspend fun removeFromSocialCircle(
         ownerUid: String,
         memberUid: String
-    ): AppResult<Unit, AppError> {
-        TODO("Not yet implemented")
-    }
+    ): AppResult<Unit, AppError> =
+        safeFirebaseCall {
+            firestore
+                .collection("users")
+                .document(ownerUid)
+                .collection("circle")
+                .document(memberUid)
+                .delete()
+        }
 }

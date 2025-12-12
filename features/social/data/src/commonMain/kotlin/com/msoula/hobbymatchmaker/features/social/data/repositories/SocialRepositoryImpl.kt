@@ -2,10 +2,15 @@ package com.msoula.hobbymatchmaker.features.social.data.repositories
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.core.common.mapSuccess
+import com.msoula.hobbymatchmaker.core.common.onFailure
+import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.SocialLocalDataSource
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.SocialRemoteDataSource
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toInviteData
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toSocialCircleMember
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toSocialInviteDomainModel
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toSocialMemberDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialInviteDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.repositories.SocialRepository
@@ -22,8 +27,14 @@ class SocialRepositoryImpl(
     ): AppResult<List<SocialMemberDomainModel>, AppError> =
         socialRemoteDataSource.searchUsersByPseudo(pseudo, ownerId)
 
+    override suspend fun findUserByUid(uid: String): AppResult<SocialMemberDomainModel?, AppError> =
+        socialRemoteDataSource.findUserByUid(uid).mapSuccess { member ->
+            member.toSocialMemberDomainModel()
+        }
+
     override fun observeSocialCircle(uid: String): Flow<List<SocialMemberDomainModel>> =
-        socialLocalDataSource.observeSocialCircle()
+        socialRemoteDataSource.observeSocialCircle(uid)
+    //return socialLocalDataSource.observeSocialCircle()
 
     override fun observeIncomingInvites(ownerUid: String): Flow<List<SocialInviteDomainModel>> {
         return socialRemoteDataSource.observeIncomingInvites(ownerUid)
@@ -31,7 +42,6 @@ class SocialRepositoryImpl(
                 list.map { invite -> invite.toSocialInviteDomainModel() }
             }
     }
-
 
     override fun observeSentInvites(uid: String): Flow<List<SocialInviteDomainModel>> {
         return socialRemoteDataSource.observeSentInvited(uid)
@@ -46,16 +56,38 @@ class SocialRepositoryImpl(
     override suspend fun cancelInvite(inviteId: String): AppResult<Unit, AppError> =
         socialRemoteDataSource.cancelInvitation(inviteId)
 
-    override suspend fun acceptInvite(inviteId: String): AppResult<Unit, AppError> =
-        socialRemoteDataSource.markInviteAsAccepted(inviteId)
+    override suspend fun acceptInvite(
+        inviteId: String,
+        ownerId: String,
+        guestUid: String
+    ): AppResult<Unit, AppError> {
+        findUserByUid(guestUid)
+            .onSuccess { member ->
+                member?.let {
+                    addMember(ownerId, member)
+                }
+            }
+            .onFailure { return AppResult.Failure(AppError.Domain.NotFound) }
+
+        return socialRemoteDataSource.markInviteAsAccepted(inviteId)
+    }
 
     override suspend fun declineInvite(inviteId: String): AppResult<Unit, AppError> =
         socialRemoteDataSource.markInviteAsDeclined(inviteId)
+
+    override suspend fun addMember(
+        ownerId: String,
+        socialMemberDomainModel: SocialMemberDomainModel
+    ): AppResult<Unit, AppError> =
+        socialRemoteDataSource.addToSocialCircle(
+            socialMemberDomainModel.toSocialCircleMember(
+                ownerId
+            )
+        )
 
     override suspend fun removeMember(
         ownerId: String,
         memberUid: String
     ): AppResult<Unit, AppError> =
         socialRemoteDataSource.removeFromSocialCircle(ownerId, memberUid)
-
 }

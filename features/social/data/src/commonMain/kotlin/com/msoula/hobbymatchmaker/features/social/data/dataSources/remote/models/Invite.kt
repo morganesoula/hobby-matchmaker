@@ -7,6 +7,7 @@ import kotlin.time.Instant
 data class Invite @OptIn(ExperimentalTime::class) constructor(
     val inviteId: String,
     val fromUid: String,
+    val fromPseudo: String,
     val toPseudo: String,
     val name: String?,
     val status: InviteStatus,

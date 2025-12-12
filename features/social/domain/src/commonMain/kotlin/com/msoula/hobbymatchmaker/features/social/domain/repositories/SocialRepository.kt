@@ -12,12 +12,25 @@ interface SocialRepository {
         ownerId: String?
     ): AppResult<List<SocialMemberDomainModel>, AppError>
 
+    suspend fun findUserByUid(
+        uid: String
+    ): AppResult<SocialMemberDomainModel?, AppError>
+
     fun observeSocialCircle(uid: String): Flow<List<SocialMemberDomainModel>>
     fun observeIncomingInvites(ownerUid: String): Flow<List<SocialInviteDomainModel>>
     fun observeSentInvites(uid: String): Flow<List<SocialInviteDomainModel>>
     suspend fun sendInvite(invite: SocialInviteDomainModel): AppResult<Unit, AppError>
     suspend fun cancelInvite(inviteId: String): AppResult<Unit, AppError>
-    suspend fun acceptInvite(inviteId: String): AppResult<Unit, AppError>
+    suspend fun acceptInvite(
+        inviteId: String,
+        ownerId: String,
+        guestUid: String
+    ): AppResult<Unit, AppError>
+
     suspend fun declineInvite(inviteId: String): AppResult<Unit, AppError>
     suspend fun removeMember(ownerId: String, memberUid: String): AppResult<Unit, AppError>
+    suspend fun addMember(
+        ownerId: String,
+        socialMemberDomainModel: SocialMemberDomainModel
+    ): AppResult<Unit, AppError>
 }

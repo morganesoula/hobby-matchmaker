@@ -22,7 +22,8 @@ import com.msoula.hobbymatchmaker.core.design.social_sent_requests_no_data_descr
 import com.msoula.hobbymatchmaker.core.design.social_sent_requests_no_data_title
 import com.msoula.hobbymatchmaker.core.design.templates.SocialLayout
 import com.msoula.hobbymatchmaker.core.design.util.UIText
-import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toListInvitation
+import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toReceivedInvitations
+import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toSentInvitations
 import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUiEventModel
 
 @Composable
@@ -60,11 +61,11 @@ fun SocialContent(
                     },
                     onSuccess = { invites ->
                         ReceivedInvitationSection(
-                            invites.toListInvitation(),
-                            onAcceptInvitationClick = { id ->
+                            invites.toReceivedInvitations(),
+                            onAcceptInvitationClick = { id, guestUid ->
                                 socialViewModel.onEvent(
                                     SocialUiEventModel.OnAcceptInvitation(
-                                        id
+                                        id, guestUid
                                     )
                                 )
                             },
@@ -101,7 +102,7 @@ fun SocialContent(
                     },
                     onSuccess = { invites ->
                         SentInvitationSection(
-                            invites.toListInvitation(),
+                            invites.toSentInvitations(),
                             onCancelInvitationClick = { id ->
                                 socialViewModel.onEvent(
                                     SocialUiEventModel.OnCancelInvitation(

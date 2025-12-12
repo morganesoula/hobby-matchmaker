@@ -58,7 +58,7 @@ class SocialViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
     internal fun observeSessionAndInvites() {
-        // Invitations envoyées
+        // Sent invitations
         scope.launch {
             observeSessionStateUseCase()
                 .flatMapLatest { state ->
@@ -100,7 +100,7 @@ class SocialViewModel(
                 }
         }
 
-        // Invitations reçues
+        // Received invitations
         scope.launch {
             observeSessionStateUseCase()
                 .flatMapLatest { state ->
@@ -154,9 +154,17 @@ class SocialViewModel(
                 }
             }
 
-            is SocialUiEventModel.OnAcceptInvitation -> {}
+            is SocialUiEventModel.OnAcceptInvitation -> {
+                scope.launch {
+                    acceptInvitation(event.inviteId, event.guestUid)
+                }
+            }
 
-            is SocialUiEventModel.OnDeclineInvitation -> {}
+            is SocialUiEventModel.OnDeclineInvitation -> {
+                scope.launch {
+                    declineInvitation(event.inviteId)
+                }
+            }
 
             is SocialUiEventModel.OnCancelInvitation -> {
                 scope.launch {
@@ -208,5 +216,38 @@ class SocialViewModel(
                     UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
                 )
             }
+    }
+
+    private suspend fun declineInvitation(inviteId: String) {
+        interactor.declineInvite(inviteId)
+            .onSuccess {
+                Logger.d("Invitation $inviteId declined successfully")
+            }
+            .onFailure { error ->
+                eventHandler.sendEvent(
+                    UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
+                )
+            }
+    }
+
+    private suspend fun acceptInvitation(inviteId: String, guestUid: String) {
+        currentUserUid?.let { ownerUid ->
+            interactor.acceptInvite(
+                inviteId,
+                ownerUid,
+                guestUid
+            )
+                .onSuccess {
+                    Logger.d("Invitation $inviteId accept successfully")
+                }
+                .onFailure { error ->
+                    eventHandler.sendEvent(
+                        UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
+                    )
+
+                }
+        } ?: eventHandler.sendEvent(
+            UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(AppError.Domain.Unauthorized))
+        )
     }
 }
