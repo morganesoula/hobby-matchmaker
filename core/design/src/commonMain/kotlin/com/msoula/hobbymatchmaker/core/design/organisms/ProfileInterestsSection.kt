@@ -15,7 +15,7 @@ import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.GenericCard
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWidth4
-import com.msoula.hobbymatchmaker.core.design.icons.Sparkle
+import com.msoula.hobbymatchmaker.core.design.icons.HeroiconsSparkles
 import com.msoula.hobbymatchmaker.core.design.molecules.InterestsBlock
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.IconSize
@@ -35,7 +35,7 @@ fun ProfileInterestsSection(
         Column {
             Row {
                 Icon(
-                    Sparkle,
+                    HeroiconsSparkles,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(IconSize.TwentyFour)

@@ -38,8 +38,8 @@ import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWidth4
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWidth8
 import com.msoula.hobbymatchmaker.core.design.authentified_no_social_members_description
 import com.msoula.hobbymatchmaker.core.design.cancel
-import com.msoula.hobbymatchmaker.core.design.icons.Heart
-import com.msoula.hobbymatchmaker.core.design.icons.Person_add
+import com.msoula.hobbymatchmaker.core.design.icons.LucideHeart
+import com.msoula.hobbymatchmaker.core.design.icons.MaterialSymbolsPerson_add
 import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMembers
 import com.msoula.hobbymatchmaker.core.design.molecules.PseudoSearchBar
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
@@ -78,7 +78,7 @@ fun ProfileSocialSection(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = Heart,
+                        imageVector = LucideHeart,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(IconSize.TwentyFour)
@@ -99,7 +99,7 @@ fun ProfileSocialSection(
                         shape = RoundedCornerShape(CustomSize.Sixteen)
                     ) {
                         Icon(
-                            imageVector = Person_add,
+                            imageVector = MaterialSymbolsPerson_add,
                             contentDescription = stringResource(
                                 Res.string.user_profile_social_circle_main_add_people_text_button
                             ),
@@ -133,7 +133,7 @@ fun ProfileSocialSection(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                imageVector = Person_add,
+                                imageVector = MaterialSymbolsPerson_add,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(IconSize.TwentyFour)

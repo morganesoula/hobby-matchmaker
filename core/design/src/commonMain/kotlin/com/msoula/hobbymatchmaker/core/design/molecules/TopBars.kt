@@ -19,9 +19,9 @@ import androidx.compose.ui.graphics.Color
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWidth4
 import com.msoula.hobbymatchmaker.core.design.cancel
-import com.msoula.hobbymatchmaker.core.design.icons.Arrow_back
-import com.msoula.hobbymatchmaker.core.design.icons.Group_add
-import com.msoula.hobbymatchmaker.core.design.icons.Person
+import com.msoula.hobbymatchmaker.core.design.icons.BootstrapPerson
+import com.msoula.hobbymatchmaker.core.design.icons.MaterialIconsArrow_back
+import com.msoula.hobbymatchmaker.core.design.icons.MaterialSymbolsGroup_add
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -47,7 +47,7 @@ fun NavigationTopBar(
                     onClick = { redirectToSocial() }
                 ) {
                     Icon(
-                        imageVector = Group_add,
+                        imageVector = MaterialSymbolsGroup_add,
                         contentDescription = "Invites",
                         tint = MaterialTheme.colorScheme.onSurface
                     )
@@ -57,7 +57,7 @@ fun NavigationTopBar(
                     onClick = { redirectToProfile() }
                 ) {
                     Icon(
-                        imageVector = Person,
+                        imageVector = BootstrapPerson,
                         contentDescription = "Profile",
                         tint = MaterialTheme.colorScheme.onSurface
                     )
@@ -86,7 +86,7 @@ fun BackNavigationTopBar(
                 onClick = { onBack() },
                 content = {
                     Icon(
-                        imageVector = Arrow_back,
+                        imageVector = MaterialIconsArrow_back,
                         contentDescription = "Back",
                         tint = MaterialTheme.colorScheme.onSurface
                     )
@@ -136,7 +136,7 @@ fun EditProfileTopBar(
                 IconButton(onClick = { onBack() }) {
                     Row {
                         Icon(
-                            imageVector = Arrow_back,
+                            imageVector = MaterialIconsArrow_back,
                             contentDescription = "Back"
                         )
                         SpacerWidth4()

@@ -18,7 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.atoms.FormIcon
-import com.msoula.hobbymatchmaker.core.design.icons.Delete
+import com.msoula.hobbymatchmaker.core.design.icons.MaterialSymbolsDelete
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.IconSize
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -79,7 +79,7 @@ fun InterestDeletableBlock(
                     modifier = Modifier.wrapContentSize()
                 ) {
                     FormIcon(
-                        icon = Delete,
+                        icon = MaterialSymbolsDelete,
                         size = IconSize.TwentyFour,
                         tint = MaterialTheme.colorScheme.primary
                     )

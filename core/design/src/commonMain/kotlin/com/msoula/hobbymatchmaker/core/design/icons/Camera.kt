@@ -2,79 +2,78 @@ package com.msoula.hobbymatchmaker.core.design.icons
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-val Camera: ImageVector
+val BootstrapCamera: ImageVector
     get() {
-        if (_Camera != null) return _Camera!!
+        if (_BootstrapCamera != null) return _BootstrapCamera!!
 
-        _Camera = ImageVector.Builder(
-            name = "Camera",
+        _BootstrapCamera = ImageVector.Builder(
+            name = "camera",
             defaultWidth = 24.dp,
             defaultHeight = 24.dp,
-            viewportWidth = 24f,
-            viewportHeight = 24f
+            viewportWidth = 16f,
+            viewportHeight = 16f
         ).apply {
             path(
-                stroke = SolidColor(Color(0xFF0F172A)),
-                strokeLineWidth = 1.5f,
-                strokeLineCap = StrokeCap.Round,
-                strokeLineJoin = StrokeJoin.Round
+                fill = SolidColor(Color.Black)
             ) {
-                moveTo(6.82689f, 6.1749f)
-                curveTo(6.46581f, 6.75354f, 5.86127f, 7.13398f, 5.186f, 7.22994f)
-                curveTo(4.80655f, 7.28386f, 4.42853f, 7.34223f, 4.05199f, 7.40497f)
-                curveTo(2.99912f, 7.58042f, 2.25f, 8.50663f, 2.25f, 9.57402f)
-                verticalLineTo(18f)
-                curveTo(2.25f, 19.2426f, 3.25736f, 20.25f, 4.5f, 20.25f)
-                horizontalLineTo(19.5f)
-                curveTo(20.7426f, 20.25f, 21.75f, 19.2426f, 21.75f, 18f)
-                verticalLineTo(9.57403f)
-                curveTo(21.75f, 8.50664f, 21.0009f, 7.58043f, 19.948f, 7.40498f)
-                curveTo(19.5715f, 7.34223f, 19.1934f, 7.28387f, 18.814f, 7.22995f)
-                curveTo(18.1387f, 7.13398f, 17.5342f, 6.75354f, 17.1731f, 6.17491f)
-                lineTo(16.3519f, 4.85889f)
-                curveTo(15.9734f, 4.25237f, 15.3294f, 3.85838f, 14.6155f, 3.82005f)
-                curveTo(13.7496f, 3.77355f, 12.8775f, 3.75f, 12f, 3.75f)
-                curveTo(11.1225f, 3.75f, 10.2504f, 3.77355f, 9.3845f, 3.82005f)
-                curveTo(8.6706f, 3.85838f, 8.02658f, 4.25237f, 7.64809f, 4.85889f)
-                lineTo(6.82689f, 6.1749f)
+                moveTo(15f, 12f)
+                arcToRelative(1f, 1f, 0f, false, true, -1f, 1f)
+                horizontalLineTo(2f)
+                arcToRelative(1f, 1f, 0f, false, true, -1f, -1f)
+                verticalLineTo(6f)
+                arcToRelative(1f, 1f, 0f, false, true, 1f, -1f)
+                horizontalLineToRelative(1.172f)
+                arcToRelative(3f, 3f, 0f, false, false, 2.12f, -0.879f)
+                lineToRelative(0.83f, -0.828f)
+                arcTo(1f, 1f, 0f, false, true, 6.827f, 3f)
+                horizontalLineToRelative(2.344f)
+                arcToRelative(1f, 1f, 0f, false, true, 0.707f, 0.293f)
+                lineToRelative(0.828f, 0.828f)
+                arcTo(3f, 3f, 0f, false, false, 12.828f, 5f)
+                horizontalLineTo(14f)
+                arcToRelative(1f, 1f, 0f, false, true, 1f, 1f)
+                close()
+                moveTo(2f, 4f)
+                arcToRelative(2f, 2f, 0f, false, false, -2f, 2f)
+                verticalLineToRelative(6f)
+                arcToRelative(2f, 2f, 0f, false, false, 2f, 2f)
+                horizontalLineToRelative(12f)
+                arcToRelative(2f, 2f, 0f, false, false, 2f, -2f)
+                verticalLineTo(6f)
+                arcToRelative(2f, 2f, 0f, false, false, -2f, -2f)
+                horizontalLineToRelative(-1.172f)
+                arcToRelative(2f, 2f, 0f, false, true, -1.414f, -0.586f)
+                lineToRelative(-0.828f, -0.828f)
+                arcTo(2f, 2f, 0f, false, false, 9.172f, 2f)
+                horizontalLineTo(6.828f)
+                arcToRelative(2f, 2f, 0f, false, false, -1.414f, 0.586f)
+                lineToRelative(-0.828f, 0.828f)
+                arcTo(2f, 2f, 0f, false, true, 3.172f, 4f)
                 close()
             }
             path(
-                stroke = SolidColor(Color(0xFF0F172A)),
-                strokeLineWidth = 1.5f,
-                strokeLineCap = StrokeCap.Round,
-                strokeLineJoin = StrokeJoin.Round
+                fill = SolidColor(Color.Black)
             ) {
-                moveTo(16.5f, 12.75f)
-                curveTo(16.5f, 15.2353f, 14.4853f, 17.25f, 12f, 17.25f)
-                curveTo(9.51472f, 17.25f, 7.5f, 15.2353f, 7.5f, 12.75f)
-                curveTo(7.5f, 10.2647f, 9.51472f, 8.25f, 12f, 8.25f)
-                curveTo(14.4853f, 8.25f, 16.5f, 10.2647f, 16.5f, 12.75f)
-                close()
-            }
-            path(
-                stroke = SolidColor(Color(0xFF0F172A)),
-                strokeLineWidth = 1.5f,
-                strokeLineCap = StrokeCap.Round,
-                strokeLineJoin = StrokeJoin.Round
-            ) {
-                moveTo(18.75f, 10.5f)
-                horizontalLineTo(18.7575f)
-                verticalLineTo(10.5075f)
-                horizontalLineTo(18.75f)
-                verticalLineTo(10.5f)
-                close()
+                moveTo(8f, 11f)
+                arcToRelative(2.5f, 2.5f, 0f, true, true, 0f, -5f)
+                arcToRelative(2.5f, 2.5f, 0f, false, true, 0f, 5f)
+                moveToRelative(0f, 1f)
+                arcToRelative(3.5f, 3.5f, 0f, true, false, 0f, -7f)
+                arcToRelative(3.5f, 3.5f, 0f, false, false, 0f, 7f)
+                moveTo(3f, 6.5f)
+                arcToRelative(0.5f, 0.5f, 0f, true, true, -1f, 0f)
+                arcToRelative(0.5f, 0.5f, 0f, false, true, 1f, 0f)
             }
         }.build()
 
-        return _Camera!!
+        return _BootstrapCamera!!
     }
 
-private var _Camera: ImageVector? = null
+private var _BootstrapCamera: ImageVector? = null
+
+
 

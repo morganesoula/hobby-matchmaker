@@ -2,65 +2,58 @@ package com.msoula.hobbymatchmaker.core.design.icons
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-val Inbox: ImageVector
+val FeatherInbox: ImageVector
     get() {
-        if (_Inbox != null) return _Inbox!!
+        if (_FeatherInbox != null) return _FeatherInbox!!
 
-        _Inbox = ImageVector.Builder(
-            name = "Inbox",
+        _FeatherInbox = ImageVector.Builder(
+            name = "inbox",
             defaultWidth = 24.dp,
             defaultHeight = 24.dp,
-            viewportWidth = 960f,
-            viewportHeight = 960f
+            viewportWidth = 24f,
+            viewportHeight = 24f
         ).apply {
             path(
-                fill = SolidColor(Color(0xFF000000))
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
             ) {
-                moveTo(200f, 840f)
-                quadToRelative(-33f, 0f, -56.5f, -23.5f)
-                reflectiveQuadTo(120f, 760f)
-                verticalLineToRelative(-560f)
-                quadToRelative(0f, -33f, 23.5f, -56.5f)
-                reflectiveQuadTo(200f, 120f)
-                horizontalLineToRelative(560f)
-                quadToRelative(33f, 0f, 56.5f, 23.5f)
-                reflectiveQuadTo(840f, 200f)
-                verticalLineToRelative(560f)
-                quadToRelative(0f, 33f, -23.5f, 56.5f)
-                reflectiveQuadTo(760f, 840f)
-                close()
-                moveToRelative(0f, -80f)
-                horizontalLineToRelative(560f)
-                verticalLineToRelative(-120f)
-                horizontalLineTo(640f)
-                quadToRelative(-30f, 38f, -71.5f, 59f)
-                reflectiveQuadTo(480f, 720f)
-                reflectiveQuadToRelative(-88.5f, -21f)
-                reflectiveQuadToRelative(-71.5f, -59f)
-                horizontalLineTo(200f)
-                close()
-                moveToRelative(280f, -120f)
-                quadToRelative(38f, 0f, 69f, -22f)
-                reflectiveQuadToRelative(43f, -58f)
-                horizontalLineToRelative(168f)
-                verticalLineToRelative(-360f)
-                horizontalLineTo(200f)
-                verticalLineToRelative(360f)
-                horizontalLineToRelative(168f)
-                quadToRelative(12f, 36f, 43f, 58f)
-                reflectiveQuadToRelative(69f, 22f)
-                moveTo(200f, 760f)
-                horizontalLineToRelative(560f)
+                moveTo(22f, 12f)
+                lineTo(16f, 12f)
+                lineTo(14f, 15f)
+                lineTo(10f, 15f)
+                lineTo(8f, 12f)
+                lineTo(2f, 12f)
+            }
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(5.45f, 5.11f)
+                lineTo(2f, 12f)
+                verticalLineToRelative(6f)
+                arcToRelative(2f, 2f, 0f, false, false, 2f, 2f)
+                horizontalLineToRelative(16f)
+                arcToRelative(2f, 2f, 0f, false, false, 2f, -2f)
+                verticalLineToRelative(-6f)
+                lineToRelative(-3.45f, -6.89f)
+                arcTo(2f, 2f, 0f, false, false, 16.76f, 4f)
+                horizontalLineTo(7.24f)
+                arcToRelative(2f, 2f, 0f, false, false, -1.79f, 1.11f)
                 close()
             }
         }.build()
 
-        return _Inbox!!
+        return _FeatherInbox!!
     }
 
-private var _Inbox: ImageVector? = null
-
+private var _FeatherInbox: ImageVector? = null

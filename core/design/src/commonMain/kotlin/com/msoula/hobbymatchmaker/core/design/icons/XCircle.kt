@@ -2,53 +2,56 @@ package com.msoula.hobbymatchmaker.core.design.icons
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-val XCircle: ImageVector
+val FeatherXCircle: ImageVector
     get() {
-        if (_XCircle != null) return _XCircle!!
+        if (_FeatherXCircle != null) return _FeatherXCircle!!
 
-        _XCircle = ImageVector.Builder(
-            name = "XCircle",
-            defaultWidth = 16.dp,
-            defaultHeight = 16.dp,
-            viewportWidth = 16f,
-            viewportHeight = 16f
+        _FeatherXCircle = ImageVector.Builder(
+            name = "x-circle",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
         ).apply {
             path(
-                fill = SolidColor(Color.Black)
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
             ) {
-                moveTo(8f, 15f)
-                arcTo(7f, 7f, 0f, true, true, 8f, 1f)
-                arcToRelative(7f, 7f, 0f, false, true, 0f, 14f)
-                moveToRelative(0f, 1f)
-                arcTo(8f, 8f, 0f, true, false, 8f, 0f)
-                arcToRelative(8f, 8f, 0f, false, false, 0f, 16f)
+                moveTo(22f, 12f)
+                arcTo(10f, 10f, 0f, false, true, 12f, 22f)
+                arcTo(10f, 10f, 0f, false, true, 2f, 12f)
+                arcTo(10f, 10f, 0f, false, true, 22f, 12f)
+                close()
             }
             path(
-                fill = SolidColor(Color.Black)
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
             ) {
-                moveTo(4.646f, 4.646f)
-                arcToRelative(0.5f, 0.5f, 0f, false, true, 0.708f, 0f)
-                lineTo(8f, 7.293f)
-                lineToRelative(2.646f, -2.647f)
-                arcToRelative(0.5f, 0.5f, 0f, false, true, 0.708f, 0.708f)
-                lineTo(8.707f, 8f)
-                lineToRelative(2.647f, 2.646f)
-                arcToRelative(0.5f, 0.5f, 0f, false, true, -0.708f, 0.708f)
-                lineTo(8f, 8.707f)
-                lineToRelative(-2.646f, 2.647f)
-                arcToRelative(0.5f, 0.5f, 0f, false, true, -0.708f, -0.708f)
-                lineTo(7.293f, 8f)
-                lineTo(4.646f, 5.354f)
-                arcToRelative(0.5f, 0.5f, 0f, false, true, 0f, -0.708f)
+                moveTo(15f, 9f)
+                lineTo(9f, 15f)
+            }
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(9f, 9f)
+                lineTo(15f, 15f)
             }
         }.build()
 
-        return _XCircle!!
+        return _FeatherXCircle!!
     }
 
-private var _XCircle: ImageVector? = null
-
+private var _FeatherXCircle: ImageVector? = null

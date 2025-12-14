@@ -40,9 +40,9 @@ import coil3.request.crossfade
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.ic_movie_clapper_board
 import com.msoula.hobbymatchmaker.core.design.ic_no_image_found_playstore
-import com.msoula.hobbymatchmaker.core.design.icons.Delete
-import com.msoula.hobbymatchmaker.core.design.icons.Hide_image
-import com.msoula.hobbymatchmaker.core.design.icons.Person
+import com.msoula.hobbymatchmaker.core.design.icons.BootstrapPerson
+import com.msoula.hobbymatchmaker.core.design.icons.MaterialIconsHide_image
+import com.msoula.hobbymatchmaker.core.design.icons.MaterialSymbolsDelete
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.IconSize
 import org.jetbrains.compose.resources.painterResource
@@ -55,7 +55,7 @@ fun ActorIcon(
     imageVector: ImageVector? = null
 ) {
     Icon(
-        imageVector = imageVector ?: Person,
+        imageVector = imageVector ?: BootstrapPerson,
         contentDescription = contentDescription,
         tint = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = modifier.size(CustomSize.ThirtyTwo)
@@ -226,7 +226,7 @@ fun CircleWithCustomPhoto(
                 contentScale = ContentScale.Crop
             )
         } ?: Icon(
-            imageVector = Hide_image,
+            imageVector = MaterialIconsHide_image,
             contentDescription = contentDescription,
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(IconSize.FortyEight).padding(CustomSize.Four)
@@ -254,7 +254,7 @@ fun FormIcon(
 @Composable
 fun FormIconPreview() {
     FormIcon(
-        icon = Delete,
+        icon = MaterialSymbolsDelete,
         size = IconSize.TwentyFour,
         tint = MaterialTheme.colorScheme.primary
     )

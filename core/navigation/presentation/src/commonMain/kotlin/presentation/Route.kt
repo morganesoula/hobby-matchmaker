@@ -1,8 +1,8 @@
 package com.msoula.hobbymatchmaker.core.navigation.presentation
 
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.msoula.hobbymatchmaker.core.design.icons.Inbox
-import com.msoula.hobbymatchmaker.core.design.icons.Send_to_mobile
+import com.msoula.hobbymatchmaker.core.design.icons.BootstrapSendCheck
+import com.msoula.hobbymatchmaker.core.design.icons.FeatherInbox
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -44,6 +44,6 @@ enum class Destination(
     val icon: ImageVector,
     val contentDescription: String
 ) {
-    RECEIVED("invitation_received", "Received", Inbox, "Received"),
-    SENT("invitation_sent", "Sent", Send_to_mobile, "Sent")
+    RECEIVED("invitation_received", "Received", FeatherInbox, "Received"),
+    SENT("invitation_sent", "Sent", BootstrapSendCheck, "Sent")
 }

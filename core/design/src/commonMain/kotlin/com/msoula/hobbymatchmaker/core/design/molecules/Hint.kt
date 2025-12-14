@@ -21,9 +21,9 @@ import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_requirements_title
-import com.msoula.hobbymatchmaker.core.design.icons.Check2Circle
-import com.msoula.hobbymatchmaker.core.design.icons.PersonExclamation
-import com.msoula.hobbymatchmaker.core.design.icons.XCircle
+import com.msoula.hobbymatchmaker.core.design.icons.BootstrapCheck
+import com.msoula.hobbymatchmaker.core.design.icons.BootstrapPersonExclamation
+import com.msoula.hobbymatchmaker.core.design.icons.FeatherXCircle
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.IconSize
 import org.jetbrains.compose.resources.stringResource
@@ -94,7 +94,7 @@ fun WarningTextField(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            imageVector = PersonExclamation,
+            imageVector = BootstrapPersonExclamation,
             contentDescription = null,
             modifier = Modifier.padding(start = CustomSize.Sixteen).size(IconSize.Sixteen),
             tint = MaterialTheme.colorScheme.onErrorContainer
@@ -127,7 +127,7 @@ fun ValidationRequirementItem(
         horizontalArrangement = Arrangement.spacedBy(CustomSize.Eight)
     ) {
         Icon(
-            imageVector = if (requirement.isValid) Check2Circle else XCircle,
+            imageVector = if (requirement.isValid) BootstrapCheck else FeatherXCircle,
             contentDescription = if (requirement.isValid) "Valid" else "Invalid",
             tint = if (requirement.isValid) MaterialTheme.colorScheme.tertiary
             else MaterialTheme.colorScheme.error,

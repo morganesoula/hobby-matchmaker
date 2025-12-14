@@ -20,7 +20,7 @@ import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.CircleWithCustomPhoto
 import com.msoula.hobbymatchmaker.core.design.atoms.GenericCard
 import com.msoula.hobbymatchmaker.core.design.edit_profile_edit_photo_title
-import com.msoula.hobbymatchmaker.core.design.icons.Camera
+import com.msoula.hobbymatchmaker.core.design.icons.BootstrapCamera
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -56,7 +56,7 @@ fun ProfileEditProfilePicture(
                     modifier = Modifier.align(Alignment.BottomEnd)
                 ) {
                     Icon(
-                        imageVector = Camera,
+                        imageVector = BootstrapCamera,
                         contentDescription = null,
                         modifier = Modifier
                             .border(

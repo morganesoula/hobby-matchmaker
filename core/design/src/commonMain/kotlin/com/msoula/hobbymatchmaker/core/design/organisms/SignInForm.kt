@@ -29,9 +29,9 @@ import com.msoula.hobbymatchmaker.core.design.atoms.rememberSubmitKeyBoardAction
 import com.msoula.hobbymatchmaker.core.design.email
 import com.msoula.hobbymatchmaker.core.design.forgot_password
 import com.msoula.hobbymatchmaker.core.design.hide_password
-import com.msoula.hobbymatchmaker.core.design.icons.Alternate_email
-import com.msoula.hobbymatchmaker.core.design.icons.Visibility
-import com.msoula.hobbymatchmaker.core.design.icons.Visibility_off
+import com.msoula.hobbymatchmaker.core.design.icons.MaterialSymbolsAlternate_email
+import com.msoula.hobbymatchmaker.core.design.icons.MaterialSymbolsVisibility
+import com.msoula.hobbymatchmaker.core.design.icons.MaterialSymbolsVisibility_off
 import com.msoula.hobbymatchmaker.core.design.log_in
 import com.msoula.hobbymatchmaker.core.design.password
 import com.msoula.hobbymatchmaker.core.design.show_password
@@ -60,7 +60,7 @@ fun SignInForm(
         contentDescription = stringResource(Res.string.email),
         singleLine = true,
         onValueChanged = onEmailChanged,
-        icon = Alternate_email
+        icon = MaterialSymbolsAlternate_email
     )
 
     SpacerHeight8()
@@ -85,7 +85,7 @@ fun SignInForm(
                         stringResource(Res.string.hide_password)
                     }
                 Icon(
-                    imageVector = if (hiddenPassword) Visibility else Visibility_off,
+                    imageVector = if (hiddenPassword) MaterialSymbolsVisibility else MaterialSymbolsVisibility_off,
                     contentDescription = description
                 )
             }

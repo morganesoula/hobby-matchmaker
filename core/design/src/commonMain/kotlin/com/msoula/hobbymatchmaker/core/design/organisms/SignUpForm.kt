@@ -28,10 +28,10 @@ import com.msoula.hobbymatchmaker.core.design.atoms.rememberSubmitKeyBoardAction
 import com.msoula.hobbymatchmaker.core.design.email
 import com.msoula.hobbymatchmaker.core.design.firstname
 import com.msoula.hobbymatchmaker.core.design.hide_password
-import com.msoula.hobbymatchmaker.core.design.icons.Alternate_email
-import com.msoula.hobbymatchmaker.core.design.icons.Person
-import com.msoula.hobbymatchmaker.core.design.icons.Visibility
-import com.msoula.hobbymatchmaker.core.design.icons.Visibility_off
+import com.msoula.hobbymatchmaker.core.design.icons.BootstrapPerson
+import com.msoula.hobbymatchmaker.core.design.icons.MaterialSymbolsAlternate_email
+import com.msoula.hobbymatchmaker.core.design.icons.MaterialSymbolsVisibility
+import com.msoula.hobbymatchmaker.core.design.icons.MaterialSymbolsVisibility_off
 import com.msoula.hobbymatchmaker.core.design.molecules.ValidationRequirement
 import com.msoula.hobbymatchmaker.core.design.molecules.ValidationRequirementsList
 import com.msoula.hobbymatchmaker.core.design.password
@@ -75,7 +75,7 @@ fun SignUpForm(
         contentDescription = stringResource(Res.string.firstname),
         singleLine = true,
         onValueChanged = onNameChanged,
-        icon = Person,
+        icon = BootstrapPerson,
         keyboardOptions = KeyboardOptions(
             capitalization = KeyboardCapitalization.Sentences,
             imeAction = ImeAction.Next
@@ -106,7 +106,7 @@ fun SignUpForm(
         contentDescription = stringResource(Res.string.email),
         singleLine = true,
         onValueChanged = onEmailChanged,
-        icon = Alternate_email,
+        icon = MaterialSymbolsAlternate_email,
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Email,
             imeAction = ImeAction.Next,
@@ -149,7 +149,7 @@ fun SignUpForm(
                         stringResource(Res.string.hide_password)
                     }
                 Icon(
-                    imageVector = if (hiddenPassword) Visibility else Visibility_off,
+                    imageVector = if (hiddenPassword) MaterialSymbolsVisibility else MaterialSymbolsVisibility_off,
                     contentDescription = description
                 )
             }

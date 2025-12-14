@@ -26,7 +26,7 @@ import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_pse
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_pseudo_not_available
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_pseudo_title
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_title
-import com.msoula.hobbymatchmaker.core.design.icons.Lightbulb
+import com.msoula.hobbymatchmaker.core.design.icons.VscodeCodiconsLightbulb
 import com.msoula.hobbymatchmaker.core.design.molecules.TipTextField
 import com.msoula.hobbymatchmaker.core.design.molecules.ValidationRequirement
 import com.msoula.hobbymatchmaker.core.design.molecules.ValidationRequirementsList
@@ -100,7 +100,7 @@ fun ProfileEditInformationForm(
 
             TipTextField(
                 hintText = stringResource(Res.string.edit_profile_basic_information_pseudo_hint),
-                icon = Lightbulb
+                icon = VscodeCodiconsLightbulb
             )
 
             PrimaryTextField(

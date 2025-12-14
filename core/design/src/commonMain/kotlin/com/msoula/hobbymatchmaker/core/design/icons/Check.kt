@@ -6,14 +6,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-val Check: ImageVector
+val BootstrapCheck: ImageVector
     get() {
-        if (_Check != null) return _Check!!
+        if (_BootstrapCheck != null) return _BootstrapCheck!!
 
-        _Check = ImageVector.Builder(
-            name = "Check",
-            defaultWidth = 16.dp,
-            defaultHeight = 16.dp,
+        _BootstrapCheck = ImageVector.Builder(
+            name = "check",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
             viewportWidth = 16f,
             viewportHeight = 16f
         ).apply {
@@ -32,8 +32,10 @@ val Check: ImageVector
             }
         }.build()
 
-        return _Check!!
+        return _BootstrapCheck!!
     }
 
-private var _Check: ImageVector? = null
+private var _BootstrapCheck: ImageVector? = null
+
+
 

@@ -2,56 +2,51 @@ package com.msoula.hobbymatchmaker.core.design.icons
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-val Edit: ImageVector
+val LucidePencil: ImageVector
     get() {
-        if (_Edit != null) return _Edit!!
+        if (_LucidePencil != null) return _LucidePencil!!
 
-        _Edit = ImageVector.Builder(
-            name = "Edit",
+        _LucidePencil = ImageVector.Builder(
+            name = "pencil",
             defaultWidth = 24.dp,
             defaultHeight = 24.dp,
-            viewportWidth = 960f,
-            viewportHeight = 960f
+            viewportWidth = 24f,
+            viewportHeight = 24f
         ).apply {
             path(
-                fill = SolidColor(Color(0xFF000000))
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
             ) {
-                moveTo(200f, 760f)
-                horizontalLineToRelative(57f)
-                lineToRelative(391f, -391f)
-                lineToRelative(-57f, -57f)
-                lineToRelative(-391f, 391f)
+                moveTo(21.174f, 6.812f)
+                arcToRelative(1f, 1f, 0f, false, false, -3.986f, -3.987f)
+                lineTo(3.842f, 16.174f)
+                arcToRelative(2f, 2f, 0f, false, false, -0.5f, 0.83f)
+                lineToRelative(-1.321f, 4.352f)
+                arcToRelative(0.5f, 0.5f, 0f, false, false, 0.623f, 0.622f)
+                lineToRelative(4.353f, -1.32f)
+                arcToRelative(2f, 2f, 0f, false, false, 0.83f, -0.497f)
                 close()
-                moveToRelative(-80f, 80f)
-                verticalLineToRelative(-170f)
-                lineToRelative(528f, -527f)
-                quadToRelative(12f, -11f, 26.5f, -17f)
-                reflectiveQuadToRelative(30.5f, -6f)
-                reflectiveQuadToRelative(31f, 6f)
-                reflectiveQuadToRelative(26f, 18f)
-                lineToRelative(55f, 56f)
-                quadToRelative(12f, 11f, 17.5f, 26f)
-                reflectiveQuadToRelative(5.5f, 30f)
-                quadToRelative(0f, 16f, -5.5f, 30.5f)
-                reflectiveQuadTo(817f, 313f)
-                lineTo(290f, 840f)
-                close()
-                moveToRelative(640f, -584f)
-                lineToRelative(-56f, -56f)
-                close()
-                moveToRelative(-141f, 85f)
-                lineToRelative(-28f, -29f)
-                lineToRelative(57f, 57f)
-                close()
+            }
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(15f, 5f)
+                lineToRelative(4f, 4f)
             }
         }.build()
 
-        return _Edit!!
+        return _LucidePencil!!
     }
 
-private var _Edit: ImageVector? = null
-
+private var _LucidePencil: ImageVector? = null

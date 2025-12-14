@@ -6,38 +6,38 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-val Add: ImageVector
+val MaterialSymbolsAdd_2: ImageVector
     get() {
-        if (_Add != null) return _Add!!
+        if (_MaterialSymbolsAdd_2 != null) return _MaterialSymbolsAdd_2!!
 
-        _Add = ImageVector.Builder(
-            name = "Add",
+        _MaterialSymbolsAdd_2 = ImageVector.Builder(
+            name = "add_2",
             defaultWidth = 24.dp,
             defaultHeight = 24.dp,
             viewportWidth = 960f,
             viewportHeight = 960f
         ).apply {
             path(
-                fill = SolidColor(Color(0xFF000000))
+                fill = SolidColor(Color.Black)
             ) {
-                moveTo(440f, 520f)
-                horizontalLineTo(200f)
+                moveTo(440f, 840f)
+                verticalLineToRelative(-320f)
+                horizontalLineTo(120f)
                 verticalLineToRelative(-80f)
-                horizontalLineToRelative(240f)
-                verticalLineToRelative(-240f)
+                horizontalLineToRelative(320f)
+                verticalLineToRelative(-320f)
                 horizontalLineToRelative(80f)
-                verticalLineToRelative(240f)
-                horizontalLineToRelative(240f)
+                verticalLineToRelative(320f)
+                horizontalLineToRelative(320f)
                 verticalLineToRelative(80f)
                 horizontalLineTo(520f)
-                verticalLineToRelative(240f)
+                verticalLineToRelative(320f)
                 horizontalLineToRelative(-80f)
                 close()
             }
         }.build()
 
-        return _Add!!
+        return _MaterialSymbolsAdd_2!!
     }
 
-private var _Add: ImageVector? = null
-
+private var _MaterialSymbolsAdd_2: ImageVector? = null

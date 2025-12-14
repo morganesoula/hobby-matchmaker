@@ -6,35 +6,47 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-val Arrow_back: ImageVector
+val MaterialIconsArrow_back: ImageVector
     get() {
-        if (_Arrow_back != null) return _Arrow_back!!
+        if (_MaterialIconsArrow_back != null) return _MaterialIconsArrow_back!!
 
-        _Arrow_back = ImageVector.Builder(
-            name = "Arrow_back",
+        _MaterialIconsArrow_back = ImageVector.Builder(
+            name = "arrow_back",
             defaultWidth = 24.dp,
             defaultHeight = 24.dp,
-            viewportWidth = 960f,
-            viewportHeight = 960f
+            viewportWidth = 24f,
+            viewportHeight = 24f
         ).apply {
             path(
-                fill = SolidColor(Color(0xFF000000))
+                fill = SolidColor(Color.Black)
             ) {
-                moveToRelative(313f, -440f)
-                lineToRelative(224f, 224f)
-                lineToRelative(-57f, 56f)
-                lineToRelative(-320f, -320f)
-                lineToRelative(320f, -320f)
-                lineToRelative(57f, 56f)
-                lineToRelative(-224f, 224f)
-                horizontalLineToRelative(487f)
-                verticalLineToRelative(80f)
+                moveTo(0f, 0f)
+                horizontalLineToRelative(24f)
+                verticalLineToRelative(24f)
+                horizontalLineTo(0f)
+                verticalLineTo(0f)
+                close()
+            }
+            path(
+                fill = SolidColor(Color.Black)
+            ) {
+                moveTo(20f, 11f)
+                horizontalLineTo(7.83f)
+                lineToRelative(5.59f, -5.59f)
+                lineTo(12f, 4f)
+                lineToRelative(-8f, 8f)
+                lineToRelative(8f, 8f)
+                lineToRelative(1.41f, -1.41f)
+                lineTo(7.83f, 13f)
+                horizontalLineTo(20f)
+                verticalLineToRelative(-2f)
                 close()
             }
         }.build()
 
-        return _Arrow_back!!
+        return _MaterialIconsArrow_back!!
     }
 
-private var _Arrow_back: ImageVector? = null
+private var _MaterialIconsArrow_back: ImageVector? = null
+
 

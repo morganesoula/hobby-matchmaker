@@ -24,11 +24,11 @@ import com.msoula.hobbymatchmaker.core.design.atoms.GenericCard
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight4
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWidth4
-import com.msoula.hobbymatchmaker.core.design.icons.Check
-import com.msoula.hobbymatchmaker.core.design.icons.ChromeClose
-import com.msoula.hobbymatchmaker.core.design.icons.Clock
-import com.msoula.hobbymatchmaker.core.design.icons.Sparkle
-import com.msoula.hobbymatchmaker.core.design.icons.Trash
+import com.msoula.hobbymatchmaker.core.design.icons.BootstrapCheck
+import com.msoula.hobbymatchmaker.core.design.icons.FeatherClock
+import com.msoula.hobbymatchmaker.core.design.icons.HeroiconsSparkles
+import com.msoula.hobbymatchmaker.core.design.icons.MaterialIconsClose
+import com.msoula.hobbymatchmaker.core.design.icons.MaterialSymbolsDelete
 import com.msoula.hobbymatchmaker.core.design.social_received_requests_accept_button_text
 import com.msoula.hobbymatchmaker.core.design.social_received_requests_decline_button_text
 import com.msoula.hobbymatchmaker.core.design.social_sent_requests_cancel_invitation_text
@@ -63,9 +63,9 @@ fun SentInvitationCard(
     }
 
     val icon = when (status) {
-        "pending" -> Clock
-        "declined" -> ChromeClose
-        else -> Check
+        "pending" -> FeatherClock
+        "declined" -> MaterialIconsClose
+        else -> BootstrapCheck
     }
 
     GenericCard(
@@ -79,7 +79,7 @@ fun SentInvitationCard(
             ) {
                 CircleWithDefaultIcon(
                     backgroundColor = MaterialTheme.colorScheme.onSurface,
-                    icon = Sparkle,
+                    icon = HeroiconsSparkles,
                     iconTint = MaterialTheme.colorScheme.primary,
                     size = CustomSize.FortyEight
                 )
@@ -154,7 +154,7 @@ fun SentInvitationCard(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            imageVector = Trash,
+                            imageVector = MaterialSymbolsDelete,
                             contentDescription = ""
                         )
 
@@ -191,7 +191,7 @@ fun ReceivedInvitationCard(
             ) {
                 CircleWithDefaultIcon(
                     backgroundColor = MaterialTheme.colorScheme.onSurface,
-                    icon = Sparkle,
+                    icon = HeroiconsSparkles,
                     iconTint = MaterialTheme.colorScheme.primary,
                     size = CustomSize.FortyEight
                 )
@@ -226,7 +226,7 @@ fun ReceivedInvitationCard(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            imageVector = Check,
+                            imageVector = BootstrapCheck,
                             contentDescription = "Accept",
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
@@ -251,7 +251,7 @@ fun ReceivedInvitationCard(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            imageVector = ChromeClose,
+                            imageVector = MaterialIconsClose,
                             contentDescription = "Decline",
                             tint = MaterialTheme.colorScheme.onSurface
                         )

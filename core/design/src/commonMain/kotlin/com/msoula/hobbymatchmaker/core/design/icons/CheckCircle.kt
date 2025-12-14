@@ -2,47 +2,49 @@ package com.msoula.hobbymatchmaker.core.design.icons
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-val Check2Circle: ImageVector
+val FeatherCheckCircle: ImageVector
     get() {
-        if (_Check2Circle != null) return _Check2Circle!!
+        if (_FeatherCheckCircle != null) return _FeatherCheckCircle!!
 
-        _Check2Circle = ImageVector.Builder(
-            name = "Check2Circle",
-            defaultWidth = 16.dp,
-            defaultHeight = 16.dp,
-            viewportWidth = 16f,
-            viewportHeight = 16f
+        _FeatherCheckCircle = ImageVector.Builder(
+            name = "check-circle",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
         ).apply {
             path(
-                fill = SolidColor(Color.Black)
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
             ) {
-                moveTo(2.5f, 8f)
-                arcToRelative(5.5f, 5.5f, 0f, false, true, 8.25f, -4.764f)
-                arcToRelative(0.5f, 0.5f, 0f, false, false, 0.5f, -0.866f)
-                arcTo(6.5f, 6.5f, 0f, true, false, 14.5f, 8f)
-                arcToRelative(0.5f, 0.5f, 0f, false, false, -1f, 0f)
-                arcToRelative(5.5f, 5.5f, 0f, true, true, -11f, 0f)
+                moveTo(22f, 11.08f)
+                verticalLineTo(12f)
+                arcToRelative(10f, 10f, 0f, true, true, -5.93f, -9.14f)
             }
             path(
-                fill = SolidColor(Color.Black)
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
             ) {
-                moveTo(15.354f, 3.354f)
-                arcToRelative(0.5f, 0.5f, 0f, false, false, -0.708f, -0.708f)
-                lineTo(8f, 9.293f)
-                lineTo(5.354f, 6.646f)
-                arcToRelative(0.5f, 0.5f, 0f, true, false, -0.708f, 0.708f)
-                lineToRelative(3f, 3f)
-                arcToRelative(0.5f, 0.5f, 0f, false, false, 0.708f, 0f)
-                close()
+                moveTo(22f, 4f)
+                lineTo(12f, 14.01f)
+                lineTo(9f, 11.01f)
             }
         }.build()
 
-        return _Check2Circle!!
+        return _FeatherCheckCircle!!
     }
 
-private var _Check2Circle: ImageVector? = null
+private var _FeatherCheckCircle: ImageVector? = null
+
+
 

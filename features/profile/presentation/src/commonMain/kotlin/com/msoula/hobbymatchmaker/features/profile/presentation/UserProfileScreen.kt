@@ -34,9 +34,9 @@ import com.msoula.hobbymatchmaker.core.design.guest_redirect_sign_up_button_text
 import com.msoula.hobbymatchmaker.core.design.guest_redirect_title
 import com.msoula.hobbymatchmaker.core.design.guest_share_interests_feature_description
 import com.msoula.hobbymatchmaker.core.design.guest_share_interests_feature_title
-import com.msoula.hobbymatchmaker.core.design.icons.Film
-import com.msoula.hobbymatchmaker.core.design.icons.Person
-import com.msoula.hobbymatchmaker.core.design.icons.Sparkle
+import com.msoula.hobbymatchmaker.core.design.icons.BootstrapPerson
+import com.msoula.hobbymatchmaker.core.design.icons.HeroiconsSparkles
+import com.msoula.hobbymatchmaker.core.design.icons.LucideFilm
 import com.msoula.hobbymatchmaker.core.design.log_out
 import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMembers
 import com.msoula.hobbymatchmaker.core.design.molecules.BackNavigationTopBar
@@ -313,28 +313,28 @@ fun UserProfileContent(
                     GuestProfileLayout(
                         guestHeader = {
                             GuestProfileHeader(
-                                icon = Film,
+                                icon = LucideFilm,
                                 titleHeader = stringResource(Res.string.guest_header_title),
                                 descriptionHeader = stringResource(Res.string.guest_header_description),
                             )
                         },
                         guestDiscoverFeature = {
                             FeatureProfileCard(
-                                icon = Film,
+                                icon = LucideFilm,
                                 titleFeature = stringResource(Res.string.guest_discover_feature_title),
                                 descriptionFeature = stringResource(Res.string.guest_discover_feature_description)
                             )
                         },
                         guestBuildCircleFeature = {
                             FeatureProfileCard(
-                                icon = Person,
+                                icon = BootstrapPerson,
                                 titleFeature = stringResource(Res.string.guest_build_circle_feature_title),
                                 descriptionFeature = stringResource(Res.string.guest_build_circle_feature_description)
                             )
                         },
                         guestSharedInterestsFeature = {
                             FeatureProfileCard(
-                                icon = Sparkle,
+                                icon = HeroiconsSparkles,
                                 titleFeature = stringResource(Res.string.guest_share_interests_feature_title),
                                 descriptionFeature = stringResource(Res.string.guest_share_interests_feature_description)
                             )

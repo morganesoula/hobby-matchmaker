@@ -52,7 +52,7 @@ import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWidth8
 import com.msoula.hobbymatchmaker.core.design.atoms.StatusChip
 import com.msoula.hobbymatchmaker.core.design.atoms.VideoPlayer
 import com.msoula.hobbymatchmaker.core.design.ic_no_image_found_playstore
-import com.msoula.hobbymatchmaker.core.design.icons.Play_arrow
+import com.msoula.hobbymatchmaker.core.design.icons.FeatherPlayCircle
 import com.msoula.hobbymatchmaker.core.design.molecules.MovieInformationMetaPill
 import com.msoula.hobbymatchmaker.core.design.molecules.MovieOverviewExpandable
 import com.msoula.hobbymatchmaker.core.design.molecules.MovieTitleMetaPill
@@ -191,7 +191,7 @@ fun MovieDetailInformation(
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                imageVector = Play_arrow,
+                                imageVector = FeatherPlayCircle,
                                 contentDescription = stringResource(
                                     Res.string.play_icon_accessibility
                                 ),

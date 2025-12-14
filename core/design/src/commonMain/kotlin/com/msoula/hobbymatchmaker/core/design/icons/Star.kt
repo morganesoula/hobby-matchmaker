@@ -6,25 +6,25 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-val Kid_star: ImageVector
+val MaterialSymbolsKid_star: ImageVector
     get() {
-        if (_Kid_star != null) return _Kid_star!!
+        if (_MaterialSymbolsKid_star != null) return _MaterialSymbolsKid_star!!
 
-        _Kid_star = ImageVector.Builder(
-            name = "Kid_star",
+        _MaterialSymbolsKid_star = ImageVector.Builder(
+            name = "kid_star",
             defaultWidth = 24.dp,
             defaultHeight = 24.dp,
             viewportWidth = 960f,
             viewportHeight = 960f
         ).apply {
             path(
-                fill = SolidColor(Color(0xFF000000))
+                fill = SolidColor(Color.Black)
             ) {
-                moveToRelative(305f, -704f)
+                moveTo(305f, 256f)
                 lineToRelative(112f, -145f)
                 quadToRelative(12f, -16f, 28.5f, -23.5f)
                 reflectiveQuadTo(480f, 80f)
-                reflectiveQuadToRelative(34.5f, 7.5f)
+                quadToRelative(18f, 0f, 34.5f, 7.5f)
                 reflectiveQuadTo(543f, 111f)
                 lineToRelative(112f, 145f)
                 lineToRelative(170f, 57f)
@@ -49,6 +49,7 @@ val Kid_star: ImageVector
                 reflectiveQuadTo(80f, 390f)
                 quadToRelative(0f, -25f, 14.5f, -46.5f)
                 reflectiveQuadTo(135f, 313f)
+                lineToRelative(170f, -57f)
                 close()
                 moveToRelative(49f, 69f)
                 lineToRelative(-194f, 64f)
@@ -60,13 +61,14 @@ val Kid_star: ImageVector
                 lineToRelative(124f, -177f)
                 lineToRelative(-194f, -66f)
                 lineToRelative(-126f, -165f)
+                lineToRelative(-126f, 165f)
                 close()
                 moveToRelative(126f, 135f)
+                close()
             }
         }.build()
 
-        return _Kid_star!!
+        return _MaterialSymbolsKid_star!!
     }
 
-private var _Kid_star: ImageVector? = null
-
+private var _MaterialSymbolsKid_star: ImageVector? = null

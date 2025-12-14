@@ -53,7 +53,7 @@ import com.msoula.hobbymatchmaker.core.design.atoms.HMMShimmerEffect
 import com.msoula.hobbymatchmaker.core.design.atoms.LoadingPosterPlaceholder
 import com.msoula.hobbymatchmaker.core.design.atoms.MovieGenericCard
 import com.msoula.hobbymatchmaker.core.design.atoms.RatingChip
-import com.msoula.hobbymatchmaker.core.design.icons.Heart
+import com.msoula.hobbymatchmaker.core.design.icons.LucideHeart
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
@@ -185,7 +185,7 @@ fun MovieCard(
 
             if (showBigHeart) {
                 Icon(
-                    imageVector = Heart,
+                    imageVector = LucideHeart,
                     contentDescription = "heart icon",
                     tint = MaterialTheme.colorScheme.error.copy(alpha = 0.8f),
                     modifier = Modifier

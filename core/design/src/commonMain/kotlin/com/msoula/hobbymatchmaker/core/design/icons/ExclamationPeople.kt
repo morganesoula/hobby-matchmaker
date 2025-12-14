@@ -6,14 +6,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-val PersonExclamation: ImageVector
+val BootstrapPersonExclamation: ImageVector
     get() {
-        if (_PersonExclamation != null) return _PersonExclamation!!
+        if (_BootstrapPersonExclamation != null) return _BootstrapPersonExclamation!!
 
-        _PersonExclamation = ImageVector.Builder(
-            name = "PersonExclamation",
-            defaultWidth = 16.dp,
-            defaultHeight = 16.dp,
+        _BootstrapPersonExclamation = ImageVector.Builder(
+            name = "person-exclamation",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
             viewportWidth = 16f,
             viewportHeight = 16f
         ).apply {
@@ -56,8 +56,10 @@ val PersonExclamation: ImageVector
             }
         }.build()
 
-        return _PersonExclamation!!
+        return _BootstrapPersonExclamation!!
     }
 
-private var _PersonExclamation: ImageVector? = null
+private var _BootstrapPersonExclamation: ImageVector? = null
+
+
 

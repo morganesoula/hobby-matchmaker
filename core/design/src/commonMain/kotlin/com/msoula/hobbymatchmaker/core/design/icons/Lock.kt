@@ -2,74 +2,54 @@ package com.msoula.hobbymatchmaker.core.design.icons
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-val Lock: ImageVector
+val LucideLock: ImageVector
     get() {
-        if (_Lock != null) return _Lock!!
+        if (_LucideLock != null) return _LucideLock!!
 
-        _Lock = ImageVector.Builder(
-            name = "Lock",
+        _LucideLock = ImageVector.Builder(
+            name = "lock",
             defaultWidth = 24.dp,
             defaultHeight = 24.dp,
-            viewportWidth = 960f,
-            viewportHeight = 960f
+            viewportWidth = 24f,
+            viewportHeight = 24f
         ).apply {
             path(
-                fill = SolidColor(Color(0xFF000000))
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
             ) {
-                moveTo(240f, 880f)
-                quadToRelative(-33f, 0f, -56.5f, -23.5f)
-                reflectiveQuadTo(160f, 800f)
-                verticalLineToRelative(-400f)
-                quadToRelative(0f, -33f, 23.5f, -56.5f)
-                reflectiveQuadTo(240f, 320f)
-                horizontalLineToRelative(40f)
-                verticalLineToRelative(-80f)
-                quadToRelative(0f, -83f, 58.5f, -141.5f)
-                reflectiveQuadTo(480f, 40f)
-                reflectiveQuadToRelative(141.5f, 58.5f)
-                reflectiveQuadTo(680f, 240f)
-                verticalLineToRelative(80f)
-                horizontalLineToRelative(40f)
-                quadToRelative(33f, 0f, 56.5f, 23.5f)
-                reflectiveQuadTo(800f, 400f)
-                verticalLineToRelative(400f)
-                quadToRelative(0f, 33f, -23.5f, 56.5f)
-                reflectiveQuadTo(720f, 880f)
+                moveTo(5f, 11f)
+                horizontalLineTo(19f)
+                arcTo(2f, 2f, 0f, false, true, 21f, 13f)
+                verticalLineTo(20f)
+                arcTo(2f, 2f, 0f, false, true, 19f, 22f)
+                horizontalLineTo(5f)
+                arcTo(2f, 2f, 0f, false, true, 3f, 20f)
+                verticalLineTo(13f)
+                arcTo(2f, 2f, 0f, false, true, 5f, 11f)
                 close()
-                moveToRelative(0f, -80f)
-                horizontalLineToRelative(480f)
-                verticalLineToRelative(-400f)
-                horizontalLineTo(240f)
-                close()
-                moveToRelative(240f, -120f)
-                quadToRelative(33f, 0f, 56.5f, -23.5f)
-                reflectiveQuadTo(560f, 600f)
-                reflectiveQuadToRelative(-23.5f, -56.5f)
-                reflectiveQuadTo(480f, 520f)
-                reflectiveQuadToRelative(-56.5f, 23.5f)
-                reflectiveQuadTo(400f, 600f)
-                reflectiveQuadToRelative(23.5f, 56.5f)
-                reflectiveQuadTo(480f, 680f)
-                moveTo(360f, 320f)
-                horizontalLineToRelative(240f)
-                verticalLineToRelative(-80f)
-                quadToRelative(0f, -50f, -35f, -85f)
-                reflectiveQuadToRelative(-85f, -35f)
-                reflectiveQuadToRelative(-85f, 35f)
-                reflectiveQuadToRelative(-35f, 85f)
-                close()
-                moveTo(240f, 800f)
-                verticalLineToRelative(-400f)
-                close()
+            }
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(7f, 11f)
+                verticalLineTo(7f)
+                arcToRelative(5f, 5f, 0f, false, true, 10f, 0f)
+                verticalLineToRelative(4f)
             }
         }.build()
 
-        return _Lock!!
+        return _LucideLock!!
     }
 
-private var _Lock: ImageVector? = null
-
+private var _LucideLock: ImageVector? = null

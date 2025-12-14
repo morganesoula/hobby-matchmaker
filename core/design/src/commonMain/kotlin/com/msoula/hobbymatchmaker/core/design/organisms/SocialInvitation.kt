@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
-import com.msoula.hobbymatchmaker.core.design.icons.Person_add
+import com.msoula.hobbymatchmaker.core.design.icons.MaterialSymbolsPerson_add
 import com.msoula.hobbymatchmaker.core.design.models.Invitation
 import com.msoula.hobbymatchmaker.core.design.molecules.ReceivedInvitationCard
 import com.msoula.hobbymatchmaker.core.design.molecules.SentInvitationCard
@@ -29,7 +29,7 @@ fun ReceivedInvitationSection(
     TipTextField(
         modifier = Modifier.padding(start = CustomSize.Sixteen, end = CustomSize.Sixteen),
         hintText = stringResource(Res.string.social_received_requests_description),
-        icon = Person_add,
+        icon = MaterialSymbolsPerson_add,
         iconColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = .8f),
         textColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = .8f)
     )

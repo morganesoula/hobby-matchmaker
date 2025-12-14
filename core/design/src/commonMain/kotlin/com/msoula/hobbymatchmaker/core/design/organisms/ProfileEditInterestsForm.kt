@@ -29,9 +29,9 @@ import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWidth4
 import com.msoula.hobbymatchmaker.core.design.edit_profile_add_interests_description
 import com.msoula.hobbymatchmaker.core.design.edit_profile_add_interests_hint
 import com.msoula.hobbymatchmaker.core.design.edit_profile_add_interests_title
-import com.msoula.hobbymatchmaker.core.design.icons.Add
-import com.msoula.hobbymatchmaker.core.design.icons.Lightbulb
-import com.msoula.hobbymatchmaker.core.design.icons.Sparkle
+import com.msoula.hobbymatchmaker.core.design.icons.HeroiconsSparkles
+import com.msoula.hobbymatchmaker.core.design.icons.MaterialSymbolsAdd_2
+import com.msoula.hobbymatchmaker.core.design.icons.VscodeCodiconsLightbulb
 import com.msoula.hobbymatchmaker.core.design.molecules.InterestDeletableBlock
 import com.msoula.hobbymatchmaker.core.design.molecules.TipTextField
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
@@ -73,7 +73,7 @@ fun ProfileEditInterestsForm(
         Column {
             Row {
                 FormIcon(
-                    icon = Sparkle,
+                    icon = HeroiconsSparkles,
                     size = IconSize.TwentyFour,
                     tint = MaterialTheme.colorScheme.primary
                 )
@@ -97,7 +97,7 @@ fun ProfileEditInterestsForm(
 
             TipTextField(
                 hintText = stringResource(Res.string.edit_profile_add_interests_description),
-                icon = Lightbulb
+                icon = VscodeCodiconsLightbulb
             )
 
             SpacerHeight8()
@@ -133,7 +133,7 @@ fun ProfileEditInterestsForm(
                     enabled = interests.size < 5 && currentInterestInput.isNotBlank()
                 ) {
                     Icon(
-                        imageVector = Add,
+                        imageVector = MaterialSymbolsAdd_2,
                         contentDescription = null,
                         modifier = Modifier.padding(CustomSize.Four)
                     )

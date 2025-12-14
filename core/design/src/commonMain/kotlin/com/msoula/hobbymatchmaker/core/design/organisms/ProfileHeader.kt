@@ -28,7 +28,7 @@ import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight4
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
 import com.msoula.hobbymatchmaker.core.design.authentified_edit_button_title
-import com.msoula.hobbymatchmaker.core.design.icons.Edit
+import com.msoula.hobbymatchmaker.core.design.icons.LucidePencil
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import org.jetbrains.compose.resources.stringResource
 
@@ -136,7 +136,7 @@ fun AuthentifiedProfileHeader(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = Edit,
+                        imageVector = LucidePencil,
                         contentDescription = null
                     )
 

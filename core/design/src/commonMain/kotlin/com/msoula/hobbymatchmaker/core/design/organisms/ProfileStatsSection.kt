@@ -20,8 +20,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.GenericCard
-import com.msoula.hobbymatchmaker.core.design.icons.Film
-import com.msoula.hobbymatchmaker.core.design.icons.Person
+import com.msoula.hobbymatchmaker.core.design.icons.BootstrapPerson
+import com.msoula.hobbymatchmaker.core.design.icons.LucideFilm
 import com.msoula.hobbymatchmaker.core.design.movies_liked_count_title
 import com.msoula.hobbymatchmaker.core.design.social_members_count_title
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
@@ -46,13 +46,13 @@ fun ProfileStatsSection(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             StatItem(
-                icon = Film,
+                icon = LucideFilm,
                 value = moviesLikedCount.toString(),
                 label = stringResource(Res.string.movies_liked_count_title)
             )
 
             StatItem(
-                icon = Person,
+                icon = BootstrapPerson,
                 value = "$socialMembersCount/5",
                 label = stringResource(Res.string.social_members_count_title)
             )

@@ -19,7 +19,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import com.msoula.hobbymatchmaker.core.design.icons.Lock
+import com.msoula.hobbymatchmaker.core.design.icons.LucideLock
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.HMMTextFieldColors
 import com.msoula.hobbymatchmaker.core.design.theme.IconSize
@@ -115,7 +115,7 @@ fun PasswordTextField(
         visualTransformation = visualTransformation,
         leadingIcon = {
             Icon(
-                Lock,
+                LucideLock,
                 contentDescription = contentDescription,
                 modifier = modifier.size(IconSize.Sixteen)
             )

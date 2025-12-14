@@ -11,7 +11,7 @@ import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.EmptyStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.StateContainer
-import com.msoula.hobbymatchmaker.core.design.icons.Sad_tab
+import com.msoula.hobbymatchmaker.core.design.icons.MaterialSymbolsRoundedSad_tab
 import com.msoula.hobbymatchmaker.core.design.models.EmptyStateConfig
 import com.msoula.hobbymatchmaker.core.design.models.TabItem
 import com.msoula.hobbymatchmaker.core.design.no_data
@@ -87,7 +87,7 @@ fun SocialContent(
                     onEmpty = {
                         EmptyStateScreen(
                             EmptyStateConfig(
-                                icon = Sad_tab,
+                                icon = MaterialSymbolsRoundedSad_tab,
                                 title = UIText.Resource(Res.string.social_sent_requests_no_data_title),
                                 description = UIText.Resource(Res.string.social_sent_requests_no_data_description)
                             )
