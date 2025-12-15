@@ -32,6 +32,8 @@ import com.msoula.hobbymatchmaker.core.design.molecules.ValidationRequirement
 import com.msoula.hobbymatchmaker.core.design.molecules.ValidationRequirementsList
 import com.msoula.hobbymatchmaker.core.design.molecules.WarningTextField
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -46,8 +48,8 @@ fun ProfileEditInformationForm(
     isPseudoAvailable: Boolean?,
     onBioChanged: (String) -> Unit,
     bio: String? = null,
-    nameRequirements: List<ValidationRequirement> = emptyList(),
-    pseudoRequirements: List<ValidationRequirement> = emptyList(),
+    nameRequirements: ImmutableList<ValidationRequirement> = persistentListOf(),
+    pseudoRequirements: ImmutableList<ValidationRequirement> = persistentListOf(),
 ) {
     val pseudoFieldFocused = rememberSaveable { mutableStateOf(false) }
 

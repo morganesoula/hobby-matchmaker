@@ -18,7 +18,6 @@ import com.msoula.hobbymatchmaker.core.design.google_logo
 import com.msoula.hobbymatchmaker.core.design.sign_in_with_apple
 import com.msoula.hobbymatchmaker.core.design.sign_in_with_google
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -36,7 +35,7 @@ internal actual fun SocialMediaButtonsPlatformSpecific(
         SocialMediaButton(
             text = stringResource(Res.string.sign_in_with_apple),
             contentDescription = stringResource(Res.string.apple_alt),
-            painter = painterResource(Res.drawable.apple_logo),
+            iconRes = Res.drawable.apple_logo,
             containerColor = MaterialTheme.colorScheme.onSurface,
             contentColor = Color.Black,
             borderStroke = BorderStroke(1.dp, Color.Black),
@@ -47,7 +46,7 @@ internal actual fun SocialMediaButtonsPlatformSpecific(
         SocialMediaButton(
             text = stringResource(Res.string.sign_in_with_google),
             contentDescription = stringResource(Res.string.google_alt),
-            painter = painterResource(Res.drawable.google_logo),
+            iconRes = Res.drawable.google_logo,
             containerColor = Color.Black,
             contentColor = MaterialTheme.colorScheme.onSurface,
             borderStroke = null,

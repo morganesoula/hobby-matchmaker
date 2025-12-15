@@ -18,12 +18,13 @@ import com.msoula.hobbymatchmaker.core.common.isIosPlatform
 import com.msoula.hobbymatchmaker.core.design.models.MovieCarouselItem
 import com.msoula.hobbymatchmaker.core.design.molecules.MovieCard
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun MovieCarousel(
     modifier: Modifier = Modifier,
     padding: PaddingValues,
-    movies: List<MovieCarouselItem>,
+    movies: ImmutableList<MovieCarouselItem>,
     onMovieSingleTap: (movieId: Long, overview: String) -> Unit,
     onMovieDoubleTap: (id: Long) -> Unit
 ) {

@@ -53,6 +53,7 @@ import com.msoula.hobbymatchmaker.core.design.atoms.StatusChip
 import com.msoula.hobbymatchmaker.core.design.atoms.VideoPlayer
 import com.msoula.hobbymatchmaker.core.design.ic_no_image_found_playstore
 import com.msoula.hobbymatchmaker.core.design.icons.FeatherPlayCircle
+import com.msoula.hobbymatchmaker.core.design.models.Casting
 import com.msoula.hobbymatchmaker.core.design.molecules.MovieInformationMetaPill
 import com.msoula.hobbymatchmaker.core.design.molecules.MovieOverviewExpandable
 import com.msoula.hobbymatchmaker.core.design.molecules.MovieTitleMetaPill
@@ -60,6 +61,8 @@ import com.msoula.hobbymatchmaker.core.design.molecules.rememberCoilImageLoader
 import com.msoula.hobbymatchmaker.core.design.play_icon_accessibility
 import com.msoula.hobbymatchmaker.core.design.play_trailer
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -71,13 +74,13 @@ fun MovieDetailInformation(
     status: String,
     title: String,
     releaseDate: String,
-    genres: List<String>,
+    genres: ImmutableList<String>,
     duration: Int,
     videoId: String,
     movieId: Long,
     isVideoUriKnown: Boolean,
     overview: String,
-    filteredCast: Map<String, String>,
+    filteredCast: Casting,
     isLoading: Boolean,
     videoPlayerVisible: Boolean,
     onVideoPlayerDismissed: () -> Unit,
@@ -159,7 +162,7 @@ fun MovieDetailInformation(
             SpacerHeight8()
             MovieTitleMetaPill(title = title)
             SpacerHeight8()
-            MovieInformationMetaPill(releaseDate, genres, duration)
+            MovieInformationMetaPill(releaseDate, genres.toImmutableList(), duration)
             SpacerHeight16()
 
             if (videoPlayerVisible) {
@@ -210,7 +213,7 @@ fun MovieDetailInformation(
             SpacerHeight16()
             MovieOverviewExpandable(overview = overview)
 
-            if (filteredCast.isNotEmpty()) actorSection()
+            if (filteredCast.cast.isNotEmpty()) actorSection()
         }
     }
 }

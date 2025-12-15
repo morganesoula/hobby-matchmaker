@@ -14,12 +14,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import com.msoula.hobbymatchmaker.core.design.models.TabItem
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun SocialLayout(
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues,
-    tabs: List<TabItem>,
+    tabs: ImmutableList<TabItem>,
     receivedContent: (@Composable () -> Unit)? = null,
     sentContent: (@Composable () -> Unit)? = null
 ) {

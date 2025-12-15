@@ -1,5 +1,6 @@
 package com.msoula.hobbymatchmaker.core.design.util
 
+import androidx.compose.runtime.Immutable
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.authentication_already_exists
@@ -21,6 +22,7 @@ import com.msoula.hobbymatchmaker.core.design.unknown_error
 import com.msoula.hobbymatchmaker.core.design.validation_error
 import org.jetbrains.compose.resources.StringResource
 
+@Immutable
 sealed interface UIText {
     data class Resource(val res: StringResource, val args: List<Any> = emptyList()) : UIText
     data class Plain(val value: String) : UIText

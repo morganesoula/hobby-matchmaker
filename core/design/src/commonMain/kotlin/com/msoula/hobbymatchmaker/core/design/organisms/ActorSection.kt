@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
 import com.msoula.hobbymatchmaker.core.design.cast
+import com.msoula.hobbymatchmaker.core.design.models.Casting
 import com.msoula.hobbymatchmaker.core.design.molecules.ActorItem
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import org.jetbrains.compose.resources.stringResource
@@ -27,9 +28,9 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun ActorSection(
     modifier: Modifier = Modifier,
-    cast: Map<String, String>
+    casting: Casting
 ) {
-    val casting = cast.entries.toList()
+    val localCasting = casting.cast.entries.toList()
 
     Column(
         modifier = modifier.fillMaxWidth()
@@ -41,7 +42,7 @@ fun ActorSection(
         )
         SpacerHeight8()
         LazyRow(horizontalArrangement = Arrangement.spacedBy(CustomSize.Eight)) {
-            items(casting, key = { it.key }) { (currentNameActor, currentRole) ->
+            items(localCasting, key = { it.key }) { (currentNameActor, currentRole) ->
                 Card(
                     modifier = Modifier
                         .size(120.dp)

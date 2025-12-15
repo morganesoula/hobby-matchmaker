@@ -15,7 +15,7 @@ interface FacebookUIClient {
 }
 
 class FacebookUIClientImpl(
-    private val facebookUIClient: FacebookUIClient
+    val facebookUIClient: FacebookUIClient
 ) : SocialUIClient {
 
     override val providerType: ProviderType

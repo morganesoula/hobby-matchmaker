@@ -25,12 +25,14 @@ import com.msoula.hobbymatchmaker.core.design.util.UIText
 import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toReceivedInvitations
 import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toSentInvitations
 import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUiEventModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun SocialContent(
     modifier: Modifier = Modifier,
     socialViewModel: SocialViewModel,
-    tabs: List<TabItem>
+    tabs: ImmutableList<TabItem>
 ) {
     val sentInvites by socialViewModel.sentInvites.collectAsState()
     val incomingInvites by socialViewModel.incomingInvites.collectAsState()
@@ -61,7 +63,7 @@ fun SocialContent(
                     },
                     onSuccess = { invites ->
                         ReceivedInvitationSection(
-                            invites.toReceivedInvitations(),
+                            invites.toImmutableList().toReceivedInvitations(),
                             onAcceptInvitationClick = { id, guestUid ->
                                 socialViewModel.onEvent(
                                     SocialUiEventModel.OnAcceptInvitation(

@@ -68,6 +68,8 @@ import io.github.vinceglb.filekit.dialogs.FileKitMode
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.path
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -219,12 +221,13 @@ fun UserProfileContent(
                                                 )
                                             )
                                         },
-                                        nameRequirements = requirements.value
+                                        nameRequirements = requirements.value.toImmutableList()
                                     )
                                 },
                                 editInterestsSection = {
                                     ProfileEditInterestsForm(
-                                        interests = currentEditableProfile.interests ?: emptyList(),
+                                        interests = currentEditableProfile.interests?.toImmutableList()
+                                            ?: persistentListOf(),
                                         onInterestChanged = {
                                             profileViewModel.onEvent(
                                                 UserProfileUiEventModel.OnInterestsChanged(it)
@@ -269,12 +272,13 @@ fun UserProfileContent(
                             },
                             interestsSection = {
                                 ProfileInterestsSection(
-                                    interests = profile.interests
+                                    interests = profile.interests?.toImmutableList()
                                 )
                             },
                             socialSection = {
                                 ProfileSocialSection(
-                                    socialMembers = profile.socialMembers.map { it.toProfileSocialMembers() },
+                                    socialMembers = profile.socialMembers.map { it.toProfileSocialMembers() }
+                                        .toImmutableList(),
                                     onSearchPeople = {
                                         socialViewModel.onEvent(SocialUiEventModel.OnSearchPeople(it))
                                     },
@@ -285,7 +289,7 @@ fun UserProfileContent(
                                             pseudo = member.pseudo,
                                             avatarUrl = member.avatarUrl
                                         )
-                                    },
+                                    }.toImmutableList(),
                                     onInviteToSocialCircle = { pseudo, name ->
                                         socialViewModel.onEvent(
                                             SocialUiEventModel.OnInviteToSocialCircle(pseudo, name)

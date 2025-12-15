@@ -37,6 +37,7 @@ import com.msoula.hobbymatchmaker.core.design.util.UIText
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.features.movies.presentation.mappers.toCarouselItems
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun MovieContent(
@@ -107,7 +108,7 @@ fun MovieContent(
                 onSuccess = { movies ->
                     MovieCarousel(
                         padding = padding,
-                        movies = movies.toCarouselItems(),
+                        movies = movies.toImmutableList().toCarouselItems(),
                         onMovieSingleTap = { id, overview ->
                             movieViewModel.onCardEvent(CardEventModel.OnSingleTap(id, overview))
                         },

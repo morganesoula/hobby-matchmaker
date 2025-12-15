@@ -47,14 +47,16 @@ import com.msoula.hobbymatchmaker.core.design.theme.IconSize
 import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_main_add_people_form_title
 import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_main_add_people_text_button
 import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_main_title
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun ProfileSocialSection(
-    socialMembers: List<ProfileSocialMembers>?,
+    socialMembers: ImmutableList<ProfileSocialMembers>?,
     onSearchPeople: (pseudo: String) -> Unit,
-    searchResult: List<ProfileSocialMembers> = emptyList(),
+    searchResult: ImmutableList<ProfileSocialMembers> = persistentListOf(),
     onInviteToSocialCircle: (pseudo: String, name: String?) -> Unit
 ) {
     val textFieldState = rememberTextFieldState()
@@ -241,7 +243,7 @@ fun ProfileSocialSection(
 @Composable
 fun ProfileSocialSectionPreview() {
     ProfileSocialSection(
-        socialMembers = emptyList(),
+        socialMembers = persistentListOf(),
         onSearchPeople = {},
         onInviteToSocialCircle = { _, _ -> }
     )

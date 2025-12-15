@@ -1,5 +1,8 @@
 package com.msoula.hobbymatchmaker.core.design.util
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 sealed interface UiState<out T> {
     data object Loading : UiState<Nothing>
     data class Success<T>(val data: T) : UiState<T>

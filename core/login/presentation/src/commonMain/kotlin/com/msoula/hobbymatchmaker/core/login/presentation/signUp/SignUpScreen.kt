@@ -10,16 +10,12 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.LoadingOverlay
 import com.msoula.hobbymatchmaker.core.design.atoms.StateContainer
-import com.msoula.hobbymatchmaker.core.design.atoms.asStringSuspend
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_requirements_no_number
 import com.msoula.hobbymatchmaker.core.design.email_validation_correct_format
 import com.msoula.hobbymatchmaker.core.design.email_validation_no_spaces
@@ -33,22 +29,21 @@ import com.msoula.hobbymatchmaker.core.design.password_validation_one_special_ch
 import com.msoula.hobbymatchmaker.core.design.password_validation_one_upper_case
 import com.msoula.hobbymatchmaker.core.design.templates.SignUpLayout
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
-import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
+import com.msoula.hobbymatchmaker.core.login.presentation.signUp.models.SignUpStateModel
+import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun SignUpScreenContent(
     modifier: Modifier = Modifier,
-    signUpViewModel: SignUpViewModel,
-    onNavigate: (String) -> Unit
+    registrationState: SignUpStateModel,
+    signUpState: UiState<Unit>,
+    snackBarHostState: SnackbarHostState,
+    onEvent: (AuthenticationUIEvent) -> Unit,
+    onNavigateToSignIn: () -> Unit
 ) {
-    val snackBarHostState = remember { SnackbarHostState() }
-
-    val registrationState by signUpViewModel.formDataFlow.collectAsState()
-    val signUpState by signUpViewModel.signUpState.collectAsState()
-
     val eightCharactersRequirement = stringResource(Res.string.password_validation_eight_characters)
     val oneNumberRequirement = stringResource(Res.string.password_validation_one_number)
     val oneUppercaseRequirement = stringResource(Res.string.password_validation_one_upper_case)
@@ -121,18 +116,6 @@ fun SignUpScreenContent(
         }
     }
 
-    LaunchedEffect(signUpViewModel.events) {
-        signUpViewModel.events.collect { event ->
-            when (event) {
-                is UiEvent.ShowSnackBar ->
-                    snackBarHostState.showSnackbar(event.message.asStringSuspend())
-
-                is UiEvent.NavigateToRoute -> onNavigate(event.route)
-                else -> {}
-            }
-        }
-    }
-
     Scaffold(
         snackbarHost = {
             SnackbarHost(
@@ -172,39 +155,39 @@ fun SignUpScreenContent(
                                 password = registrationState.password,
                                 loading = signUpState is UiState.Loading,
                                 enabled = registrationState.submit,
-                                nameRequirement = nameRequirements.value,
-                                emailRequirement = emailRequirements.value,
-                                passwordRequirement = passwordRequirements.value,
+                                nameRequirement = nameRequirements.value.toImmutableList(),
+                                emailRequirement = emailRequirements.value.toImmutableList(),
+                                passwordRequirement = passwordRequirements.value.toImmutableList(),
                                 onNameChanged = {
-                                    signUpViewModel.onEvent(
+                                    onEvent(
                                         AuthenticationUIEvent.OnFirstNameChanged(
                                             it
                                         )
                                     )
                                 },
                                 onEmailChanged = {
-                                    signUpViewModel.onEvent(
+                                    onEvent(
                                         AuthenticationUIEvent.OnEmailChanged(
                                             it
                                         )
                                     )
                                 },
                                 onPasswordChanged = {
-                                    signUpViewModel.onEvent(
+                                    onEvent(
                                         AuthenticationUIEvent.OnPasswordChanged(
                                             it
                                         )
                                     )
                                 },
-                                onFinish = { signUpViewModel.onEvent(AuthenticationUIEvent.OnSignUp) }
+                                onFinish = { onEvent(AuthenticationUIEvent.OnSignUp) }
                             )
                         },
                         bottomSection = {
                             AuthenticationScreenBottom(
                                 isSignInScreen = false,
                                 onNavigateToOppositeScreen = {
-                                    signUpViewModel.onEvent(AuthenticationUIEvent.OnScreenChanged)
-                                    onNavigate("sign_in")
+                                    onEvent(AuthenticationUIEvent.OnScreenChanged)
+                                    onNavigateToSignIn()
                                 }
                             )
                         }

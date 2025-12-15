@@ -16,9 +16,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.common.toReadableDuration
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
-private fun MetaPill(modifier: Modifier = Modifier, content: @Composable RowScope.() -> Unit) {
+private fun MetaPill(
+    modifier: Modifier = Modifier,
+    content: @Composable RowScope.() -> Unit
+) {
     Row(
         modifier = modifier
             .background(
@@ -58,7 +62,7 @@ fun MovieTitleMetaPill(
 @Composable
 fun MovieInformationMetaPill(
     releaseDate: String,
-    genres: List<String>,
+    genres: ImmutableList<String>,
     duration: Int
 ) {
     MetaPill {

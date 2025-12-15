@@ -6,6 +6,8 @@ import com.msoula.hobbymatchmaker.features.social.domain.models.SocialInviteDoma
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.InviteUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUserSummaryUiModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlin.time.ExperimentalTime
 
 fun SocialMemberDomainModel.toSocialSummaryUiModel(): SocialUserSummaryUiModel =
@@ -53,8 +55,8 @@ fun InviteUiModel.toInvitation(): Invitation =
         invitationStatus = this.inviteStatus.name
     )
 
-fun List<InviteUiModel>.toReceivedInvitations(): List<Invitation> {
-    return map { it.toInvitation() }
+fun ImmutableList<InviteUiModel>.toReceivedInvitations(): ImmutableList<Invitation> {
+    return map { it.toInvitation() }.toImmutableList()
 }
 
 fun List<InviteUiModel>.toSentInvitations(): List<Invitation> {

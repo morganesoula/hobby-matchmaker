@@ -16,12 +16,14 @@ import com.msoula.hobbymatchmaker.core.design.molecules.SentInvitationCard
 import com.msoula.hobbymatchmaker.core.design.molecules.TipTextField
 import com.msoula.hobbymatchmaker.core.design.social_received_requests_description
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun ReceivedInvitationSection(
-    receivedInvitation: List<Invitation>,
+    receivedInvitation: ImmutableList<Invitation>,
     onAcceptInvitationClick: (invitationId: String, guestUid: String) -> Unit,
     onDeclineInvitationClick: (invitationId: String) -> Unit
 ) {
@@ -82,7 +84,7 @@ fun SentInvitationSection(
 fun ReceivedInvitationSectionPreview() {
     Column {
         ReceivedInvitationSection(
-            listOf(
+            persistentListOf(
                 Invitation(
                     ownerId = "AZERTY",
                     invitationId = "123AZE",

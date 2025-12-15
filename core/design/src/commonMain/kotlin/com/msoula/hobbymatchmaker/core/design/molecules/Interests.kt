@@ -21,12 +21,13 @@ import com.msoula.hobbymatchmaker.core.design.atoms.FormIcon
 import com.msoula.hobbymatchmaker.core.design.icons.MaterialSymbolsDelete
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.IconSize
+import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun InterestsBlock(
     modifier: Modifier = Modifier,
-    interests: List<String>?
+    interests: ImmutableList<String>?
 ) {
     FlowRow {
         interests?.forEach { tag ->
@@ -47,7 +48,7 @@ fun InterestsBlock(
 @Composable
 fun InterestDeletableBlock(
     modifier: Modifier = Modifier,
-    interests: List<String>?,
+    interests: ImmutableList<String>?,
     onDeleteClicked: (tag: String) -> Unit
 ) {
     FlowRow(
@@ -93,7 +94,7 @@ fun InterestDeletableBlock(
 @Composable
 fun InterestDeletableBlockPreview() {
     InterestDeletableBlock(
-        interests = listOf("Chat", "Chien", "Lapin", "Renard", "Randonnée"),
+        interests = listOf("Chat", "Chien", "Lapin", "Renard", "Randonnée") as ImmutableList<String>?,
         onDeleteClicked = {}
     )
 }

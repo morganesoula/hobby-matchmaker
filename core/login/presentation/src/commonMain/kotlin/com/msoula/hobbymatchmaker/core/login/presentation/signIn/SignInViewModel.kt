@@ -15,6 +15,7 @@ import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.core.login.presentation.interactors.SignInInteractor
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.models.SignInFormStateModel
+import com.msoula.hobbymatchmaker.core.login.presentation.signIn.models.SocialClientsVM
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,7 +25,7 @@ import kotlinx.coroutines.launch
 
 class SignInViewModel(
     private val signInInteractor: SignInInteractor,
-    private val socialClients: Map<ProviderType, SocialUIClient>,
+    private val socialClients: SocialClientsVM,
     private val defaultErrorMessageMapper: ErrorMessageMapper,
     externalScope: CoroutineScope? = null
 ) : ViewModel() {
@@ -83,7 +84,7 @@ class SignInViewModel(
                 doSignIn {
                     signInInteractor.signInSocial(
                         ProviderType.GOOGLE,
-                        credentialProvider = { socialClients[ProviderType.GOOGLE]!!.getCredential() }
+                        credentialProvider = { socialClients.clients[ProviderType.GOOGLE]!!.getCredential() }
                     )
                 }
             }
@@ -92,7 +93,7 @@ class SignInViewModel(
                 doSignIn {
                     signInInteractor.signInSocial(
                         ProviderType.APPLE,
-                        { socialClients[ProviderType.APPLE]!!.getCredential() }
+                        { socialClients.clients[ProviderType.APPLE]!!.getCredential() }
                     )
                 }
             }

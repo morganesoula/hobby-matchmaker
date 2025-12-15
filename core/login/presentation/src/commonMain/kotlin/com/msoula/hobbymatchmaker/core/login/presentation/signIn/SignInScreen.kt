@@ -16,10 +16,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -31,7 +29,6 @@ import com.msoula.hobbymatchmaker.core.design.atoms.LoadingOverlay
 import com.msoula.hobbymatchmaker.core.design.atoms.PrimaryAlertDialog
 import com.msoula.hobbymatchmaker.core.design.atoms.PrimaryTextField
 import com.msoula.hobbymatchmaker.core.design.atoms.StateContainer
-import com.msoula.hobbymatchmaker.core.design.atoms.asStringSuspend
 import com.msoula.hobbymatchmaker.core.design.cancel
 import com.msoula.hobbymatchmaker.core.design.continue_as_guest_create_redirect_button
 import com.msoula.hobbymatchmaker.core.design.continue_as_guest_dialog_text
@@ -48,61 +45,30 @@ import com.msoula.hobbymatchmaker.core.design.organisms.SignInSocialMedia
 import com.msoula.hobbymatchmaker.core.design.reset_password
 import com.msoula.hobbymatchmaker.core.design.templates.SignInLayout
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
-import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.core.design.your_email
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
-import org.jetbrains.compose.resources.getString
+import com.msoula.hobbymatchmaker.core.login.presentation.signIn.models.SignInFormStateModel
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun SignInScreenContent(
-    signInViewModel: SignInViewModel,
+    signInState: UiState<Unit>,
+    formState: SignInFormStateModel,
+    onEvent: (AuthenticationUIEvent) -> Unit,
+    dontAskCheckbox: Boolean,
     onNavigate: (String) -> Unit,
+    snackBarHostState: SnackbarHostState,
     facebookUIClient: FacebookUIClient
 ) {
-    val signInState by signInViewModel.signInState.collectAsState()
-    val formState by signInViewModel.formDataFlow.collectAsState()
-
-    val snackBarHostState = remember { SnackbarHostState() }
-
     var displayResetPasswordDialog by rememberSaveable { mutableStateOf(false) }
     var displayGuestDialog by rememberSaveable { mutableStateOf(false) }
     var localCheckboxValue by rememberSaveable { mutableStateOf(false) }
 
-    val dontAskCheckboxValue by signInViewModel.dontAskCheckboxValue.collectAsState()
-
     LaunchedEffect(displayGuestDialog) {
         if (displayGuestDialog) {
-            localCheckboxValue = dontAskCheckboxValue
-        }
-    }
-
-    LaunchedEffect(signInViewModel.events) {
-        signInViewModel.events.collect { event ->
-            when (event) {
-                is UiEvent.ShowSnackBar ->
-                    snackBarHostState.showSnackbar(event.message.asStringSuspend())
-
-                is UiEvent.NavigateToRoute -> onNavigate(event.route)
-
-                is UiEvent.OpenDialog ->
-                    when (event.dialogPurpose) {
-                        else -> {}
-                    }
-
-                is UiEvent.CloseDialog -> {
-                    when (event.dialogName) {
-                        "reset_password" -> {
-                            displayResetPasswordDialog = false
-                            snackBarHostState.showSnackbar(getString(Res.string.reset_password))
-                        }
-                    }
-                }
-
-                else -> Unit
-            }
+            localCheckboxValue = dontAskCheckbox
         }
     }
 
@@ -143,10 +109,10 @@ fun SignInScreenContent(
                                 loading = signInState is UiState.Loading,
                                 enabled = formState.submit,
                                 onEmailChanged = {
-                                    signInViewModel.onEvent(AuthenticationUIEvent.OnEmailChanged(it))
+                                    onEvent(AuthenticationUIEvent.OnEmailChanged(it))
                                 },
                                 onPasswordChanged = {
-                                    signInViewModel.onEvent(
+                                    onEvent(
                                         AuthenticationUIEvent.OnPasswordChanged(
                                             it
                                         )
@@ -154,7 +120,7 @@ fun SignInScreenContent(
                                 },
                                 onForgotPasswordClicked = { displayResetPasswordDialog = true },
                                 onFinish = {
-                                    signInViewModel.onEvent(AuthenticationUIEvent.OnSignIn)
+                                    onEvent(AuthenticationUIEvent.OnSignIn)
                                 }
                             )
                         },
@@ -162,10 +128,10 @@ fun SignInScreenContent(
                         socialMediaSection = {
                             SignInSocialMedia(
                                 onGoogleClick = {
-                                    signInViewModel.onEvent(AuthenticationUIEvent.OnGoogleButtonClicked)
+                                    onEvent(AuthenticationUIEvent.OnGoogleButtonClicked)
                                 },
                                 onAppleClick = {
-                                    signInViewModel.onEvent(AuthenticationUIEvent.OnAppleButtonClicked)
+                                    onEvent(AuthenticationUIEvent.OnAppleButtonClicked)
                                 },
                                 onFacebookClick = {
                                     if (facebookUIClient.hasValidToken()) {
@@ -174,7 +140,7 @@ fun SignInScreenContent(
 
                                     facebookUIClient.registerCallback(
                                         onSuccess = { credential, _ ->
-                                            signInViewModel.onEvent(
+                                            onEvent(
                                                 AuthenticationUIEvent.OnFacebookButtonClicked(
                                                     credential
                                                 )
@@ -191,9 +157,9 @@ fun SignInScreenContent(
                                 isSignInScreen = true,
                                 onNavigateToOppositeScreen = { onNavigate("sign_up") },
                                 onContinueAsGuest = {
-                                    if (dontAskCheckboxValue) {
+                                    if (dontAskCheckbox) {
                                         Logger.d("Continue as guest clicked - setting account as guest")
-                                        signInViewModel.onEvent(AuthenticationUIEvent.SetAccountAsGuest)
+                                        onEvent(AuthenticationUIEvent.SetAccountAsGuest)
                                     } else {
                                         displayGuestDialog = true
                                     }
@@ -215,14 +181,14 @@ fun SignInScreenContent(
                     isLoading = false,
                     onCancel = { displayResetPasswordDialog = false },
                     onDismiss = { displayResetPasswordDialog = false },
-                    onConfirm = { signInViewModel.onEvent(AuthenticationUIEvent.OnResetPasswordConfirmed) }
+                    onConfirm = { onEvent(AuthenticationUIEvent.OnResetPasswordConfirmed) }
                 ) {
                     PrimaryTextField(
                         text = formState.emailReset,
                         label = stringResource(Res.string.your_email),
                         singleLine = true,
                         onValueChanged = {
-                            signInViewModel.onEvent(
+                            onEvent(
                                 AuthenticationUIEvent.OnEmailResetChanged(
                                     it
                                 )
@@ -249,7 +215,7 @@ fun SignInScreenContent(
                     },
                     onConfirm = {
                         displayGuestDialog = false
-                        signInViewModel.onEvent(AuthenticationUIEvent.SetAccountAsGuest)
+                        onEvent(AuthenticationUIEvent.SetAccountAsGuest)
                     }
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -264,7 +230,7 @@ fun SignInScreenContent(
                                 onCheckedChange = {
                                     Logger.d("Checkbox value: $it")
                                     localCheckboxValue = it
-                                    signInViewModel.onEvent(
+                                    onEvent(
                                         AuthenticationUIEvent.SaveDontAskGuestDialogValue(it)
                                     )
                                 }

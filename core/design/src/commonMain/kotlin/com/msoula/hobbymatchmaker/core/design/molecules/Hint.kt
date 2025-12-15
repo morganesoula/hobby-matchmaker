@@ -13,6 +13,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,6 +27,7 @@ import com.msoula.hobbymatchmaker.core.design.icons.BootstrapPersonExclamation
 import com.msoula.hobbymatchmaker.core.design.icons.FeatherXCircle
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.IconSize
+import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -144,7 +146,7 @@ fun ValidationRequirementItem(
 
 @Composable
 fun ValidationRequirementsList(
-    requirements: List<ValidationRequirement>,
+    requirements: ImmutableList<ValidationRequirement>,
     modifier: Modifier = Modifier
 ) {
     Column(

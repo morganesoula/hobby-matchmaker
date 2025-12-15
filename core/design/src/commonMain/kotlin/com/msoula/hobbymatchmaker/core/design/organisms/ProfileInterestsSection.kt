@@ -20,11 +20,12 @@ import com.msoula.hobbymatchmaker.core.design.molecules.InterestsBlock
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.IconSize
 import com.msoula.hobbymatchmaker.core.design.user_profile_interests_title
+import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ProfileInterestsSection(
-    interests: List<String>?
+    interests: ImmutableList<String>?
 ) {
     GenericCard(
         modifier = Modifier

@@ -28,6 +28,7 @@ import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.MovieDetailLoadingScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.StateContainer
 import com.msoula.hobbymatchmaker.core.design.atoms.asStringSuspend
+import com.msoula.hobbymatchmaker.core.design.models.Casting
 import com.msoula.hobbymatchmaker.core.design.models.EmptyStateConfig
 import com.msoula.hobbymatchmaker.core.design.molecules.BackNavigationTopBar
 import com.msoula.hobbymatchmaker.core.design.no_data
@@ -37,6 +38,7 @@ import com.msoula.hobbymatchmaker.core.design.organisms.MovieDetailInformation
 import com.msoula.hobbymatchmaker.core.design.util.UIText
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiEventModel
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun MovieDetailContent(
@@ -131,13 +133,13 @@ fun MovieDetailContent(
                         status = movie.status,
                         title = movie.title,
                         releaseDate = movie.releaseDate,
-                        genres = movie.genre,
+                        genres = movie.genre.toImmutableList(),
                         duration = movie.duration,
                         videoId = videoId,
                         movieId = movie.id,
                         isVideoUriKnown = videoId.isNotEmpty(),
                         overview = movie.synopsis,
-                        filteredCast = filteredCast,
+                        filteredCast = Casting(filteredCast),
                         isLoading = isLoading,
                         videoPlayerVisible = videoPlayerVisible,
                         onVideoPlayerDismissed = { videoPlayerVisible = false },
@@ -150,7 +152,7 @@ fun MovieDetailContent(
                             )
                         },
                         actorSection = {
-                            ActorSection(cast = movie.cast)
+                            ActorSection(casting = Casting(movie.cast))
                         }
                     )
                 }

@@ -19,7 +19,6 @@ import com.msoula.hobbymatchmaker.core.design.google_logo
 import com.msoula.hobbymatchmaker.core.design.sign_in_with_facebook
 import com.msoula.hobbymatchmaker.core.design.sign_in_with_google
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -37,7 +36,7 @@ internal actual fun SocialMediaButtonsPlatformSpecific(
         SocialMediaButton(
             text = stringResource(Res.string.sign_in_with_google),
             contentDescription = stringResource(Res.string.google_alt),
-            painter = painterResource(Res.drawable.google_logo),
+            iconRes = Res.drawable.google_logo,
             containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSurface else Color.White,
             contentColor = if (isSystemInDarkTheme()) Color.Black else MaterialTheme.colorScheme.onSurface,
             borderStroke = BorderStroke(1.dp, Color.LightGray),
@@ -48,7 +47,7 @@ internal actual fun SocialMediaButtonsPlatformSpecific(
         SocialMediaButton(
             text = stringResource(Res.string.sign_in_with_facebook),
             contentDescription = stringResource(Res.string.facebook_alt),
-            painter = painterResource(Res.drawable.facebook_logo),
+            iconRes = Res.drawable.facebook_logo,
             containerColor = Color(0xFF1877F2),
             contentColor = MaterialTheme.colorScheme.onSurface,
             borderStroke = null,

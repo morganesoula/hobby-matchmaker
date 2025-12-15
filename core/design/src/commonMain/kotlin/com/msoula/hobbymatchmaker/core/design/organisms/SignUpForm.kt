@@ -38,6 +38,8 @@ import com.msoula.hobbymatchmaker.core.design.password
 import com.msoula.hobbymatchmaker.core.design.show_password
 import com.msoula.hobbymatchmaker.core.design.sign_up
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -48,9 +50,9 @@ fun SignUpForm(
     password: String,
     loading: Boolean,
     enabled: Boolean,
-    nameRequirement: List<ValidationRequirement> = emptyList(),
-    emailRequirement: List<ValidationRequirement> = emptyList(),
-    passwordRequirement: List<ValidationRequirement> = emptyList(),
+    nameRequirement: ImmutableList<ValidationRequirement> = persistentListOf(),
+    emailRequirement: ImmutableList<ValidationRequirement> = persistentListOf(),
+    passwordRequirement: ImmutableList<ValidationRequirement> = persistentListOf(),
     onNameChanged: (String) -> Unit,
     onEmailChanged: (String) -> Unit,
     onPasswordChanged: (String) -> Unit,

@@ -3,6 +3,8 @@ package com.msoula.hobbymatchmaker.features.movies.presentation.mappers
 import com.msoula.hobbymatchmaker.core.design.models.MovieCarouselItem
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 fun MovieDomainModel.toMovieUiModel(): MovieUiModel {
     val local = this.localCoverFilePath
@@ -42,6 +44,6 @@ fun MovieUiModel.toCarouselItem(): MovieCarouselItem {
     )
 }
 
-fun List<MovieUiModel>.toCarouselItems(): List<MovieCarouselItem> {
-    return map { it.toCarouselItem() }
+fun ImmutableList<MovieUiModel>.toCarouselItems(): ImmutableList<MovieCarouselItem> {
+    return map { it.toCarouselItem() }.toImmutableList()
 }

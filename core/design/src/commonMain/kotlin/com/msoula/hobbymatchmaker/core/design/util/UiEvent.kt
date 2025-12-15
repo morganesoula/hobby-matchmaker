@@ -1,5 +1,8 @@
 package com.msoula.hobbymatchmaker.core.design.util
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 sealed interface UiEvent {
     data class ShowSnackBar(val message: UIText) : UiEvent
     data class NavigateToRoute(val route: String) : UiEvent

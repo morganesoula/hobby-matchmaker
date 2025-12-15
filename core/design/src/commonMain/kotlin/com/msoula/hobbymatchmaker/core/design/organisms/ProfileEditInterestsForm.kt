@@ -38,13 +38,15 @@ import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.HMMTextFieldColors
 import com.msoula.hobbymatchmaker.core.design.theme.IconSize
 import com.msoula.hobbymatchmaker.core.design.user_profile_interests_title
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun ProfileEditInterestsForm(
     modifier: Modifier = Modifier,
-    interests: List<String>,
+    interests: ImmutableList<String>,
     onInterestChanged: (List<String>) -> Unit
 ) {
     var currentInterestInput by remember { mutableStateOf("") }
@@ -147,7 +149,7 @@ fun ProfileEditInterestsForm(
 @Composable
 fun EditInterestsFormPreview() {
     ProfileEditInterestsForm(
-        interests = listOf("Chat", "Lapin", "Chien"),
+        interests = listOf("Chat", "Lapin", "Chien").toImmutableList(),
         onInterestChanged = { list -> }
     )
 }

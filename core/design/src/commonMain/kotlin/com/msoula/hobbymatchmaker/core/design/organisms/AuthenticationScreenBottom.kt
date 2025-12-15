@@ -45,7 +45,6 @@ fun AuthenticationScreenBottom(
 
     val annotatedString = buildAnnotatedString {
         if (isSignInScreen) {
-            // "New member? Sign up"
             append(stringResource(Res.string.new_member) + " ")
             pushStringAnnotation(tag = "clickable", annotation = "link")
             withStyle(
@@ -58,7 +57,6 @@ fun AuthenticationScreenBottom(
             }
             pop()
         } else {
-            // "Already a member? Connect"
             append(stringResource(Res.string.already_a_member) + " ")
             pushStringAnnotation(tag = "clickable", annotation = "link")
             withStyle(
@@ -73,7 +71,6 @@ fun AuthenticationScreenBottom(
         }
     }
 
-    // "Continue as Guest" button (only on SignIn screen)
     if (isSignInScreen) {
         OutlinedButton(
             onClick = { onContinueAsGuest() },
@@ -98,7 +95,6 @@ fun AuthenticationScreenBottom(
         }
     }
 
-    // Navigation link text
     Text(
         text = annotatedString,
         textAlign = TextAlign.Center,

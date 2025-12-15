@@ -16,7 +16,6 @@ import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 
 @Composable
 fun GenericProfileBackground(
-    modifier: Modifier = Modifier,
     padding: PaddingValues,
     content: @Composable () -> Unit
 ) {

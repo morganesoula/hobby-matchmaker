@@ -13,6 +13,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.clients.AndroidGoogleU
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClientImpl
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.GoogleUIClientImpl
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SocialUIClient
+import com.msoula.hobbymatchmaker.core.navigation.presentation.models.SocialClients
 import com.msoula.hobbymatchmaker.presentation.navigation.App
 
 class MainActivity : ComponentActivity() {
@@ -24,22 +25,27 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         val googleUIClient = AndroidGoogleUIClient(CredentialManager.create(this), this)
-        val facebookUIClient = AndroidFacebookUIClient({ this }, callbackManager)
+        val facebookUIClient = AndroidFacebookUIClient(
+            activityProvider = { this },
+            callbackManager = callbackManager
+        )
 
-        val socialClients: Map<ProviderType, SocialUIClient> = mapOf(
-            ProviderType.GOOGLE to GoogleUIClientImpl(googleUIClient),
-            ProviderType.FACEBOOK to FacebookUIClientImpl(facebookUIClient)
+        val socialClients = SocialClients(
+            clients = mapOf(
+                ProviderType.GOOGLE to GoogleUIClientImpl(googleUIClient),
+                ProviderType.FACEBOOK to FacebookUIClientImpl(facebookUIClient)
+            )
         )
 
         setContent {
             App(
-                socialClients = socialClients,
-                facebookUIClient = facebookUIClient,
+                socialClients = socialClients
             )
         }
     }
 
-    @Deprecated("")
+    @Deprecated("Required for Facebook SDK compatibility", level = DeprecationLevel.HIDDEN)
+    @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         callbackManager.onActivityResult(requestCode, resultCode, data)

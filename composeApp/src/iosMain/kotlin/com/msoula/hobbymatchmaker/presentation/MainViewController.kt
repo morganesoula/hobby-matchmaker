@@ -5,18 +5,19 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.AppleUIClientImpl
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.GoogleUIClientImpl
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.IosAppleUIClient
-import com.msoula.hobbymatchmaker.core.login.presentation.clients.IosFacebookUIClient
+import com.msoula.hobbymatchmaker.core.navigation.presentation.models.SocialClients
 import com.msoula.hobbymatchmaker.presentation.clients.IosGoogleUIClient
 import com.msoula.hobbymatchmaker.presentation.navigation.App
 
 fun MainViewController() = ComposeUIViewController {
-    val socialClients = mapOf(
-        ProviderType.GOOGLE to GoogleUIClientImpl(IosGoogleUIClient()),
-        ProviderType.APPLE to AppleUIClientImpl(IosAppleUIClient())
+    val socialClients = SocialClients(
+        mapOf(
+            ProviderType.GOOGLE to GoogleUIClientImpl(IosGoogleUIClient()),
+            ProviderType.APPLE to AppleUIClientImpl(IosAppleUIClient())
+        )
     )
 
     App(
-        socialClients = socialClients,
-        facebookUIClient = IosFacebookUIClient()
+        socialClients = socialClients
     )
 }
