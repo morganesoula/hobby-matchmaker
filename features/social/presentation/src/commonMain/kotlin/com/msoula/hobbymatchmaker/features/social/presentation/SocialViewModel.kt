@@ -21,6 +21,9 @@ import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toSocialS
 import com.msoula.hobbymatchmaker.features.social.presentation.models.InviteUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUiEventModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUserSummaryUiModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,13 +46,17 @@ class SocialViewModel(
 
     private var currentUserUid: String? = null
 
-    private val _searchResults = MutableStateFlow<List<SocialUserSummaryUiModel>>(emptyList())
+    private val _searchResults = MutableStateFlow<ImmutableList<SocialUserSummaryUiModel>>(
+        persistentListOf()
+    )
     val searchResults = _searchResults.asStateFlow()
 
-    private val _sentInvites = MutableStateFlow<UiState<List<InviteUiModel>>>(UiState.Loading)
+    private val _sentInvites =
+        MutableStateFlow<UiState<ImmutableList<InviteUiModel>>>(UiState.Loading)
     val sentInvites = _sentInvites.asStateFlow()
 
-    private val _incomingInvites = MutableStateFlow<UiState<List<InviteUiModel>>>(UiState.Loading)
+    private val _incomingInvites =
+        MutableStateFlow<UiState<ImmutableList<InviteUiModel>>>(UiState.Loading)
     val incomingInvites = _incomingInvites.asStateFlow()
 
     init {
@@ -57,7 +64,7 @@ class SocialViewModel(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
-    internal fun observeSessionAndInvites() {
+    fun observeSessionAndInvites() {
         // Sent invitations
         scope.launch {
             observeSessionStateUseCase()
@@ -88,6 +95,7 @@ class SocialViewModel(
                                     is ObserveSentInvitesSuccess.Empty -> UiState.Empty
                                     is ObserveSentInvitesSuccess.Success -> UiState.Success(
                                         data.invites.map { invite -> invite.toInviteUiModel() }
+                                            .toImmutableList()
                                     )
                                 }
                             }
@@ -127,6 +135,7 @@ class SocialViewModel(
                                     is ObserveIncomingInvitesSuccess.Empty -> UiState.Empty
                                     is ObserveIncomingInvitesSuccess.Success -> UiState.Success(
                                         data.invites.map { invite -> invite.toInviteUiModel() }
+                                            .toImmutableList()
                                     )
                                 }
                             }
@@ -177,7 +186,7 @@ class SocialViewModel(
     private suspend fun searchUsers(pseudo: String) {
         interactor.searchUsers(pseudo, currentUserUid)
             .onSuccess { list ->
-                _searchResults.update { list.map { it.toSocialSummaryUiModel() } }
+                _searchResults.update { list.map { it.toSocialSummaryUiModel() }.toImmutableList() }
             }
             .onFailure { error ->
                 eventHandler.sendEvent(

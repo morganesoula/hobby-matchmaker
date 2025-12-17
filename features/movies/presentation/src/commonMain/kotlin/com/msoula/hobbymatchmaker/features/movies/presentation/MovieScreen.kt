@@ -35,33 +35,22 @@ import com.msoula.hobbymatchmaker.core.design.not_found
 import com.msoula.hobbymatchmaker.core.design.organisms.MovieCarousel
 import com.msoula.hobbymatchmaker.core.design.util.UIText
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
+import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.features.movies.presentation.mappers.toCarouselItems
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
+import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiModel
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun MovieContent(
     modifier: Modifier = Modifier,
-    movieViewModel: MovieViewModel,
+    movieState: UiState<ImmutableList<MovieUiModel>>,
+    snackBarHostState: SnackbarHostState,
     onNavigate: (String) -> Unit,
-    onNavigateToDetail: (Long) -> Unit
+    observeMovies: () -> Unit,
+    onEvent: (CardEventModel) -> Unit
 ) {
-    val movieState by movieViewModel.screenState.collectAsState()
-    val snackBarHostState = remember { SnackbarHostState() }
-
-    LaunchedEffect(movieViewModel.events) {
-        movieViewModel.events.collect { event ->
-            when (event) {
-                is UiEvent.NavigateToRoute -> onNavigate(event.route)
-                is UiEvent.NavigateToDetail -> onNavigateToDetail(event.id)
-                is UiEvent.ShowSnackBar ->
-                    snackBarHostState.showSnackbar(event.message.asStringSuspend())
-
-                else -> {}
-            }
-        }
-    }
-
     Scaffold(
         topBar = {
             NavigationTopBar(
@@ -102,7 +91,7 @@ fun MovieContent(
                     ErrorStateScreen(
                         error = error,
                         hint = hint,
-                        onRetry = { movieViewModel.observeMovies() }
+                        onRetry = { observeMovies() }
                     )
                 },
                 onSuccess = { movies ->
@@ -110,11 +99,11 @@ fun MovieContent(
                         padding = padding,
                         movies = movies.toImmutableList().toCarouselItems(),
                         onMovieSingleTap = { id, overview ->
-                            movieViewModel.onCardEvent(CardEventModel.OnSingleTap(id, overview))
+                            onEvent(CardEventModel.OnSingleTap(id, overview))
                         },
                         onMovieDoubleTap = { id ->
                             val selectedMovie = movies.first { it.id == id }
-                            movieViewModel.onCardEvent(CardEventModel.OnDoubleTap(selectedMovie))
+                            onEvent(CardEventModel.OnDoubleTap(selectedMovie))
                         }
                     )
                 }

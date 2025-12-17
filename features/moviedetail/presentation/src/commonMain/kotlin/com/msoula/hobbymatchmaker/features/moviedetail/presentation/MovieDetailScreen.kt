@@ -12,13 +12,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.common.isIosPlatform
@@ -27,7 +21,6 @@ import com.msoula.hobbymatchmaker.core.design.atoms.EmptyStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.MovieDetailLoadingScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.StateContainer
-import com.msoula.hobbymatchmaker.core.design.atoms.asStringSuspend
 import com.msoula.hobbymatchmaker.core.design.models.Casting
 import com.msoula.hobbymatchmaker.core.design.models.EmptyStateConfig
 import com.msoula.hobbymatchmaker.core.design.molecules.BackNavigationTopBar
@@ -36,29 +29,22 @@ import com.msoula.hobbymatchmaker.core.design.not_found
 import com.msoula.hobbymatchmaker.core.design.organisms.ActorSection
 import com.msoula.hobbymatchmaker.core.design.organisms.MovieDetailInformation
 import com.msoula.hobbymatchmaker.core.design.util.UIText
-import com.msoula.hobbymatchmaker.core.design.util.UiEvent
+import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiEventModel
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.VideoPlayerState
 import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun MovieDetailContent(
-    movieDetailViewModel: MovieDetailViewModel,
-    onNavigate: (String) -> Unit
+    movieDetailState: UiState<MovieDetailUiModel>,
+    snackBarHostState: SnackbarHostState,
+    videoPlayerState: VideoPlayerState,
+    onVideoPlayerDismissed: () -> Unit,
+    onNavigate: (String) -> Unit,
+    observeMovieDetail: () -> Unit,
+    onEvent: (MovieDetailUiEventModel) -> Unit
 ) {
-    val movieDetailState by movieDetailViewModel.screenState.collectAsState()
-    val snackBarHostState = remember { SnackbarHostState() }
-
-    LaunchedEffect(Unit) {
-        movieDetailViewModel.events.collect { event ->
-            when (event) {
-                is UiEvent.ShowSnackBar ->
-                    snackBarHostState.showSnackbar(event.message.asStringSuspend())
-
-                else -> {}
-            }
-        }
-    }
-
     Scaffold(
         snackbarHost = {
             SnackbarHost(
@@ -97,35 +83,12 @@ fun MovieDetailContent(
                     ErrorStateScreen(
                         error = error,
                         hint = hint,
-                        onRetry = { movieDetailViewModel.observeMovieDetail() }
+                        onRetry = observeMovieDetail
                     )
                 },
                 onSuccess = { movie ->
-                    var videoPlayerVisible by rememberSaveable { mutableStateOf(false) }
-                    var videoId by rememberSaveable { mutableStateOf(movie.videoKey) }
-                    var isLoading by rememberSaveable { mutableStateOf(false) }
-
                     val filteredCast =
                         remember(movie.cast) { movie.cast.filterNot { it.key == "NO_CAST" } }
-
-                    LaunchedEffect(movie.id) {
-                        videoId = movie.videoKey
-                        videoPlayerVisible = false
-                        isLoading = false
-                    }
-
-                    LaunchedEffect(Unit) {
-                        movieDetailViewModel.events.collect { event ->
-                            when (event) {
-                                is UiEvent.OnDataReady -> {
-                                    videoId = event.data
-                                    videoPlayerVisible = true
-                                }
-
-                                else -> {}
-                            }
-                        }
-                    }
 
                     MovieDetailInformation(
                         padding = padding,
@@ -135,16 +98,16 @@ fun MovieDetailContent(
                         releaseDate = movie.releaseDate,
                         genres = movie.genre.toImmutableList(),
                         duration = movie.duration,
-                        videoId = videoId,
+                        videoId = videoPlayerState.videoId,
                         movieId = movie.id,
-                        isVideoUriKnown = videoId.isNotEmpty(),
+                        isVideoUriKnown = videoPlayerState.videoId.isNotEmpty(),
                         overview = movie.synopsis,
                         filteredCast = Casting(filteredCast),
-                        isLoading = isLoading,
-                        videoPlayerVisible = videoPlayerVisible,
-                        onVideoPlayerDismissed = { videoPlayerVisible = false },
+                        isLoading = videoPlayerState.isLoading,
+                        videoPlayerVisible = videoPlayerState.isVisible,
+                        onVideoPlayerDismissed = onVideoPlayerDismissed,
                         onPlayTrailerClicked = { localMovieId, localVideoUriKnown ->
-                            movieDetailViewModel.onEvent(
+                            onEvent(
                                 MovieDetailUiEventModel.OnPlayMovieTrailerClicked(
                                     movieId = localMovieId,
                                     isVideoURIknown = localVideoUriKnown

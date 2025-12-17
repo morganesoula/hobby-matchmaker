@@ -8,12 +8,9 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.isIosPlatform
@@ -21,7 +18,6 @@ import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.ProfileLoadingScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.SecondaryButton
-import com.msoula.hobbymatchmaker.core.design.atoms.asStringSuspend
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_requirements_no_number
 import com.msoula.hobbymatchmaker.core.design.guest_build_circle_feature_description
 import com.msoula.hobbymatchmaker.core.design.guest_build_circle_feature_title
@@ -58,51 +54,46 @@ import com.msoula.hobbymatchmaker.core.design.templates.EditableProfileLayout
 import com.msoula.hobbymatchmaker.core.design.templates.GuestProfileLayout
 import com.msoula.hobbymatchmaker.core.design.util.RetryPolicy
 import com.msoula.hobbymatchmaker.core.design.util.UIErrorHint
-import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.features.profile.presentation.mappers.toProfileSocialMembers
+import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileActions
+import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileState
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiEventModel
+import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiStateModel
-import com.msoula.hobbymatchmaker.features.social.presentation.SocialViewModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUiEventModel
+import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUserSummaryUiModel
 import io.github.vinceglb.filekit.dialogs.FileKitMode
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.path
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun UserProfileContent(
-    modifier: Modifier = Modifier,
-    profileViewModel: UserProfileViewModel,
-    socialViewModel: SocialViewModel,
-    onNavigate: (String) -> Unit
+    profile: UserProfileUiModel,
+    snackBarHostState: SnackbarHostState,
+    searchedPseudos: ImmutableList<SocialUserSummaryUiModel>,
+    userProfileState: UserProfileState,
+    userProfileActions: UserProfileActions
 ) {
-    val profileState by profileViewModel.screenState.collectAsState()
-    val isEditMode by profileViewModel.isEditMode.collectAsState()
-    val editableProfile by profileViewModel.editableProfile.collectAsState()
-    val isPseudoAvailable by profileViewModel.isPseudoAvailable.collectAsState()
-
-    val snackBarHostState = remember { SnackbarHostState() }
-
     val noNumberRequirement =
         stringResource(Res.string.edit_profile_basic_information_requirements_no_number)
 
-    val requirements = remember(editableProfile) {
-        derivedStateOf {
-            listOf(
-                ValidationRequirement(
-                    text = noNumberRequirement,
-                    isValid = editableProfile?.name?.all { !it.isDigit() } == true
-                )
+    val requirements = remember(userProfileState.editableProfile) {
+        listOf(
+            ValidationRequirement(
+                text = noNumberRequirement,
+                isValid = userProfileState.editableProfile?.name?.all { !it.isDigit() } == true
             )
-        }
+        )
     }
 
-    val enableSaveTopBarButton by remember(requirements.value) {
+    val enableSaveTopBarButton by remember(userProfileState.editableProfile) {
         derivedStateOf {
-            requirements.value.all { it.isValid }
+            userProfileState.editableProfile?.name?.all { !it.isDigit() } == true
         }
     }
 
@@ -111,29 +102,8 @@ fun UserProfileContent(
         mode = FileKitMode.Single
     ) { image ->
         image?.let {
-            profileViewModel.onEvent(UserProfileUiEventModel.OnAvatarSelected(it.path))
+            userProfileActions.onEvent(UserProfileUiEventModel.OnAvatarSelected(it.path))
         } ?: Logger.d("No image found in the gallery")
-    }
-
-    LaunchedEffect(profileViewModel.events) {
-        profileViewModel.events.collect { event ->
-            when (event) {
-                is UiEvent.ShowSnackBar ->
-                    snackBarHostState.showSnackbar(event.message.asStringSuspend())
-
-                is UiEvent.NavigateToRoute -> {
-                    onNavigate(event.route)
-                }
-
-                is UiEvent.OnDataReady -> {
-                    when (event.data) {
-                        "profile_updated" -> profileViewModel.closeEdition()
-                    }
-                }
-
-                else -> Unit
-            }
-        }
     }
 
     Scaffold(
@@ -152,35 +122,34 @@ fun UserProfileContent(
             )
         },
         topBar = {
-            if (isEditMode) {
+            if (userProfileState.isEditMode) {
                 EditProfileTopBar(
                     isIOS = isIosPlatform(),
-                    onBack = { profileViewModel.closeEdition() },
-                    onSave = { profileViewModel.onEvent(UserProfileUiEventModel.OnSaveClicked) },
+                    onBack = { userProfileActions.closeEdition() },
+                    onSave = { userProfileActions.onEvent(UserProfileUiEventModel.OnSaveClicked) },
                     enableSave = enableSaveTopBarButton
                 )
             } else {
                 if (isIosPlatform()) {
-                    BackNavigationTopBar(onBack = { onNavigate("movies") })
+                    BackNavigationTopBar(onBack = { userProfileActions.onNavigate("movies") })
                 }
             }
         },
     ) { padding ->
-        when (profileState) {
+        when (userProfileState.profileState) {
             is UserProfileUiStateModel.Loading -> ProfileLoadingScreen()
 
             is UserProfileUiStateModel.Error -> {
-                val error = (profileState as UserProfileUiStateModel.Error)
                 ErrorStateScreen(
-                    error = error.errorMessage,
+                    error = userProfileState.profileState.errorMessage,
                     hint = UIErrorHint(retry = RetryPolicy.Manual),
                     onRetry = {}
                 )
             }
 
             is UserProfileUiStateModel.Success -> {
-                if (isEditMode) {
-                    editableProfile?.let { currentEditableProfile ->
+                if (userProfileState.isEditMode) {
+                    userProfileState.editableProfile?.let { currentEditableProfile ->
                         GenericProfileBackground(
                             padding = padding
                         ) {
@@ -195,7 +164,7 @@ fun UserProfileContent(
                                     ProfileEditInformationForm(
                                         name = currentEditableProfile.name,
                                         onNameChanged = { name ->
-                                            profileViewModel.onEvent(
+                                            userProfileActions.onEvent(
                                                 UserProfileUiEventModel.OnNameChanged(
                                                     name
                                                 )
@@ -203,25 +172,25 @@ fun UserProfileContent(
                                         },
                                         pseudo = currentEditableProfile.pseudo,
                                         onPseudoChanged = { pseudo ->
-                                            profileViewModel.onEvent(
+                                            userProfileActions.onEvent(
                                                 UserProfileUiEventModel.OnPseudoChanged(
                                                     pseudo
                                                 )
                                             )
                                         },
                                         onPseudoFocusLost = {
-                                            profileViewModel.onEvent(UserProfileUiEventModel.OnPseudoDefined)
+                                            userProfileActions.onEvent(UserProfileUiEventModel.OnPseudoDefined)
                                         },
-                                        isPseudoAvailable = isPseudoAvailable,
+                                        isPseudoAvailable = userProfileState.isPseudoAvailable,
                                         bio = currentEditableProfile.bio,
                                         onBioChanged = { bio ->
-                                            profileViewModel.onEvent(
+                                            userProfileActions.onEvent(
                                                 UserProfileUiEventModel.OnBioChanged(
                                                     bio
                                                 )
                                             )
                                         },
-                                        nameRequirements = requirements.value.toImmutableList()
+                                        nameRequirements = requirements.toImmutableList()
                                     )
                                 },
                                 editInterestsSection = {
@@ -229,7 +198,7 @@ fun UserProfileContent(
                                         interests = currentEditableProfile.interests?.toImmutableList()
                                             ?: persistentListOf(),
                                         onInterestChanged = {
-                                            profileViewModel.onEvent(
+                                            userProfileActions.onEvent(
                                                 UserProfileUiEventModel.OnInterestsChanged(it)
                                             )
                                         }
@@ -239,7 +208,7 @@ fun UserProfileContent(
                                     SecondaryButton(
                                         text = stringResource(Res.string.log_out),
                                         onClick = {
-                                            profileViewModel.logOut("sign_in")
+                                            userProfileActions.logOut("sign_in")
                                         }
                                     )
                                 }
@@ -250,9 +219,6 @@ fun UserProfileContent(
                     GenericProfileBackground(
                         padding = padding
                     ) {
-                        val profile = (profileState as UserProfileUiStateModel.Success).userProfile
-                        val searchedPseudos by socialViewModel.searchResults.collectAsState()
-
                         CompleteProfileLayout(
                             headerSection = {
                                 AuthentifiedProfileHeader(
@@ -260,7 +226,7 @@ fun UserProfileContent(
                                     biography = profile.bio ?: "",
                                     avatarPath = profile.avatarUrl,
                                     onEditProfileClicked = {
-                                        profileViewModel.onEvent(UserProfileUiEventModel.OnEditModeClicked)
+                                        userProfileActions.onEvent(UserProfileUiEventModel.OnEditModeClicked)
                                     }
                                 )
                             },
@@ -280,7 +246,11 @@ fun UserProfileContent(
                                     socialMembers = profile.socialMembers.map { it.toProfileSocialMembers() }
                                         .toImmutableList(),
                                     onSearchPeople = {
-                                        socialViewModel.onEvent(SocialUiEventModel.OnSearchPeople(it))
+                                        userProfileActions.onSocialEvent(
+                                            SocialUiEventModel.OnSearchPeople(
+                                                it
+                                            )
+                                        )
                                     },
                                     searchResult = searchedPseudos.map { member ->
                                         ProfileSocialMembers(
@@ -291,7 +261,7 @@ fun UserProfileContent(
                                         )
                                     }.toImmutableList(),
                                     onInviteToSocialCircle = { pseudo, name ->
-                                        socialViewModel.onEvent(
+                                        userProfileActions.onSocialEvent(
                                             SocialUiEventModel.OnInviteToSocialCircle(pseudo, name)
                                         )
                                     }
@@ -300,9 +270,7 @@ fun UserProfileContent(
                             logOut = {
                                 SecondaryButton(
                                     text = stringResource(Res.string.log_out),
-                                    onClick = {
-                                        profileViewModel.logOut("sign_in")
-                                    }
+                                    onClick = { userProfileActions.logOut("sign_in") }
                                 )
                             }
                         )
@@ -348,7 +316,7 @@ fun UserProfileContent(
                                 titleFeature = stringResource(Res.string.guest_redirect_title),
                                 descriptionFeature = stringResource(Res.string.guest_redirect_description),
                                 buttonText = stringResource(Res.string.guest_redirect_sign_up_button_text),
-                                onClick = { onNavigate("sign_up") }
+                                onClick = { userProfileActions.onNavigate("sign_up") }
                             )
                         }
                     )

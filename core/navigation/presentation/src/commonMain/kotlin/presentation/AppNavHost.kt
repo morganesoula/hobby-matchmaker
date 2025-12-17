@@ -5,7 +5,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
@@ -19,6 +22,7 @@ import com.msoula.hobbymatchmaker.core.design.atoms.asStringSuspend
 import com.msoula.hobbymatchmaker.core.design.models.TabItem
 import com.msoula.hobbymatchmaker.core.design.reset_password
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
+import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClientImpl
 import org.jetbrains.compose.resources.getString
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SignInScreenContent
@@ -31,10 +35,15 @@ import com.msoula.hobbymatchmaker.core.splashscreen.presentation.SplashScreenCon
 import com.msoula.hobbymatchmaker.core.splashscreen.presentation.SplashViewModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailContent
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailViewModel
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.VideoPlayerState
 import com.msoula.hobbymatchmaker.features.movies.presentation.MovieContent
 import com.msoula.hobbymatchmaker.features.movies.presentation.MovieViewModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.UserProfileContent
 import com.msoula.hobbymatchmaker.features.profile.presentation.UserProfileViewModel
+import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileActions
+import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileState
+import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiStateModel
 import com.msoula.hobbymatchmaker.features.social.presentation.SocialContent
 import com.msoula.hobbymatchmaker.features.social.presentation.SocialViewModel
 import kotlinx.collections.immutable.toImmutableList
@@ -150,7 +159,7 @@ fun AppNavHost(
 
                 val snackBarHostState = remember { SnackbarHostState() }
 
-                LaunchedEffect(signUpViewModel.events) {
+                LaunchedEffect(Unit) {
                     signUpViewModel.events.collect { event ->
                         when (event) {
                             is UiEvent.ShowSnackBar ->
@@ -189,22 +198,43 @@ fun AppNavHost(
         composable<Movies> {
             val movieViewModel: MovieViewModel = koinViewModel()
 
+            val movieState by movieViewModel.screenState.collectAsState()
+            val snackBarHostState = remember { SnackbarHostState() }
+
+            LaunchedEffect(Unit) {
+                movieViewModel.events.collect { event ->
+                    when (event) {
+                        is UiEvent.NavigateToRoute ->
+                            when (event.route) {
+                                "sign_in" -> nav.navigate(SignIn) {
+                                    popUpTo(0) { inclusive = true }
+                                    launchSingleTop = true
+                                }
+
+                                else -> Unit
+                            }
+
+                        is UiEvent.NavigateToDetail -> nav.navigate(MovieDetail(event.id))
+                        is UiEvent.ShowSnackBar ->
+                            snackBarHostState.showSnackbar(event.message.asStringSuspend())
+
+                        else -> {}
+                    }
+                }
+            }
+
             MovieContent(
                 modifier = Modifier,
-                movieViewModel = movieViewModel,
-                onNavigate = { route ->
-                    when (route) {
-                        "sign_in" -> nav.navigate(SignIn) {
-                            popUpTo(0) { inclusive = true }
-                            launchSingleTop = true
-                        }
-
+                movieState = movieState,
+                onNavigate = {
+                    when (it) {
                         "profile" -> nav.navigate(Profile)
                         "social" -> nav.navigate(Social)
-                        else -> return@MovieContent
                     }
                 },
-                onNavigateToDetail = { movieId -> nav.navigate(MovieDetail(movieId)) }
+                snackBarHostState = snackBarHostState,
+                observeMovies = movieViewModel::observeMovies,
+                onEvent = movieViewModel::onCardEvent
             )
         }
 
@@ -215,48 +245,132 @@ fun AppNavHost(
                 parameters = { parametersOf(movieId) }
             )
 
+            val movieDetailState by movieDetailViewModel.screenState.collectAsState()
+            val snackBarHostState = remember { SnackbarHostState() }
+            var videoPlayerState by rememberSaveable { mutableStateOf(VideoPlayerState()) }
+
+            LaunchedEffect(Unit) {
+                movieDetailViewModel.events.collect { event ->
+                    when (event) {
+                        is UiEvent.ShowSnackBar ->
+                            snackBarHostState.showSnackbar(event.message.asStringSuspend())
+
+                        is UiEvent.OnDataReady -> {
+                            videoPlayerState = videoPlayerState.copy(
+                                videoId = event.data,
+                                isVisible = true
+                            )
+                        }
+
+                        else -> {}
+                    }
+                }
+            }
+
+            LaunchedEffect(Unit) {
+                if (movieDetailState is UiState.Success) {
+                    videoPlayerState = VideoPlayerState(
+                        videoId = (movieDetailState as UiState.Success<MovieDetailUiModel>).data.videoKey,
+                        isVisible = false,
+                        isLoading = false
+                    )
+                }
+            }
+
             MovieDetailContent(
-                movieDetailViewModel = movieDetailViewModel,
                 onNavigate = { route ->
                     when (route) {
                         "movies" -> nav.popBackStack()
                         else -> return@MovieDetailContent
                     }
-                }
+                },
+                movieDetailState = movieDetailState,
+                snackBarHostState = snackBarHostState,
+                videoPlayerState = videoPlayerState,
+                onVideoPlayerDismissed = {
+                    videoPlayerState = videoPlayerState.copy(isVisible = false)
+                },
+                observeMovieDetail = { movieDetailViewModel.observeMovieDetail() },
+                onEvent = movieDetailViewModel::onEvent
             )
         }
 
         composable<Profile> {
             val userProfileViewModel = koinViewModel<UserProfileViewModel>()
+            val snackBarHostState = remember { SnackbarHostState() }
 
-            UserProfileContent(
-                profileViewModel = userProfileViewModel,
-                socialViewModel = socialViewModel,
-                onNavigate = { route ->
-                    when (route) {
-                        "sign_in" -> {
-                            nav.navigate(Auth) {
-                                popUpTo(0) { inclusive = true }
-                                launchSingleTop = true
+            val profileState by userProfileViewModel.screenState.collectAsState()
+            val isEditMode by userProfileViewModel.isEditMode.collectAsState()
+            val editableProfile by userProfileViewModel.editableProfile.collectAsState()
+            val isPseudoAvailable by userProfileViewModel.isPseudoAvailable.collectAsState()
+
+            val searchedPseudos by socialViewModel.searchResults.collectAsState()
+            val profile = (profileState as? UserProfileUiStateModel.Success)?.userProfile
+
+            LaunchedEffect(Unit) {
+                userProfileViewModel.events.collect { event ->
+                    when (event) {
+                        is UiEvent.ShowSnackBar ->
+                            snackBarHostState.showSnackbar(event.message.asStringSuspend())
+
+                        is UiEvent.NavigateToRoute -> {
+                            when (event.route) {
+                                "sign_in" -> {
+                                    nav.navigate(Auth) {
+                                        popUpTo(0) { inclusive = true }
+                                        launchSingleTop = true
+                                    }
+                                }
                             }
                         }
 
-                        "sign_up" -> {
-                            nav.navigate(Auth) {
-                                popUpTo(0) { inclusive = true }
-                                launchSingleTop = true
+                        is UiEvent.OnDataReady -> {
+                            when (event.data) {
+                                "profile_updated" -> userProfileViewModel.closeEdition()
                             }
                         }
 
-                        "movies" -> {
-                            nav.navigate(Movies) {
-                                popUpTo<Profile> { inclusive = true }
-                                launchSingleTop = true
-                            }
-                        }
+                        else -> Unit
                     }
                 }
-            )
+            }
+
+            if (profile != null) {
+                UserProfileContent(
+                    snackBarHostState = snackBarHostState,
+                    searchedPseudos = searchedPseudos,
+                    profile = profile,
+                    userProfileState = UserProfileState(
+                        profileState = profileState,
+                        editableProfile = editableProfile,
+                        isEditMode = isEditMode,
+                        isPseudoAvailable = isPseudoAvailable
+                    ),
+                    userProfileActions = UserProfileActions(
+                        closeEdition = { userProfileViewModel.closeEdition() },
+                        logOut = { userProfileViewModel.logOut(it) },
+                        onNavigate = { route ->
+                            when (route) {
+                                "sign_up" -> {
+                                    nav.navigate(Auth) {
+                                        popUpTo(0) { inclusive = true }
+                                        launchSingleTop = true
+                                    }
+                                }
+
+                                "movies" -> {
+                                    nav.navigate(Movies) {
+                                        popUpTo<Profile> { inclusive = true }
+                                        launchSingleTop = true
+                                    }
+                                }
+                            }
+                        },
+                        onEvent = userProfileViewModel::onEvent,
+                        onSocialEvent = socialViewModel::onEvent
+                    )
+                )
+            }
         }
 
         composable<Social> {
@@ -271,9 +385,17 @@ fun AppNavHost(
                 )
             }
 
+            val sentInvites by socialViewModel.sentInvites.collectAsState()
+            val incomingInvites by socialViewModel.incomingInvites.collectAsState()
+
             SocialContent(
-                socialViewModel = socialViewModel,
-                tabs = socialTabs.toImmutableList()
+                sentInvites = sentInvites,
+                incomingInvites = incomingInvites,
+                tabs = socialTabs.toImmutableList(),
+                observeSessionAndInvites = {
+                    socialViewModel.observeSessionAndInvites()
+                },
+                onEvent = socialViewModel::onEvent
             )
         }
     }

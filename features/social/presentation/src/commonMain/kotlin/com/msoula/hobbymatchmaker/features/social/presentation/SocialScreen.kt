@@ -4,9 +4,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MovieFilter
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.EmptyStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
@@ -22,21 +19,22 @@ import com.msoula.hobbymatchmaker.core.design.social_sent_requests_no_data_descr
 import com.msoula.hobbymatchmaker.core.design.social_sent_requests_no_data_title
 import com.msoula.hobbymatchmaker.core.design.templates.SocialLayout
 import com.msoula.hobbymatchmaker.core.design.util.UIText
+import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toReceivedInvitations
 import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toSentInvitations
+import com.msoula.hobbymatchmaker.features.social.presentation.models.InviteUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUiEventModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun SocialContent(
-    modifier: Modifier = Modifier,
-    socialViewModel: SocialViewModel,
-    tabs: ImmutableList<TabItem>
+    sentInvites: UiState<ImmutableList<InviteUiModel>>,
+    incomingInvites: UiState<ImmutableList<InviteUiModel>>,
+    tabs: ImmutableList<TabItem>,
+    observeSessionAndInvites: () -> Unit,
+    onEvent: (SocialUiEventModel) -> Unit
 ) {
-    val sentInvites by socialViewModel.sentInvites.collectAsState()
-    val incomingInvites by socialViewModel.incomingInvites.collectAsState()
-
     Scaffold { paddingValues ->
         SocialLayout(
             paddingValues = paddingValues,
@@ -63,16 +61,16 @@ fun SocialContent(
                     },
                     onSuccess = { invites ->
                         ReceivedInvitationSection(
-                            invites.toImmutableList().toReceivedInvitations(),
+                            invites.toReceivedInvitations(),
                             onAcceptInvitationClick = { id, guestUid ->
-                                socialViewModel.onEvent(
+                                onEvent(
                                     SocialUiEventModel.OnAcceptInvitation(
                                         id, guestUid
                                     )
                                 )
                             },
                             onDeclineInvitationClick = { id ->
-                                socialViewModel.onEvent(
+                                onEvent(
                                     SocialUiEventModel.OnDeclineInvitation(
                                         id
                                     )
@@ -99,14 +97,14 @@ fun SocialContent(
                         ErrorStateScreen(
                             error = error,
                             hint = hint,
-                            onRetry = { socialViewModel.observeSessionAndInvites() }
+                            onRetry = { observeSessionAndInvites() }
                         )
                     },
                     onSuccess = { invites ->
                         SentInvitationSection(
                             invites.toSentInvitations(),
                             onCancelInvitationClick = { id ->
-                                socialViewModel.onEvent(
+                                onEvent(
                                     SocialUiEventModel.OnCancelInvitation(
                                         id
                                     )

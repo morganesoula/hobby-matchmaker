@@ -20,6 +20,8 @@ import com.msoula.hobbymatchmaker.features.movies.presentation.interactors.Movie
 import com.msoula.hobbymatchmaker.features.movies.presentation.mappers.toMovieUiModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,7 +42,8 @@ class MovieViewModel(
 
     private val language = getDeviceLocale()
 
-    private val _screenState = MutableStateFlow<UiState<List<MovieUiModel>>>(UiState.Loading)
+    private val _screenState =
+        MutableStateFlow<UiState<ImmutableList<MovieUiModel>>>(UiState.Loading)
     val screenState = _screenState.asStateFlow()
 
     init {
@@ -94,11 +97,11 @@ class MovieViewModel(
             }
     }
 
-    private fun mapSuccess(success: ObserveAllMoviesSuccess): UiState<List<MovieUiModel>> =
+    private fun mapSuccess(success: ObserveAllMoviesSuccess): UiState<ImmutableList<MovieUiModel>> =
         when (success) {
             is ObserveAllMoviesSuccess.Success -> {
-                val movies = success.movies.map { it.toMovieUiModel() }
-                if (movies.isEmpty()) UiState.Empty else UiState.Success(movies)
+                val movies = success.movies.map { it.toMovieUiModel() }.toImmutableList()
+                if (movies.isEmpty()) UiState.Empty else UiState.Success(movies.toImmutableList())
             }
 
             is ObserveAllMoviesSuccess.DataLoadedInDB -> UiState.Loading
