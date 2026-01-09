@@ -155,8 +155,6 @@ SELECT movieId
 FROM movie
 WHERE isFavorite = 1;
 
-CREATE INDEX IF NOT EXISTS movie_is_favorite ON movie(isFavorite);
-
 selectUserById:
 SELECT *
 FROM user_profile
@@ -216,3 +214,10 @@ DELETE FROM social_circle_member WHERE uid = ? AND member_uid = ?;
 
 selectSocialMembersByUid:
 SELECT * FROM social_circle_member WHERE uid = ?;
+
+CREATE INDEX IF NOT EXISTS movie_is_favorite ON movie(isFavorite);
+CREATE INDEX IF NOT EXISTS idx_user_profile_uid ON user_profile(uid);
+CREATE INDEX IF NOT EXISTS idx_user_profile_pseudo ON user_profile(pseudo);
+CREATE INDEX IF NOT EXISTS idx_social_circle_member_uid ON social_circle_member(uid);
+CREATE INDEX IF NOT EXISTS idx_social_circle_member_composite ON social_circle_member(uid, member_uid);
+CREATE INDEX IF NOT EXISTS idx_movie_id ON movie(movieId);

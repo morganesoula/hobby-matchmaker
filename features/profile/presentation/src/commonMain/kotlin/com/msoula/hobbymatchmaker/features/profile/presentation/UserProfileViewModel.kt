@@ -7,6 +7,7 @@ import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.design.util.EventHandler
+import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.session.domain.models.SessionState
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveSessionStateUseCase
@@ -19,8 +20,15 @@ import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfi
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiStateModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.ExperimentalTime
@@ -42,22 +50,29 @@ class UserProfileViewModel(
     private val _isEditMode = MutableStateFlow(false)
     val isEditMode = _isEditMode.asStateFlow()
 
-    private var currentUserUid: String? = null
-
     private val _editableProfile = MutableStateFlow<UserProfileUiModel?>(null)
-    val editableProfile = _editableProfile.asStateFlow()
 
+    val editableProfile = _editableProfile.asStateFlow()
     private val _originalProfile = MutableStateFlow<UserProfileUiModel?>(null)
 
     private val _isPseudoAvailable = MutableStateFlow<Boolean?>(null)
-    val isPseudoAvailable = _isPseudoAvailable.asStateFlow()
 
+    val isPseudoAvailable = _isPseudoAvailable.asStateFlow()
     private val _enableSave = MutableStateFlow<Boolean?>(true)
-    val enableSave = _enableSave.asStateFlow()
 
     private val _screenState =
         MutableStateFlow<UserProfileUiStateModel>(UserProfileUiStateModel.Loading)
+
     val screenState = _screenState.asStateFlow()
+
+    private val currentUserUid: StateFlow<String?> = observeSessionStateUseCase()
+        .map { state ->
+            when (state) {
+                is SessionState.Authenticated -> state.uid
+                else -> null
+            }
+        }
+        .stateIn(scope, SharingStarted.WhileSubscribed(), null)
 
     init {
         observeProfile()
@@ -65,36 +80,20 @@ class UserProfileViewModel(
 
     fun observeProfile() {
         scope.launch {
-            observeSessionStateUseCase().collect { state ->
-                when (state) {
-                    is SessionState.Authenticated -> {
-                        Logger.d("UserProfileViewModel", "Authenticated session")
-                        currentUserUid = state.uid
-
-                        observeCurrentUserProfileStateUseCase(state.uid).collect { profile ->
-                            val uiModel = profile.toUserProfileUiModel()
-
-                            if (!_isEditMode.value) {
-                                _originalProfile.update { uiModel }
-                                _editableProfile.update { uiModel }
-                            }
-
-                            Logger.d("UserProfileViewModel", "Success with uid: $currentUserUid")
-                            _screenState.update { UserProfileUiStateModel.Success(uiModel) }
-                        }
-                    }
-
-                    is SessionState.Guest -> {
-                        Logger.d("UserProfileViewModel", "Guest session")
-                        _screenState.update { UserProfileUiStateModel.Guest }
-                    }
-
-                    null -> {
-                        Logger.d("UserProfileViewModel", "No session found (null state)")
-                        _screenState.update { UserProfileUiStateModel.Guest }
+            observeSessionStateUseCase()
+                .flatMapLatest { state ->
+                    when (state) {
+                        is SessionState.Authenticated -> observeCurrentUserProfileStateUseCase(state.uid)
+                        else -> flowOf(null)
                     }
                 }
-            }
+                .collect { profile ->
+                    profile?.let {
+                        val uiModel = it.toUserProfileUiModel()
+                        _editableProfile.update { uiModel }
+                        _screenState.update { UserProfileUiStateModel.Success(uiModel) }
+                    }
+                }
         }
     }
 
@@ -156,8 +155,8 @@ class UserProfileViewModel(
 
     private fun saveProfile() {
         scope.launch {
-            val uid = currentUserUid ?: return@launch
             val editable = _editableProfile.value ?: return@launch
+            val uid = currentUserUid.value ?: return@launch
 
             val profile = editable.toUserProfileDomainModel(uid)
 
@@ -167,11 +166,13 @@ class UserProfileViewModel(
                         UiEvent.OnDataReady("profile_updated")
                     )
 
-                    launch {
-                        interactor.syncProfile(profile)
-                            .onFailure {
-                                Logger.e("Failed to sync profile remotely - ${profile.uid}")
-                            }
+                    coroutineScope {
+                        launch {
+                            interactor.syncProfile(profile)
+                                .onFailure {
+                                    Logger.e("Failed to sync profile remotely - ${profile.uid}")
+                                }
+                        }
                     }
                 }
                 .onFailure { error ->
@@ -188,13 +189,11 @@ class UserProfileViewModel(
     }
 
     fun logOut(route: String) {
-        Logger.d("Logging out to route:$route")
         scope.launch {
             interactor.logOut()
                 .onSuccess {
-                    Logger.d("Successful logging out:$route")
                     eventHandler.sendEvent(
-                        UiEvent.NavigateToRoute(route)
+                        UiEvent.Navigate(NavigationDestination.SignIn)
                     )
                 }
                 .onFailure { error ->
@@ -214,18 +213,20 @@ class UserProfileViewModel(
     @OptIn(ExperimentalTime::class)
     private fun onAvatarSelected(avatarPath: String) {
         scope.launch {
-            val uid = currentUserUid ?: return@launch
+            val uid = currentUserUid.value
             val old = _editableProfile.value?.avatarUrl
 
-            interactor.saveAvatar(uid, old, avatarPath)
-                .onSuccess { newPath ->
-                    _editableProfile.update { it?.copy(avatarUrl = newPath) }
-                }
-                .onFailure { error ->
-                    eventHandler.sendEvent(
-                        UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
-                    )
-                }
+            uid?.let { safeUid ->
+                interactor.saveAvatar(safeUid, old, avatarPath)
+                    .onSuccess { newPath ->
+                        _editableProfile.update { it?.copy(avatarUrl = newPath) }
+                    }
+                    .onFailure { error ->
+                        eventHandler.sendEvent(
+                            UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
+                        )
+                    }
+            }
         }
     }
 }

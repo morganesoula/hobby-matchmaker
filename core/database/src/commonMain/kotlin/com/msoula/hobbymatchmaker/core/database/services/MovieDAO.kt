@@ -1,5 +1,7 @@
 package com.msoula.hobbymatchmaker.core.database.services
 
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.database.Actor
 import com.msoula.hobbymatchmaker.core.database.Movie
 import com.msoula.hobbymatchmaker.core.database.Movie_actor_cross_ref
@@ -9,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface MovieDAO {
     suspend fun insertMovie(movie: Movie)
-    suspend fun upsertMovies(movies: List<Movie>)
+    suspend fun upsertMovies(movies: List<Movie>): AppResult<Unit, AppError>
     suspend fun updateExistingMovie(
         movie: Movie
     )

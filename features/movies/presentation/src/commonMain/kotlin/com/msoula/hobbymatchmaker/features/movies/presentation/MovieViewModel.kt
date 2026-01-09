@@ -10,6 +10,7 @@ import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.connection_issue
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.design.util.EventHandler
+import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
 import com.msoula.hobbymatchmaker.core.design.util.RetryPolicy
 import com.msoula.hobbymatchmaker.core.design.util.UIErrorHint
 import com.msoula.hobbymatchmaker.core.design.util.UIText
@@ -41,6 +42,7 @@ class MovieViewModel(
     val events = eventHandler.events
 
     private val language = getDeviceLocale()
+    private var fetchLaunched = false
 
     private val _screenState =
         MutableStateFlow<UiState<ImmutableList<MovieUiModel>>>(UiState.Loading)
@@ -52,11 +54,22 @@ class MovieViewModel(
 
     fun observeMovies() {
         scope.launch {
-            interactor.observeMovies((language)).collect { result ->
-                _screenState.update {
-                    when (result) {
-                        is AppResult.Success -> mapSuccess(result.data)
-                        is AppResult.Failure -> mapError(result.error)
+            interactor.observeMovies().collect { result ->
+                when (result) {
+                    is AppResult.Success -> {
+                        val movies = result.data
+
+                        if (movies is ObserveAllMoviesSuccess.Success && movies.movies.isEmpty() && !fetchLaunched) {
+                            fetchLaunched = true
+                            launch {
+                                interactor.fetchMovies(language)
+                            }
+                        } else {
+                            _screenState.update { mapSuccess(movies) }
+                        }
+                    }
+                    is AppResult.Failure -> {
+                        _screenState.update { mapError(result.error) }
                     }
                 }
             }
@@ -74,7 +87,7 @@ class MovieViewModel(
         val canAccess = interactor.canAccessMovieDetail(movieId)
 
         if (canAccess) {
-            eventHandler.sendEvent(UiEvent.NavigateToDetail(movieId))
+            eventHandler.sendEvent(UiEvent.Navigate(NavigationDestination.MovieDetail(movieId)))
         } else {
             eventHandler.sendEvent(
                 UiEvent.ShowSnackBar(UIText.Resource(Res.string.connection_issue))
@@ -103,8 +116,6 @@ class MovieViewModel(
                 val movies = success.movies.map { it.toMovieUiModel() }.toImmutableList()
                 if (movies.isEmpty()) UiState.Empty else UiState.Success(movies.toImmutableList())
             }
-
-            is ObserveAllMoviesSuccess.DataLoadedInDB -> UiState.Loading
         }
 
     private fun mapError(error: AppError): UiState.Error =

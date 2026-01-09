@@ -3,7 +3,6 @@ package com.msoula.hobbymatchmaker.core.session.domain.useCases
 import com.benasher44.uuid.uuid4
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
-import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.session.domain.repositories.SessionRepository
 import kotlin.uuid.ExperimentalUuidApi
@@ -17,7 +16,6 @@ class SetCurrentUserProfileUuidUseCase(
             return sessionRepository
                 .setCurrentUserUid(authenticatedUid)
                 .mapSuccess {
-                    Logger.d("Set current user uid to $authenticatedUid")
                     authenticatedUid
                 }
         }

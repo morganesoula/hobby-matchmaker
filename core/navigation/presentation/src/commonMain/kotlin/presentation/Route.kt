@@ -39,11 +39,10 @@ object Profile
 object Social
 
 enum class Destination(
-    val route: String,
     val label: String,
     val icon: ImageVector,
     val contentDescription: String
 ) {
-    RECEIVED("invitation_received", "Received", FeatherInbox, "Received"),
-    SENT("invitation_sent", "Sent", BootstrapSendCheck, "Sent")
+    RECEIVED("Received", FeatherInbox, "Received"),
+    SENT("Sent", BootstrapSendCheck, "Sent")
 }

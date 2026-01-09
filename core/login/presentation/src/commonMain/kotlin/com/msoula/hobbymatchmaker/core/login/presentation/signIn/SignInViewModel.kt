@@ -1,6 +1,5 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.signIn
 
-import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
@@ -10,6 +9,7 @@ import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.design.util.EventHandler
+import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.core.login.presentation.interactors.SignInInteractor
@@ -38,9 +38,6 @@ class SignInViewModel(
     private val _signInState: MutableStateFlow<UiState<Unit>> =
         MutableStateFlow(UiState.Success(Unit))
     val signInState: StateFlow<UiState<Unit>> = _signInState.asStateFlow()
-
-    @VisibleForTesting
-    internal var isSignIn = false
 
     private val _dontAskCheckboxValue = MutableStateFlow(false)
     val dontAskCheckboxValue: StateFlow<Boolean> = _dontAskCheckboxValue.asStateFlow()
@@ -170,7 +167,7 @@ class SignInViewModel(
 
         action()
             .onSuccess {
-                eventHandler.sendEvent(UiEvent.NavigateToRoute("movies"))
+                eventHandler.sendEvent(UiEvent.Navigate(NavigationDestination.Movies))
             }
             .onFailure { error ->
                 _signInState.update { UiState.Success(Unit) }

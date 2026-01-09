@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
+import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ErrorResult
@@ -57,7 +58,6 @@ import com.msoula.hobbymatchmaker.core.design.models.Casting
 import com.msoula.hobbymatchmaker.core.design.molecules.MovieInformationMetaPill
 import com.msoula.hobbymatchmaker.core.design.molecules.MovieOverviewExpandable
 import com.msoula.hobbymatchmaker.core.design.molecules.MovieTitleMetaPill
-import com.msoula.hobbymatchmaker.core.design.molecules.rememberCoilImageLoader
 import com.msoula.hobbymatchmaker.core.design.play_icon_accessibility
 import com.msoula.hobbymatchmaker.core.design.play_trailer
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
@@ -65,6 +65,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 
 @Composable
 fun MovieDetailInformation(
@@ -87,11 +88,12 @@ fun MovieDetailInformation(
     onPlayTrailerClicked: (Long, Boolean) -> Unit,
     actorSection: @Composable () -> Unit
 ) {
+    val imageLoader: ImageLoader = koinInject()
+
     val context = LocalPlatformContext.current
     val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
     val scrollState = rememberScrollState()
-    val imageLoader = rememberCoilImageLoader()
     val scrim = rememberLegibilityScrim()
 
     Box(

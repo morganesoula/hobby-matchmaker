@@ -19,6 +19,9 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            // Modules
+            implementation(project(Modules.COMMON))
+
             // Serialization
             implementation(libs.findLibrary("kotlinx-serialization").get())
 

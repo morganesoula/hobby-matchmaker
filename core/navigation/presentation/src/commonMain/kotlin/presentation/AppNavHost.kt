@@ -7,6 +7,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -21,6 +22,7 @@ import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.asStringSuspend
 import com.msoula.hobbymatchmaker.core.design.models.TabItem
 import com.msoula.hobbymatchmaker.core.design.reset_password
+import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClientImpl
@@ -31,6 +33,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.signIn.models.SocialCl
 import com.msoula.hobbymatchmaker.core.login.presentation.signUp.SignUpScreenContent
 import com.msoula.hobbymatchmaker.core.login.presentation.signUp.SignUpViewModel
 import com.msoula.hobbymatchmaker.core.navigation.presentation.models.SocialClients
+import com.msoula.hobbymatchmaker.core.navigation.presentation.utils.NavigationCallbacks
 import com.msoula.hobbymatchmaker.core.splashscreen.presentation.SplashScreenContent
 import com.msoula.hobbymatchmaker.core.splashscreen.presentation.SplashViewModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailContent
@@ -50,6 +53,19 @@ import kotlinx.collections.immutable.toImmutableList
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
+private val VideoPlayerStateSaver = Saver<VideoPlayerState, List<Any>>(
+    save = { state ->
+        listOf(state.videoId, state.isVisible, state.isLoading)
+    },
+    restore = { list ->
+        VideoPlayerState(
+            videoId = list[0] as String,
+            isVisible = list[1] as Boolean,
+            isLoading = list[2] as Boolean
+        )
+    }
+)
+
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun AppNavHost(
@@ -57,6 +73,7 @@ fun AppNavHost(
     socialClients: SocialClients
 ) {
     val nav = rememberNavController()
+    val navCallbacks = remember(nav) { NavigationCallbacks(nav) }
     val socialViewModel = koinViewModel<SocialViewModel>()
 
     NavHost(
@@ -70,22 +87,8 @@ fun AppNavHost(
 
             SplashScreenContent(
                 state = state,
-                redirectToAuth = {
-                    nav.navigate(Auth) {
-                        popUpTo<Splash> {
-                            inclusive = true
-                        }
-                        launchSingleTop = true
-                    }
-                },
-                redirectToMovies = {
-                    nav.navigate(Movies) {
-                        popUpTo<Splash> {
-                            inclusive = true
-                        }
-                        launchSingleTop = true
-                    }
-                }
+                redirectToAuth = navCallbacks.navigateToAuthFromSplash,
+                redirectToMovies = navCallbacks.navigateToMoviesFromSplash
             )
         }
 
@@ -103,26 +106,26 @@ fun AppNavHost(
                 LaunchedEffect(Unit) {
                     signInViewModel.events.collect { event ->
                         when (event) {
-                            is UiEvent.NavigateToRoute -> {
-                                when (event.route) {
-                                    "movies" -> nav.navigate(Movies) {
-                                        popUpTo<Auth> { inclusive = true }
-                                        launchSingleTop = true
-                                    }
-
-                                    "sign_up" -> nav.navigate(SignUp)
+                            is UiEvent.Navigate -> {
+                                when (event.destination) {
+                                    NavigationDestination.Movies -> navCallbacks.navigateToMoviesFromAuth()
+                                    NavigationDestination.SignUp -> nav.navigate(SignUp)
+                                    else -> Unit
                                 }
                             }
 
                             is UiEvent.ShowSnackBar -> {
-                                snackbarHostState.showSnackbar(event.message.asStringSuspend())
+                                snackbarHostState.showSnackbar(
+                                    event.message.asStringSuspend()
+                                )
                             }
 
                             is UiEvent.CloseDialog -> {
                                 when (event.dialogName) {
-                                    "reset_password" -> {
-                                        snackbarHostState.showSnackbar(getString(Res.string.reset_password))
-                                    }
+                                    "reset_password" ->
+                                        snackbarHostState.showSnackbar(
+                                            getString(Res.string.reset_password)
+                                        )
                                 }
                             }
 
@@ -132,14 +135,10 @@ fun AppNavHost(
                 }
 
                 SignInScreenContent(
-                    onNavigate = { route ->
-                        when (route) {
-                            "movies" -> nav.navigate(Movies) {
-                                popUpTo<Auth> { inclusive = true }
-                                launchSingleTop = true
-                            }
-
-                            "sign_up" -> nav.navigate(SignUp)
+                    onNavigate = { destination ->
+                        when (destination) {
+                            NavigationDestination.SignUp -> nav.navigate(SignUp)
+                            else -> Unit
                         }
                     },
                     signInState = signInState,
@@ -165,18 +164,11 @@ fun AppNavHost(
                             is UiEvent.ShowSnackBar ->
                                 snackBarHostState.showSnackbar(event.message.asStringSuspend())
 
-                            is UiEvent.NavigateToRoute -> {
-                                when (event.route) {
-                                    "movies" -> {
-                                        nav.navigate(Movies) {
-                                            popUpTo<Auth> { inclusive = true }
-                                            launchSingleTop = true
-                                        }
-                                    }
-
-                                    "sign_in" -> {
-                                        nav.popBackStack()
-                                    }
+                            is UiEvent.Navigate -> {
+                                when (event.destination) {
+                                    NavigationDestination.Movies -> navCallbacks.navigateToMoviesFromAuth()
+                                    NavigationDestination.SignIn -> nav.popBackStack()
+                                    else -> Unit
                                 }
                             }
 
@@ -204,17 +196,18 @@ fun AppNavHost(
             LaunchedEffect(Unit) {
                 movieViewModel.events.collect { event ->
                     when (event) {
-                        is UiEvent.NavigateToRoute ->
-                            when (event.route) {
-                                "sign_in" -> nav.navigate(SignIn) {
-                                    popUpTo(0) { inclusive = true }
-                                    launchSingleTop = true
-                                }
+                        is UiEvent.Navigate ->
+                            when (val dest = event.destination) {
+                                is NavigationDestination.MovieDetail -> nav.navigate(
+                                    MovieDetail(
+                                        dest.movieId
+                                    )
+                                )
 
+                                NavigationDestination.SignIn -> navCallbacks.navigateAndClearToAuth()
                                 else -> Unit
                             }
 
-                        is UiEvent.NavigateToDetail -> nav.navigate(MovieDetail(event.id))
                         is UiEvent.ShowSnackBar ->
                             snackBarHostState.showSnackbar(event.message.asStringSuspend())
 
@@ -226,10 +219,11 @@ fun AppNavHost(
             MovieContent(
                 modifier = Modifier,
                 movieState = movieState,
-                onNavigate = {
-                    when (it) {
-                        "profile" -> nav.navigate(Profile)
-                        "social" -> nav.navigate(Social)
+                onNavigate = { destination ->
+                    when (destination) {
+                        NavigationDestination.Profile -> nav.navigate(Profile)
+                        NavigationDestination.Social -> nav.navigate(Social)
+                        else -> Unit
                     }
                 },
                 snackBarHostState = snackBarHostState,
@@ -247,7 +241,9 @@ fun AppNavHost(
 
             val movieDetailState by movieDetailViewModel.screenState.collectAsState()
             val snackBarHostState = remember { SnackbarHostState() }
-            var videoPlayerState by rememberSaveable { mutableStateOf(VideoPlayerState()) }
+            var videoPlayerState by rememberSaveable(stateSaver = VideoPlayerStateSaver) {
+                mutableStateOf(VideoPlayerState())
+            }
 
             LaunchedEffect(Unit) {
                 movieDetailViewModel.events.collect { event ->
@@ -278,9 +274,9 @@ fun AppNavHost(
             }
 
             MovieDetailContent(
-                onNavigate = { route ->
-                    when (route) {
-                        "movies" -> nav.popBackStack()
+                onNavigate = { destination ->
+                    when (destination) {
+                        NavigationDestination.Movies -> nav.popBackStack()
                         else -> return@MovieDetailContent
                     }
                 },
@@ -313,14 +309,10 @@ fun AppNavHost(
                         is UiEvent.ShowSnackBar ->
                             snackBarHostState.showSnackbar(event.message.asStringSuspend())
 
-                        is UiEvent.NavigateToRoute -> {
-                            when (event.route) {
-                                "sign_in" -> {
-                                    nav.navigate(Auth) {
-                                        popUpTo(0) { inclusive = true }
-                                        launchSingleTop = true
-                                    }
-                                }
+                        is UiEvent.Navigate -> {
+                            when (event.destination) {
+                                NavigationDestination.SignIn -> navCallbacks.navigateAndClearToAuth()
+                                else -> Unit
                             }
                         }
 
@@ -336,53 +328,55 @@ fun AppNavHost(
             }
 
             if (profile != null) {
-                UserProfileContent(
-                    snackBarHostState = snackBarHostState,
-                    searchedPseudos = searchedPseudos,
-                    profile = profile,
-                    userProfileState = UserProfileState(
-                        profileState = profileState,
-                        editableProfile = editableProfile,
-                        isEditMode = isEditMode,
-                        isPseudoAvailable = isPseudoAvailable
-                    ),
-                    userProfileActions = UserProfileActions(
+                val userProfileActions = remember(userProfileViewModel, socialViewModel) {
+                    UserProfileActions(
                         closeEdition = { userProfileViewModel.closeEdition() },
                         logOut = { userProfileViewModel.logOut(it) },
-                        onNavigate = { route ->
-                            when (route) {
-                                "sign_up" -> {
-                                    nav.navigate(Auth) {
-                                        popUpTo(0) { inclusive = true }
-                                        launchSingleTop = true
-                                    }
-                                }
-
-                                "movies" -> {
-                                    nav.navigate(Movies) {
-                                        popUpTo<Profile> { inclusive = true }
-                                        launchSingleTop = true
-                                    }
-                                }
+                        onNavigate = { destination ->
+                            when (destination) {
+                                NavigationDestination.SignUp -> navCallbacks.navigateAndClearToAuth()
+                                NavigationDestination.Movies -> navCallbacks.navigateToMoviesFromProfile()
+                                else -> Unit
                             }
                         },
                         onEvent = userProfileViewModel::onEvent,
                         onSocialEvent = socialViewModel::onEvent
                     )
+                }
+
+                val userProfileState = remember(
+                    profileState, editableProfile, isEditMode, isPseudoAvailable
+                ) {
+                    UserProfileState(
+                        profileState = profileState,
+                        editableProfile = editableProfile,
+                        isEditMode = isEditMode,
+                        isPseudoAvailable = isPseudoAvailable
+                    )
+                }
+
+                UserProfileContent(
+                    snackBarHostState = snackBarHostState,
+                    searchedPseudos = searchedPseudos,
+                    profile = profile,
+                    userProfileState = userProfileState,
+                    userProfileActions = userProfileActions
                 )
             }
         }
 
         composable<Social> {
-            val socialTabs = listOf(
-                Destination.RECEIVED,
-                Destination.SENT
-            ).map { destination ->
-                TabItem(
-                    label = destination.label,
-                    icon = destination.icon,
-                    contentDescription = destination.contentDescription
-                )
+            val socialTabs = remember {
+                listOf(
+                    Destination.RECEIVED,
+                    Destination.SENT
+                ).map { destination ->
+                    TabItem(
+                        label = destination.label,
+                        icon = destination.icon,
+                        contentDescription = destination.contentDescription
+                    )
+                }.toImmutableList()
             }
 
             val sentInvites by socialViewModel.sentInvites.collectAsState()
@@ -391,7 +385,7 @@ fun AppNavHost(
             SocialContent(
                 sentInvites = sentInvites,
                 incomingInvites = incomingInvites,
-                tabs = socialTabs.toImmutableList(),
+                tabs = socialTabs,
                 observeSessionAndInvites = {
                     socialViewModel.observeSessionAndInvites()
                 },

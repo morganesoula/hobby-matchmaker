@@ -2,7 +2,6 @@ package com.msoula.hobbymatchmaker.features.profile.data.repositories
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
-import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.MovieRepository
 import com.msoula.hobbymatchmaker.features.profile.data.dataSources.local.UserProfileLocalDataSource
 import com.msoula.hobbymatchmaker.features.profile.data.dataSources.mappers.toUserProfileLocalDataModel
@@ -31,7 +30,6 @@ class UserProfileRepositoryImpl(
                 .onStart { emit(emptyList()) }
         ) { profile, count, members ->
             if (profile == null) {
-                Logger.d("No profile found in local storage")
                 null
             } else {
                 UserProfileDomainModel(

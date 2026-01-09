@@ -3,6 +3,9 @@ package com.msoula.hobbymatchmaker.core.database.services
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOne
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.database.Actor
 import com.msoula.hobbymatchmaker.core.database.HMMDatabase
 import com.msoula.hobbymatchmaker.core.database.Movie
@@ -54,48 +57,55 @@ class MovieDAOImpl(private val database: HMMDatabase) : MovieDAO {
         )
     }
 
-    override suspend fun upsertMovies(movies: List<Movie>) {
-        database.transaction {
-            movies.forEach { movie ->
-                val existingMovie =
-                    database.hmm_databaseQueries.getMovieById(movie.movieId).executeAsOneOrNull()
+    override suspend fun upsertMovies(movies: List<Movie>): AppResult<Unit, AppError> {
+        return try {
+            database.transaction {
+                movies.forEach { movie ->
+                    val existingMovie =
+                        database.hmm_databaseQueries.getMovieById(movie.movieId)
+                            .executeAsOneOrNull()
 
-                if (existingMovie == null) {
-                    database.hmm_databaseQueries.insertMovie(
-                        movieId = movie.movieId,
-                        title = movie.title,
-                        posterFileName = movie.posterFileName,
-                        synopsis = movie.synopsis,
-                        releaseDate = movie.releaseDate,
-                        genres = movie.genres,
-                        localCoverFilePath = movie.localCoverFilePath,
-                        isFavorite = movie.isFavorite,
-                        isSeen = movie.isSeen,
-                        popularity = movie.popularity,
-                        status = movie.status,
-                        videoKey = movie.videoKey,
-                        duration = movie.duration,
-                        note = movie.note
-                    )
-                } else {
-                    database.hmm_databaseQueries.updateExistingMovie(
-                        movieId = movie.movieId,
-                        title = movie.title,
-                        posterFileName = movie.posterFileName,
-                        synopsis = movie.synopsis,
-                        releaseDate = movie.releaseDate,
-                        genres = movie.genres,
-                        localCoverFilePath = movie.localCoverFilePath,
-                        isFavorite = movie.isFavorite,
-                        isSeen = movie.isSeen,
-                        popularity = movie.popularity,
-                        status = movie.status,
-                        videoKey = movie.videoKey,
-                        duration = movie.duration,
-                        note = movie.note
-                    )
+                    if (existingMovie == null) {
+                        database.hmm_databaseQueries.insertMovie(
+                            movieId = movie.movieId,
+                            title = movie.title,
+                            posterFileName = movie.posterFileName,
+                            synopsis = movie.synopsis,
+                            releaseDate = movie.releaseDate,
+                            genres = movie.genres,
+                            localCoverFilePath = movie.localCoverFilePath,
+                            isFavorite = movie.isFavorite,
+                            isSeen = movie.isSeen,
+                            popularity = movie.popularity,
+                            status = movie.status,
+                            videoKey = movie.videoKey,
+                            duration = movie.duration,
+                            note = movie.note
+                        )
+                    } else {
+                        database.hmm_databaseQueries.updateExistingMovie(
+                            movieId = movie.movieId,
+                            title = movie.title,
+                            posterFileName = movie.posterFileName,
+                            synopsis = movie.synopsis,
+                            releaseDate = movie.releaseDate,
+                            genres = movie.genres,
+                            localCoverFilePath = movie.localCoverFilePath,
+                            isFavorite = movie.isFavorite,
+                            isSeen = movie.isSeen,
+                            popularity = movie.popularity,
+                            status = movie.status,
+                            videoKey = movie.videoKey,
+                            duration = movie.duration,
+                            note = movie.note
+                        )
+                    }
                 }
             }
+            AppResult.Success(Unit)
+        } catch (e: Exception) {
+            Logger.e("MovieDAOImpl - Database transaction failed: $e")
+            AppResult.Failure(AppError.Storage.WriteFailed)
         }
     }
 

@@ -21,12 +21,7 @@ interface SocialRepository {
     fun observeSentInvites(uid: String): Flow<List<SocialInviteDomainModel>>
     suspend fun sendInvite(invite: SocialInviteDomainModel): AppResult<Unit, AppError>
     suspend fun cancelInvite(inviteId: String): AppResult<Unit, AppError>
-    suspend fun acceptInvite(
-        inviteId: String,
-        ownerId: String,
-        guestUid: String
-    ): AppResult<Unit, AppError>
-
+    suspend fun acceptInvite(inviteId: String): AppResult<Unit, AppError>
     suspend fun declineInvite(inviteId: String): AppResult<Unit, AppError>
     suspend fun removeMember(ownerId: String, memberUid: String): AppResult<Unit, AppError>
     suspend fun addMember(

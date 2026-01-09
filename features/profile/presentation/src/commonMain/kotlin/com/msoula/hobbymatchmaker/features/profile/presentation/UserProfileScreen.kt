@@ -52,6 +52,7 @@ import com.msoula.hobbymatchmaker.core.design.organisms.ProfileStatsSection
 import com.msoula.hobbymatchmaker.core.design.templates.CompleteProfileLayout
 import com.msoula.hobbymatchmaker.core.design.templates.EditableProfileLayout
 import com.msoula.hobbymatchmaker.core.design.templates.GuestProfileLayout
+import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
 import com.msoula.hobbymatchmaker.core.design.util.RetryPolicy
 import com.msoula.hobbymatchmaker.core.design.util.UIErrorHint
 import com.msoula.hobbymatchmaker.features.profile.presentation.mappers.toProfileSocialMembers
@@ -131,7 +132,9 @@ fun UserProfileContent(
                 )
             } else {
                 if (isIosPlatform()) {
-                    BackNavigationTopBar(onBack = { userProfileActions.onNavigate("movies") })
+                    BackNavigationTopBar(onBack = {
+                        userProfileActions.onNavigate(NavigationDestination.Movies)
+                    })
                 }
             }
         },
@@ -316,7 +319,7 @@ fun UserProfileContent(
                                 titleFeature = stringResource(Res.string.guest_redirect_title),
                                 descriptionFeature = stringResource(Res.string.guest_redirect_description),
                                 buttonText = stringResource(Res.string.guest_redirect_sign_up_button_text),
-                                onClick = { userProfileActions.onNavigate("sign_up") }
+                                onClick = { userProfileActions.onNavigate(NavigationDestination.SignUp) }
                             )
                         }
                     )

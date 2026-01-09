@@ -45,6 +45,7 @@ import com.msoula.hobbymatchmaker.core.design.organisms.SignInSocialMedia
 import com.msoula.hobbymatchmaker.core.design.reset_password
 import com.msoula.hobbymatchmaker.core.design.templates.SignInLayout
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
+import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
 import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.core.design.your_email
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClient
@@ -58,7 +59,7 @@ fun SignInScreenContent(
     formState: SignInFormStateModel,
     onEvent: (AuthenticationUIEvent) -> Unit,
     dontAskCheckbox: Boolean,
-    onNavigate: (String) -> Unit,
+    onNavigate: (NavigationDestination) -> Unit,
     snackBarHostState: SnackbarHostState,
     facebookUIClient: FacebookUIClient
 ) {
@@ -155,7 +156,7 @@ fun SignInScreenContent(
                         bottomSection = {
                             AuthenticationScreenBottom(
                                 isSignInScreen = true,
-                                onNavigateToOppositeScreen = { onNavigate("sign_up") },
+                                onNavigateToOppositeScreen = { onNavigate(NavigationDestination.SignUp) },
                                 onContinueAsGuest = {
                                     if (dontAskCheckbox) {
                                         Logger.d("Continue as guest clicked - setting account as guest")
@@ -208,7 +209,7 @@ fun SignInScreenContent(
                     isLoading = false,
                     onCancel = {
                         displayGuestDialog = false
-                        onNavigate("sign_up")
+                        onNavigate(NavigationDestination.SignUp)
                     },
                     onDismiss = {
                         displayGuestDialog = false

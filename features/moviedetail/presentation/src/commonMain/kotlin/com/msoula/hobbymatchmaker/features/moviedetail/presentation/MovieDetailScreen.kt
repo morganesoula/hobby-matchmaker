@@ -28,6 +28,7 @@ import com.msoula.hobbymatchmaker.core.design.no_data
 import com.msoula.hobbymatchmaker.core.design.not_found
 import com.msoula.hobbymatchmaker.core.design.organisms.ActorSection
 import com.msoula.hobbymatchmaker.core.design.organisms.MovieDetailInformation
+import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
 import com.msoula.hobbymatchmaker.core.design.util.UIText
 import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiEventModel
@@ -41,7 +42,7 @@ fun MovieDetailContent(
     snackBarHostState: SnackbarHostState,
     videoPlayerState: VideoPlayerState,
     onVideoPlayerDismissed: () -> Unit,
-    onNavigate: (String) -> Unit,
+    onNavigate: (NavigationDestination) -> Unit,
     observeMovieDetail: () -> Unit,
     onEvent: (MovieDetailUiEventModel) -> Unit
 ) {
@@ -62,7 +63,7 @@ fun MovieDetailContent(
         },
         topBar = {
             if (isIosPlatform()) {
-                BackNavigationTopBar(onBack = { onNavigate("movies") })
+                BackNavigationTopBar(onBack = { onNavigate(NavigationDestination.Movies) })
             }
         }
     ) { padding ->

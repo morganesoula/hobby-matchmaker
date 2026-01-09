@@ -3,8 +3,6 @@ package com.msoula.hobbymatchmaker.features.social.data.repositories
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
-import com.msoula.hobbymatchmaker.core.common.onFailure
-import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.SocialLocalDataSource
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.SocialRemoteDataSource
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toInviteData
@@ -34,7 +32,6 @@ class SocialRepositoryImpl(
 
     override fun observeSocialCircle(uid: String): Flow<List<SocialMemberDomainModel>> =
         socialRemoteDataSource.observeSocialCircle(uid)
-    //return socialLocalDataSource.observeSocialCircle()
 
     override fun observeIncomingInvites(ownerUid: String): Flow<List<SocialInviteDomainModel>> {
         return socialRemoteDataSource.observeIncomingInvites(ownerUid)
@@ -56,21 +53,8 @@ class SocialRepositoryImpl(
     override suspend fun cancelInvite(inviteId: String): AppResult<Unit, AppError> =
         socialRemoteDataSource.cancelInvitation(inviteId)
 
-    override suspend fun acceptInvite(
-        inviteId: String,
-        ownerId: String,
-        guestUid: String
-    ): AppResult<Unit, AppError> {
-        findUserByUid(guestUid)
-            .onSuccess { member ->
-                member?.let {
-                    addMember(ownerId, member)
-                }
-            }
-            .onFailure { return AppResult.Failure(AppError.Domain.NotFound) }
-
-        return socialRemoteDataSource.markInviteAsAccepted(inviteId)
-    }
+    override suspend fun acceptInvite(inviteId: String): AppResult<Unit, AppError> =
+        socialRemoteDataSource.markInviteAsAccepted(inviteId)
 
     override suspend fun declineInvite(inviteId: String): AppResult<Unit, AppError> =
         socialRemoteDataSource.markInviteAsDeclined(inviteId)

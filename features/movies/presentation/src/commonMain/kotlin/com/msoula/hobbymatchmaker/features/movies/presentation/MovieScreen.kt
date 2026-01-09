@@ -13,10 +13,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
@@ -27,14 +23,13 @@ import com.msoula.hobbymatchmaker.core.design.atoms.EmptyStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.MovieListLoadingScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.StateContainer
-import com.msoula.hobbymatchmaker.core.design.atoms.asStringSuspend
 import com.msoula.hobbymatchmaker.core.design.models.EmptyStateConfig
 import com.msoula.hobbymatchmaker.core.design.molecules.NavigationTopBar
 import com.msoula.hobbymatchmaker.core.design.no_data
 import com.msoula.hobbymatchmaker.core.design.not_found
 import com.msoula.hobbymatchmaker.core.design.organisms.MovieCarousel
+import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
 import com.msoula.hobbymatchmaker.core.design.util.UIText
-import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.features.movies.presentation.mappers.toCarouselItems
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
@@ -47,15 +42,15 @@ fun MovieContent(
     modifier: Modifier = Modifier,
     movieState: UiState<ImmutableList<MovieUiModel>>,
     snackBarHostState: SnackbarHostState,
-    onNavigate: (String) -> Unit,
+    onNavigate: (NavigationDestination) -> Unit,
     observeMovies: () -> Unit,
     onEvent: (CardEventModel) -> Unit
 ) {
     Scaffold(
         topBar = {
             NavigationTopBar(
-                redirectToProfile = { onNavigate("profile") },
-                redirectToSocial = { onNavigate("social") }
+                redirectToProfile = { onNavigate(NavigationDestination.Profile) },
+                redirectToSocial = { onNavigate(NavigationDestination.Social) }
             )
         },
         snackbarHost = {

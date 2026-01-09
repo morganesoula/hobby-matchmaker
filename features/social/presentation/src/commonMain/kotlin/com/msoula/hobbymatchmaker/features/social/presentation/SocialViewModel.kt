@@ -26,6 +26,7 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -65,6 +66,52 @@ class SocialViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
     fun observeSessionAndInvites() {
+        scope.launch {
+            observeWhenAuthenticated(
+                emptyResult = ObserveSentInvitesSuccess.Empty,
+                observe = { uid ->
+                    currentUserUid = uid
+                    interactor.observeSentInvites(uid)
+                }
+            ).collect { result ->
+                _sentInvites.update {
+                    result.toUIState { data ->
+                        when (data) {
+                            is ObserveSentInvitesSuccess.Empty -> UiState.Empty
+                            is ObserveSentInvitesSuccess.Success ->
+                                UiState.Success(
+                                    data.invites
+                                        .map { it.toInviteUiModel() }
+                                        .toImmutableList()
+                                )
+                        }
+                    }
+                }
+            }
+        }
+
+        scope.launch {
+            observeWhenAuthenticated(
+                emptyResult = ObserveIncomingInvitesSuccess.Empty,
+                observe = interactor::observeIncomingInvites
+            ).collect { result ->
+                _incomingInvites.update {
+                    result.toUIState { data ->
+                        when (data) {
+                            is ObserveIncomingInvitesSuccess.Empty -> UiState.Empty
+                            is ObserveIncomingInvitesSuccess.Success ->
+                                UiState.Success(
+                                    data.invites
+                                        .map { it.toInviteUiModel() }
+                                        .toImmutableList()
+                                )
+                        }
+                    }
+                }
+            }
+        }
+
+
         // Sent invitations
         scope.launch {
             observeSessionStateUseCase()
@@ -90,7 +137,6 @@ class SocialViewModel(
                     _sentInvites.update {
                         when (result) {
                             is AppResult.Success -> {
-                                Logger.d("Updating sentInvites with: ${result.data}")
                                 when (val data = result.data) {
                                     is ObserveSentInvitesSuccess.Empty -> UiState.Empty
                                     is ObserveSentInvitesSuccess.Success -> UiState.Success(
@@ -130,7 +176,6 @@ class SocialViewModel(
                     _incomingInvites.update {
                         when (result) {
                             is AppResult.Success -> {
-                                Logger.d("Updating incomingInvites with: ${result.data}")
                                 when (val data = result.data) {
                                     is ObserveIncomingInvitesSuccess.Empty -> UiState.Empty
                                     is ObserveIncomingInvitesSuccess.Success -> UiState.Success(
@@ -259,4 +304,27 @@ class SocialViewModel(
             UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(AppError.Domain.Unauthorized))
         )
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun <T> observeWhenAuthenticated(
+        emptyResult: T,
+        observe: (uid: String) -> Flow<AppResult<T, AppError>>
+    ): Flow<AppResult<T, AppError>> =
+        observeSessionStateUseCase()
+            .flatMapLatest { state ->
+                when (state) {
+                    is SessionState.Authenticated -> observe(state.uid)
+                    is SessionState.Guest, null ->
+                        flowOf(AppResult.Success(emptyResult))
+                }
+            }
+
+    private fun <T, R> AppResult<T, AppError>.toUIState(
+        mapper: (T) -> UiState<R>
+    ): UiState<R> =
+        when (this) {
+            is AppResult.Success -> mapper(data)
+            is AppResult.Failure ->
+                UiState.Error(defaultMessageMapper.toUIText(error))
+        }
 }

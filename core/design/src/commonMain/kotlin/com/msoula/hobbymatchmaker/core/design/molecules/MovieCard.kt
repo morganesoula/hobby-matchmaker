@@ -43,7 +43,6 @@ import coil3.ImageLoader
 import coil3.compose.LocalPlatformContext
 import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.SubcomposeAsyncImageContent
-import coil3.network.ktor3.KtorNetworkFetcherFactory
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.msoula.hobbymatchmaker.core.common.Logger
@@ -54,7 +53,6 @@ import com.msoula.hobbymatchmaker.core.design.atoms.LoadingPosterPlaceholder
 import com.msoula.hobbymatchmaker.core.design.atoms.MovieGenericCard
 import com.msoula.hobbymatchmaker.core.design.atoms.RatingChip
 import com.msoula.hobbymatchmaker.core.design.icons.LucideHeart
-import io.ktor.client.HttpClient
 import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
 
@@ -72,6 +70,8 @@ fun MovieCard(
     state: LazyListState,
     index: Int
 ) {
+    val imageLoader: ImageLoader = koinInject()
+
     var showBigHeart by remember { mutableStateOf(false) }
     var animateFavorite by remember { mutableStateOf(false) }
 
@@ -116,7 +116,7 @@ fun MovieCard(
                 }
         ) {
             SubcomposeAsyncImage(
-                imageLoader = rememberCoilImageLoader(),
+                imageLoader = imageLoader,
                 model = ImageRequest.Builder(LocalPlatformContext.current)
                     .data(posterFilePath)
                     .crossfade(true)
@@ -194,19 +194,5 @@ fun MovieCard(
                 )
             }
         }
-    }
-}
-
-@Composable
-fun rememberCoilImageLoader(): ImageLoader {
-    val context = LocalPlatformContext.current
-    val httpClient: HttpClient = koinInject()
-
-    return remember {
-        ImageLoader.Builder(context)
-            .components {
-                add(KtorNetworkFetcherFactory(httpClient))
-            }
-            .build()
     }
 }

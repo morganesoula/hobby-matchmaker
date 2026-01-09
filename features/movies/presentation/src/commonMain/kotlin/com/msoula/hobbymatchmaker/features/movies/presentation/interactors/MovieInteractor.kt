@@ -7,19 +7,25 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.CheckMovieSynopsisValueUseCase
+import com.msoula.hobbymatchmaker.features.movies.domain.useCases.FetchMoviesUseCase
+import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesSuccess
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.SetMovieFavoriteUseCase
+import kotlinx.coroutines.flow.Flow
 
 class MovieInteractor(
     private val setMovieFavoriteUseCase: SetMovieFavoriteUseCase,
     private val observeAllMoviesUseCase: ObserveAllMoviesUseCase,
+    private val fetchMoviesUseCase: FetchMoviesUseCase,
     private val fetchFirebaseUserInfo: FetchFirebaseUserInfo,
     private val logOutUseCase: LogOutUseCase,
     private val checkMovieSynopsisValueUseCase: CheckMovieSynopsisValueUseCase,
     private val connectivityChecker: NetworkConnectivityChecker
 ) {
 
-    fun observeMovies(language: String) = observeAllMoviesUseCase(language)
+    fun observeMovies(): Flow<AppResult<ObserveAllMoviesSuccess, AppError>> = observeAllMoviesUseCase()
+
+    suspend fun fetchMovies(language: String): AppResult<Unit, AppError> = fetchMoviesUseCase(language)
 
     suspend fun logOut() = logOutUseCase()
 

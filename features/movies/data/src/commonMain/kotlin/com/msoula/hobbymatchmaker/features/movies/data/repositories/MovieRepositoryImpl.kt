@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.features.movies.data.repositories
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.flatMap
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.MovieLocalDataSource
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.mappers.toMovieDB
@@ -62,7 +63,7 @@ class MovieRepositoryImpl(
                                     )
                                 }
                             } catch (e: Exception) {
-
+                                Logger.e("MovieRepositoryImpl - Error downloading image: ${e.message}")
                             }
                         }
                     }.awaitAll()

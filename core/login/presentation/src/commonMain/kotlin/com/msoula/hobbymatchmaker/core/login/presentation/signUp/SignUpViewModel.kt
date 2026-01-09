@@ -9,6 +9,7 @@ import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.design.util.EventHandler
+import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.core.login.presentation.interactors.SignUpInteractor
@@ -106,7 +107,7 @@ class SignUpViewModel(
         action()
             .onSuccess {
                 _signUpState.update { UiState.Success(Unit) }
-                eventHandler.sendEvent(UiEvent.NavigateToRoute("movies"))
+                eventHandler.sendEvent(UiEvent.Navigate(NavigationDestination.Movies))
             }
             .onFailure { error ->
                 _signUpState.update { UiState.Success(Unit) }
