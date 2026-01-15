@@ -11,6 +11,12 @@ multiplatformConfig {
 }
 
 kotlin {
+    androidLibrary {
+        namespace = "com.msoula.hobbymatchmaker.core.design"
+        @Suppress("OPT_IN_USAGE")
+        experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true
+    }
+
     iosArm64().apply {
         compilations["main"].cinterops.create("nativeIosPlayerShared")
     }
@@ -29,13 +35,9 @@ kotlin {
             implementation(libs.findLibrary("youtube-player").get())
 
             // Preview
-            implementation(compose.uiTooling)
+            implementation(libs.findLibrary("compose-preview").get())
         }
     }
-}
-
-android {
-    namespace = "com.msoula.hobbymatchmaker.core.design"
 }
 
 compose.resources {

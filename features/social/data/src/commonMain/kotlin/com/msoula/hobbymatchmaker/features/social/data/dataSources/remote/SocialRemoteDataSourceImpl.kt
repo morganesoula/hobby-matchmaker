@@ -36,11 +36,13 @@ class SocialRemoteDataSourceImpl(
             val endTerm = searchTerm + '\uf8ff'
 
             val documents = try {
-                firestore
+                val startAtFieldValues = firestore
                     .collection("users")
                     .orderBy("information.pseudo", Direction.ASCENDING)
-                    .startAt(searchTerm)
-                    .endAt(endTerm)
+                    .startAtFieldValues { kotlin.arrayOf<Any?>(searchTerm)
+                        .forEach { this.add(it) } }
+                startAtFieldValues.endAtFieldValues { kotlin.arrayOf<Any?>(endTerm)
+                    .forEach { this.add(it) } }
                     .limit(20)
                     .get()
                     .documents

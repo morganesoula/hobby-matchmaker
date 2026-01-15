@@ -9,6 +9,10 @@ multiplatformConfig {
 }
 
 kotlin {
+    androidLibrary {
+        namespace = "com.msoula.hobbymatchmaker.core.session.data"
+    }
+
     sourceSets {
         commonMain.dependencies {
             // DataStore
@@ -23,8 +27,4 @@ kotlin {
             implementation(libs.findLibrary("koin-android").get())
         }
     }
-}
-
-android {
-    namespace = "com.msoula.hobbymatchmaker.core.session.data"
 }

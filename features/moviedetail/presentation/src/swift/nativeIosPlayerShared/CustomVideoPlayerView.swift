@@ -1,9 +1,27 @@
 import UIKit
 import YouTubeiOSPlayerHelper
 
-@objcMembers public class YoutubePlayerViewController: UIViewController, YTPlayerViewDelegate {
+private class PlayerDelegate: NSObject, YTPlayerViewDelegate {
+    weak var controller: YoutubePlayerViewController?
+
+    func playerViewDidBecomeReady(_ playerView: YTPlayerView) {
+        print("✅ YTPlayerView is ready to play")
+        playerView.playVideo()
+    }
+
+    func playerView(_ playerView: YTPlayerView, didChangeTo state: YTPlayerState) {
+        print("🎬 YTPlayerView changed state: \(state.rawValue)")
+    }
+
+    func playerView(_ playerView: YTPlayerView, receivedError error: YTPlayerError) {
+        print("❌ YTPlayerView error: \(error)")
+    }
+}
+
+@objcMembers public class YoutubePlayerViewController: UIViewController {
     private var playerView: YTPlayerView!
     private var videoId: String
+    private var playerDelegate: PlayerDelegate!
 
     @objc public init(videoId: String) {
         self.videoId = videoId
@@ -18,8 +36,11 @@ import YouTubeiOSPlayerHelper
         super.viewDidLoad()
         print("▶️ viewDidLoad called for videoId: \(videoId)")
 
+        playerDelegate = PlayerDelegate()
+        playerDelegate.controller = self
+
         playerView = YTPlayerView()
-        playerView.delegate = self
+        playerView.delegate = playerDelegate
         playerView.frame = view.bounds
         playerView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         view.addSubview(playerView)
@@ -49,19 +70,6 @@ import YouTubeiOSPlayerHelper
         super.viewDidAppear(animated)
         print("▶️ viewDidAppear called")
         playerView.playVideo()
-    }
-
-    @objc public func playerViewDidBecomeReady(_ playerView: YTPlayerView) {
-        print("✅ YTPlayerView is ready to play")
-        playerView.playVideo()
-    }
-
-    @objc public func playerView(_ playerView: YTPlayerView, didChangeTo state: YTPlayerState) {
-        print("🎬 YTPlayerView changed state: \(state.rawValue)")
-    }
-
-    @objc public func playerView(_ playerView: YTPlayerView, receivedError error: YTPlayerError) {
-        print("❌ YTPlayerView error: \(error)")
     }
 }
 

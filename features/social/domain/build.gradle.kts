@@ -4,14 +4,14 @@ plugins {
 }
 
 kotlin {
+    androidLibrary {
+        namespace = "com.msoula.hobbymatchmaker.features.social.domain"
+    }
+
     sourceSets {
         commonMain.dependencies {
             // Modules
             implementation(project(Modules.COMMON))
         }
     }
-}
-
-android {
-    namespace = "com.msoula.hobbymatchmaker.features.social.domain"
 }

@@ -5,6 +5,10 @@ plugins {
 }
 
 kotlin {
+    androidLibrary {
+        namespace = "com.msoula.hobbymatchmaker.features.moviedetail.data"
+    }
+
     sourceSets {
         commonMain.dependencies {
             // Ktor
@@ -18,8 +22,4 @@ kotlin {
             implementation(project(Modules.NETWORK))
         }
     }
-}
-
-android {
-    namespace = "com.msoula.hobbymatchmaker.features.moviedetail.data"
 }

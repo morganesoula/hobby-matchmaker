@@ -3,7 +3,17 @@ plugins {
 }
 
 kotlin {
+    androidLibrary {
+        namespace = "com.msoula.hobbymatchmaker.core.splashscreen.presentation"
+        @Suppress("OPT_IN_USAGE")
+        experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true
+    }
+
     sourceSets {
+        all {
+            languageSettings.enableLanguageFeature("ExplicitBackingFields")
+        }
+
         commonMain.dependencies {
             // Modules
             implementation(project(Modules.COMMON))
@@ -12,8 +22,4 @@ kotlin {
             implementation(project(Modules.SESSION_DOMAIN))
         }
     }
-}
-
-android {
-    namespace = "com.msoula.hobbymatchmaker.core.splashscreen.presentation"
 }

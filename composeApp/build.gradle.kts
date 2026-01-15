@@ -1,15 +1,16 @@
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 import java.io.FileInputStream
 import java.net.URI
 import java.util.Properties
 
 plugins {
-    alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.hobbymatchmaker.buildlogic.application)
     alias(libs.plugins.kover)
     alias(libs.plugins.spm.kmp)
+    alias(libs.plugins.build.konfig)
 }
 
 multiplatformConfig {
@@ -30,6 +31,10 @@ kotlin {
     }
 
     sourceSets {
+        all {
+            languageSettings.enableLanguageFeature("ExplicitBackingFields")
+        }
+
         commonMain.dependencies {
             // Modules
             implementation(project(Modules.AUTHENTICATION_DATA))
@@ -66,11 +71,6 @@ kotlin {
             // Facebook
             implementation(libs.findLibrary("facebook-android-sdk").get())
 
-            // Firebase to make :generateDebugAndroidTestLintModel pass
-            implementation("com.google.firebase:firebase-auth-ktx:23.2.0")
-            implementation("com.google.firebase:firebase-common-ktx:21.0.0")
-            implementation("com.google.firebase:firebase-firestore:25.1.2")
-
             // Google
             implementation(libs.findLibrary("play-services-auth").get())
 
@@ -86,37 +86,47 @@ kotlin {
 android {
     namespace = "com.msoula.hobbymatchmaker"
 
-    val secretsPropertiesFile = rootProject.file("secrets.properties")
-    val secretProperties = Properties()
-
-    if (secretsPropertiesFile.exists()) {
-        secretProperties.load(FileInputStream(secretsPropertiesFile))
-    }
-
     defaultConfig {
+        val secretsPropertiesFile = rootProject.file("secrets.properties")
+        val secretProperties = Properties()
+
+        if (secretsPropertiesFile.exists()) {
+            secretProperties.load(FileInputStream(secretsPropertiesFile))
+        }
+
         manifestPlaceholders["facebookApplicationID"] =
-            secretProperties["facebook_application_id"] ?: ""
+            secretProperties["facebook_application_id"]?.toString() ?: ""
         manifestPlaceholders["facebookClientToken"] =
-            secretProperties["facebook_client_token"] ?: ""
+            secretProperties["facebook_client_token"]?.toString() ?: ""
+    }
+}
+
+buildkonfig {
+    packageName = "com.msoula.hobbymatchmaker"
+
+    defaultConfigs {
+        val secretsPropertiesFile = rootProject.file("secrets.properties")
+        val secretProperties = Properties()
+
+        if (secretsPropertiesFile.exists()) {
+            secretProperties.load(FileInputStream(secretsPropertiesFile))
+        }
 
         buildConfigField(
-            "String",
+            STRING,
             "FIREBASE_APP_ID",
-            "\"${secretProperties["firebase_application_id"]}\""
+            secretProperties["firebase_application_id"]?.toString() ?: ""
         )
         buildConfigField(
-            "String",
+            STRING,
             "FIREBASE_API_KEY",
-            "\"${secretProperties["firebase_api_key"]}\""
+            secretProperties["firebase_api_key"]?.toString() ?: ""
         )
         buildConfigField(
-            "String",
+            STRING,
             "KOTZILLA_KEY",
-            "\"${secretProperties["kotzilla_key"]}\""
+            secretProperties["kotzilla_key"]?.toString() ?: ""
         )
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables.useSupportLibrary = true
     }
 }
 
@@ -157,16 +167,18 @@ swiftPackageConfig {
             remotePackageVersion(
                 url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
                 products = {
-                    add("FirebaseCore", exportToKotlin = true)
-                    add("FirebaseAuth", exportToKotlin = true)
-                    add("FirebaseFirestore", exportToKotlin = true)
+                    // Don't export Firebase to Kotlin - using gitlive bindings instead
+                    add("FirebaseCore", exportToKotlin = false)
+                    add("FirebaseAuth", exportToKotlin = false)
+                    add("FirebaseFirestore", exportToKotlin = false)
                 },
                 version = "11.14.0"
             )
             remotePackageVersion(
                 url = URI("https://github.com/google/GoogleSignIn-iOS"),
                 products = {
-                    add("GoogleSignIn", exportToKotlin = true)
+                    // Don't export GoogleSignIn to Kotlin - Swift code returns simple types
+                    add("GoogleSignIn", exportToKotlin = false)
                 },
                 version = "8.0.0"
             )

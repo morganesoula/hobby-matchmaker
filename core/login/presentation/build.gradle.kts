@@ -1,3 +1,4 @@
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.FileInputStream
 import java.util.Properties
@@ -7,6 +8,7 @@ plugins {
     alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform.test)
     alias(libs.plugins.kover)
     alias(libs.plugins.spm.kmp)
+    alias(libs.plugins.build.konfig)
 }
 
 multiplatformConfig {
@@ -14,7 +16,9 @@ multiplatformConfig {
 }
 
 kotlin {
-    androidTarget {
+    androidLibrary {
+        namespace = "com.msoula.hobbymatchmaker.core.login.presentation"
+
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_21)
             freeCompilerArgs.addAll(
@@ -29,6 +33,10 @@ kotlin {
     }
 
     sourceSets {
+        all {
+            languageSettings.enableLanguageFeature("ExplicitBackingFields")
+        }
+
         commonMain.dependencies {
             // Modules
             implementation(project(Modules.AUTHENTICATION_DOMAIN))
@@ -60,11 +68,10 @@ kotlin {
     }
 }
 
-android {
-    namespace = "com.msoula.hobbymatchmaker.core.login.presentation"
-    buildFeatures.buildConfig = true
+buildkonfig {
+    packageName = "com.msoula.hobbymatchmaker.core.login.presentation"
 
-    defaultConfig {
+    defaultConfigs {
         val secretsPropertiesFile = project.rootProject.file("secrets.properties")
         val secretProperties = Properties()
 
@@ -73,14 +80,10 @@ android {
         }
 
         buildConfigField(
-            "String",
+            STRING,
             "WEB_CLIENT_ID",
-            "\"${secretProperties["web_client_id"]}\""
+            secretProperties["web_client_id"]?.toString() ?: ""
         )
-    }
-
-    lint {
-        disable += listOf("CoroutineCreationDuringComposition")
     }
 }
 

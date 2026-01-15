@@ -8,7 +8,15 @@ multiplatformConfig {
 }
 
 kotlin {
+    androidLibrary {
+        namespace = "com.msoula.hobbymatchmaker.features.profile.presentation"
+    }
+
     sourceSets {
+        all {
+            languageSettings.enableLanguageFeature("ExplicitBackingFields")
+        }
+
         commonMain.dependencies {
             // Images
             implementation(libs.findLibrary("file-kit-core").get())
@@ -23,8 +31,3 @@ kotlin {
         }
     }
 }
-
-android {
-    namespace = "com.msoula.hobbymatchmaker.features.profile.presentation"
-}
-

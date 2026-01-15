@@ -34,6 +34,7 @@ class MovieDetailViewModel(
 
     private val eventHandler = EventHandler()
     val events = eventHandler.events
+
     private val _screenState = MutableStateFlow<UiState<MovieDetailUiModel>>(UiState.Loading)
     val screenState = _screenState.asStateFlow()
 

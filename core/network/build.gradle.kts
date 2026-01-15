@@ -1,8 +1,11 @@
+import com.android.build.api.dsl.androidLibrary
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 import java.util.Properties
 
 plugins {
     alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform)
     alias(libs.plugins.spm.kmp)
+    alias(libs.plugins.build.konfig)
 }
 
 multiplatformConfig {
@@ -10,6 +13,10 @@ multiplatformConfig {
 }
 
 kotlin {
+    androidLibrary {
+        namespace = "com.msoula.hobbymatchmaker.core.network"
+    }
+
     sourceSets {
         commonMain.dependencies {
             // Ktor
@@ -34,19 +41,18 @@ kotlin {
     }
 }
 
-android {
-    namespace = "com.msoula.hobbymatchmaker.core.network"
-    buildFeatures.buildConfig = true
+buildkonfig {
+    packageName = "com.msoula.hobbymatchmaker.core.network"
 
-    val tmdbPropertiesFile = project.rootProject.file("./secrets.properties")
-    val tmdbProperties = Properties()
+    defaultConfigs {
+        val tmdbPropertiesFile = project.rootProject.file("./secrets.properties")
+        val tmdbProperties = Properties()
 
-    if (tmdbPropertiesFile.exists()) {
-        tmdbProperties.load(tmdbPropertiesFile.inputStream())
-    }
+        if (tmdbPropertiesFile.exists()) {
+            tmdbProperties.load(tmdbPropertiesFile.inputStream())
+        }
 
-    defaultConfig {
-        buildConfigField("String", "TMDB_KEY", "\"${tmdbProperties["tmdb_key"]}\"")
+        buildConfigField(STRING, "TMDB_KEY", tmdbProperties["tmdb_key"]?.toString() ?: "")
     }
 }
 

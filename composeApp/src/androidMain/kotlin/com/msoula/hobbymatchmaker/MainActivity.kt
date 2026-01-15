@@ -12,7 +12,6 @@ import com.msoula.hobbymatchmaker.core.login.presentation.clients.AndroidFaceboo
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.AndroidGoogleUIClient
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClientImpl
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.GoogleUIClientImpl
-import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SocialUIClient
 import com.msoula.hobbymatchmaker.core.navigation.presentation.models.SocialClients
 import com.msoula.hobbymatchmaker.presentation.navigation.App
 

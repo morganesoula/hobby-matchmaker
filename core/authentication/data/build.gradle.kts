@@ -9,6 +9,10 @@ multiplatformConfig {
 }
 
 kotlin {
+    androidLibrary {
+        namespace = "com.msoula.hobbymatchmaker.core.authentication.data"
+    }
+
     sourceSets {
         androidMain.dependencies {
             // Facebook
@@ -23,8 +27,4 @@ kotlin {
             implementation(project(Modules.NETWORK))
         }
     }
-}
-
-android {
-    namespace = "com.msoula.hobbymatchmaker.core.authentication.data"
 }

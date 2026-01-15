@@ -13,7 +13,7 @@ class IosAppleUIClient : AppleUIClient {
 
     override suspend fun getAppleCredentials(): AuthCredential? =
         suspendCancellableCoroutine { continuation ->
-            val cancel = AppleSignInManager.shared().signInWithApple { token, nonce, error ->
+            AppleSignInManager.shared().signInWithApple { token, nonce, error ->
                 if (!continuation.isActive) return@signInWithApple
 
                 when {
@@ -33,9 +33,6 @@ class IosAppleUIClient : AppleUIClient {
 
                     else -> continuation.resumeWithException(Exception("Unknown Apple Sign-In failure"))
                 }
-            }
-            continuation.invokeOnCancellation {
-                try { AppleSignInManager.shared().cancel(cancel) } catch (_: Throwable) {}
             }
         }
 }

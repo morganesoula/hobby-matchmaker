@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -18,6 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.error_issue_retry
+import com.msoula.hobbymatchmaker.core.design.icons.MaterialIconsError_outline
 import com.msoula.hobbymatchmaker.core.design.models.EmptyStateConfig
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.util.RetryPolicy
@@ -60,7 +59,7 @@ fun ErrorStateScreen(
             .padding(CustomSize.TwentyFour)
     ) {
         Icon(
-            imageVector = Icons.Outlined.ErrorOutline,
+            imageVector = MaterialIconsError_outline,
             contentDescription = null,
             modifier = Modifier.size(72.dp)
         )

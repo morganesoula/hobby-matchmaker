@@ -1,4 +1,4 @@
-import com.android.build.gradle.LibraryExtension
+import com.msoula.convention.MultiplatformConfigExtension
 import com.msoula.convention.configureMultiplatformAndroid
 import com.msoula.convention.configureMultiplatformIos
 import com.msoula.convention.configureMultiplatformMinimalist
@@ -11,10 +11,12 @@ class MultiplatformMinimalistPlugin : Plugin<Project> {
 
     override fun apply(target: Project) = with(target) {
         val libs = this.libs
+        val config = MultiplatformConfigExtension(target, libs)
+        target.extensions.add("multiplatformConfig", config)
 
         with(pluginManager) {
-            apply("com.android.library")
             apply("org.jetbrains.kotlin.multiplatform")
+            apply("com.android.kotlin.multiplatform.library")
             apply("org.jetbrains.kotlin.plugin.serialization")
 
             // Only apply Kotzilla if kotzilla.json exists in the module or at root
@@ -37,14 +39,9 @@ class MultiplatformMinimalistPlugin : Plugin<Project> {
             }
         }
 
-        target.afterEvaluate {
-            extensions.configure<KotlinMultiplatformExtension> {
-                configureMultiplatformIos(this@with)
-                configureMultiplatformMinimalist(libs)
-            }
-        }
-
-        extensions.configure<LibraryExtension> {
+        extensions.configure<KotlinMultiplatformExtension> {
+            configureMultiplatformIos(this@with)
+            configureMultiplatformMinimalist(libs)
             configureMultiplatformAndroid()
         }
     }

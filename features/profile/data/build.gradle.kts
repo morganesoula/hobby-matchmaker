@@ -8,6 +8,10 @@ multiplatformConfig {
 }
 
 kotlin {
+    androidLibrary {
+        namespace = "com.msoula.hobbymatchmaker.features.profile.data"
+    }
+
     sourceSets {
         commonMain.dependencies {
             // Ktor
@@ -22,8 +26,4 @@ kotlin {
             implementation(project(Modules.SOCIAL_DOMAIN))
         }
     }
-}
-
-android {
-    namespace = "com.msoula.hobbymatchmaker.features.profile.data"
 }

@@ -12,11 +12,19 @@ multiplatformConfig {
 }
 
 kotlin {
+    androidLibrary {
+        namespace = "com.msoula.hobbymatchmaker.features.moviedetail.presentation"
+    }
+
     iosArm64().apply {
         compilations["main"].cinterops.create("nativeIosPlayerShared")
     }
 
     sourceSets {
+        all {
+            languageSettings.enableLanguageFeature("ExplicitBackingFields")
+        }
+
         commonMain.dependencies {
             // Coil
             implementation(libs.findLibrary("coil-network").get())
@@ -45,10 +53,6 @@ kotlin {
             implementation(libs.findLibrary("ktor-client-darwin").get())
         }
     }
-}
-
-android {
-    namespace = "com.msoula.hobbymatchmaker.features.moviedetail.presentation"
 }
 
 swiftPackageConfig {

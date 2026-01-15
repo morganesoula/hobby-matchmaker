@@ -7,8 +7,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.UIKitView
+import kotlinx.cinterop.ExperimentalForeignApi
 import nativeIosPlayerShared.YoutubePlayerContainer
 
+@OptIn(ExperimentalForeignApi::class)
 @Composable
 actual fun YoutubePlayer(
     modifier: Modifier,

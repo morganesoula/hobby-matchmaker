@@ -5,6 +5,10 @@ plugins {
 }
 
 kotlin {
+    androidLibrary {
+        namespace = "com.msoula.hobbymatchmaker.features.movies.domain"
+    }
+
     sourceSets {
         commonMain {
             dependencies {
@@ -14,8 +18,4 @@ kotlin {
             }
         }
     }
-}
-
-android {
-    namespace = "com.msoula.hobbymatchmaker.features.movies.domain"
 }

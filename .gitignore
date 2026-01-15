@@ -34,3 +34,4 @@ DerivedData/
 .build/
 .swiftpm/
 
+iosApp/iosApp/secrets.xcconfig

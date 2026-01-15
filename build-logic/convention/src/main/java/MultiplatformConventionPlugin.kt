@@ -1,4 +1,3 @@
-import com.android.build.gradle.LibraryExtension
 import com.msoula.convention.MultiplatformConfigExtension
 import com.msoula.convention.configureCInterops
 import com.msoula.convention.configureMultiplatform
@@ -13,11 +12,11 @@ class MultiplatformConventionPlugin : Plugin<Project> {
 
     override fun apply(target: Project) = with(target) {
         val libs = this.libs
-        val config = MultiplatformConfigExtension()
+        val config = MultiplatformConfigExtension(target, libs)
         target.extensions.add("multiplatformConfig", config)
 
         with(pluginManager) {
-            apply("com.android.library")
+            apply("com.android.kotlin.multiplatform.library")
             apply("org.jetbrains.kotlin.multiplatform")
             apply("org.jetbrains.kotlin.plugin.serialization")
 
@@ -41,15 +40,10 @@ class MultiplatformConventionPlugin : Plugin<Project> {
             }
         }
 
-        target.afterEvaluate {
-            extensions.configure<KotlinMultiplatformExtension> {
-                configureMultiplatformIos(this@with)
-                configureMultiplatform(libs, config)
-                configureCInterops(this@with)
-            }
-        }
-
-        extensions.configure<LibraryExtension> {
+        extensions.configure<KotlinMultiplatformExtension> {
+            configureMultiplatformIos(this@with)
+            configureMultiplatform(libs)
+            configureCInterops(this@with)
             configureMultiplatformAndroid()
         }
     }

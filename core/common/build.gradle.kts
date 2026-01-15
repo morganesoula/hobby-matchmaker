@@ -3,18 +3,27 @@ plugins {
     alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform.compose)
 }
 
+multiplatformConfig {
+    useFirebase()
+}
+
 kotlin {
+    androidLibrary {
+        namespace = "com.msoula.hobbymatchmaker.core.common"
+
+        androidResources {
+            ignoreAssetsPattern = ""
+        }
+    }
+
     sourceSets {
         commonMain.dependencies {
             // Compose Resources
-            implementation(compose.runtime)
-            implementation(compose.components.resources)
+            implementation(libs.findLibrary("compose-runtime").get())
+            implementation(libs.findLibrary("compose-resources").get())
 
             implementation(libs.findLibrary("kotlinx-datetime").get())
             implementation(libs.findLibrary("kotlinx-io").get())
-
-            // FireStore
-            implementation(libs.findLibrary("firebase-kmp-firestore").get())
         }
 
         androidMain.dependencies {
@@ -22,12 +31,5 @@ kotlin {
             implementation(libs.findLibrary("facebook-android-sdk").get())
             implementation(libs.findLibrary("timber-android").get())
         }
-    }
-}
-
-android {
-    namespace = "com.msoula.hobbymatchmaker.core.common"
-    androidResources {
-        enable = false
     }
 }

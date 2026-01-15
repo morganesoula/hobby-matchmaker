@@ -4,8 +4,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.MovieFilter
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
@@ -23,6 +21,7 @@ import com.msoula.hobbymatchmaker.core.design.atoms.EmptyStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.MovieListLoadingScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.StateContainer
+import com.msoula.hobbymatchmaker.core.design.icons.MaterialIconsMovie_filter
 import com.msoula.hobbymatchmaker.core.design.models.EmptyStateConfig
 import com.msoula.hobbymatchmaker.core.design.molecules.NavigationTopBar
 import com.msoula.hobbymatchmaker.core.design.no_data
@@ -76,7 +75,7 @@ fun MovieContent(
                 onEmpty = {
                     EmptyStateScreen(
                         config = EmptyStateConfig(
-                            icon = Icons.Outlined.MovieFilter,
+                            icon = MaterialIconsMovie_filter,
                             title = UIText.Resource(Res.string.no_data),
                             description = UIText.Resource(Res.string.not_found)
                         )

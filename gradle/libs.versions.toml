@@ -1,8 +1,9 @@
 [versions]
 activityCompose = "1.12.0"
 appcompat = "1.7.1"
+buildKonfig = "0.17.1"
 coil = "3.3.0"
-composeMultiplatform = "1.9.3"
+composeMultiplatform = "1.10.0"
 composeNavigation = "2.9.1"
 coreKtx = "1.17.0"
 credentials = "1.5.0"
@@ -11,13 +12,14 @@ datetime = "0.7.1"
 detekt = "1.23.8"
 facebookAndroidSdk = "18.1.3"
 fileKit = "0.12.0"
-firebaseKMP = "2.1.0"
+firebaseBOM = "33.7.0"
+firebaseKMP = "2.4.0"
 googleIdentity = "1.1.1"
 googleServices = "4.4.4"
 gradle = "8.13.2"
 koin = "4.1.1"
 kotest = "6.0.7"
-kotlinGradlePlugin = "2.2.21"
+kotlinGradlePlugin = "2.3.0"
 kotlinxCollectionsImmutable = "0.4.0"
 kotlinxCoroutinesTest = "1.10.2"
 kotlinxIo = "0.8.2"
@@ -26,6 +28,8 @@ kotlinxCoroutineKMP = "1.10.2"
 kotzilla = "1.4.0"
 kover = "0.9.3"
 ktor = "3.3.1"
+material = "1.13.0"
+material3 = "1.9.0"
 mediaPlayer = "2.1.0"
 mockk = "1.14.6"
 playServicesAuth = "21.4.0"
@@ -41,7 +45,6 @@ uuid = "0.8.4"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
-material = "1.13.0"
 
 [libraries]
 activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
@@ -49,7 +52,11 @@ appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat"
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-network = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
 compose-gradle-plugin = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "composeMultiplatform" }
+compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
 compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
+compose-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "composeMultiplatform" }
+compose-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "composeMultiplatform" }
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "composeMultiplatform" }
 core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
 credentials-play-services = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
@@ -58,6 +65,10 @@ facebook-android-sdk = { module = "com.facebook.android:facebook-android-sdk", v
 facebook-login = { module = "com.facebook.android:facebook-login", version.ref = "facebookAndroidSdk" }
 file-kit-core = { module = "io.github.vinceglb:filekit-core", version.ref = "fileKit" }
 file-kit-compose = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "fileKit" }
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBOM" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
+firebase-common = { group = "com.google.firebase", name = "firebase-common" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
 firebase-kmp-auth = { group = "dev.gitlive", name = "firebase-auth", version.ref = "firebaseKMP" }
 firebase-kmp-firestore = { group = "dev.gitlive", name = "firebase-firestore", version.ref = "firebaseKMP" }
 google-identity = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleIdentity" }
@@ -111,8 +122,8 @@ material = { group = "com.google.android.material", name = "material", version.r
 ktor = ["ktor-client-core", "ktor-client-logging", "ktor-client-negotiation", "ktor-serialization-json"]
 
 [plugins]
-android-application = { id = "com.android.application", version.ref = "gradle" }
 android-library = { id = "com.android.library", version.ref = "gradle" }
+build-konfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildKonfig" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlinGradlePlugin" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinGradlePlugin" }

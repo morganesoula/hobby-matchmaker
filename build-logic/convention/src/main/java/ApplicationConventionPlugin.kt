@@ -15,31 +15,32 @@ class ApplicationConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             val libs = this.libs
-            val config = MultiplatformConfigExtension()
-            target.extensions.add("multiplatformConfig", config)
 
             with(pluginManager) {
-                apply("com.android.application")
                 apply("org.jetbrains.kotlin.multiplatform")
+                apply("com.android.application")
                 apply("org.jetbrains.compose")
                 apply("org.jetbrains.kotlin.plugin.compose")
                 apply("io.kotzilla.kotzilla-plugin")
             }
 
             val compose = extensions.getByType(ComposeExtension::class.java).dependencies
+            val config = MultiplatformConfigExtension(target, libs, compose)
+            target.extensions.add("multiplatformConfig", config)
 
-            extensions.configure<KotlinMultiplatformExtension> {
-                configureIOSApplication()
-            }
+            extensions.configure<ApplicationExtension> {
+                compileSdk = ProjectConfig.PROJECT_CONFIG_SDK_VERSION
 
-            target.afterEvaluate {
-                extensions.configure<KotlinMultiplatformExtension> {
-                    configureCompose(libs, config, compose)
+                defaultConfig {
+                    minSdk = ProjectConfig.PROJECT_CONFIG_MIN_SDK_VERSION
+                    targetSdk = ProjectConfig.PROJECT_CONFIG_TARGET_SDK_VERSION
                 }
             }
 
-            extensions.configure<ApplicationExtension> {
+            extensions.configure<KotlinMultiplatformExtension> {
+                configureIOSApplication()
                 configureAndroidApplication()
+                configureCompose(libs)
             }
 
             // Task if you modify iosMain

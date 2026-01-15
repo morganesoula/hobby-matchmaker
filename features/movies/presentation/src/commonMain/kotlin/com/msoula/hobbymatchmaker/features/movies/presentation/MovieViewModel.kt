@@ -43,7 +43,6 @@ class MovieViewModel(
 
     private val language = getDeviceLocale()
     private var fetchLaunched = false
-
     private val _screenState =
         MutableStateFlow<UiState<ImmutableList<MovieUiModel>>>(UiState.Loading)
     val screenState = _screenState.asStateFlow()

@@ -1,13 +1,12 @@
 package com.msoula.hobbymatchmaker.features.social.presentation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.MovieFilter
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.EmptyStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.StateContainer
+import com.msoula.hobbymatchmaker.core.design.icons.MaterialIconsMovie_filter
 import com.msoula.hobbymatchmaker.core.design.icons.MaterialSymbolsRoundedSad_tab
 import com.msoula.hobbymatchmaker.core.design.models.EmptyStateConfig
 import com.msoula.hobbymatchmaker.core.design.models.TabItem
@@ -25,7 +24,6 @@ import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toSentInv
 import com.msoula.hobbymatchmaker.features.social.presentation.models.InviteUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUiEventModel
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun SocialContent(
@@ -46,7 +44,7 @@ fun SocialContent(
                     onEmpty = {
                         EmptyStateScreen(
                             EmptyStateConfig(
-                                icon = Icons.Outlined.MovieFilter,
+                                icon = MaterialIconsMovie_filter,
                                 title = UIText.Resource(Res.string.no_data),
                                 description = UIText.Resource(Res.string.not_found)
                             )

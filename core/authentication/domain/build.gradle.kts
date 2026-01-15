@@ -5,6 +5,10 @@ plugins {
 }
 
 kotlin {
+    androidLibrary {
+        namespace = "com.msoula.hobbymatchmaker.core.authentication.domain"
+    }
+
     sourceSets {
         commonMain.dependencies {
             // Modules
@@ -17,8 +21,4 @@ kotlin {
             implementation(libs.findLibrary("kotlinx-coroutines-test").get())
         }
     }
-}
-
-android {
-    namespace = "com.msoula.hobbymatchmaker.core.authentication.domain"
 }

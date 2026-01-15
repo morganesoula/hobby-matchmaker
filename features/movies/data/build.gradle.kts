@@ -9,6 +9,10 @@ multiplatformConfig {
 }
 
 kotlin {
+    androidLibrary {
+        namespace = "com.msoula.hobbymatchmaker.features.movies.data"
+    }
+
     sourceSets {
         commonMain {
             dependencies {
@@ -23,8 +27,4 @@ kotlin {
             }
         }
     }
-}
-
-android {
-    namespace = "com.msoula.hobbymatchmaker.features.movies.data"
 }

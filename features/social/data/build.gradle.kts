@@ -8,6 +8,10 @@ multiplatformConfig {
 }
 
 kotlin {
+    androidLibrary {
+        namespace = "com.msoula.hobbymatchmaker.features.social.data"
+    }
+
     sourceSets {
         commonMain.dependencies {
             implementation(project(Modules.COMMON))
@@ -16,8 +20,4 @@ kotlin {
             implementation(project(Modules.SOCIAL_DOMAIN))
         }
     }
-}
-
-android {
-    namespace = "com.msoula.hobbymatchmaker.features.social.data"
 }

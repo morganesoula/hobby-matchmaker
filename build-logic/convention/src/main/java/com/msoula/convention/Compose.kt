@@ -1,43 +1,22 @@
 package com.msoula.convention
 
 import org.gradle.api.artifacts.VersionCatalog
-import org.jetbrains.compose.ComposePlugin
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 internal fun KotlinMultiplatformExtension.configureCompose(
-    libs: VersionCatalog,
-    config: MultiplatformConfigExtension,
-    compose: ComposePlugin.Dependencies
+    libs: VersionCatalog
 ) {
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
-        }
-    }
-
     sourceSets.commonMain.dependencies {
         // Coroutines
         implementation(libs.findLibrary("kotlinx-coroutines-kmp").get())
         implementation(libs.findLibrary("kotlinx-collections-immutable").get())
 
-        // Coil
-        if (config.useCoil) {
-            implementation(libs.findLibrary("coil-compose").get())
-        }
-
         // Compose
-        implementation(compose.runtime)
-        implementation(compose.components.resources)
-        implementation(compose.material3)
-        implementation(compose.materialIconsExtended)
-        implementation(compose.components.uiToolingPreview)
-
-        // Firebase - FireStore
-        if (config.useFirebase) {
-            implementation(libs.findLibrary("firebase-kmp-auth").get())
-            implementation(libs.findLibrary("firebase-kmp-firestore").get())
-        }
+        implementation(libs.findLibrary("compose-runtime").get())
+        implementation(libs.findLibrary("compose-resources").get())
+        implementation(libs.findLibrary("compose-material3").get())
+        //implementation(compose.materialIconsExtended)
+        implementation(libs.findLibrary("compose-preview").get())
 
         // Koin
         api(libs.findLibrary("koin-core").get())

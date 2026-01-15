@@ -6,6 +6,10 @@ plugins {
 }
 
 kotlin {
+    androidLibrary {
+        namespace = "com.msoula.hobbymatchmaker.core.database"
+    }
+
     metadata {
         compilations.all {
             val compilationName = name
@@ -42,10 +46,6 @@ kotlin {
             implementation(libs.findLibrary("sqldelight-native-driver").get())
         }
     }
-}
-
-android {
-    namespace = "com.msoula.hobbymatchmaker.core.database"
 }
 
 sqldelight {

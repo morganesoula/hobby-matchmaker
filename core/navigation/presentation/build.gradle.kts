@@ -3,7 +3,14 @@ plugins {
 }
 
 kotlin {
+    androidLibrary {
+        namespace = "com.msoula.hobbymatchmaker.core.navigation.presentation"
+    }
+
     sourceSets {
+        all {
+            languageSettings.enableLanguageFeature("ExplicitBackingFields")
+        }
         commonMain.dependencies {
             // Module
             implementation(project(Modules.AUTHENTICATION_DOMAIN))
@@ -18,8 +25,4 @@ kotlin {
             implementation(project(Modules.SPLASHSCREEN_PRESENTATION))
         }
     }
-}
-
-android {
-    namespace = "com.msoula.hobbymatchmaker.core.navigation.presentation"
 }

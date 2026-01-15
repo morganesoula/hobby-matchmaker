@@ -3,6 +3,10 @@ plugins {
 }
 
 kotlin {
+    androidLibrary {
+        namespace = "com.msoula.hobbymatchmaker.core.session.domain"
+    }
+
     sourceSets {
         commonMain {
             dependencies {
@@ -13,8 +17,4 @@ kotlin {
             }
         }
     }
-}
-
-android {
-    namespace = "com.msoula.hobbymatchmaker.core.session.domain"
 }
