@@ -1,18 +1,17 @@
 [versions]
-activityCompose = "1.12.0"
+activityCompose = "1.12.2"
 appcompat = "1.7.1"
 buildKonfig = "0.17.1"
 coil = "3.3.0"
 composeMultiplatform = "1.10.0"
 composeNavigation = "2.9.1"
-coreKtx = "1.17.0"
 credentials = "1.5.0"
-datastore = "1.1.7"
+datastore = "1.2.0"
 datetime = "0.7.1"
 detekt = "1.23.8"
 facebookAndroidSdk = "18.1.3"
 fileKit = "0.12.0"
-firebaseBOM = "33.7.0"
+firebaseBOM = "34.7.0"
 firebaseKMP = "2.4.0"
 googleIdentity = "1.1.1"
 googleServices = "4.4.4"
@@ -27,20 +26,18 @@ kotlinxSerialization = "1.9.0"
 kotlinxCoroutineKMP = "1.10.2"
 kotzilla = "1.4.0"
 kover = "0.9.3"
-ktor = "3.3.1"
-material = "1.13.0"
+ktor = "3.3.3"
 material3 = "1.9.0"
 mediaPlayer = "2.1.0"
-mockk = "1.14.6"
-playServicesAuth = "21.4.0"
-savedState = "1.3.3"
+mockk = "1.14.7"
+playServicesAuth = "21.5.0"
+savedState = "1.4.0"
 spm = "1.1.1"
 sqldelight = "2.1.0"
 timber = "5.0.1"
 turbine = "1.2.1"
 youtube = "13.0.0"
 jetbrainsKotlinJvm = "2.2.21"
-uiTooling = "1.9.5"
 uuid = "0.8.4"
 junit = "4.13.2"
 junitVersion = "1.3.0"
@@ -57,7 +54,6 @@ compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-co
 compose-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "composeMultiplatform" }
 compose-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "composeMultiplatform" }
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "composeMultiplatform" }
-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
 credentials-play-services = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
 datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
@@ -105,18 +101,15 @@ play-services-auth = { module = "com.google.android.gms:play-services-auth", ver
 saved-state-kmp = { module = "androidx.savedstate:savedstate-ktx", version.ref = "savedState" }
 sqldelight-android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
-sqldelight-driver = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
 sqldelight-native-driver = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
 sqldelight-runtime = { module = "app.cash.sqldelight:runtime", version.ref = "sqldelight" }
 timber-android = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 youtube-player = { module = "com.pierfrancescosoffritti.androidyoutubeplayer:core", version.ref = "youtube" }
-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [bundles]
 ktor = ["ktor-client-core", "ktor-client-logging", "ktor-client-negotiation", "ktor-serialization-json"]
@@ -143,5 +136,3 @@ hobbymatchmaker-buildlogic-multiplatform-test = { id = "hobbymatchmaker.buildlog
 ### Test
 kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
-jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinGradlePlugin" }
