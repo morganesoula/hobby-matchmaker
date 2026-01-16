@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>FACEBOOK_APPLICATION_ID</key>
+	<string>$(FACEBOOK_APPLICATION_ID)</string>
+	<key>FACEBOOK_CLIENT_TOKEN</key>
+	<string>$(FACEBOOK_CLIENT_TOKEN)</string>
+	<key>FIREBASE_API_KEY</key>
+	<string>$(FIREBASE_API_KEY)</string>
+	<key>FIREBASE_APPLICATION_ID</key>
+	<string>$(FIREBASE_APPLICATION_ID)</string>
+	<key>TMDB_KEY</key>
+	<string>$(TMDB_KEY)</string>
+	<key>WEB_CLIENT_ID</key>
+	<string>$(WEB_CLIENT_ID)</string>
+</dict>
+</plist>

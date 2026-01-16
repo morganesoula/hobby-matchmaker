@@ -1,0 +1,30 @@
+appId: com.msoula.hobbymatchmaker
+---
+- launchApp:
+    clearState: true
+- assertVisible: Content de vous revoir\n\n sur HobbyMatchMaker
+- assertVisible: E-mail
+- assertVisible: Mot de passe
+- tapOn: E-mail
+- inputText: test@test.fr
+- tapOn: Mot de passe
+- inputText: azerty123!
+- hideKeyboard
+- tapOn: Se connecter
+- assertVisible: Identifiants incorrects. Veuillez vérifier vos informations.
+- tapOn: Mot de passe oublié ?
+- assertVisible: Merci d'entrer votre e-mail. Nous allons vous envoyer un e-mail avec les instructions à suivre.
+- tapOn: Annuler
+- assertNotVisible: Merci d'entrer votre e-mail. Nous allons vous envoyer un e-mail avec les instructions à suivre.
+- scrollUntilVisible:
+    element: Pas encore membre ? Inscrivez-vous
+- tapOn: Pas encore membre ? Inscrivez-vous
+- assertVisible: Bienvenue sur\n\nHobbyMatchMaker
+- scrollUntilVisible:
+    element: Déjà membre ? Connectez-vous
+- tapOn: Déjà membre ? Connectez-vous
+- assertVisible: Content de vous revoir\n\n sur HobbyMatchMaker
+- tapOn: Logo Google
+- assertVisible: Sélectionner un compte
+- tapOn: Annuler
+- assertNotVisible: Sélectionner un compte

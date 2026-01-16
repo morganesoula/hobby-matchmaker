@@ -1,0 +1,21 @@
+## This file must *NOT* be checked into Version Control Systems,
+# as it contains information specific to your local configuration.
+#
+# Location of the SDK. This is only used by Gradle.
+# For customization when using a Version Control System, please read the
+# header note.
+#Wed Jun 11 15:01:41 CEST 2025
+sdk.dir=/Users/morganesoula/Library/Android/sdk
+
+# BUILD PERFORMANCE OPTIMIZATIONS
+# Disable iOS compilation during Android development for MUCH faster builds
+# Set to true when you need to build/test iOS
+
+# Or use these to control individual targets
+# kmp.buildTargets.android.enabled=true
+# kmp.buildTargets.jvm.enabled=true
+
+# Build Performance Optimization
+
+# Build Performance - Full Build Mode
+kmp.buildTargets.ios.enabled=true

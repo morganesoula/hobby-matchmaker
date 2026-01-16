@@ -1,0 +1,6 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="presentation-jvm">
+    <output-path>$PROJECT_DIR$/features/social/presentation/build/libs</output-path>
+    <root id="archive" name="presentation-jvm.jar" />
+  </artifact>
+</component>

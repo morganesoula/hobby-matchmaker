@@ -1,0 +1,18 @@
+GET https://api.themoviedb.org/3/movie/552524?api_key=9fef25726e535de97b60abe52e2b461a
+Accept: application/json
+User-Agent: IntelliJ HTTP Client/Android Studio Narwhal Feature Drop | 2025.1.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+
+<> 2025-08-11T192707.200.json
+
+###
+
+GET https://api.themoviedb.org/3/movie/552524?api_key=9fef25726e535de97b60abe52e2b461a
+Accept: application/json
+User-Agent: IntelliJ HTTP Client/Android Studio Narwhal Feature Drop | 2025.1.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+
+<> 2025-08-11T155602.200.json
+
+###
+

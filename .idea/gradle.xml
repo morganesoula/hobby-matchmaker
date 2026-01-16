@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <compositeConfiguration>
+          <compositeBuild compositeDefinitionSource="SCRIPT">
+            <builds>
+              <build path="$PROJECT_DIR$/build-logic" name="build-logic">
+                <projects>
+                  <project path="$PROJECT_DIR$/build-logic" />
+                  <project path="$PROJECT_DIR$/build-logic/convention" />
+                </projects>
+              </build>
+            </builds>
+          </compositeBuild>
+        </compositeConfiguration>
+        <option name="testRunner" value="CHOOSE_PER_TEST" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleJvm" value="#GRADLE_LOCAL_JAVA_HOME" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/build-logic" />
+            <option value="$PROJECT_DIR$/build-logic/convention" />
+            <option value="$PROJECT_DIR$/composeApp" />
+            <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/core/authentication" />
+            <option value="$PROJECT_DIR$/core/authentication/data" />
+            <option value="$PROJECT_DIR$/core/authentication/domain" />
+            <option value="$PROJECT_DIR$/core/common" />
+            <option value="$PROJECT_DIR$/core/database" />
+            <option value="$PROJECT_DIR$/core/design" />
+            <option value="$PROJECT_DIR$/core/login" />
+            <option value="$PROJECT_DIR$/core/login/domain" />
+            <option value="$PROJECT_DIR$/core/login/presentation" />
+            <option value="$PROJECT_DIR$/core/navigation" />
+            <option value="$PROJECT_DIR$/core/navigation/presentation" />
+            <option value="$PROJECT_DIR$/core/network" />
+            <option value="$PROJECT_DIR$/core/session" />
+            <option value="$PROJECT_DIR$/core/session/data" />
+            <option value="$PROJECT_DIR$/core/session/domain" />
+            <option value="$PROJECT_DIR$/core/splashscreen" />
+            <option value="$PROJECT_DIR$/core/splashscreen/presentation" />
+            <option value="$PROJECT_DIR$/features" />
+            <option value="$PROJECT_DIR$/features/moviedetail" />
+            <option value="$PROJECT_DIR$/features/moviedetail/data" />
+            <option value="$PROJECT_DIR$/features/moviedetail/domain" />
+            <option value="$PROJECT_DIR$/features/moviedetail/presentation" />
+            <option value="$PROJECT_DIR$/features/movies" />
+            <option value="$PROJECT_DIR$/features/movies/data" />
+            <option value="$PROJECT_DIR$/features/movies/domain" />
+            <option value="$PROJECT_DIR$/features/movies/presentation" />
+            <option value="$PROJECT_DIR$/features/profile" />
+            <option value="$PROJECT_DIR$/features/profile/data" />
+            <option value="$PROJECT_DIR$/features/profile/domain" />
+            <option value="$PROJECT_DIR$/features/profile/presentation" />
+            <option value="$PROJECT_DIR$/features/social" />
+            <option value="$PROJECT_DIR$/features/social/data" />
+            <option value="$PROJECT_DIR$/features/social/domain" />
+            <option value="$PROJECT_DIR$/features/social/presentation" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

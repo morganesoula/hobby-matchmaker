@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="di-jvm">
+    <output-path>$PROJECT_DIR$/core/di/build/libs</output-path>
+    <root id="archive" name="di-jvm.jar">
+      <element id="module-output" name="HobbyMatchmaker.core.di.jvmMain" />
+    </root>
+  </artifact>
+</component>

@@ -1,0 +1,17 @@
+appId: com.msoula.hobbymatchmaker
+---
+- launchApp:
+    clearState: true
+- assertVisible: Content de vous revoir\n\n sur HobbyMatchMaker
+- assertVisible: E-mail
+- assertVisible: Mot de passe
+- tapOn: E-mail
+- inputText: morganes56@gmail.com
+- tapOn: Mot de passe
+- inputText: Testpassword123!
+- hideKeyboard
+- tapOn: Se connecter
+- assertVisible: Logout
+- tapOn: LogOut
+- assertVisible: Content de vous revoir\n\n sur HobbyMatchMaker
+- assertVisible: morganes56@gmail.com
