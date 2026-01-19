@@ -33,13 +33,6 @@ gradlePlugin {
     }
 
     plugins {
-        register("application") {
-            id = "hobbymatchmaker.buildlogic.application"
-            implementationClass = "ApplicationConventionPlugin"
-        }
-    }
-
-    plugins {
         register("multiplatformTest") {
             id = "hobbymatchmaker.buildlogic.multiplatformTest"
             implementationClass = "MultiplatformTestConventionPlugin"

@@ -6,10 +6,6 @@ plugins {
 }
 
 kotlin {
-    androidLibrary {
-        namespace = "com.msoula.hobbymatchmaker.core.database"
-    }
-
     metadata {
         compilations.all {
             val compilationName = name

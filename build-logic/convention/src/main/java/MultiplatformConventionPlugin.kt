@@ -1,7 +1,7 @@
 import com.msoula.convention.MultiplatformConfigExtension
+import com.msoula.convention.configureAndroidLibrary
 import com.msoula.convention.configureCInterops
 import com.msoula.convention.configureMultiplatform
-import com.msoula.convention.configureMultiplatformAndroid
 import com.msoula.convention.configureMultiplatformIos
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -16,35 +16,16 @@ class MultiplatformConventionPlugin : Plugin<Project> {
         target.extensions.add("multiplatformConfig", config)
 
         with(pluginManager) {
-            apply("com.android.kotlin.multiplatform.library")
             apply("org.jetbrains.kotlin.multiplatform")
+            apply("com.android.kotlin.multiplatform.library")
             apply("org.jetbrains.kotlin.plugin.serialization")
-
-            // Only apply Kotzilla if kotzilla.json exists in the module or at root
-            val moduleKotzillaFile = file("kotzilla.json")
-            val rootKotzillaFile = rootProject.file("kotzilla.json")
-            if (moduleKotzillaFile.exists() || rootKotzillaFile.exists()) {
-                apply("io.kotzilla.kotzilla-plugin")
-
-                // Create symlink if only root file exists
-                if (!moduleKotzillaFile.exists() && rootKotzillaFile.exists()) {
-                    try {
-                        java.nio.file.Files.createSymbolicLink(
-                            moduleKotzillaFile.toPath(),
-                            rootKotzillaFile.toPath()
-                        )
-                    } catch (e: Exception) {
-                        logger.warn("Could not create symlink for kotzilla.json: ${e.message}")
-                    }
-                }
-            }
         }
 
         extensions.configure<KotlinMultiplatformExtension> {
+            configureAndroidLibrary(this@with)
             configureMultiplatformIos(this@with)
             configureMultiplatform(libs)
             configureCInterops(this@with)
-            configureMultiplatformAndroid()
         }
     }
 }

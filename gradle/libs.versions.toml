@@ -15,7 +15,7 @@ firebaseBOM = "34.7.0"
 firebaseKMP = "2.4.0"
 googleIdentity = "1.1.1"
 googleServices = "4.4.4"
-gradle = "8.13.2"
+gradle = "9.0.0"
 koin = "4.1.1"
 kotest = "6.0.7"
 kotlinGradlePlugin = "2.3.0"
@@ -115,7 +115,10 @@ espresso-core = { group = "androidx.test.espresso", name = "espresso-core", vers
 ktor = ["ktor-client-core", "ktor-client-logging", "ktor-client-negotiation", "ktor-serialization-json"]
 
 [plugins]
+android-application = { id = "com.android.application", version.ref = "gradle" }
 android-library = { id = "com.android.library", version.ref = "gradle" }
+android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "gradle" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinGradlePlugin" }
 build-konfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildKonfig" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlinGradlePlugin" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
@@ -127,7 +130,6 @@ kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref 
 spm-kmp = { id = "io.github.frankois944.spmForKmp", version.ref = "spm" }
 kotzilla = { id = "io.kotzilla.kotzilla-plugin", version.ref = "kotzilla" }
 
-hobbymatchmaker-buildlogic-application = { id = "hobbymatchmaker.buildlogic.application", version = "unspecified" }
 hobbymatchmaker-buildlogic-multiplatform = { id = "hobbymatchmaker.buildlogic.multiplatform", version = "unspecified" }
 hobbymatchmaker-buildlogic-multiplatform-compose = { id = "hobbymatchmaker.buildlogic.multiplatformCompose", version = "unspecified" }
 hobbymatchmaker-buildlogic-multiplatform-minimalist = { id = "hobbymatchmaker.buildlogic.multiplatformMinimalist", version = "unspecified" }

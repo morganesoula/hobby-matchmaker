@@ -22,7 +22,7 @@ import kotlinx.coroutines.withContext
 class AndroidGoogleUIClient(
     private val credentialManager: CredentialManager,
     private val context: Context
-) : GoogleUIClient {
+): GoogleUIClient {
 
     private val googleIdOption = GetGoogleIdOption.Builder()
         .setFilterByAuthorizedAccounts(false)
@@ -34,6 +34,7 @@ class AndroidGoogleUIClient(
         .addCredentialOption(googleIdOption)
         .build()
 
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     override suspend fun getGoogleCredentials(): AuthCredential? {
         return withContext(Dispatchers.IO) {
             try {

@@ -1,14 +1,14 @@
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 import java.io.FileInputStream
 import java.net.URI
 import java.util.Properties
 
 plugins {
-    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform)
     alias(libs.plugins.compose.multiplatform)
-    alias(libs.plugins.hobbymatchmaker.buildlogic.application)
-    alias(libs.plugins.kover)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.spm.kmp)
     alias(libs.plugins.build.konfig)
 }
@@ -19,8 +19,17 @@ multiplatformConfig {
 }
 
 kotlin {
-    val xcf = XCFramework()
+    androidLibrary {
+        namespace = "com.msoula.hobbymatchmaker.composeapp"
+        compileSdk = ProjectConfig.PROJECT_CONFIG_SDK_VERSION
+        minSdk = ProjectConfig.PROJECT_CONFIG_MIN_SDK_VERSION
 
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
+        }
+    }
+
+    val xcf = XCFramework()
     iosArm64().apply {
         compilations["main"].cinterops.create("nativeIosShared")
         binaries.framework {
@@ -36,6 +45,9 @@ kotlin {
         }
 
         commonMain.dependencies {
+            // Compose Resources
+            implementation(libs.findLibrary("compose-resources").get())
+
             // Modules
             implementation(project(Modules.AUTHENTICATION_DATA))
             implementation(project(Modules.AUTHENTICATION_DOMAIN))
@@ -62,47 +74,12 @@ kotlin {
             implementation(project(Modules.SOCIAL_PRESENTATION))
             implementation(project(Modules.SPLASHSCREEN_PRESENTATION))
         }
-
-        androidMain.dependencies {
-            // AndroidX
-            api(libs.findLibrary("appcompat").get())
-            implementation(libs.findLibrary("activity-compose").get())
-
-            // Facebook
-            implementation(libs.findLibrary("facebook-android-sdk").get())
-
-            // Google
-            implementation(libs.findLibrary("play-services-auth").get())
-
-            // Koin
-            implementation(libs.findLibrary("koin-android").get())
-
-            // Timber
-            implementation(libs.findLibrary("timber-android").get())
-        }
-    }
-}
-
-android {
-    namespace = "com.msoula.hobbymatchmaker"
-
-    defaultConfig {
-        val secretsPropertiesFile = rootProject.file("secrets.properties")
-        val secretProperties = Properties()
-
-        if (secretsPropertiesFile.exists()) {
-            secretProperties.load(FileInputStream(secretsPropertiesFile))
-        }
-
-        manifestPlaceholders["facebookApplicationID"] =
-            secretProperties["facebook_application_id"]?.toString() ?: ""
-        manifestPlaceholders["facebookClientToken"] =
-            secretProperties["facebook_client_token"]?.toString() ?: ""
     }
 }
 
 buildkonfig {
     packageName = "com.msoula.hobbymatchmaker"
+    exposeObjectWithName = "BuildKonfig"
 
     defaultConfigs {
         val secretsPropertiesFile = rootProject.file("secrets.properties")
@@ -134,29 +111,6 @@ compose.resources {
     publicResClass = true
     packageOfResClass = "com.msoula.hobbymatchmaker"
     generateResClass = always
-}
-
-kover {
-    reports {
-
-    }
-}
-
-dependencies {
-    kover(project(Modules.AUTHENTICATION_DATA))
-    kover(project(Modules.AUTHENTICATION_DOMAIN))
-    kover(project(Modules.LOGIN_DOMAIN))
-    kover(project(Modules.LOGIN_PRESENTATION))
-    kover(project(Modules.MOVIE_DATA))
-    kover(project(Modules.MOVIE_DOMAIN))
-    kover(project(Modules.MOVIE_DETAIL_DATA))
-    kover(project(Modules.MOVIE_DETAIL_DOMAIN))
-    kover(project(Modules.MOVIE_DETAIL_PRESENTATION))
-    kover(project(Modules.MOVIE_PRESENTATION))
-    kover(project(Modules.PROFILE_DATA))
-    kover(project(Modules.PROFILE_DOMAIN))
-    kover(project(Modules.PROFILE_PRESENTATION))
-    kover(project(Modules.SESSION_DATA))
 }
 
 swiftPackageConfig {

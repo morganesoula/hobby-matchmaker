@@ -10,8 +10,6 @@
 		A107BB8E2DBC08CA00ABD150 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A107BB8D2DBC08CA00ABD150 /* libsqlite3.tbd */; };
 		A18419902DCFD1930033E797 /* YouTubeiOSPlayerHelper in Frameworks */ = {isa = PBXBuildFile; productRef = A184198F2DCFD1930033E797 /* YouTubeiOSPlayerHelper */; };
 		A18E733E2EAD1F6500B1816D /* nativeIosShared in Frameworks */ = {isa = PBXBuildFile; productRef = A18E733D2EAD1F6500B1816D /* nativeIosShared */; };
-		A1F3BA3E2DCA4DE6005104EF /* composeApp.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1F3BA3D2DCA4DE6005104EF /* composeApp.xcframework */; };
-		A1F3BA3F2DCA4DE6005104EF /* composeApp.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A1F3BA3D2DCA4DE6005104EF /* composeApp.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,7 +36,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				A1F3BA3F2DCA4DE6005104EF /* composeApp.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -50,11 +47,10 @@
 		A1654D952D5BB95100F7F8E6 /* HobbyMatchMaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HobbyMatchMaker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1654DA52D5BB95200F7F8E6 /* iosAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iosAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1654DAF2D5BB95200F7F8E6 /* iosAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iosAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		A1F3BA3D2DCA4DE6005104EF /* composeApp.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = composeApp.xcframework; path = ../composeApp/build/XCFrameworks/debug/composeApp.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		A18DEC7B2EA7E3390065D9B8 /* Exceptions for "iosApp" folder in "iosApp" target */ = {
+		A18DEC7B2EA7E3390065D9B8 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -67,7 +63,7 @@
 		A1654D972D5BB95100F7F8E6 /* iosApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				A18DEC7B2EA7E3390065D9B8 /* Exceptions for "iosApp" folder in "iosApp" target */,
+				A18DEC7B2EA7E3390065D9B8 /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -90,7 +86,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				A18E733E2EAD1F6500B1816D /* nativeIosShared in Frameworks */,
-				A1F3BA3E2DCA4DE6005104EF /* composeApp.xcframework in Frameworks */,
 				A107BB8E2DBC08CA00ABD150 /* libsqlite3.tbd in Frameworks */,
 				A18419902DCFD1930033E797 /* YouTubeiOSPlayerHelper in Frameworks */,
 			);
@@ -116,7 +111,6 @@
 		7DEDD20BC06CE39FE6B82CDD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				A1F3BA3D2DCA4DE6005104EF /* composeApp.xcframework */,
 				A107BB8D2DBC08CA00ABD150 /* libsqlite3.tbd */,
 			);
 			name = Frameworks;

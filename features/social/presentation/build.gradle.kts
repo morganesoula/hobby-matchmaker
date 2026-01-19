@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform.compose)
-    alias(libs.plugins.kover)
 }
 
 kotlin {

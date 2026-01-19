@@ -9,10 +9,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.msoula.hobbymatchmaker" />
+                  <option name="mobileSdkAppId" value="1:115887741528:android:4ef4f4e30dab485c09082d" />
+                  <option name="projectId" value="hobby-matchmaker" />
+                  <option name="projectNumber" value="115887741528" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

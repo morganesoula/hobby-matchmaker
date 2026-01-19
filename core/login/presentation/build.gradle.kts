@@ -6,7 +6,6 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform.compose)
     alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform.test)
-    alias(libs.plugins.kover)
     alias(libs.plugins.spm.kmp)
     alias(libs.plugins.build.konfig)
 }

@@ -16,6 +16,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "HobbyMatchmaker"
 include(":composeApp")
+include(":androidApp")
 include(":core")
 include(":core:authentication")
 include(":core:authentication:data")

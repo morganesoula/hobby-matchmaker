@@ -17,8 +17,8 @@ kotlin {
         experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true
     }
 
-    iosArm64().apply {
-        compilations["main"].cinterops.create("nativeIosPlayerShared")
+    listOf(iosArm64(), iosSimulatorArm64()).forEach { target ->
+        target.compilations["main"].cinterops.create("nativeIosPlayerShared")
     }
 
     sourceSets {

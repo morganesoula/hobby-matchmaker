@@ -1,6 +1,8 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="common">
     <output-path>$PROJECT_DIR$/core/common/build/libs</output-path>
-    <root id="archive" name="common.jar" />
+    <root id="archive" name="common.jar">
+      <element id="module-output" name="HobbyMatchmaker.core.common.androidMain" />
+    </root>
   </artifact>
 </component>
