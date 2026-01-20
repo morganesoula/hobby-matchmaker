@@ -51,7 +51,7 @@ buildkonfig {
             tmdbProperties.load(tmdbPropertiesFile.inputStream())
         }
 
-        buildConfigField(STRING, "TMDB_KEY", tmdbProperties["tmdb_key"]?.toString() ?: "")
+        buildConfigField(STRING, "APP_SECRET", tmdbProperties["app_secret"]?.toString() ?: "")
     }
 }
 

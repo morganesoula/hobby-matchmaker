@@ -2,7 +2,7 @@ package com.msoula.hobbymatchmaker.core.network.di
 
 import com.msoula.hobbymatchmaker.core.network.IOSNetworkConnectivityChecker
 import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
-import com.msoula.hobbymatchmaker.core.network.Utility
+import com.msoula.hobbymatchmaker.core.network.BuildKonfig.APP_SECRET
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.darwin.Darwin
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -42,7 +42,7 @@ actual val coreModuleNetworkPlatformSpecific = module {
                     protocol = URLProtocol.HTTPS
                     host = "api.themoviedb.org"
                     encodedPath = "3/"
-                    parameters.append("api_key", Utility.getPlatformTMDBKey())
+                    parameters.append("api_key", APP_SECRET)
                 }
 
                 header(HttpHeaders.ContentType, ContentType.Application.Json)

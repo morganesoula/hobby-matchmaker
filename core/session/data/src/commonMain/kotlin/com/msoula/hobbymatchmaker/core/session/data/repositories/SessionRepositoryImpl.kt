@@ -13,6 +13,7 @@ class SessionRepositoryImpl(
     private val sessionLocalDataSource: SessionLocalDataSource,
     private val sessionRemoteDataSource: SessionRemoteDataSource
 ) : SessionRepository {
+
     override suspend fun setIsConnected(isConnected: Boolean) =
         sessionLocalDataSource.setIsConnected(isConnected)
 

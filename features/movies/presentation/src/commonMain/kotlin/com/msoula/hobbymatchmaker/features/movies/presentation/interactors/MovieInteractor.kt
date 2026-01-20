@@ -23,9 +23,11 @@ class MovieInteractor(
     private val connectivityChecker: NetworkConnectivityChecker
 ) {
 
-    fun observeMovies(): Flow<AppResult<ObserveAllMoviesSuccess, AppError>> = observeAllMoviesUseCase()
+    fun observeMovies(): Flow<AppResult<ObserveAllMoviesSuccess, AppError>> =
+        observeAllMoviesUseCase()
 
-    suspend fun fetchMovies(language: String): AppResult<Unit, AppError> = fetchMoviesUseCase(language)
+    suspend fun fetchMovies(language: String): AppResult<Unit, AppError> =
+        fetchMoviesUseCase(language)
 
     suspend fun logOut() = logOutUseCase()
 

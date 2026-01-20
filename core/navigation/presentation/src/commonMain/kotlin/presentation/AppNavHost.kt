@@ -77,7 +77,6 @@ fun AppNavHost(
     val socialViewModel = koinViewModel<SocialViewModel>()
 
     NavHost(
-        modifier = modifier,
         navController = nav,
         startDestination = Splash
     ) {

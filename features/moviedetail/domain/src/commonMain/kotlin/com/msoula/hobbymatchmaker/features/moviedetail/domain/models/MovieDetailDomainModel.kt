@@ -14,7 +14,7 @@ data class MovieDetailDomainModel(
     val coverFileName: String? = null,
     var videoKey: String? = "",
     val cast: List<MovieActorDomainModel>? = null,
-    val duration: Int ? = null
+    val duration: Int? = null
 ) {
     companion object {
         const val DEFAULT_ID: Long = -1
@@ -31,12 +31,16 @@ data class MovieDetailDomainModel(
 
 @Serializable
 data class GenreDomainModel(
-    val id: Int? = null,
-    val name: String? = null
+    val id: Int = DEFAULT_ID,
+    val name: String = DEFAULT_NAME
 ) {
+    init {
+        require(name.isNotBlank()) { "Genre name cannot be blank" }
+    }
+
     companion object {
         const val DEFAULT_ID: Int = -1
-        const val DEFAULT_NAME: String = ""
+        const val DEFAULT_NAME: String = "Unknown"
     }
 }
 
