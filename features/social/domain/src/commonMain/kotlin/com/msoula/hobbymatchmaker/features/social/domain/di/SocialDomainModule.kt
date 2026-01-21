@@ -9,6 +9,7 @@ import com.msoula.hobbymatchmaker.features.social.domain.useCases.ObserveSocialC
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.RemoveMemberUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.SearchUsersByPseudoUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.SendInviteUseCase
+import com.msoula.hobbymatchmaker.features.social.domain.useCases.SocialUseCases
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 
@@ -22,4 +23,5 @@ val featuresModuleSocialDomain = module {
     factoryOf(::ObserveSocialCircleUseCase)
     factoryOf(::RemoveMemberUseCase)
     factoryOf(::SendInviteUseCase)
+    factoryOf(::SocialUseCases)
 }

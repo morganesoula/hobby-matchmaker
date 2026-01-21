@@ -13,13 +13,18 @@ class AcceptInviteUseCase(
         ownerUid: String,
         guestUid: String
     ): AppResult<Unit, AppError> {
-        return socialRepository.findUserByUid(guestUid)
-            .flatMap { member ->
-                member ?: return@flatMap AppResult.Failure(AppError.Domain.NotFound)
-                socialRepository.addMember(ownerUid, member)
-            }
-            .flatMap {
-                socialRepository.acceptInvite(inviteId)
+        return socialRepository.findUserByUid(ownerUid)
+            .flatMap { owner ->
+                owner ?: return@flatMap AppResult.Failure(AppError.Domain.NotFound)
+                socialRepository.findUserByUid(guestUid)
+                    .flatMap { member ->
+                        member ?: return@flatMap AppResult.Failure(AppError.Domain.NotFound)
+                        socialRepository.acceptInviteAndAddMembers(
+                            inviteId = inviteId,
+                            owner = owner,
+                            member = member
+                        )
+                    }
             }
     }
 }

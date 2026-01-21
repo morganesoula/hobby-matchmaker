@@ -1,16 +1,14 @@
 package com.msoula.hobbymatchmaker.features.social.presentation
 
-import com.msoula.hobbymatchmaker.features.social.presentation.interactors.SocialInteractor
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val featuresModuleSocialPresentation = module {
-    factoryOf(::SocialInteractor)
-
     viewModel {
         SocialViewModel(
-            interactor = get(),
+            socialUseCases = get(),
+            observeCurrentUser = get(),
             observeSessionStateUseCase = get(),
             defaultMessageMapper = get(),
             externalScope = null

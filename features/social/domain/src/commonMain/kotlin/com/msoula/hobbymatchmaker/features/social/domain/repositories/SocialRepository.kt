@@ -28,4 +28,10 @@ interface SocialRepository {
         ownerId: String,
         socialMemberDomainModel: SocialMemberDomainModel
     ): AppResult<Unit, AppError>
+
+    suspend fun acceptInviteAndAddMembers(
+        inviteId: String,
+        owner: SocialMemberDomainModel,
+        member: SocialMemberDomainModel
+    ): AppResult<Unit, AppError>
 }

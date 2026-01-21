@@ -1,6 +1,7 @@
 package com.msoula.hobbymatchmaker.core.design.util
 
 import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 
 enum class RetryPolicy { Manual, Never, WithBackoff }
 
@@ -8,6 +9,16 @@ data class UIErrorHint(
     val retry: RetryPolicy = RetryPolicy.Never,
     val isUserActionable: Boolean = false
 )
+
+fun <T, R> AppResult<T, AppError>.toUIState(
+    errorMessageMapper: ErrorMessageMapper,
+    mapper: (T) -> UiState<R>
+): UiState<R> =
+    when (this) {
+        is AppResult.Success -> mapper(data)
+        is AppResult.Failure ->
+            UiState.Error(errorMessageMapper.toUIText(error))
+    }
 
 fun AppError.hint(): UIErrorHint = when (this) {
     is AppError.Network.Timeout -> UIErrorHint(RetryPolicy.WithBackoff, false)

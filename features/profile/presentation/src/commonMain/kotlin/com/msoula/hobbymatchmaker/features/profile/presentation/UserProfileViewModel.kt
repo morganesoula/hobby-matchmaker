@@ -68,11 +68,14 @@ class UserProfileViewModel(
     private val currentUserUid: StateFlow<String?> = observeSessionStateUseCase()
         .map { state ->
             when (state) {
-                is SessionState.Authenticated -> state.uid
+                is SessionState.Authenticated -> {
+                    state.uid
+                }
+
                 else -> null
             }
         }
-        .stateIn(scope, SharingStarted.WhileSubscribed(), null)
+        .stateIn(scope, SharingStarted.Eagerly, null)
 
     init {
         observeProfile()

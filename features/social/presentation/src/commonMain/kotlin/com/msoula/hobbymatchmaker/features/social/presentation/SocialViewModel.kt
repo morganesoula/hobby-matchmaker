@@ -11,11 +11,15 @@ import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.design.util.EventHandler
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.design.util.UiState
+import com.msoula.hobbymatchmaker.core.design.util.toUIState
 import com.msoula.hobbymatchmaker.core.session.domain.models.SessionState
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveSessionStateUseCase
+import com.msoula.hobbymatchmaker.features.profile.domain.useCases.ObserveCurrentUserProfileStateUseCase
+import com.msoula.hobbymatchmaker.features.social.domain.models.InviteStatus
+import com.msoula.hobbymatchmaker.features.social.domain.models.SocialInviteDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.ObserveIncomingInvitesSuccess
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.ObserveSentInvitesSuccess
-import com.msoula.hobbymatchmaker.features.social.presentation.interactors.SocialInteractor
+import com.msoula.hobbymatchmaker.features.social.domain.useCases.SocialUseCases
 import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toInviteUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toSocialSummaryUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.InviteUiModel
@@ -33,11 +37,12 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.time.ExperimentalTime
+import kotlin.time.Clock
 
 class SocialViewModel(
-    private val interactor: SocialInteractor,
     private val observeSessionStateUseCase: ObserveSessionStateUseCase,
+    private val observeCurrentUser: ObserveCurrentUserProfileStateUseCase,
+    private val socialUseCases: SocialUseCases,
     private val defaultMessageMapper: ErrorMessageMapper,
     externalScope: CoroutineScope? = null
 ) : ViewModel() {
@@ -46,6 +51,7 @@ class SocialViewModel(
     val events = eventHandler.events
 
     private var currentUserUid: String? = null
+    private var currentUserPseudo: String? = null
 
     private val _searchResults = MutableStateFlow<ImmutableList<SocialUserSummaryUiModel>>(
         persistentListOf()
@@ -64,135 +70,62 @@ class SocialViewModel(
         observeSessionAndInvites()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun observeSessionAndInvites() {
+        // Sent invitations
         scope.launch {
             observeWhenAuthenticated(
                 emptyResult = ObserveSentInvitesSuccess.Empty,
                 observe = { uid ->
                     currentUserUid = uid
-                    interactor.observeSentInvites(uid)
+                    socialUseCases.observeSentInvitesUseCase(uid)
                 }
             ).collect { result ->
-                _sentInvites.update {
-                    result.toUIState { data ->
-                        when (data) {
-                            is ObserveSentInvitesSuccess.Empty -> UiState.Empty
-                            is ObserveSentInvitesSuccess.Success ->
-                                UiState.Success(
-                                    data.invites
-                                        .map { it.toInviteUiModel() }
-                                        .toImmutableList()
-                                )
-                        }
-                    }
-                }
+                _sentInvites.update { result.toInvitesUiState() }
             }
         }
 
+        // Incoming invitations
         scope.launch {
             observeWhenAuthenticated(
                 emptyResult = ObserveIncomingInvitesSuccess.Empty,
-                observe = interactor::observeIncomingInvites
+                observe = { uid -> socialUseCases.observeIncomingInvitesUseCase(uid) }
             ).collect { result ->
-                _incomingInvites.update {
-                    result.toUIState { data ->
-                        when (data) {
-                            is ObserveIncomingInvitesSuccess.Empty -> UiState.Empty
-                            is ObserveIncomingInvitesSuccess.Success ->
-                                UiState.Success(
-                                    data.invites
-                                        .map { it.toInviteUiModel() }
-                                        .toImmutableList()
-                                )
-                        }
-                    }
-                }
+                _incomingInvites.update { result.toInvitesUiState() }
             }
         }
 
-
-        // Sent invitations
         scope.launch {
             observeSessionStateUseCase()
                 .flatMapLatest { state ->
                     when (state) {
-                        is SessionState.Authenticated -> {
-                            currentUserUid = state.uid
-                            interactor.observeSentInvites(state.uid)
-                        }
-
-                        is SessionState.Guest -> {
-                            currentUserUid = null
-                            flowOf(AppResult.Success(ObserveSentInvitesSuccess.Empty))
-                        }
-
-                        null -> {
-                            currentUserUid = null
-                            flowOf(AppResult.Success(ObserveSentInvitesSuccess.Empty))
-                        }
+                        is SessionState.Authenticated -> observeCurrentUser(state.uid)
+                        is SessionState.Guest, null -> flowOf(null)
                     }
                 }
-                .collect { result ->
-                    _sentInvites.update {
-                        when (result) {
-                            is AppResult.Success -> {
-                                when (val data = result.data) {
-                                    is ObserveSentInvitesSuccess.Empty -> UiState.Empty
-                                    is ObserveSentInvitesSuccess.Success -> UiState.Success(
-                                        data.invites.map { invite -> invite.toInviteUiModel() }
-                                            .toImmutableList()
-                                    )
-                                }
-                            }
-
-                            is AppResult.Failure -> UiState.Error(
-                                defaultMessageMapper.toUIText(result.error)
-                            )
-                        }
-                    }
-                }
-        }
-
-        // Received invitations
-        scope.launch {
-            observeSessionStateUseCase()
-                .flatMapLatest { state ->
-                    when (state) {
-                        is SessionState.Authenticated -> {
-                            interactor.observeIncomingInvites(state.uid)
-                        }
-
-                        is SessionState.Guest -> {
-                            flowOf(AppResult.Success(ObserveIncomingInvitesSuccess.Empty))
-                        }
-
-                        null -> {
-                            flowOf(AppResult.Success(ObserveIncomingInvitesSuccess.Empty))
-                        }
-                    }
-                }
-                .collect { result ->
-                    _incomingInvites.update {
-                        when (result) {
-                            is AppResult.Success -> {
-                                when (val data = result.data) {
-                                    is ObserveIncomingInvitesSuccess.Empty -> UiState.Empty
-                                    is ObserveIncomingInvitesSuccess.Success -> UiState.Success(
-                                        data.invites.map { invite -> invite.toInviteUiModel() }
-                                            .toImmutableList()
-                                    )
-                                }
-                            }
-
-                            is AppResult.Failure -> UiState.Error(
-                                defaultMessageMapper.toUIText(result.error)
-                            )
-                        }
-                    }
+                .collect { profile ->
+                    currentUserPseudo = profile?.pseudo
                 }
         }
     }
+
+    private inline fun <reified T> AppResult<T, AppError>.toInvitesUiState(): UiState<ImmutableList<InviteUiModel>> =
+        toUIState(defaultMessageMapper) { data ->
+            when (data) {
+                is ObserveSentInvitesSuccess.Empty,
+                is ObserveIncomingInvitesSuccess.Empty -> UiState.Empty
+
+                is ObserveSentInvitesSuccess.Success -> UiState.Success(
+                    data.invites.map { it.toInviteUiModel() }.toImmutableList()
+                )
+
+                is ObserveIncomingInvitesSuccess.Success -> UiState.Success(
+                    data.invites.map { it.toInviteUiModel() }.toImmutableList()
+                )
+
+                else -> UiState.Empty
+            }
+        }
 
     fun onEvent(event: SocialUiEventModel) {
         when (event) {
@@ -229,7 +162,8 @@ class SocialViewModel(
     }
 
     private suspend fun searchUsers(pseudo: String) {
-        interactor.searchUsers(pseudo, currentUserUid)
+        Logger.d("SocialViewModel - Searching for pseudo: $pseudo")
+        socialUseCases.searchUsersByPseudoUseCase(pseudo, currentUserUid)
             .onSuccess { list ->
                 _searchResults.update { list.map { it.toSocialSummaryUiModel() }.toImmutableList() }
             }
@@ -249,7 +183,18 @@ class SocialViewModel(
             return
         }
 
-        interactor.sendInvite(uid, pseudo, name)
+        socialUseCases.sendInvitesUseCase(
+            SocialInviteDomainModel(
+                inviteId = "",
+                fromUid = uid,
+                fromPseudo = currentUserPseudo ?: "",
+                toPseudo = pseudo,
+                name = name,
+                status = InviteStatus.PENDING,
+                createdAt = Clock.System.now(),
+                updatedAt = null
+            )
+        )
             .onSuccess {
                 eventHandler.sendEvent(UiEvent.OnDataReady("invitation_sent"))
             }
@@ -261,7 +206,7 @@ class SocialViewModel(
     }
 
     private suspend fun cancelInvitation(inviteId: String) {
-        interactor.cancelInvite(inviteId)
+        socialUseCases.cancelInvitationUseCase(inviteId)
             .onSuccess {
                 Logger.d("Invitation $inviteId canceled successfully")
             }
@@ -273,7 +218,7 @@ class SocialViewModel(
     }
 
     private suspend fun declineInvitation(inviteId: String) {
-        interactor.declineInvite(inviteId)
+        socialUseCases.declineInviteUseCase(inviteId)
             .onSuccess {
                 Logger.d("Invitation $inviteId declined successfully")
             }
@@ -286,7 +231,7 @@ class SocialViewModel(
 
     private suspend fun acceptInvitation(inviteId: String, guestUid: String) {
         currentUserUid?.let { ownerUid ->
-            interactor.acceptInvite(
+            socialUseCases.acceptInviteUseCase(
                 inviteId,
                 ownerUid,
                 guestUid
@@ -318,13 +263,4 @@ class SocialViewModel(
                         flowOf(AppResult.Success(emptyResult))
                 }
             }
-
-    private fun <T, R> AppResult<T, AppError>.toUIState(
-        mapper: (T) -> UiState<R>
-    ): UiState<R> =
-        when (this) {
-            is AppResult.Success -> mapper(data)
-            is AppResult.Failure ->
-                UiState.Error(defaultMessageMapper.toUIText(error))
-        }
 }

@@ -30,8 +30,11 @@ class SocialRemoteDataSourceImpl(
         ownerUid: String?
     ): AppResult<List<SocialMemberDomainModel>, AppError> =
         safeFirebaseCall {
+            Logger.d("SocialRemoteDataSource - Pseudo is: $pseudo and ownerUid: $ownerUid")
             val searchTerm = pseudo.trim().lowercase()
             if (searchTerm.isEmpty()) return@safeFirebaseCall emptyList()
+
+            Logger.d("SocialRemoteDataSource - Search term is: $searchTerm")
 
             val endTerm = searchTerm + '\uf8ff'
 
@@ -39,10 +42,14 @@ class SocialRemoteDataSourceImpl(
                 val startAtFieldValues = firestore
                     .collection("users")
                     .orderBy("information.pseudo", Direction.ASCENDING)
-                    .startAtFieldValues { kotlin.arrayOf<Any?>(searchTerm)
-                        .forEach { this.add(it) } }
-                startAtFieldValues.endAtFieldValues { kotlin.arrayOf<Any?>(endTerm)
-                    .forEach { this.add(it) } }
+                    .startAtFieldValues {
+                        kotlin.arrayOf<Any?>(searchTerm)
+                            .forEach { this.add(it) }
+                    }
+                startAtFieldValues.endAtFieldValues {
+                    kotlin.arrayOf<Any?>(endTerm)
+                        .forEach { this.add(it) }
+                }
                     .limit(20)
                     .get()
                     .documents
@@ -61,6 +68,7 @@ class SocialRemoteDataSourceImpl(
                     if (uid == ownerUid) return@mapNotNull null
 
                     if (userPseudo != null && userPseudo.lowercase().contains(searchTerm)) {
+                        Logger.d("SocialRemoteDataSource: Found user with pseudo: $userPseudo")
                         SocialUserSummaryDomainModel(
                             uid = uid,
                             name = name,
@@ -135,7 +143,8 @@ class SocialRemoteDataSourceImpl(
     @OptIn(ExperimentalTime::class)
     override suspend fun sendInvite(invite: Invite): AppResult<Unit, AppError> =
         safeFirebaseCall {
-            firestore.collection("socialInvites").document.set(
+            val inviteId = "${invite.fromUid}_${invite.toPseudo}"
+            firestore.collection("socialInvites").document(inviteId).set(
                 mapOf(
                     "fromUid" to invite.fromUid,
                     "toPseudo" to invite.toPseudo,
@@ -284,5 +293,54 @@ class SocialRemoteDataSourceImpl(
                 .collection("circle")
                 .document(memberUid)
                 .delete()
+        }
+
+    override suspend fun acceptInviteAndAddMembers(
+        inviteId: String,
+        memberAddedToOwnerCircle: SocialCircleMember,
+        ownerAddedToMemberCircle: SocialCircleMember
+    ): AppResult<Unit, AppError> =
+        safeFirebaseCall {
+            firestore.runTransaction {
+                val inviteRef = firestore
+                    .collection("socialInvites")
+                    .document(inviteId)
+
+                val ownerCircleRef = firestore
+                    .collection("users")
+                    .document(memberAddedToOwnerCircle.ownerUid)
+                    .collection("circle")
+                    .document(memberAddedToOwnerCircle.uid)
+
+                val memberCircleRef = firestore
+                    .collection("users")
+                    .document(ownerAddedToMemberCircle.ownerUid)
+                    .collection("circle")
+                    .document(ownerAddedToMemberCircle.uid)
+
+                updateFields(inviteRef) { "status" to InviteStatus.ACCEPTED }
+
+                set(
+                    ownerCircleRef,
+                    mapOf(
+                        "memberPseudo" to memberAddedToOwnerCircle.pseudo,
+                        "username" to memberAddedToOwnerCircle.name,
+                        "avatarUrl" to memberAddedToOwnerCircle.avatarUrl,
+                        "commonMoviesCount" to memberAddedToOwnerCircle.commonMovieCount
+                    ),
+                    merge = true
+                )
+
+                set(
+                    memberCircleRef,
+                    mapOf(
+                        "memberPseudo" to ownerAddedToMemberCircle.pseudo,
+                        "username" to ownerAddedToMemberCircle.name,
+                        "avatarUrl" to ownerAddedToMemberCircle.avatarUrl,
+                        "commonMoviesCount" to ownerAddedToMemberCircle.commonMovieCount
+                    ),
+                    merge = true
+                )
+            }
         }
 }

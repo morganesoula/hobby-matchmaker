@@ -74,4 +74,15 @@ class SocialRepositoryImpl(
         memberUid: String
     ): AppResult<Unit, AppError> =
         socialRemoteDataSource.removeFromSocialCircle(ownerId, memberUid)
+
+    override suspend fun acceptInviteAndAddMembers(
+        inviteId: String,
+        owner: SocialMemberDomainModel,
+        member: SocialMemberDomainModel
+    ): AppResult<Unit, AppError> =
+        socialRemoteDataSource.acceptInviteAndAddMembers(
+            inviteId = inviteId,
+            memberAddedToOwnerCircle = member.toSocialCircleMember(owner.uid),
+            ownerAddedToMemberCircle = owner.toSocialCircleMember(member.uid)
+        )
 }

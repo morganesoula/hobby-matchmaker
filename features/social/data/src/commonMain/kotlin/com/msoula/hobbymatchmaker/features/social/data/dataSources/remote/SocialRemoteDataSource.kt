@@ -26,4 +26,10 @@ interface SocialRemoteDataSource {
         ownerUid: String,
         memberUid: String
     ): AppResult<Unit, AppError>
+
+    suspend fun acceptInviteAndAddMembers(
+        inviteId: String,
+        memberAddedToOwnerCircle: SocialCircleMember,
+        ownerAddedToMemberCircle: SocialCircleMember
+    ): AppResult<Unit, AppError>
 }
