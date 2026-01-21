@@ -189,7 +189,9 @@ fun AppNavHost(
         composable<Movies> {
             val movieViewModel: MovieViewModel = koinViewModel()
 
-            val movieState by movieViewModel.screenState.collectAsState()
+            val movieState by movieViewModel.movieScreenState.collectAsState()
+            val paginationState by movieViewModel.paginationState.collectAsState()
+
             val snackBarHostState = remember { SnackbarHostState() }
 
             LaunchedEffect(Unit) {
@@ -218,6 +220,7 @@ fun AppNavHost(
             MovieContent(
                 modifier = Modifier,
                 movieState = movieState,
+                paginationState = paginationState,
                 onNavigate = { destination ->
                     when (destination) {
                         NavigationDestination.Profile -> nav.navigate(Profile)
@@ -227,7 +230,8 @@ fun AppNavHost(
                 },
                 snackBarHostState = snackBarHostState,
                 observeMovies = movieViewModel::observeMovies,
-                onEvent = movieViewModel::onCardEvent
+                onEvent = movieViewModel::onCardEvent,
+                onLoadMore = movieViewModel::loadMore
             )
         }
 
@@ -241,7 +245,7 @@ fun AppNavHost(
             val movieDetailState by movieDetailViewModel.screenState.collectAsState()
             val snackBarHostState = remember { SnackbarHostState() }
             var videoPlayerState by rememberSaveable(stateSaver = VideoPlayerStateSaver) {
-                mutableStateOf(VideoPlayerState())
+                mutableStateOf(VideoPlayerState.Initial)
             }
 
             LaunchedEffect(Unit) {

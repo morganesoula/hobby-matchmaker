@@ -1,7 +1,9 @@
-package com.msoula.hobbymatchmaker.core.session.data.dataSources.local
+package com.msoula.hobbymatchmaker.core.common
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import com.msoula.hobbymatchmaker.core.common.data.createDataStore
+import com.msoula.hobbymatchmaker.core.common.data.dataStoreFileName
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager

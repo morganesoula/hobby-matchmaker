@@ -6,11 +6,14 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutUseC
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
+import com.msoula.hobbymatchmaker.features.movies.domain.models.PaginationInfo
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.CheckMovieSynopsisValueUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.FetchMoviesUseCase
+import com.msoula.hobbymatchmaker.features.movies.domain.useCases.LoadMoreMoviesUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesSuccess
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.SetMovieFavoriteUseCase
+import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ShouldRefreshMoviesUseCase
 import kotlinx.coroutines.flow.Flow
 
 class MovieInteractor(
@@ -20,14 +23,20 @@ class MovieInteractor(
     private val fetchFirebaseUserInfo: FetchFirebaseUserInfo,
     private val logOutUseCase: LogOutUseCase,
     private val checkMovieSynopsisValueUseCase: CheckMovieSynopsisValueUseCase,
+    private val shouldRefreshMoviesUseCase: ShouldRefreshMoviesUseCase,
+    private val loadMoreMoviesUseCase: LoadMoreMoviesUseCase,
     private val connectivityChecker: NetworkConnectivityChecker
 ) {
-
     fun observeMovies(): Flow<AppResult<ObserveAllMoviesSuccess, AppError>> =
         observeAllMoviesUseCase()
 
     suspend fun fetchMovies(language: String): AppResult<Unit, AppError> =
         fetchMoviesUseCase(language)
+
+    suspend fun loadMoreMovies(language: String, page: Int): AppResult<PaginationInfo, AppError> =
+        loadMoreMoviesUseCase(language, page)
+
+    suspend fun shouldRefreshMovies() = shouldRefreshMoviesUseCase()
 
     suspend fun logOut() = logOutUseCase()
 

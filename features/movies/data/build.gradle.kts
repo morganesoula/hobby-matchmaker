@@ -15,6 +15,9 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
+                // DataStore
+                implementation(libs.findLibrary("datastore-preferences").get())
+
                 // Ktor
                 implementation(libs.findBundle("ktor").get())
 

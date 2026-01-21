@@ -5,6 +5,7 @@ import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.common.safeFirebaseCall
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.MovieRemoteModel
+import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.PaginatedMovieResult
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.services.TMDBKtorService
 import dev.gitlive.firebase.firestore.FieldValue
 import dev.gitlive.firebase.firestore.FirebaseFirestore
@@ -28,6 +29,20 @@ class MovieRemoteDataSourceImpl(
         return AppResult.Success(movies)
     }
 
+    override suspend fun fetchMoviesPage(
+        language: String,
+        page: Int
+    ): AppResult<PaginatedMovieResult, AppError> =
+        tmdbKtorService.getMoviesByPopularityDesc(language, page)
+            .mapSuccess { response ->
+                PaginatedMovieResult(
+                    movies = response.results ?: emptyList(),
+                    currentPage = response.page ?: page,
+                    totalPages = response.totalPages ?: 1,
+                    hasMore = (response.page ?: page) < (response.totalPages ?: 1)
+                )
+            }
+
     override suspend fun updateUserFavoriteMovieList(
         uuidUser: String,
         movieId: Long,
@@ -42,7 +57,10 @@ class MovieRemoteDataSourceImpl(
         }
     }
 
-    override suspend fun setUserFavoriteMovies(uid: String, ids: List<Long>): AppResult<Unit, AppError> =
+    override suspend fun setUserFavoriteMovies(
+        uid: String,
+        ids: List<Long>
+    ): AppResult<Unit, AppError> =
         safeFirebaseCall {
             firestore.collection("users").document(uid)
                 .set(mapOf("movies" to ids), merge = true)

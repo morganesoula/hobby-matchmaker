@@ -1,9 +1,7 @@
-package com.msoula.hobbymatchmaker.core.session.data.dataSources.local.helpers
+package com.msoula.hobbymatchmaker.core.common
 
-import androidx.datastore.core.IOException
-import com.msoula.hobbymatchmaker.core.common.AppError
-import com.msoula.hobbymatchmaker.core.common.AppResult
 import kotlinx.coroutines.CancellationException
+import kotlinx.io.IOException
 
 suspend inline fun safeLocalWrite(crossinline block: suspend () -> Unit): AppResult<Unit, AppError> =
     try {

@@ -12,4 +12,8 @@ data class InviteUiModel(
     val guestAvatarUrl: String = "",
     val inviteTime: Long = 0L,
     val inviteStatus: InviteStatus = InviteStatus.PENDING
-)
+) {
+    companion object {
+        val Initial = InviteUiModel()
+    }
+}

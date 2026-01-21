@@ -33,6 +33,7 @@ import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.features.movies.presentation.mappers.toCarouselItems
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiModel
+import com.msoula.hobbymatchmaker.features.movies.presentation.models.PaginationStateModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
@@ -40,10 +41,12 @@ import kotlinx.collections.immutable.toImmutableList
 fun MovieContent(
     modifier: Modifier = Modifier,
     movieState: UiState<ImmutableList<MovieUiModel>>,
+    paginationState: PaginationStateModel,
     snackBarHostState: SnackbarHostState,
     onNavigate: (NavigationDestination) -> Unit,
     observeMovies: () -> Unit,
-    onEvent: (CardEventModel) -> Unit
+    onEvent: (CardEventModel) -> Unit,
+    onLoadMore: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -92,6 +95,9 @@ fun MovieContent(
                     MovieCarousel(
                         padding = padding,
                         movies = movies.toImmutableList().toCarouselItems(),
+                        isLoadingMore = paginationState.isLoadingMore,
+                        hasMorePages = paginationState.hasMorePages,
+                        onLoadMore = onLoadMore,
                         onMovieSingleTap = { id, overview ->
                             onEvent(CardEventModel.OnSingleTap(id, overview))
                         },

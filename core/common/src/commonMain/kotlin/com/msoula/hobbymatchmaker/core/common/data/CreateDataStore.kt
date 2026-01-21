@@ -1,4 +1,4 @@
-package com.msoula.hobbymatchmaker.core.session.data.dataSources.local
+package com.msoula.hobbymatchmaker.core.common.data
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory

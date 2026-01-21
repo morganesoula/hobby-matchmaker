@@ -10,11 +10,16 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.common.isIosPlatform
+import com.msoula.hobbymatchmaker.core.design.atoms.LoadMoreDataIndicator
 import com.msoula.hobbymatchmaker.core.design.models.MovieCarouselItem
 import com.msoula.hobbymatchmaker.core.design.molecules.MovieCard
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
@@ -25,10 +30,27 @@ fun MovieCarousel(
     modifier: Modifier = Modifier,
     padding: PaddingValues,
     movies: ImmutableList<MovieCarouselItem>,
+    isLoadingMore: Boolean = false,
+    hasMorePages: Boolean = true,
+    onLoadMore: () -> Unit = {},
     onMovieSingleTap: (movieId: Long, overview: String) -> Unit,
     onMovieDoubleTap: (id: Long) -> Unit
 ) {
     val listState = rememberLazyListState()
+
+    val shouldLoadMore by remember {
+        derivedStateOf {
+            val lastVisibleIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
+            val totalItems = listState.layoutInfo.totalItemsCount
+            lastVisibleIndex?.let {
+                it >= totalItems - 3 && hasMorePages && !isLoadingMore && totalItems > 0
+            }
+        }
+    }
+
+    LaunchedEffect(shouldLoadMore) {
+        if (shouldLoadMore == true) onLoadMore()
+    }
 
     Box(
         modifier = modifier
@@ -59,6 +81,15 @@ fun MovieCarousel(
                     state = listState,
                     index = index
                 )
+            }
+
+            if (hasMorePages) {
+                item(key = "load_more_indicator") {
+                    LoadMoreDataIndicator(
+                        isLoading = isLoadingMore,
+                        onLoadMore = onLoadMore
+                    )
+                }
             }
         }
     }

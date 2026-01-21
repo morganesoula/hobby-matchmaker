@@ -39,7 +39,7 @@ class MovieDetailViewModel(
     val screenState = _screenState.asStateFlow()
 
     private val language = getDeviceLocale()
-    private var currentMovie: MovieDetailUiModel? = MovieDetailUiModel()
+    private var currentMovie: MovieDetailUiModel? = MovieDetailUiModel.Initial
 
     init {
         observeMovieDetail()

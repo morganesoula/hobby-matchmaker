@@ -7,6 +7,7 @@ import org.koin.dsl.module
 
 val coreModuleCommon = module {
     includes(platformModule)
+
     single<FirebaseFirestore>(createdAtStart = true) {
         Firebase.firestore
     }

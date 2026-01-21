@@ -22,6 +22,9 @@ kotlin {
             implementation(libs.findLibrary("compose-runtime").get())
             implementation(libs.findLibrary("compose-resources").get())
 
+            // DataStore
+            implementation(libs.findLibrary("datastore-preferences").get())
+
             implementation(libs.findLibrary("kotlinx-datetime").get())
             implementation(libs.findLibrary("kotlinx-io").get())
         }

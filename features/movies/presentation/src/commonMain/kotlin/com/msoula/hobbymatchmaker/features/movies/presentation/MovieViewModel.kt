@@ -21,6 +21,7 @@ import com.msoula.hobbymatchmaker.features.movies.presentation.interactors.Movie
 import com.msoula.hobbymatchmaker.features.movies.presentation.mappers.toMovieUiModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiModel
+import com.msoula.hobbymatchmaker.features.movies.presentation.models.PaginationStateModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
@@ -43,12 +44,16 @@ class MovieViewModel(
 
     private val language = getDeviceLocale()
     private var fetchLaunched = false
-    private val _screenState =
+    private val _movieScreenState =
         MutableStateFlow<UiState<ImmutableList<MovieUiModel>>>(UiState.Loading)
-    val screenState = _screenState.asStateFlow()
+    val movieScreenState = _movieScreenState.asStateFlow()
+
+    private val _paginationState = MutableStateFlow(PaginationStateModel.Initial)
+    val paginationState = _paginationState.asStateFlow()
 
     init {
         observeMovies()
+        checkAndRefreshIfStale()
     }
 
     fun observeMovies() {
@@ -64,12 +69,51 @@ class MovieViewModel(
                                 interactor.fetchMovies(language)
                             }
                         } else {
-                            _screenState.update { mapSuccess(movies) }
+                            _movieScreenState.update { mapSuccess(movies) }
                         }
                     }
+
                     is AppResult.Failure -> {
-                        _screenState.update { mapError(result.error) }
+                        _movieScreenState.update { mapError(result.error) }
                     }
+                }
+            }
+        }
+    }
+
+    private fun checkAndRefreshIfStale() {
+        scope.launch {
+            if (interactor.shouldRefreshMovies()) {
+                interactor.fetchMovies(language)
+            }
+        }
+    }
+
+    fun loadMore() {
+        val current = _paginationState.value
+        if (current.isLoadingMore || !current.hasMorePages) return
+
+        scope.launch {
+            _paginationState.update { it.copy(isLoadingMore = true) }
+
+            when (val result = interactor.loadMoreMovies(language, current.currentPage + 1)) {
+                is AppResult.Success -> {
+                    _paginationState.update {
+                        it.copy(
+                            isLoadingMore = false,
+                            currentPage = result.data.currentPage,
+                            hasMorePages = result.data.hasMore
+                        )
+                    }
+                }
+
+                is AppResult.Failure -> {
+                    _paginationState.update {
+                        it.copy(isLoadingMore = false)
+                    }
+                    eventHandler.sendEvent(
+                        UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(result.error))
+                    )
                 }
             }
         }
@@ -95,7 +139,7 @@ class MovieViewModel(
     }
 
     private suspend fun toggleFavorite(movieId: Long) {
-        val currentState = _screenState.value
+        val currentState = _movieScreenState.value
         if (currentState !is UiState.Success) return
 
         val movie = currentState.data.firstOrNull { it.id == movieId } ?: return

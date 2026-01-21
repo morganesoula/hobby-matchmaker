@@ -2,6 +2,8 @@ package com.msoula.hobbymatchmaker.features.movies.data.di
 
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.MovieLocalDataSource
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.MovieLocalDataSourceImpl
+import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.MovieSyncPreferences
+import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.MovieSyncPreferencesImpl
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.MovieRemoteDataSource
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.MovieRemoteDataSourceImpl
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.services.TMDBKtorService
@@ -15,6 +17,7 @@ import org.koin.dsl.module
 
 val featuresModuleMovieData = module {
     includes(featuresModuleMovieDataPlatformSpecific)
+    singleOf(::MovieSyncPreferencesImpl) bind MovieSyncPreferences::class
     singleOf(::MovieRemoteDataSourceImpl) bind MovieRemoteDataSource::class
     single<MovieLocalDataSource>(createdAtStart = true) { MovieLocalDataSourceImpl(get()) }
     singleOf(::MovieRepositoryImpl) bind MovieRepository::class

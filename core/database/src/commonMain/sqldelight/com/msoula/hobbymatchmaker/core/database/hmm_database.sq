@@ -75,6 +75,23 @@ CREATE TABLE social_circle_member (
      status = ?, videoKey = ?, duration = ?, note = ?
  WHERE movieId = ?;
 
+ upsertMoviePreservingUserData:
+ UPDATE movie
+ SET title = COALESCE(:title, title),
+     posterFileName = COALESCE(:posterFileName, posterFileName),
+     synopsis = COALESCE(:synopsis, synopsis),
+     releaseDate = COALESCE(:releaseDate, releaseDate),
+     genres = COALESCE(:genres, genres),
+     localCoverFilePath = COALESCE(:localCoverFilePath, localCoverFilePath),
+     isFavorite = COALESCE(isFavorite, :isFavorite),
+     isSeen = COALESCE(isSeen, :isSeen),
+     popularity = COALESCE(:popularity, popularity),
+     status = COALESCE(:status, status),
+     videoKey = COALESCE(:videoKey, videoKey),
+     duration = COALESCE(:duration, duration),
+     note = COALESCE(:note, note)
+ WHERE movieId = :movieId;
+
 insertActor:
 INSERT INTO actor (actorId, name, role)
 VALUES (?, ?, ?);
@@ -112,7 +129,7 @@ UPDATE movie SET
 WHERE movieId = :movieId;
 
 observeMovies:
-SELECT * FROM movie;
+SELECT * FROM movie ORDER BY popularity DESC, movieId ASC;
 
 observeDetailMovie:
 SELECT m.movieId, m.title, m.genres, m.popularity, m.releaseDate, m.synopsis,

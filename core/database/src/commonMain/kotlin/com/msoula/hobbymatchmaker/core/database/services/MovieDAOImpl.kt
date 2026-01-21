@@ -83,7 +83,7 @@ class MovieDAOImpl(private val database: HMMDatabase) : MovieDAO {
                             note = movie.note
                         )
                     } else {
-                        database.hmm_databaseQueries.updateExistingMovie(
+                        database.hmm_databaseQueries.upsertMoviePreservingUserData(
                             movieId = movie.movieId,
                             title = movie.title,
                             posterFileName = movie.posterFileName,

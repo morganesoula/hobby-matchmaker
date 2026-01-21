@@ -7,4 +7,8 @@ data class VideoPlayerState(
     val videoId: String = "",
     val isVisible: Boolean = false,
     val isLoading: Boolean = false
-)
+) {
+    companion object {
+        val Initial = VideoPlayerState()
+    }
+}

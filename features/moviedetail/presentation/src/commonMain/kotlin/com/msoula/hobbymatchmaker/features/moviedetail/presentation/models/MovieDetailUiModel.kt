@@ -25,7 +25,11 @@ data class MovieDetailUiModel(
     val cast: Map<String, String> = emptyMap(),
     val videoKey: String = "",
     val duration: Int = -1
-)
+) {
+    companion object {
+        val Initial = MovieDetailUiModel()
+    }
+}
 
 suspend fun MovieDetailDomainModel.toMovieDetailUiModel(): MovieDetailUiModel {
     val local = this.localCoverFilePath.orEmpty()

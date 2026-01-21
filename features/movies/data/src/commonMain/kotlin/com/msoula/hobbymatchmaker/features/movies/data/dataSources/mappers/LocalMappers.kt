@@ -15,7 +15,7 @@ fun MovieRemoteModel.toMovieDB(): Movie {
         localCoverFilePath = null,
         isFavorite = null,
         isSeen = null,
-        popularity = null,
+        popularity = this.popularity,
         status = null,
         videoKey = null,
         duration = null,

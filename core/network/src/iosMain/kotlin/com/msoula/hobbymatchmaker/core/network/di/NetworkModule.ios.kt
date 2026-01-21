@@ -1,8 +1,8 @@
 package com.msoula.hobbymatchmaker.core.network.di
 
+import com.msoula.hobbymatchmaker.core.network.BuildKonfig.APP_SECRET
 import com.msoula.hobbymatchmaker.core.network.IOSNetworkConnectivityChecker
 import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
-import com.msoula.hobbymatchmaker.core.network.BuildKonfig.APP_SECRET
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.darwin.Darwin
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
