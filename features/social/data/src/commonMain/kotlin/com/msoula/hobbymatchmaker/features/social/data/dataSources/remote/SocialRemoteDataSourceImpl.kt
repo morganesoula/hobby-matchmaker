@@ -41,7 +41,7 @@ class SocialRemoteDataSourceImpl(
             val documents = try {
                 val startAtFieldValues = firestore
                     .collection("users")
-                    .orderBy("information.pseudo", Direction.ASCENDING)
+                    .orderBy("information.pseudoLowercase", Direction.ASCENDING)
                     .startAtFieldValues {
                         kotlin.arrayOf<Any?>(searchTerm)
                             .forEach { this.add(it) }

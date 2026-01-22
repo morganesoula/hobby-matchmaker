@@ -14,6 +14,7 @@ class UserProfileRemoteDataSourceImpl(
         val user = hashMapOf(
             "name" to userProfileRemoteDataModel.name,
             "pseudo" to userProfileRemoteDataModel.pseudo,
+            "pseudoLowercase" to userProfileRemoteDataModel.pseudo?.lowercase(),
             "avatarUrl" to userProfileRemoteDataModel.avatarUrl,
             "bio" to userProfileRemoteDataModel.bio,
             "interests" to userProfileRemoteDataModel.interests
