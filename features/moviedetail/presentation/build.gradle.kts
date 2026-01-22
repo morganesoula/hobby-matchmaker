@@ -32,8 +32,10 @@ kotlin {
             implementation(libs.findLibrary("media-player-kmp").get())
 
             // Modules
+            implementation(project(Modules.AUTHENTICATION_DOMAIN))
             implementation(project(Modules.COMMON))
             implementation(project(Modules.DESIGN))
+            implementation(project(Modules.MOVIE_DOMAIN))
             implementation(project(Modules.MOVIE_DETAIL_DOMAIN))
             implementation(project(Modules.NETWORK))
 

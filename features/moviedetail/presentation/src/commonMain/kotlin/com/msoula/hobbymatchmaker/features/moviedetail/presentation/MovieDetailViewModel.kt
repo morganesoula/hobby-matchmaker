@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 class MovieDetailViewModel(
     private val movieId: Long,
     private val interactor: MovieDetailInteractor,
-    private val defaultErrorMessageMapper: ErrorMessageMapper,
+    private val defaultMessageMapper: ErrorMessageMapper,
     externalScope: CoroutineScope? = null
 ) : ViewModel() {
     val scope = externalScope ?: viewModelScope
@@ -63,6 +63,9 @@ class MovieDetailViewModel(
             is MovieDetailUiEventModel.OnPlayMovieTrailerClicked ->
                 scope.launch { playTrailer(event.isVideoURIknown) }
 
+            is MovieDetailUiEventModel.OnMovieDoubleTap ->
+                scope.launch { toggleFavorite(event.movieId) }
+
             else -> Unit
         }
     }
@@ -78,8 +81,23 @@ class MovieDetailViewModel(
             .onFailure { error ->
                 eventHandler.sendEvent(
                     UiEvent.ShowSnackBar(
-                        defaultErrorMessageMapper.toUIText(error)
+                        defaultMessageMapper.toUIText(error)
                     )
+                )
+            }
+    }
+
+    private suspend fun toggleFavorite(movieId: Long) {
+        val currentState = _screenState.value
+        if (currentState !is UiState.Success) return
+
+        val movie = currentState.data
+        val newFavoriteState = !movie.isFavorite
+
+        interactor.toggleFavorite(movieId, newFavoriteState)
+            .onFailure { error ->
+                eventHandler.sendEvent(
+                    UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
                 )
             }
     }
@@ -97,7 +115,7 @@ class MovieDetailViewModel(
 
     private fun mapError(error: AppError) =
         UiState.Error(
-            error = defaultErrorMessageMapper.toUIText(error),
+            error = defaultMessageMapper.toUIText(error),
             hint = UIErrorHint(retry = RetryPolicy.Manual)
         )
 

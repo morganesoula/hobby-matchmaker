@@ -94,7 +94,7 @@ fun ProfileSocialSection(
                     )
                 }
 
-                if (!displayAddPeopleForm) {
+                if (!displayAddPeopleForm && (socialMembers?.size ?: 0) < 5) {
                     Button(
                         onClick = { displayAddPeopleForm = true },
                         modifier = Modifier.wrapContentWidth(),

@@ -9,7 +9,7 @@ actual val featuresModuleMovieDetailPresentationPlatformSpecific = module {
         MovieDetailViewModel(
             movieId = movieId,
             interactor = get(),
-            defaultErrorMessageMapper = get()
+            defaultMessageMapper = get()
         )
     }
 }

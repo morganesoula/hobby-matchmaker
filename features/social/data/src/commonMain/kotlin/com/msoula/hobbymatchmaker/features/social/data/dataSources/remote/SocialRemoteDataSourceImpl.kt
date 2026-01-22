@@ -25,6 +25,8 @@ class SocialRemoteDataSourceImpl(
     private val firestore: FirebaseFirestore
 ) : SocialRemoteDataSource {
 
+    private val MAX_CIRCLE_SIZE = 5
+
     override suspend fun searchUsersByPseudo(
         pseudo: String,
         ownerUid: String?
@@ -242,10 +244,13 @@ class SocialRemoteDataSourceImpl(
 
     override suspend fun markInviteAsAccepted(inviteId: String): AppResult<Unit, AppError> =
         safeFirebaseCall {
-            firestore
+            val inviteRef = firestore
                 .collection("socialInvites")
                 .document(inviteId)
-                .update("status" to InviteStatus.ACCEPTED)
+
+            firestore.runTransaction {
+                updateFields(inviteRef) { "status" to InviteStatus.ACCEPTED }
+            }
         }
 
     override suspend fun markInviteAsDeclined(inviteId: String): AppResult<Unit, AppError> =
@@ -342,5 +347,34 @@ class SocialRemoteDataSourceImpl(
                     merge = true
                 )
             }
+        }
+
+    override suspend fun checkSocialCircleLimit(
+        ownerUid: String,
+        invitingMemberUid: String
+    ): AppResult<Boolean, AppError> =
+        safeFirebaseCall {
+            val ownerDocument = firestore
+                .collection("users")
+                .document(ownerUid)
+                .get()
+
+            if (!ownerDocument.exists) {
+                throw Exception("User not found with uid: $ownerUid")
+            }
+
+            val memberDocument = firestore
+                .collection("users")
+                .document(invitingMemberUid)
+                .get()
+
+            if (!memberDocument.exists) {
+                throw Exception("User not found with uid: $invitingMemberUid")
+            }
+
+            val circleCount = ownerDocument.get<Int?>("circle") ?: 0
+            val memberCount = memberDocument.get<Int?>("circle") ?: 0
+
+            circleCount < MAX_CIRCLE_SIZE && memberCount < MAX_CIRCLE_SIZE
         }
 }

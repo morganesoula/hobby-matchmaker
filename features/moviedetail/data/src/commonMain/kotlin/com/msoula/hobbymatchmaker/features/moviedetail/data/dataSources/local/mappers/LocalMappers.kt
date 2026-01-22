@@ -13,6 +13,7 @@ fun MovieDetailDataEntity.toMovieDetailDomainModel(): MovieDetailDomainModel {
     return MovieDetailDomainModel(
         id = this.movie.movieId,
         title = this.movie.title,
+        isFavorite = this.movie.isFavorite == 1L,
         genre = parseGenresJson(this.movie.genres),
         popularity = this.movie.popularity,
         releaseDate = this.movie.releaseDate,

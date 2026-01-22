@@ -19,6 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.design.Res
+import com.msoula.hobbymatchmaker.core.design.atoms.MinimalDialog
 import com.msoula.hobbymatchmaker.core.design.atoms.asStringSuspend
 import com.msoula.hobbymatchmaker.core.design.models.TabItem
 import com.msoula.hobbymatchmaker.core.design.reset_password
@@ -69,7 +70,6 @@ private val VideoPlayerStateSaver = Saver<VideoPlayerState, List<Any>>(
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun AppNavHost(
-    modifier: Modifier = Modifier,
     socialClients: SocialClients
 ) {
     val nav = rememberNavController()
@@ -384,6 +384,24 @@ fun AppNavHost(
 
             val sentInvites by socialViewModel.sentInvites.collectAsState()
             val incomingInvites by socialViewModel.incomingInvites.collectAsState()
+            var showCapacityDialog by remember { mutableStateOf(false) }
+
+            LaunchedEffect(Unit) {
+                socialViewModel.events.collect { event ->
+                    when (event) {
+                        UiEvent.CapacityReached -> showCapacityDialog = true
+                        else -> Unit
+                    }
+                }
+            }
+
+            if (showCapacityDialog) {
+                MinimalDialog(
+                    noDataText = ""
+                ) {
+                    showCapacityDialog = false
+                }
+            }
 
             SocialContent(
                 sentInvites = sentInvites,

@@ -16,6 +16,7 @@ import org.jetbrains.compose.resources.getString
 data class MovieDetailUiModel(
     val id: Long = -1,
     val title: String = "",
+    val isFavorite: Boolean = false,
     val synopsis: String = "",
     val posterPath: String = "",
     val genre: List<String> = emptyList(),
@@ -52,9 +53,10 @@ suspend fun MovieDetailDomainModel.toMovieDetailUiModel(): MovieDetailUiModel {
     return MovieDetailUiModel(
         id = this.id ?: MovieDetailDomainModel.DEFAULT_ID,
         title = this.title ?: MovieDetailDomainModel.DEFAULT_TITLE,
+        isFavorite = this.isFavorite ?: MovieDetailDomainModel.DEFAULT_IS_FAVORITE,
         synopsis = this.synopsis ?: MovieDetailDomainModel.DEFAULT_SYNOPSIS,
         posterPath = resolvedPoster,
-        genre = this.genre?.map { it.name ?: "" } ?: listOf(GenreDomainModel.DEFAULT_NAME),
+        genre = this.genre?.map { it.name } ?: listOf(GenreDomainModel.DEFAULT_NAME),
         releaseDate = this.releaseDate?.extractYear()
             ?: MovieDetailDomainModel.DEFAULT_RELEASE_DATE,
         status = this.status?.mapStatus() ?: MovieDetailDomainModel.DEFAULT_STATUS,

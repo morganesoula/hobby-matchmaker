@@ -187,7 +187,7 @@ fun MovieCard(
                 Icon(
                     imageVector = LucideHeart,
                     contentDescription = "heart icon",
-                    tint = MaterialTheme.colorScheme.error.copy(alpha = 0.8f),
+                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
                     modifier = Modifier
                         .align(Alignment.Center)
                         .scale(bigHeartScale)

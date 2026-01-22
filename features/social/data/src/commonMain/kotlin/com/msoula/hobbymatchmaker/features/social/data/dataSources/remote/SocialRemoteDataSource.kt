@@ -32,4 +32,9 @@ interface SocialRemoteDataSource {
         memberAddedToOwnerCircle: SocialCircleMember,
         ownerAddedToMemberCircle: SocialCircleMember
     ): AppResult<Unit, AppError>
+
+    suspend fun checkSocialCircleLimit(
+        ownerUid: String,
+        invitingMemberUid: String
+    ): AppResult<Boolean, AppError>
 }

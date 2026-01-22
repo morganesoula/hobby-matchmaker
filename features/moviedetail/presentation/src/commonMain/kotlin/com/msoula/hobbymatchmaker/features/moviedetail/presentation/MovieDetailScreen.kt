@@ -95,6 +95,7 @@ fun MovieDetailContent(
                         posterPath = movie.posterPath,
                         status = movie.status,
                         title = movie.title,
+                        isFavorite = movie.isFavorite,
                         releaseDate = movie.releaseDate,
                         genres = movie.genre.toImmutableList(),
                         duration = movie.duration,
@@ -106,6 +107,11 @@ fun MovieDetailContent(
                         isLoading = videoPlayerState.isLoading,
                         videoPlayerVisible = videoPlayerState.isVisible,
                         onVideoPlayerDismissed = onVideoPlayerDismissed,
+                        onMovieDoubleTap = {
+                            onEvent(
+                                MovieDetailUiEventModel.OnMovieDoubleTap(it)
+                            )
+                        },
                         onPlayTrailerClicked = { localMovieId, localVideoUriKnown ->
                             onEvent(
                                 MovieDetailUiEventModel.OnPlayMovieTrailerClicked(

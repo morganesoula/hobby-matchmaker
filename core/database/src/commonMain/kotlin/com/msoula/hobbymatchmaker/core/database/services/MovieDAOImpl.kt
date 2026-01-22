@@ -225,7 +225,7 @@ class MovieDAOImpl(private val database: HMMDatabase) : MovieDAO {
                         releaseDate = firstRow.releaseDate,
                         genres = firstRow.genres,
                         localCoverFilePath = firstRow.localCoverFilePath,
-                        isFavorite = null,
+                        isFavorite = firstRow.isFavorite,
                         isSeen = null,
                         popularity = firstRow.popularity,
                         status = firstRow.status,

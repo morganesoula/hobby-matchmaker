@@ -85,4 +85,10 @@ class SocialRepositoryImpl(
             memberAddedToOwnerCircle = member.toSocialCircleMember(owner.uid),
             ownerAddedToMemberCircle = owner.toSocialCircleMember(member.uid)
         )
+
+    override suspend fun checkSocialCircleLimit(
+        ownerUid: String,
+        invitingMemberUid: String
+    ): AppResult<Boolean, AppError> =
+        socialRemoteDataSource.checkSocialCircleLimit(ownerUid, invitingMemberUid)
 }

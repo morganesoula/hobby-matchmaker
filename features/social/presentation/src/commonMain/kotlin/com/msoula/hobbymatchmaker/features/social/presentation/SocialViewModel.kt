@@ -162,7 +162,6 @@ class SocialViewModel(
     }
 
     private suspend fun searchUsers(pseudo: String) {
-        Logger.d("SocialViewModel - Searching for pseudo: $pseudo")
         socialUseCases.searchUsersByPseudoUseCase(pseudo, currentUserUid)
             .onSuccess { list ->
                 _searchResults.update { list.map { it.toSocialSummaryUiModel() }.toImmutableList() }
@@ -231,19 +230,30 @@ class SocialViewModel(
 
     private suspend fun acceptInvitation(inviteId: String, guestUid: String) {
         currentUserUid?.let { ownerUid ->
-            socialUseCases.acceptInviteUseCase(
-                inviteId,
-                ownerUid,
-                guestUid
-            )
-                .onSuccess {
-                    Logger.d("Invitation $inviteId accept successfully")
+            socialUseCases.checkSocialCircleLimitUseCase(ownerUid, guestUid)
+                .onSuccess { slotAvailable ->
+                    if (slotAvailable) {
+                        socialUseCases.acceptInviteUseCase(
+                            inviteId,
+                            ownerUid,
+                            guestUid
+                        )
+                            .onSuccess {
+                                Logger.d("Invitation $inviteId accept successfully")
+                            }
+                            .onFailure { error ->
+                                eventHandler.sendEvent(
+                                    UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
+                                )
+                            }
+                    } else {
+                        eventHandler.sendEvent(UiEvent.CapacityReached)
+                    }
                 }
                 .onFailure { error ->
                     eventHandler.sendEvent(
                         UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
                     )
-
                 }
         } ?: eventHandler.sendEvent(
             UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(AppError.Domain.Unauthorized))

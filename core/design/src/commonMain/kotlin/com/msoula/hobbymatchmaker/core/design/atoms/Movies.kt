@@ -25,7 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import com.msoula.hobbymatchmaker.core.common.formatOneDecimal
 import com.msoula.hobbymatchmaker.core.design.icons.MaterialIconsFavorite
 import com.msoula.hobbymatchmaker.core.design.icons.MaterialIconsFavorite_border
-import com.msoula.hobbymatchmaker.core.design.icons.MaterialSymbolsKid_star
+import com.msoula.hobbymatchmaker.core.design.icons.VscodeCodiconsStarFull
 import com.msoula.hobbymatchmaker.core.design.theme.CustomFontSize
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.IconSize
@@ -54,7 +54,7 @@ fun FavoriteButton(
         Icon(
             imageVector = if (isFavorite) MaterialIconsFavorite else MaterialIconsFavorite_border,
             contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
-            tint = if (isFavorite) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
+            tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.size(IconSize.FortyEight)
         )
     }
@@ -75,9 +75,9 @@ fun RatingChip(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            imageVector = MaterialSymbolsKid_star,
+            imageVector = VscodeCodiconsStarFull,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurface
+            tint = MaterialTheme.colorScheme.primary
         )
         Spacer(Modifier.width(CustomSize.Four))
         Text(

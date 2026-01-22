@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 data class MovieDetailDomainModel(
     val id: Long? = null,
     val title: String? = null,
+    val isFavorite: Boolean? = null,
     val genre: List<GenreDomainModel>? = null,
     val popularity: Double? = null,
     val releaseDate: String? = null,
@@ -19,6 +20,7 @@ data class MovieDetailDomainModel(
     companion object {
         const val DEFAULT_ID: Long = -1
         const val DEFAULT_TITLE: String = ""
+        const val DEFAULT_IS_FAVORITE: Boolean = false
         const val DEFAULT_POPULARITY: Double = -1.0
         const val DEFAULT_RELEASE_DATE: String = ""
         const val DEFAULT_SYNOPSIS: String = ""
