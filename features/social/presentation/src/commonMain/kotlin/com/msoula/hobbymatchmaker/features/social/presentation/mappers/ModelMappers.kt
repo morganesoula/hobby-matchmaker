@@ -59,7 +59,7 @@ fun ImmutableList<InviteUiModel>.toReceivedInvitations(): ImmutableList<Invitati
     return map { it.toInvitation() }.toImmutableList()
 }
 
-fun List<InviteUiModel>.toSentInvitations(): List<Invitation> {
+fun ImmutableList<InviteUiModel>.toSentInvitations(): ImmutableList<Invitation> {
     return map { invite ->
         Invitation(
             ownerId = invite.ownerId,
@@ -71,5 +71,5 @@ fun List<InviteUiModel>.toSentInvitations(): List<Invitation> {
             invitationTime = invite.inviteTime.toTimeAgo(),
             invitationStatus = invite.inviteStatus.name
         )
-    }
+    }.toImmutableList()
 }

@@ -251,7 +251,7 @@ fun ReceivedInvitationCard(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            imageVector = MaterialIconsClose,
+                            imageVector = MaterialSymbolsDelete,
                             contentDescription = "Decline",
                             tint = MaterialTheme.colorScheme.onSurface
                         )

@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
+import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
 import com.msoula.hobbymatchmaker.core.design.icons.MaterialSymbolsPerson_add
 import com.msoula.hobbymatchmaker.core.design.models.Invitation
 import com.msoula.hobbymatchmaker.core.design.molecules.ReceivedInvitationCard
@@ -50,6 +51,8 @@ fun ReceivedInvitationSection(
                     onAcceptInvitationClick = onAcceptInvitationClick,
                     onDeclineInvitationClick = onDeclineInvitationClick
                 )
+
+                SpacerHeight8()
             }
         }
     }
@@ -57,7 +60,7 @@ fun ReceivedInvitationSection(
 
 @Composable
 fun SentInvitationSection(
-    sentInvitation: List<Invitation>,
+    sentInvitation: ImmutableList<Invitation>,
     onCancelInvitationClick: (invitationId: String) -> Unit
 ) {
     SpacerHeight16()
@@ -76,6 +79,8 @@ fun SentInvitationSection(
                 )
             }
         }
+
+        SpacerHeight8()
     }
 }
 
