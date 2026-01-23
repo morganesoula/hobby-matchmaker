@@ -47,8 +47,7 @@ fun ProfileEditProfilePicture(
             Box {
                 CircleWithCustomPhoto(
                     customAvatarPath = customAvatarPath,
-                    borderColor = MaterialTheme.colorScheme.primary,
-                    backgroundColor = MaterialTheme.colorScheme.surface
+                    borderColor = MaterialTheme.colorScheme.primary
                 )
 
                 IconButton(

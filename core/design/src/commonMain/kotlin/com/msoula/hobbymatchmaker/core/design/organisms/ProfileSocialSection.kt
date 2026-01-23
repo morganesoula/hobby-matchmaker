@@ -70,29 +70,18 @@ fun ProfileSocialSection(
             .padding(horizontal = CustomSize.TwentyFour),
         containerColor = MaterialTheme.colorScheme.surfaceContainer
     ) {
-        Column(Modifier.padding(CustomSize.Sixteen)) {
+        Column(Modifier.padding(CustomSize.Eight)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = LucideHeart,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(IconSize.TwentyFour)
-                    )
-                    SpacerWidth4()
-                    Text(
-                        text = stringResource(Res.string.user_profile_social_circle_main_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onBackground,
-                    )
-                }
+                Text(
+                    text = stringResource(Res.string.user_profile_social_circle_main_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onBackground,
+                )
 
                 if (!displayAddPeopleForm && (socialMembers?.size ?: 0) < 5) {
                     Button(

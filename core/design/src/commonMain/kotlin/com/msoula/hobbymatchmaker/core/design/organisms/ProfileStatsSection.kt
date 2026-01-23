@@ -20,10 +20,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.GenericCard
-import com.msoula.hobbymatchmaker.core.design.icons.BootstrapPerson
+import com.msoula.hobbymatchmaker.core.design.icons.FontAwesomeUserFriends
 import com.msoula.hobbymatchmaker.core.design.icons.LucideFilm
-import com.msoula.hobbymatchmaker.core.design.movies_liked_count_title
-import com.msoula.hobbymatchmaker.core.design.social_members_count_title
+import com.msoula.hobbymatchmaker.core.design.movies_liked_count_title_plural
+import com.msoula.hobbymatchmaker.core.design.movies_liked_count_title_singular
+import com.msoula.hobbymatchmaker.core.design.social_members_count_title_plural
+import com.msoula.hobbymatchmaker.core.design.social_members_count_title_singular
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import org.jetbrains.compose.resources.stringResource
 
@@ -48,13 +50,19 @@ fun ProfileStatsSection(
             StatItem(
                 icon = LucideFilm,
                 value = moviesLikedCount.toString(),
-                label = stringResource(Res.string.movies_liked_count_title)
+                label = if (moviesLikedCount < 2)
+                    stringResource(Res.string.movies_liked_count_title_singular)
+                else
+                    stringResource(Res.string.movies_liked_count_title_plural)
             )
 
             StatItem(
-                icon = BootstrapPerson,
+                icon = FontAwesomeUserFriends,
                 value = "$socialMembersCount/5",
-                label = stringResource(Res.string.social_members_count_title)
+                label = if (socialMembersCount < 2)
+                    stringResource(Res.string.social_members_count_title_singular)
+                else
+                    stringResource(Res.string.social_members_count_title_plural)
             )
         }
     }
@@ -71,14 +79,16 @@ fun StatItem(
     Row(
         Modifier
             .background(color.copy(alpha = .15f), RoundedCornerShape(CustomSize.Eight))
-            .padding(all = CustomSize.Eight),
+            .padding(all = CustomSize.Sixteen),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             icon,
             contentDescription = null,
             tint = color,
-            modifier = Modifier.size(CustomSize.TwentyFour)
+            modifier = Modifier
+                .padding(CustomSize.Eight)
+                .size(CustomSize.ThirtyTwo)
         )
         Spacer(Modifier.width(CustomSize.Eight))
         Column(
@@ -87,12 +97,12 @@ fun StatItem(
             Text(
                 value,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.primary
             )
             Text(
                 label,
                 style = MaterialTheme.typography.labelSmall,
-                color = color
+                color = MaterialTheme.colorScheme.onBackground
             )
         }
     }

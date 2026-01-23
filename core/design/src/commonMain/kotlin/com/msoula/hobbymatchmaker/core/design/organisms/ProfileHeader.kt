@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.CircleWithCustomPhoto
@@ -27,6 +28,7 @@ import com.msoula.hobbymatchmaker.core.design.atoms.CircleWithDefaultIcon
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight4
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
+import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWidth8
 import com.msoula.hobbymatchmaker.core.design.authentified_edit_button_title
 import com.msoula.hobbymatchmaker.core.design.icons.LucidePencil
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
@@ -99,23 +101,31 @@ fun AuthentifiedProfileHeader(
             verticalArrangement = Arrangement.Center
         ) {
             CircleWithCustomPhoto(
-                customAvatarPath = avatarPath
-            )
-            SpacerHeight8()
-            Text(
-                text = fullName,
-                color = MaterialTheme.colorScheme.onPrimary,
-                style = MaterialTheme.typography.titleLarge,
-                textAlign = TextAlign.Center
-            )
-            SpacerHeight4()
-            Text(
-                text = biography,
-                color = MaterialTheme.colorScheme.onPrimary,
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center
+                customAvatarPath = avatarPath,
+                borderColor = MaterialTheme.colorScheme.primary.copy(alpha = .4f)
             )
             SpacerHeight16()
+
+            if (fullName.isNotBlank()) {
+                Text(
+                    text = fullName,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center
+                )
+                SpacerHeight4()
+            }
+
+            if (biography.isNotBlank()) {
+                Text(
+                    text = biography,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center
+                )
+
+                SpacerHeight16()
+            }
 
             Button(
                 onClick = { onEditProfileClicked() },
@@ -140,6 +150,8 @@ fun AuthentifiedProfileHeader(
                         contentDescription = null
                     )
 
+                    SpacerWidth8()
+
                     Text(
                         text = stringResource(Res.string.authentified_edit_button_title),
                         textAlign = TextAlign.Center
@@ -148,4 +160,14 @@ fun AuthentifiedProfileHeader(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun AuthentifiedProfileHeaderPreview() {
+    AuthentifiedProfileHeader(
+        fullName = "Kit Kat",
+        biography = "Random biography to make it real",
+        onEditProfileClicked = { }
+    )
 }

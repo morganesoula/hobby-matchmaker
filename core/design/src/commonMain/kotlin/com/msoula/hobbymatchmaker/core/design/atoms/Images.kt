@@ -42,7 +42,7 @@ import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.ic_movie_clapper_board
 import com.msoula.hobbymatchmaker.core.design.ic_no_image_found_playstore
 import com.msoula.hobbymatchmaker.core.design.icons.BootstrapPerson
-import com.msoula.hobbymatchmaker.core.design.icons.MaterialIconsHide_image
+import com.msoula.hobbymatchmaker.core.design.icons.LucideImageOff
 import com.msoula.hobbymatchmaker.core.design.icons.MaterialSymbolsDelete
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.IconSize
@@ -200,19 +200,14 @@ fun RectangleWithIcon(
 @Composable
 fun CircleWithCustomPhoto(
     modifier: Modifier = Modifier,
-    backgroundColor: Color? = null,
     borderColor: Color? = null,
     contentDescription: String? = null,
     customAvatarPath: String? = null
 ) {
     Box(
         modifier = modifier
-            .size(CustomSize.NinetySix)
-            .background(
-                color = backgroundColor ?: MaterialTheme.colorScheme.onSurface,
-                shape = CircleShape
-            )
-            .border(2.dp, borderColor ?: MaterialTheme.colorScheme.surface, CircleShape),
+            .size(CustomSize.NinetySix + CustomSize.Sixteen)
+            .border(CustomSize.Two, borderColor ?: MaterialTheme.colorScheme.surface, CircleShape),
         contentAlignment = Alignment.Center
     ) {
         customAvatarPath?.let {
@@ -226,10 +221,10 @@ fun CircleWithCustomPhoto(
                 contentScale = ContentScale.Crop
             )
         } ?: Icon(
-            imageVector = MaterialIconsHide_image,
+            imageVector = LucideImageOff,
             contentDescription = contentDescription,
             tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(IconSize.FortyEight).padding(CustomSize.Four)
+            modifier = Modifier.size(IconSize.FortyEight).padding(CustomSize.Eight)
         )
     }
 }

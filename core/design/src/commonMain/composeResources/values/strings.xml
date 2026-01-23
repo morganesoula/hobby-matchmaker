@@ -114,8 +114,10 @@
     // PROFILE
     <string name="log_out">Déconnexion</string>
 
-    <string name="movies_liked_count_title">Films aimés</string>
-    <string name="social_members_count_title">Connexions</string>
+    <string name="movies_liked_count_title_singular">Film aimé</string>
+    <string name="movies_liked_count_title_plural">Films aimés</string>
+    <string name="social_members_count_title_singular">Connexion</string>
+    <string name="social_members_count_title_plural">Connexions</string>
     <string name="user_profile_interests_title">Intérêts</string>
     <string name="user_profile_social_circle_main_title">Mon cercle social</string>
     <string name="user_profile_social_circle_main_add_people_text_button">Inviter</string>

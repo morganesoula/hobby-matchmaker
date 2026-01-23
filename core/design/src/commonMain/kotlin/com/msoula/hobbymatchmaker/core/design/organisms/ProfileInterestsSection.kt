@@ -34,26 +34,19 @@ fun ProfileInterestsSection(
         containerColor = MaterialTheme.colorScheme.surfaceContainer
     ) {
         Column {
-            Row {
-                Icon(
-                    HeroiconsSparkles,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(IconSize.TwentyFour)
-                )
-                SpacerWidth4()
-                Text(
-                    text = stringResource(Res.string.user_profile_interests_title),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
+            Text(
+                text = stringResource(Res.string.user_profile_interests_title),
+                color = MaterialTheme.colorScheme.onBackground,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(start = CustomSize.Eight)
+            )
+            SpacerHeight16()
+            interests?.let {
+                InterestsBlock(
+                    interests = interests
                 )
             }
-
-            SpacerHeight16()
-            InterestsBlock(
-                interests = interests
-            )
         }
     }
 }

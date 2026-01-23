@@ -115,8 +115,10 @@
     // Profile
     <string name="log_out">Log out</string>
 
-    <string name="movies_liked_count_title">Movies Liked</string>
-    <string name="social_members_count_title">Connections</string>
+    <string name="movies_liked_count_title_singular">Movie Liked</string>
+    <string name="movies_liked_count_title_plural">Movies Liked</string>
+    <string name="social_members_count_title_singular">Connection</string>
+    <string name="social_members_count_title_plural">Connections</string>
     <string name="user_profile_interests_title">Interests in Life</string>
     <string name="user_profile_social_circle_main_title">My Social Circle</string>
     <string name="user_profile_social_circle_main_add_people_text_button">Add</string>
