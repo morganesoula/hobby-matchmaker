@@ -19,12 +19,29 @@ class AcceptInviteUseCase(
                 socialRepository.findUserByUid(guestUid)
                     .flatMap { member ->
                         member ?: return@flatMap AppResult.Failure(AppError.Domain.NotFound)
+
+                        val commonMoviesCount = calculateCommonMovies(
+                            owner.moviesLiked,
+                            member.moviesLiked
+                        )
+
+                        val ownerWithCount = owner.copy(commonMoviesCount = commonMoviesCount)
+                        val memberWithCount = member.copy(commonMoviesCount = commonMoviesCount)
+
                         socialRepository.acceptInviteAndAddMembers(
                             inviteId = inviteId,
-                            owner = owner,
-                            member = member
+                            owner = ownerWithCount,
+                            member = memberWithCount
                         )
                     }
             }
+    }
+
+    private fun calculateCommonMovies(
+        ownerMovies: List<Long>?,
+        memberMovies: List<Long>?
+    ): Int {
+        if (ownerMovies.isNullOrEmpty() || memberMovies.isNullOrEmpty()) return 0
+        return ownerMovies.intersect(memberMovies.toSet()).size
     }
 }

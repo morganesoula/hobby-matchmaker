@@ -17,6 +17,10 @@ class MovieLocalDataSourceImpl(private val movieDAO: MovieDAOImpl) : MovieLocalD
         return movieDAO.observeMoviesFavoriteCount()
     }
 
+    override fun observeLikedMoviesIds(): Flow<List<Long>> {
+        return movieDAO.observeLikedMoviesIds()
+    }
+
     override suspend fun updateMovieWithFavoriteValue(
         id: Long,
         isFavorite: Boolean

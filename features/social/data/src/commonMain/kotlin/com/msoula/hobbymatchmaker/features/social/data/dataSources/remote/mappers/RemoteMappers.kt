@@ -41,7 +41,8 @@ fun SocialMemberDomainModel.toSocialCircleMember(ownerUid: String): SocialCircle
         pseudo = this.pseudo,
         name = this.name,
         avatarUrl = this.avatarUrl,
-        commonMovieCount = this.commonMoviesCount
+        moviesLiked = this.moviesLiked,
+        commonMoviesCount = this.commonMoviesCount
     )
 }
 
@@ -51,5 +52,6 @@ fun SocialCircleMember.toSocialMemberDomainModel(): SocialMemberDomainModel =
         pseudo = this.pseudo,
         name = this.name,
         avatarUrl = this.avatarUrl,
-        commonMoviesCount = this.commonMovieCount
+        moviesLiked = this.moviesLiked,
+        commonMoviesCount = this.commonMoviesCount
     )

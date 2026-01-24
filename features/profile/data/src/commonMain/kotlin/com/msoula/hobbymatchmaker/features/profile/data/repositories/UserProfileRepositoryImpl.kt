@@ -26,12 +26,15 @@ class UserProfileRepositoryImpl(
         combine(
             userProfileLocalDataSource.observeCurrentUserProfile(uid),
             movieRepository.observeMoviesLikedCount(),
+            movieRepository.observeLikedMoviesIds(),
             socialRepository.observeSocialCircle(uid)
                 .onStart { emit(emptyList()) }
-        ) { profile, count, members ->
+        ) { profile, count, userMoviesIds, members ->
             if (profile == null) {
                 null
             } else {
+                val userMoviesSet = userMoviesIds.toSet()
+
                 UserProfileDomainModel(
                     uid = profile.uid,
                     name = profile.name,
@@ -41,12 +44,17 @@ class UserProfileRepositoryImpl(
                     interests = profile.interests,
                     likedMoviesCount = count.toInt(),
                     socialCircle =
-                        members.map {
+                        members.map { member ->
+                            val commonCount = member.moviesLiked
+                                ?.count { movieId -> userMoviesSet.contains(movieId) }
+                                ?: 0
+
                             UserSummaryDomainModel(
-                                uid = it.uid,
-                                name = it.name,
-                                pseudo = it.pseudo,
-                                avatarUrl = it.avatarUrl
+                                uid = member.uid,
+                                name = member.name,
+                                pseudo = member.pseudo,
+                                avatarUrl = member.avatarUrl,
+                                commonMoviesCount = commonCount
                             )
                         }
                 )

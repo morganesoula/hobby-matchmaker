@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 interface MovieLocalDataSource {
     fun observeMovies(): Flow<List<Movie>>
     fun observeMoviesLikedCount(): Flow<Long>
+    fun observeLikedMoviesIds(): Flow<List<Long>>
     suspend fun updateMovieWithFavoriteValue(
         id: Long,
         isFavorite: Boolean

@@ -6,10 +6,6 @@ import com.msoula.hobbymatchmaker.core.database.models.SocialCircleMemberDataEnt
 import com.msoula.hobbymatchmaker.core.database.services.SocialMemberDAO
 import com.msoula.hobbymatchmaker.core.session.data.dataSources.local.SessionLocalDataSource
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel
-import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel.Companion.DEFAULT_AVATAR_URL
-import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel.Companion.DEFAULT_COMMON_MOVIES_COUNT
-import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel.Companion.DEFAULT_NAME
-import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel.Companion.DEFAULT_PSEUDO
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
@@ -32,10 +28,10 @@ class SocialLocalDataSourceImpl(
                         entities.map { entity ->
                             SocialMemberDomainModel(
                                 uid = entity.memberUid,
-                                pseudo = entity.memberPseudo ?: DEFAULT_PSEUDO,
-                                name = entity.memberName ?: DEFAULT_NAME,
-                                avatarUrl = entity.memberAvatarUrl ?: DEFAULT_AVATAR_URL,
-                                commonMoviesCount = DEFAULT_COMMON_MOVIES_COUNT
+                                pseudo = entity.memberPseudo ?: SocialMemberDomainModel.Initial.pseudo,
+                                name = entity.memberName ?: SocialMemberDomainModel.Initial.name,
+                                avatarUrl = entity.memberAvatarUrl ?: SocialMemberDomainModel.Initial.avatarUrl,
+                                commonMoviesCount = SocialMemberDomainModel.Initial.commonMoviesCount
                             )
                         }
                     }

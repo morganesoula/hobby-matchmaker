@@ -12,7 +12,7 @@ class ObserveCurrentUserProfileStateUseCase(
     operator fun invoke(uid: String): Flow<UserProfileDomainModel> =
         userProfileRepository.observeCurrentUserProfile(uid)
             .map {
-                it ?: UserProfileDomainModel.empty()
+                it ?: UserProfileDomainModel.Initial
             }
             .distinctUntilChanged()
 }

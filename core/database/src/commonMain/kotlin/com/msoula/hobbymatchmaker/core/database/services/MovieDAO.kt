@@ -42,4 +42,5 @@ interface MovieDAO {
     suspend fun isMovieSynopsisAvailable(movieId: Long): Boolean
     suspend fun getFavoriteLocalMovieIds(): List<Long>?
     fun observeMoviesFavoriteCount(): Flow<Long>
+    fun observeLikedMoviesIds(): Flow<List<Long>>
 }

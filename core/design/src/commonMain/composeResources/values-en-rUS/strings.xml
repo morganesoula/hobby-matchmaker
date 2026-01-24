@@ -123,6 +123,8 @@
     <string name="user_profile_social_circle_main_title">My Social Circle</string>
     <string name="user_profile_social_circle_main_add_people_text_button">Add</string>
     <string name="user_profile_social_circle_main_add_people_form_field_hint">Enter pseudo...</string>
+    <string name="user_profile_social_circle_common_movies_count_singular">1 common movie</string>
+    <string name="user_profile_social_circle_common_movies_count_plural">common movies</string>
 
     <string name="guest_header_title">Welcome to HobbyMatchMaker</string>
     <string name="guest_header_description">Connect with people who share your passions</string>

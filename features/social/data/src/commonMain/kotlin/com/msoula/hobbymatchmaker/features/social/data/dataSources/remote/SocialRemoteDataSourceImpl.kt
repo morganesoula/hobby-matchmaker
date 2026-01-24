@@ -5,16 +5,16 @@ import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.safeFirebaseCall
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.Invite
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.MemberBasicInfo
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.SocialCircleMember
 import com.msoula.hobbymatchmaker.features.social.domain.models.InviteStatus
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel
-import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel.Companion.DEFAULT_AVATAR_URL
-import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel.Companion.DEFAULT_COMMON_MOVIES_COUNT
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialUserSummaryDomainModel
 import dev.gitlive.firebase.firestore.Direction
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -66,6 +66,7 @@ class SocialRemoteDataSourceImpl(
                     val userPseudo = document.get<String?>("information.pseudo")
                     val name = document.get<String?>("information.name")
                     val avatar = document.get<String?>("information.avatarUrl")
+                    val moviesLiked = document.get<List<Long>?>("movies")
 
                     if (uid == ownerUid) return@mapNotNull null
 
@@ -75,20 +76,20 @@ class SocialRemoteDataSourceImpl(
                             uid = uid,
                             name = name,
                             pseudo = userPseudo,
-                            avatarUrl = avatar
+                            avatarUrl = avatar,
+                            moviesLiked = moviesLiked
                         )
                     } else null
                 }
                 .take(10)
 
-            //TODO Update DEFAULT_COMMON_MOVIES_COUNT?
             results.map { member ->
                 SocialMemberDomainModel(
                     uid = member.uid,
                     name = member.name,
                     pseudo = member.pseudo,
-                    avatarUrl = member.avatarUrl ?: DEFAULT_AVATAR_URL,
-                    commonMoviesCount = DEFAULT_COMMON_MOVIES_COUNT
+                    avatarUrl = member.avatarUrl ?: SocialMemberDomainModel.Initial.avatarUrl,
+                    commonMoviesCount = SocialMemberDomainModel.Initial.commonMoviesCount
                 )
             }
         }
@@ -107,6 +108,7 @@ class SocialRemoteDataSourceImpl(
             val pseudo = userDoc.get<String>("information.pseudo")
             val name = userDoc.get<String?>("information.name")
             val avatarUrl = userDoc.get<String?>("information.avatarUrl")
+            val moviesLiked = userDoc.get<List<Long>?>("movies")
 
             SocialCircleMember(
                 ownerUid = "",
@@ -114,31 +116,57 @@ class SocialRemoteDataSourceImpl(
                 pseudo = pseudo,
                 name = name,
                 avatarUrl = avatarUrl,
-                commonMovieCount = DEFAULT_COMMON_MOVIES_COUNT
+                moviesLiked = moviesLiked,
+                commonMoviesCount = SocialCircleMember.Initial.commonMoviesCount
             )
         }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun observeSocialCircle(uid: String): Flow<List<SocialMemberDomainModel>> =
         firestore
             .collection("users")
             .document(uid)
             .collection("circle")
             .snapshots
-            .map { querySnapshot ->
-                querySnapshot.documents.map { document ->
-                    val memberUid = document.id
-                    val memberPseudo = document.get<String>("memberPseudo")
-                    val memberName = document.get<String?>("username")
-                    val avatarUrl = document.get<String?>("avatarUrl")
-                    val commonMoviesCount = document.get<Int?>("commonMoviesCount")
-
-                    SocialMemberDomainModel(
-                        uid = memberUid,
-                        pseudo = memberPseudo,
-                        name = memberName,
-                        avatarUrl = avatarUrl ?: DEFAULT_AVATAR_URL,
-                        commonMoviesCount = commonMoviesCount ?: DEFAULT_COMMON_MOVIES_COUNT
+            .flatMapLatest { querySnapshot ->
+                val members = querySnapshot.documents.map { document ->
+                    MemberBasicInfo(
+                        uid = document.id,
+                        pseudo = document.get<String>("memberPseudo"),
+                        name = document.get<String?>("username"),
+                        avatarUrl = document.get<String?>("avatarUrl"),
+                        commonMoviesCount = document.get<Int?>("commonMoviesCount")
                     )
+                }
+
+                if (members.isEmpty()) {
+                    flowOf(emptyList())
+                } else {
+                    val memberMoviesFlows = members.map { member ->
+                        firestore
+                            .collection("users")
+                            .document(member.uid)
+                            .snapshots
+                            .map { userDoc ->
+                                val moviesLiked = userDoc.get<List<Long>?>("movies")
+                                member to (moviesLiked ?: emptyList())
+                            }
+                    }
+
+                    combine(memberMoviesFlows) { memberWithMoviesArray ->
+                        memberWithMoviesArray.map { (member, moviesLiked) ->
+                            SocialMemberDomainModel(
+                                uid = member.uid,
+                                pseudo = member.pseudo,
+                                name = member.name,
+                                avatarUrl = member.avatarUrl
+                                    ?: SocialMemberDomainModel.Initial.avatarUrl,
+                                moviesLiked = moviesLiked,
+                                commonMoviesCount = member.commonMoviesCount
+                                    ?: SocialMemberDomainModel.Initial.commonMoviesCount
+                            )
+                        }
+                    }
                 }
             }
 
@@ -281,7 +309,8 @@ class SocialRemoteDataSourceImpl(
                         "memberPseudo" to socialCircleMember.pseudo,
                         "username" to socialCircleMember.name,
                         "avatarUrl" to socialCircleMember.avatarUrl,
-                        "commonMoviesCount" to socialCircleMember.commonMovieCount
+                        "commonMoviesCount" to socialCircleMember.commonMoviesCount,
+                        "moviesLiked" to socialCircleMember.moviesLiked
                     ),
                     merge = true
                 )
@@ -331,7 +360,8 @@ class SocialRemoteDataSourceImpl(
                         "memberPseudo" to memberAddedToOwnerCircle.pseudo,
                         "username" to memberAddedToOwnerCircle.name,
                         "avatarUrl" to memberAddedToOwnerCircle.avatarUrl,
-                        "commonMoviesCount" to memberAddedToOwnerCircle.commonMovieCount
+                        "commonMoviesCount" to memberAddedToOwnerCircle.commonMoviesCount,
+                        "moviesLiked" to memberAddedToOwnerCircle.moviesLiked
                     ),
                     merge = true
                 )
@@ -342,7 +372,8 @@ class SocialRemoteDataSourceImpl(
                         "memberPseudo" to ownerAddedToMemberCircle.pseudo,
                         "username" to ownerAddedToMemberCircle.name,
                         "avatarUrl" to ownerAddedToMemberCircle.avatarUrl,
-                        "commonMoviesCount" to ownerAddedToMemberCircle.commonMovieCount
+                        "commonMoviesCount" to ownerAddedToMemberCircle.commonMoviesCount,
+                        "moviesLiked" to ownerAddedToMemberCircle.moviesLiked
                     ),
                     merge = true
                 )

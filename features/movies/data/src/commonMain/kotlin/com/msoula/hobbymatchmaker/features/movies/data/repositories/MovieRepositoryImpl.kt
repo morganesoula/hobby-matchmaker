@@ -37,6 +37,9 @@ class MovieRepositoryImpl(
     override fun observeMoviesLikedCount(): Flow<Long> =
         movieLocalDataSource.observeMoviesLikedCount()
 
+    override fun observeLikedMoviesIds(): Flow<List<Long>> =
+        movieLocalDataSource.observeLikedMoviesIds()
+
     override suspend fun updateMovieWithLocalCoverFilePath(
         coverFileName: String,
         localCoverFilePath: String,

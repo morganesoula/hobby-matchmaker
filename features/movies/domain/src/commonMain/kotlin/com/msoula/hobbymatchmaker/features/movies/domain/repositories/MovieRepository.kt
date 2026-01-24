@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 interface MovieRepository {
     fun observeMovies(): Flow<List<MovieDomainModel>>
     fun observeMoviesLikedCount(): Flow<Long>
+    fun observeLikedMoviesIds(): Flow<List<Long>>
     suspend fun updateMovieFavoriteLocal(id: Long, isFavorite: Boolean): AppResult<Unit, AppError>
     suspend fun updateMovieFavoriteRemote(
         uid: String,
@@ -30,5 +31,6 @@ interface MovieRepository {
         uid: String,
         localIds: List<Long>
     ): AppResult<Unit, AppError>
+
     suspend fun getLastMovieSyncTimestamp(): Long
 }

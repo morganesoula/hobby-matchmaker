@@ -22,7 +22,8 @@ fun UserSummaryDomainModel.toSocialMemberUiModel(): SocialMemberUiModel =
         uid = this.uid,
         name = this.name,
         pseudo = this.pseudo,
-        avatarUrl = this.avatarUrl
+        avatarUrl = this.avatarUrl,
+        commonMoviesCount = this.commonMoviesCount
     )
 
 fun UserProfileUiModel.toUserProfileDomainModel(uid: String): UserProfileDomainModel =

@@ -9,7 +9,8 @@ fun SocialMemberUiModel.toProfileSocialMembers(): ProfileSocialMembers {
         uid = uid,
         name = name,
         pseudo = pseudo,
-        avatarUrl = avatarUrl
+        avatarUrl = avatarUrl,
+        commonMoviesCount = commonMoviesCount
     )
 }
 
@@ -18,5 +19,6 @@ fun SocialMemberUiModel.toUserSummaryDomainModel(): UserSummaryDomainModel =
         uid = uid,
         name = name,
         pseudo = pseudo,
-        avatarUrl = avatarUrl
+        avatarUrl = avatarUrl,
+        commonMoviesCount = commonMoviesCount
     )

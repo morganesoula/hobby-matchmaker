@@ -39,12 +39,13 @@ import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWidth4
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWidth8
 import com.msoula.hobbymatchmaker.core.design.authentified_no_social_members_description
 import com.msoula.hobbymatchmaker.core.design.cancel
-import com.msoula.hobbymatchmaker.core.design.icons.LucideHeart
 import com.msoula.hobbymatchmaker.core.design.icons.MaterialSymbolsPerson_add
 import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMembers
 import com.msoula.hobbymatchmaker.core.design.molecules.PseudoSearchBar
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.IconSize
+import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_common_movies_count_plural
+import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_common_movies_count_singular
 import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_main_add_people_form_title
 import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_main_add_people_text_button
 import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_main_title
@@ -203,11 +204,27 @@ fun ProfileSocialSection(
                         )
 
                         SpacerWidth8()
-                        Text(
-                            text = member.name ?: member.pseudo,
-                            fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
+
+                        Column {
+                            Text(
+                                text = member.name ?: member.pseudo,
+                                fontWeight = FontWeight.Medium,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+
+                            member.commonMoviesCount?.let { count ->
+                                if (count > 0) {
+                                    Text(
+                                        text = when (count) {
+                                            1 -> stringResource(Res.string.user_profile_social_circle_common_movies_count_singular)
+                                            else -> "$count " + stringResource(Res.string.user_profile_social_circle_common_movies_count_plural)
+                                        },
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        }
                     }
 
                     if (index < socialMembers.lastIndex) {

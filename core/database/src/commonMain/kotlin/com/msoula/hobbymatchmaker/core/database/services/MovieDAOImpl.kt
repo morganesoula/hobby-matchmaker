@@ -267,4 +267,9 @@ class MovieDAOImpl(private val database: HMMDatabase) : MovieDAO {
             Dispatchers.IO
         )
     }
+
+    override fun observeLikedMoviesIds(): Flow<List<Long>> {
+        return database.hmm_databaseQueries.getFavoriteIds().asFlow()
+            .mapToList(Dispatchers.IO)
+    }
 }
