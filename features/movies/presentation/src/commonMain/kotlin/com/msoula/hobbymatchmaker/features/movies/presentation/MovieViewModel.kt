@@ -6,8 +6,10 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.getDeviceLocale
 import com.msoula.hobbymatchmaker.core.common.onFailure
+import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.connection_issue
+import com.msoula.hobbymatchmaker.core.design.social_movie_match_notification
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.design.util.EventHandler
 import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
@@ -22,6 +24,7 @@ import com.msoula.hobbymatchmaker.features.movies.presentation.mappers.toMovieUi
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.PaginationStateModel
+import com.msoula.hobbymatchmaker.features.social.domain.models.MovieMatchResult
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
@@ -145,11 +148,35 @@ class MovieViewModel(
         val movie = currentState.data.firstOrNull { it.id == movieId } ?: return
         val newFavoriteState = !movie.isFavorite
 
+        val uid = interactor.getAuthenticatedUid()
+
         interactor.toggleFavorite(movieId, newFavoriteState)
+            .onSuccess {
+                if (newFavoriteState && uid != null) {
+                    checkAndNotifyMatch(uid, movieId)
+                }
+            }
             .onFailure { error ->
                 eventHandler.sendEvent(
                     UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
                 )
+            }
+    }
+
+    private suspend fun checkAndNotifyMatch(uid: String, movieId: Long) {
+        interactor.checkForMovieMatch(uid, movieId)
+            .onSuccess { result ->
+                if (result is MovieMatchResult.Match) {
+                    val names = result.matchingMemberNames.joinToString(", ")
+                    eventHandler.sendEvent(
+                        UiEvent.ShowSnackBar(
+                            UIText.Resource(
+                                Res.string.social_movie_match_notification,
+                                listOf(names)
+                            )
+                        )
+                    )
+                }
             }
     }
 

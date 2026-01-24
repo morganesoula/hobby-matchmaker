@@ -15,6 +15,7 @@ import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -408,4 +409,7 @@ class SocialRemoteDataSourceImpl(
 
             circleCount < MAX_CIRCLE_SIZE && memberCount < MAX_CIRCLE_SIZE
         }
+
+    override suspend fun getSocialCircleSnapshot(uid: String): AppResult<List<SocialMemberDomainModel>, AppError> =
+        AppResult.Success(observeSocialCircle(uid).first())
 }

@@ -38,6 +38,7 @@ kotlin {
             implementation(project(Modules.MOVIE_DOMAIN))
             implementation(project(Modules.MOVIE_DETAIL_DOMAIN))
             implementation(project(Modules.NETWORK))
+            implementation(project(Modules.SOCIAL_DOMAIN))
 
         }
 

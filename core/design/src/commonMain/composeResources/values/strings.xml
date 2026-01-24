@@ -170,4 +170,6 @@
     <string name="social_sent_requests_no_data_title">Oh non, vous n'avez encore invité personne...</string>
     <string name="social_sent_requests_no_data_description">Bonne nouvelle: ajoutez des personnes via votre profil pour profiter de l'expérience au maximum !</string>
     <string name="social_capacity_reached">Il semblerait que vous ou votre invité ait atteint la limite maximale (5) de personnes autorisées à rejoindre le cercle d'amis !</string>
+
+    <string name="social_movie_match_notification">Match avec %1$s !</string>
 </resources>

@@ -37,4 +37,6 @@ interface SocialRemoteDataSource {
         ownerUid: String,
         invitingMemberUid: String
     ): AppResult<Boolean, AppError>
+
+    suspend fun getSocialCircleSnapshot(uid: String): AppResult<List<SocialMemberDomainModel>, AppError>
 }

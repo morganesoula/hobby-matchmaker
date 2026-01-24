@@ -27,6 +27,7 @@ kotlin {
             implementation(project(Modules.DESIGN))
             implementation(project(Modules.MOVIE_DOMAIN))
             implementation(project(Modules.NETWORK))
+            implementation(project(Modules.SOCIAL_DOMAIN))
         }
 
         androidMain.dependencies {

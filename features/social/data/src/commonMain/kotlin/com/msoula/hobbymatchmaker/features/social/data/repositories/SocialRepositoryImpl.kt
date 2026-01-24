@@ -3,7 +3,6 @@ package com.msoula.hobbymatchmaker.features.social.data.repositories
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
-import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.SocialLocalDataSource
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.SocialRemoteDataSource
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toInviteData
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toSocialCircleMember
@@ -16,7 +15,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class SocialRepositoryImpl(
-    private val socialLocalDataSource: SocialLocalDataSource,
     private val socialRemoteDataSource: SocialRemoteDataSource
 ) : SocialRepository {
     override suspend fun searchUsersByPseudo(
@@ -91,4 +89,7 @@ class SocialRepositoryImpl(
         invitingMemberUid: String
     ): AppResult<Boolean, AppError> =
         socialRemoteDataSource.checkSocialCircleLimit(ownerUid, invitingMemberUid)
+
+    override suspend fun getSocialCircleSnapshot(uid: String): AppResult<List<SocialMemberDomainModel>, AppError> =
+        socialRemoteDataSource.getSocialCircleSnapshot(uid)
 }

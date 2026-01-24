@@ -51,6 +51,7 @@ and Jetpack Compose Multiplatform for UI.
 - Do not invent business rules or missing APIs
 - If multiple valid solutions exist, explain trade-offs briefly
 - Prefer correctness and clarity over clever abstractions
+- When you create a new plan, always put the instructions in the .md file dedicated (`CLAUDE.md`)
 
 ### Code Style Rules
 
