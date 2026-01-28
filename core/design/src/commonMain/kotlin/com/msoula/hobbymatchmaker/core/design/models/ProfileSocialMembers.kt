@@ -1,5 +1,8 @@
 package com.msoula.hobbymatchmaker.core.design.models
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class ProfileSocialMembers(
     val uid: String = "",
     val name: String? = "",

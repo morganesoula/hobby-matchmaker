@@ -194,6 +194,15 @@ fun AppNavHost(
 
             val snackBarHostState = remember { SnackbarHostState() }
 
+            var socialMembersJoinedName by remember { mutableStateOf("") }
+
+            LaunchedEffect(Unit) {
+            }
+
+            var matchAnimVisibility by remember {
+                mutableStateOf(false)
+            }
+
             LaunchedEffect(Unit) {
                 movieViewModel.events.collect { event ->
                     when (event) {
@@ -212,6 +221,11 @@ fun AppNavHost(
                         is UiEvent.ShowSnackBar ->
                             snackBarHostState.showSnackbar(event.message.asStringSuspend())
 
+                        is UiEvent.ShowAnimation -> {
+                            matchAnimVisibility = true
+                            socialMembersJoinedName = event.args as String
+                        }
+
                         else -> {}
                     }
                 }
@@ -221,6 +235,7 @@ fun AppNavHost(
                 modifier = Modifier,
                 movieState = movieState,
                 paginationState = paginationState,
+                socialMembers = socialMembersJoinedName,
                 onNavigate = { destination ->
                     when (destination) {
                         NavigationDestination.Profile -> nav.navigate(Profile)
@@ -229,9 +244,11 @@ fun AppNavHost(
                     }
                 },
                 snackBarHostState = snackBarHostState,
+                showMatchAnimation = matchAnimVisibility,
                 observeMovies = movieViewModel::observeMovies,
                 onEvent = movieViewModel::onCardEvent,
-                onLoadMore = movieViewModel::loadMore
+                onLoadMore = movieViewModel::loadMore,
+                resetAnimation = { matchAnimVisibility = false }
             )
         }
 

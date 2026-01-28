@@ -11,18 +11,25 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
+import com.msoula.hobbymatchmaker.core.design.animation.MovieMatchAnimation
 import com.msoula.hobbymatchmaker.core.design.atoms.EmptyStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.MovieListLoadingScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.StateContainer
 import com.msoula.hobbymatchmaker.core.design.icons.MaterialIconsMovie_filter
 import com.msoula.hobbymatchmaker.core.design.models.EmptyStateConfig
+import com.msoula.hobbymatchmaker.core.design.models.MatchAnimationStep
 import com.msoula.hobbymatchmaker.core.design.molecules.NavigationTopBar
 import com.msoula.hobbymatchmaker.core.design.no_data
 import com.msoula.hobbymatchmaker.core.design.not_found
@@ -43,11 +50,22 @@ fun MovieContent(
     movieState: UiState<ImmutableList<MovieUiModel>>,
     paginationState: PaginationStateModel,
     snackBarHostState: SnackbarHostState,
+    showMatchAnimation: Boolean,
+    socialMembers: String,
     onNavigate: (NavigationDestination) -> Unit,
     observeMovies: () -> Unit,
     onEvent: (CardEventModel) -> Unit,
-    onLoadMore: () -> Unit
+    onLoadMore: () -> Unit,
+    resetAnimation: () -> Unit
 ) {
+    var animationStep by remember { mutableStateOf(MatchAnimationStep.Idle) }
+
+    LaunchedEffect(showMatchAnimation) {
+        if (showMatchAnimation) {
+            animationStep = MatchAnimationStep.SlidingIn
+        }
+    }
+
     Scaffold(
         topBar = {
             NavigationTopBar(
@@ -106,6 +124,19 @@ fun MovieContent(
                             onEvent(CardEventModel.OnDoubleTap(selectedMovie))
                         }
                     )
+                }
+            )
+        }
+
+        if (showMatchAnimation) {
+            MovieMatchAnimation(
+                step = animationStep,
+                users = socialMembers,
+                ownerAvatarUrl = "",
+                updateAnimationStep = { animationStep = it },
+                onFinished = {
+                    animationStep = MatchAnimationStep.Idle
+                    resetAnimation()
                 }
             )
         }

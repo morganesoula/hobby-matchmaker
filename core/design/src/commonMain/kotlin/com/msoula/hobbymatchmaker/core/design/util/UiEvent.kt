@@ -9,6 +9,7 @@ sealed interface UiEvent {
     data class OnDataReady(val data: String) : UiEvent
     data class OpenDialog(val dialogPurpose: String) : UiEvent
     data class CloseDialog(val dialogName: String) : UiEvent
+    data class ShowAnimation(val args: Any = "") : UiEvent
     data object CapacityReached : UiEvent
 }
 

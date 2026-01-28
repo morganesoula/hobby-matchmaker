@@ -9,7 +9,6 @@ import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.connection_issue
-import com.msoula.hobbymatchmaker.core.design.social_movie_match_notification
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.design.util.EventHandler
 import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
@@ -169,12 +168,7 @@ class MovieViewModel(
                 if (result is MovieMatchResult.Match) {
                     val names = result.matchingMemberNames.joinToString(", ")
                     eventHandler.sendEvent(
-                        UiEvent.ShowSnackBar(
-                            UIText.Resource(
-                                Res.string.social_movie_match_notification,
-                                listOf(names)
-                            )
-                        )
+                        UiEvent.ShowAnimation(names)
                     )
                 }
             }
