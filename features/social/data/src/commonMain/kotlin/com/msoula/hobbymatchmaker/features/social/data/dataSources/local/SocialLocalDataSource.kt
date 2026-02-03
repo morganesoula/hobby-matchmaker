@@ -9,4 +9,5 @@ interface SocialLocalDataSource {
     fun observeSocialCircle(): Flow<List<SocialMemberDomainModel>>
     suspend fun addToCircle(member: SocialMemberDomainModel): AppResult<Unit, AppError>
     suspend fun removeFromCircle(memberUid: String): AppResult<Unit, AppError>
+    suspend fun syncCircle(members: List<SocialMemberDomainModel>)
 }

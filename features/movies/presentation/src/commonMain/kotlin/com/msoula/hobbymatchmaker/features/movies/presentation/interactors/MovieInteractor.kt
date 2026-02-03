@@ -16,6 +16,7 @@ import com.msoula.hobbymatchmaker.features.movies.domain.useCases.SetMovieFavori
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ShouldRefreshMoviesUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.models.MovieMatchResult
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.CheckMovieMatchUseCase
+import com.msoula.hobbymatchmaker.features.social.domain.useCases.GetUserAvatarUrlUseCase
 import kotlinx.coroutines.flow.Flow
 
 class MovieInteractor(
@@ -28,6 +29,7 @@ class MovieInteractor(
     private val shouldRefreshMoviesUseCase: ShouldRefreshMoviesUseCase,
     private val loadMoreMoviesUseCase: LoadMoreMoviesUseCase,
     private val checkMovieMatchUseCase: CheckMovieMatchUseCase,
+    private val getUserAvatarUrlUseCase: GetUserAvatarUrlUseCase,
     private val connectivityChecker: NetworkConnectivityChecker
 ) {
     fun observeMovies(): Flow<AppResult<ObserveAllMoviesSuccess, AppError>> =
@@ -87,4 +89,11 @@ class MovieInteractor(
     ): AppResult<MovieMatchResult, AppError> = checkMovieMatchUseCase(
         uid, movieId
     )
+
+    suspend fun getOwnerAvatarUrl(uid: String): String? {
+        return when (val result = getUserAvatarUrlUseCase(uid)) {
+            is AppResult.Success -> result.data
+            is AppResult.Failure -> null
+        }
+    }
 }

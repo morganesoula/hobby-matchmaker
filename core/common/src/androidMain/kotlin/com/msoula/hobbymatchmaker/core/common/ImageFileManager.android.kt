@@ -2,15 +2,14 @@ package com.msoula.hobbymatchmaker.core.common
 
 import android.content.Context
 import android.net.Uri
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 
-actual class ImageFileManager(private val context: Context) {
+actual class ImageFileManager(private val context: Context, private val dispatcherProvider: DispatcherProvider) {
     actual suspend fun copyImageToInternalStorage(sourceUri: String, fileName: String): String? =
-        withContext(Dispatchers.IO) {
+        withContext(dispatcherProvider.io) {
             try {
                 val uri = Uri.parse(sourceUri)
 

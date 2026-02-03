@@ -1,6 +1,7 @@
 package com.msoula.hobbymatchmaker.core.design.util
 
 import androidx.compose.runtime.Immutable
+import com.msoula.hobbymatchmaker.core.design.models.MatchAnimationData
 
 @Immutable
 sealed interface UiEvent {
@@ -9,7 +10,7 @@ sealed interface UiEvent {
     data class OnDataReady(val data: String) : UiEvent
     data class OpenDialog(val dialogPurpose: String) : UiEvent
     data class CloseDialog(val dialogName: String) : UiEvent
-    data class ShowAnimation(val args: Any = "") : UiEvent
+    data class ShowAnimation(val data: MatchAnimationData) : UiEvent
     data object CapacityReached : UiEvent
 }
 

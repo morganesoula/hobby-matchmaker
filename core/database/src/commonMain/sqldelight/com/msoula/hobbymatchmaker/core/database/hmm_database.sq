@@ -60,6 +60,15 @@ CREATE TABLE social_circle_member (
     FOREIGN KEY (uid) REFERENCES user_profile(uid) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS user_cache (
+    uid TEXT NOT NULL PRIMARY KEY,
+    pseudo TEXT NOT NULL,
+    name TEXT,
+    avatar_url TEXT,
+    movies_liked_json TEXT NOT NULL DEFAULT '[]',
+    updated_at INTEGER NOT NULL
+);
+
  -- QUERIES --
 
  insertMovie:
@@ -224,14 +233,40 @@ deleteUserProfileById:
 DELETE FROM user_profile WHERE uid = ?;
 
 insertSocialMember:
-INSERT INTO social_circle_member (uid, member_uid, member_name, member_pseudo, member_avatar_url, added_at)
+INSERT OR IGNORE INTO social_circle_member (uid, member_uid, member_name, member_pseudo, member_avatar_url, added_at)
 VALUES (?, ?, ?, ?, ?, ?);
 
 deleteSocialMember:
 DELETE FROM social_circle_member WHERE uid = ? AND member_uid = ?;
 
+deleteAllSocialMembersByUid:
+DELETE FROM social_circle_member WHERE uid = ?;
+
 selectSocialMembersByUid:
 SELECT * FROM social_circle_member WHERE uid = ?;
+
+-- Queries for user_cache
+selectUserByUid:
+SELECT * FROM user_cache WHERE uid = ?;
+
+selectUsersByUids:
+SELECT * FROM user_cache WHERE uid IN ?;
+
+observeUserByUid:
+SELECT * FROM user_cache WHERE uid = ?;
+
+observeUsersByUids:
+SELECT * FROM user_cache WHERE uid IN ?;
+
+upsertUser:
+INSERT OR REPLACE INTO user_cache (uid, pseudo, name, avatar_url, movies_liked_json, updated_at)
+VALUES (?, ?, ?, ?, ?, ?);
+
+deleteUser:
+DELETE FROM user_cache WHERE uid = ?;
+
+deleteAllUsers:
+DELETE FROM user_cache;
 
 CREATE INDEX IF NOT EXISTS movie_is_favorite ON movie(isFavorite);
 CREATE INDEX IF NOT EXISTS idx_user_profile_uid ON user_profile(uid);

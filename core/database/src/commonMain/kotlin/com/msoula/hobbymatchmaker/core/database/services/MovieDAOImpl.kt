@@ -5,19 +5,19 @@ import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOne
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.core.common.DispatcherProvider
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.database.Actor
 import com.msoula.hobbymatchmaker.core.database.HMMDatabase
 import com.msoula.hobbymatchmaker.core.database.Movie
 import com.msoula.hobbymatchmaker.core.database.Movie_actor_cross_ref
+import com.msoula.hobbymatchmaker.core.database.mappers.toMovieDetailDataEntity
 import com.msoula.hobbymatchmaker.core.database.models.MovieDetailDataEntity
 import com.msoula.hobbymatchmaker.core.database.models.MovieUpdatedDataEntity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class MovieDAOImpl(private val database: HMMDatabase) : MovieDAO {
+class MovieDAOImpl(private val database: HMMDatabase, private val dispatcherProvider: DispatcherProvider) : MovieDAO {
 
     override suspend fun insertMovie(movie: Movie) {
         database.hmm_databaseQueries.insertMovie(
@@ -205,44 +205,17 @@ class MovieDAOImpl(private val database: HMMDatabase) : MovieDAO {
     }
 
     override fun observeMovies(): Flow<List<Movie>> {
-        return database.hmm_databaseQueries.observeMovies().asFlow().mapToList(Dispatchers.IO)
+        return database.hmm_databaseQueries.observeMovies().asFlow().mapToList(dispatcherProvider.io)
     }
 
     override fun observeMovieWithActor(movieId: Long): Flow<MovieDetailDataEntity> {
         return database.hmm_databaseQueries
             .observeDetailMovie(movieId)
             .asFlow()
-            .mapToList(Dispatchers.IO)
+            .mapToList(dispatcherProvider.io)
             .map { rows ->
                 if (rows.isEmpty()) throw IllegalStateException("Movie not found")
-
-                val firstRow = rows.first()
-                MovieDetailDataEntity(
-                    movie = Movie(
-                        movieId = movieId, title = firstRow.title,
-                        posterFileName = firstRow.posterFileName,
-                        synopsis = firstRow.synopsis,
-                        releaseDate = firstRow.releaseDate,
-                        genres = firstRow.genres,
-                        localCoverFilePath = firstRow.localCoverFilePath,
-                        isFavorite = firstRow.isFavorite,
-                        isSeen = null,
-                        popularity = firstRow.popularity,
-                        status = firstRow.status,
-                        videoKey = firstRow.videoKey,
-                        duration = firstRow.duration,
-                        note = null
-                    ),
-                    actors = rows
-                        .filter { it.actorId != null }
-                        .map {
-                            Actor(
-                                actorId = it.actorId ?: 0L,
-                                name = it.actorName,
-                                role = it.actorRole
-                            )
-                        }
-                )
+                rows.first().toMovieDetailDataEntity(rows)
             }
     }
 
@@ -264,12 +237,12 @@ class MovieDAOImpl(private val database: HMMDatabase) : MovieDAO {
 
     override fun observeMoviesFavoriteCount(): Flow<Long> {
         return database.hmm_databaseQueries.observeMoviesFavoriteCount().asFlow().mapToOne(
-            Dispatchers.IO
+            dispatcherProvider.io
         )
     }
 
     override fun observeLikedMoviesIds(): Flow<List<Long>> {
         return database.hmm_databaseQueries.getFavoriteIds().asFlow()
-            .mapToList(Dispatchers.IO)
+            .mapToList(dispatcherProvider.io)
     }
 }

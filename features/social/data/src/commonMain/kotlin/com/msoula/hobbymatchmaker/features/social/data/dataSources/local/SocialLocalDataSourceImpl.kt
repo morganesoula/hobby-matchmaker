@@ -5,6 +5,7 @@ import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.database.models.SocialCircleMemberDataEntity
 import com.msoula.hobbymatchmaker.core.database.services.SocialMemberDAO
 import com.msoula.hobbymatchmaker.core.session.data.dataSources.local.SessionLocalDataSource
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.mappers.toSocialCircleMemberDataEntity
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -28,9 +29,11 @@ class SocialLocalDataSourceImpl(
                         entities.map { entity ->
                             SocialMemberDomainModel(
                                 uid = entity.memberUid,
-                                pseudo = entity.memberPseudo ?: SocialMemberDomainModel.Initial.pseudo,
+                                pseudo = entity.memberPseudo
+                                    ?: SocialMemberDomainModel.Initial.pseudo,
                                 name = entity.memberName ?: SocialMemberDomainModel.Initial.name,
-                                avatarUrl = entity.memberAvatarUrl ?: SocialMemberDomainModel.Initial.avatarUrl,
+                                avatarUrl = entity.memberAvatarUrl
+                                    ?: SocialMemberDomainModel.Initial.avatarUrl,
                                 commonMoviesCount = SocialMemberDomainModel.Initial.commonMoviesCount
                             )
                         }
@@ -77,5 +80,16 @@ class SocialLocalDataSourceImpl(
         } catch (t: Throwable) {
             AppResult.Failure(AppError.Network.Unknown(t))
         }
+    }
+
+    override suspend fun syncCircle(members: List<SocialMemberDomainModel>) {
+        val ownerUId = sessionLocalDataSource.observeCurrentUid().first()
+
+        if (ownerUId.isEmpty()) return
+
+        socialMemberDAO.replaceAll(
+            ownerUid = ownerUId,
+            members.map { it.toSocialCircleMemberDataEntity(ownerUId) }
+        )
     }
 }

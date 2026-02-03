@@ -38,4 +38,6 @@ object Modules {
     const val SOCIAL_DOMAIN = ":features:social:domain"
     const val SOCIAL_PRESENTATION = ":features:social:presentation"
     const val SPLASHSCREEN_PRESENTATION = ":core:splashscreen:presentation"
+    const val USER_DATA = ":core:user:data"
+    const val USER_DOMAIN = ":core:user:domain"
 }

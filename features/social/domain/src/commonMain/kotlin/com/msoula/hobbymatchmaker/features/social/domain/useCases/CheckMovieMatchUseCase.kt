@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.features.social.domain.useCases
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.features.social.domain.models.MatchingMember
 import com.msoula.hobbymatchmaker.features.social.domain.models.MovieMatchResult
 import com.msoula.hobbymatchmaker.features.social.domain.repositories.SocialRepository
 import com.msoula.hobbymatchmaker.features.social.domain.utils.SocialMatchingUtils
@@ -15,19 +16,19 @@ class CheckMovieMatchUseCase(
     ): AppResult<MovieMatchResult, AppError> {
         return when (val result = socialRepository.getSocialCircleSnapshot(ownerUid)) {
             is AppResult.Success -> {
-                val matchingNames = result.data
-                    .filter { member ->
-                        SocialMatchingUtils.hasMoviesInCommon(movieId, member.moviesLiked)
-                    }
+                val matchingMembers = result.data
+                    .filter { SocialMatchingUtils.hasMoviesInCommon(movieId, it.moviesLiked) }
                     .mapNotNull { member ->
-                        member.pseudo.ifBlank { member.name }
+                        val displayName =
+                            member.pseudo.ifBlank { member.name } ?: return@mapNotNull null
+                        if (displayName.isBlank()) return@mapNotNull null
+                        MatchingMember(displayName = displayName, avatarUrl = member.avatarUrl)
                     }
-                    .filter { it.isNotBlank() }
 
-                if (matchingNames.isEmpty()) {
+                if (matchingMembers.isEmpty()) {
                     AppResult.Success(MovieMatchResult.NoMatch)
                 } else {
-                    AppResult.Success(MovieMatchResult.Match(matchingNames))
+                    AppResult.Success(MovieMatchResult.Match(matchingMembers))
                 }
             }
 

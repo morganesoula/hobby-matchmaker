@@ -7,4 +7,8 @@ interface SocialMemberDAO {
     fun insertSocialMember(socialCircleMemberDataEntity: SocialCircleMemberDataEntity)
     fun deleteSocialMember(userProfileUid: String, memberUid: String)
     fun observeUserProfileMembers(userProfileUid: String): Flow<List<SocialCircleMemberDataEntity>>
+    fun replaceAll(
+        ownerUid: String,
+        members: List<SocialCircleMemberDataEntity>
+    )
 }

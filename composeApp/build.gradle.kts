@@ -73,6 +73,8 @@ kotlin {
             implementation(project(Modules.SOCIAL_DOMAIN))
             implementation(project(Modules.SOCIAL_PRESENTATION))
             implementation(project(Modules.SPLASHSCREEN_PRESENTATION))
+            implementation(project(Modules.USER_DATA))
+            implementation(project(Modules.USER_DOMAIN))
         }
     }
 }

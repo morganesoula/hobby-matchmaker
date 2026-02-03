@@ -13,6 +13,7 @@ import com.msoula.hobbymatchmaker.core.network.di.coreModuleNetwork
 import com.msoula.hobbymatchmaker.core.session.data.di.coreModuleSessionData
 import com.msoula.hobbymatchmaker.core.session.domain.di.coreModuleSessionDomain
 import com.msoula.hobbymatchmaker.core.splashscreen.presentation.di.coreModuleSplashPresentation
+import com.msoula.hobbymatchmaker.core.user.data.di.coreModuleUserData
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.di.featuresModuleMovieDetailData
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.di.featuresModuleMovieDetailDomain
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.di.featuresModuleMovieDetailViewModel
@@ -39,6 +40,7 @@ fun appModule() = listOf(
     coreModuleLoginFormValidation,
     coreModuleSignInViewModel,
     coreModuleSignUpViewModel,
+    coreModuleUserData,
     featuresModuleMovieDetailData,
     featuresModuleMovieDetailDomain,
     featuresModuleMovieDetailViewModel,

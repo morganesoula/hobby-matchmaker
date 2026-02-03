@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="21" />
+    <bytecodeTargetLevel target="21">
+      <module name="HobbyMatchmaker.core.user.data.main" target="11" />
+      <module name="HobbyMatchmaker.core.user.data.test" target="11" />
+      <module name="HobbyMatchmaker.core.user.domain.main" target="11" />
+      <module name="HobbyMatchmaker.core.user.domain.test" target="11" />
+      <module name="HobbyMatchmaker.core.user.main" target="11" />
+      <module name="HobbyMatchmaker.core.user.test" target="11" />
+    </bytecodeTargetLevel>
   </component>
 </project>

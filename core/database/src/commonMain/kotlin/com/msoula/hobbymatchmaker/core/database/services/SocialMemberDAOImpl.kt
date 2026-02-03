@@ -2,10 +2,9 @@ package com.msoula.hobbymatchmaker.core.database.services
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
+import com.msoula.hobbymatchmaker.core.common.DispatcherProvider
 import com.msoula.hobbymatchmaker.core.database.HMMDatabase
 import com.msoula.hobbymatchmaker.core.database.models.SocialCircleMemberDataEntity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlin.time.Clock
@@ -13,7 +12,8 @@ import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 class SocialMemberDAOImpl(
-    private val database: HMMDatabase
+    private val database: HMMDatabase,
+    private val dispatcherProvider: DispatcherProvider
 ) : SocialMemberDAO {
     override fun insertSocialMember(socialCircleMemberDataEntity: SocialCircleMemberDataEntity) {
         database.hmm_databaseQueries.insertSocialMember(
@@ -33,7 +33,7 @@ class SocialMemberDAOImpl(
     override fun observeUserProfileMembers(userProfileUid: String): Flow<List<SocialCircleMemberDataEntity>> =
         database.hmm_databaseQueries.selectSocialMembersByUid(userProfileUid)
             .asFlow()
-            .mapToList(Dispatchers.IO)
+            .mapToList(dispatcherProvider.io)
             .map { list ->
                 list.map {
                     SocialCircleMemberDataEntity(
@@ -45,4 +45,12 @@ class SocialMemberDAOImpl(
                     )
                 }
             }
+
+    override fun replaceAll(
+        ownerUid: String,
+        members: List<SocialCircleMemberDataEntity>
+    ) {
+        database.hmm_databaseQueries.deleteAllSocialMembersByUid(ownerUid)
+        members.forEach { insertSocialMember(it) }
+    }
 }

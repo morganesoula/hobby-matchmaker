@@ -21,6 +21,7 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.MinimalDialog
 import com.msoula.hobbymatchmaker.core.design.atoms.asStringSuspend
+import com.msoula.hobbymatchmaker.core.design.models.MatchAnimationData
 import com.msoula.hobbymatchmaker.core.design.models.TabItem
 import com.msoula.hobbymatchmaker.core.design.reset_password
 import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
@@ -194,7 +195,7 @@ fun AppNavHost(
 
             val snackBarHostState = remember { SnackbarHostState() }
 
-            var socialMembersJoinedName by remember { mutableStateOf("") }
+            var matchingAnimationData by remember { mutableStateOf(MatchAnimationData.Empty) }
 
             LaunchedEffect(Unit) {
             }
@@ -223,7 +224,7 @@ fun AppNavHost(
 
                         is UiEvent.ShowAnimation -> {
                             matchAnimVisibility = true
-                            socialMembersJoinedName = event.args as String
+                            matchingAnimationData = event.data
                         }
 
                         else -> {}
@@ -235,7 +236,7 @@ fun AppNavHost(
                 modifier = Modifier,
                 movieState = movieState,
                 paginationState = paginationState,
-                socialMembers = socialMembersJoinedName,
+                matchingAnimationData = matchingAnimationData,
                 onNavigate = { destination ->
                     when (destination) {
                         NavigationDestination.Profile -> nav.navigate(Profile)

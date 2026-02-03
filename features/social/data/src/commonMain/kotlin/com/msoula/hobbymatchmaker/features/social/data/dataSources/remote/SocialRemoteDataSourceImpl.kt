@@ -4,26 +4,28 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.safeFirebaseCall
+import com.msoula.hobbymatchmaker.core.user.domain.repositories.UserDataRepository
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.Invite
-import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.MemberBasicInfo
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.SocialCircleMember
 import com.msoula.hobbymatchmaker.features.social.domain.models.InviteStatus
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialUserSummaryDomainModel
 import dev.gitlive.firebase.firestore.Direction
+import dev.gitlive.firebase.firestore.FieldValue
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlin.collections.emptyList
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 class SocialRemoteDataSourceImpl(
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val userDataRepository: UserDataRepository
 ) : SocialRemoteDataSource {
 
     private val MAX_CIRCLE_SIZE = 5
@@ -46,11 +48,11 @@ class SocialRemoteDataSourceImpl(
                     .collection("users")
                     .orderBy("information.pseudoLowercase", Direction.ASCENDING)
                     .startAtFieldValues {
-                        kotlin.arrayOf<Any?>(searchTerm)
+                        arrayOf<Any?>(searchTerm)
                             .forEach { this.add(it) }
                     }
                 startAtFieldValues.endAtFieldValues {
-                    kotlin.arrayOf<Any?>(endTerm)
+                    arrayOf<Any?>(endTerm)
                         .forEach { this.add(it) }
                 }
                     .limit(20)
@@ -84,6 +86,8 @@ class SocialRemoteDataSourceImpl(
                 }
                 .take(10)
 
+            userDataRepository.prefetchUsers(results.map { it.uid })
+
             results.map { member ->
                 SocialMemberDomainModel(
                     uid = member.uid,
@@ -97,27 +101,16 @@ class SocialRemoteDataSourceImpl(
 
     override suspend fun findUserByUid(uid: String): AppResult<SocialCircleMember, AppError> =
         safeFirebaseCall {
-            val userDoc = firestore
-                .collection("users")
-                .document(uid)
-                .get()
-
-            if (!userDoc.exists) {
-                throw Exception("User not found with uid: $uid")
-            }
-
-            val pseudo = userDoc.get<String>("information.pseudo")
-            val name = userDoc.get<String?>("information.name")
-            val avatarUrl = userDoc.get<String?>("information.avatarUrl")
-            val moviesLiked = userDoc.get<List<Long>?>("movies")
+            val user = userDataRepository.getUser(uid)
+                ?: throw Exception("User not found with uid: $uid")
 
             SocialCircleMember(
+                uid = user.uid,
                 ownerUid = "",
-                uid = uid,
-                pseudo = pseudo,
-                name = name,
-                avatarUrl = avatarUrl,
-                moviesLiked = moviesLiked,
+                pseudo = user.pseudo,
+                name = user.name,
+                avatarUrl = user.avatarUrl,
+                moviesLiked = user.moviesLiked,
                 commonMoviesCount = SocialCircleMember.Initial.commonMoviesCount
             )
         }
@@ -130,44 +123,33 @@ class SocialRemoteDataSourceImpl(
             .collection("circle")
             .snapshots
             .flatMapLatest { querySnapshot ->
-                val members = querySnapshot.documents.map { document ->
-                    MemberBasicInfo(
-                        uid = document.id,
-                        pseudo = document.get<String>("memberPseudo"),
-                        name = document.get<String?>("username"),
-                        avatarUrl = document.get<String?>("avatarUrl"),
-                        commonMoviesCount = document.get<Int?>("commonMoviesCount")
-                    )
+                val memberData = querySnapshot.documents.map { document ->
+                    document.id to (document.get<Int?>("commonMoviesCount") ?: 0)
                 }
 
-                if (members.isEmpty()) {
+                if (memberData.isEmpty()) {
                     flowOf(emptyList())
                 } else {
-                    val memberMoviesFlows = members.map { member ->
-                        firestore
-                            .collection("users")
-                            .document(member.uid)
-                            .snapshots
-                            .map { userDoc ->
-                                val moviesLiked = userDoc.get<List<Long>?>("movies")
-                                member to (moviesLiked ?: emptyList())
-                            }
-                    }
+                    val memberUids = memberData.map { it.first }
+                    val commonMoviesCounts = memberData.toMap()
 
-                    combine(memberMoviesFlows) { memberWithMoviesArray ->
-                        memberWithMoviesArray.map { (member, moviesLiked) ->
-                            SocialMemberDomainModel(
-                                uid = member.uid,
-                                pseudo = member.pseudo,
-                                name = member.name,
-                                avatarUrl = member.avatarUrl
-                                    ?: SocialMemberDomainModel.Initial.avatarUrl,
-                                moviesLiked = moviesLiked,
-                                commonMoviesCount = member.commonMoviesCount
-                                    ?: SocialMemberDomainModel.Initial.commonMoviesCount
-                            )
+                    userDataRepository.observeUsers(memberUids)
+                        .map { usersMap ->
+                            memberUids.mapNotNull { memberUid ->
+                                usersMap[memberUid]?.let { user ->
+                                    SocialMemberDomainModel(
+                                        uid = user.uid,
+                                        pseudo = user.pseudo,
+                                        name = user.name,
+                                        avatarUrl = user.avatarUrl
+                                            ?: SocialMemberDomainModel.Initial.avatarUrl,
+                                        moviesLiked = user.moviesLiked,
+                                        commonMoviesCount = commonMoviesCounts[memberUid]
+                                            ?: SocialMemberDomainModel.Initial.commonMoviesCount
+                                    )
+                                }
+                            }
                         }
-                    }
                 }
             }
 
@@ -307,11 +289,8 @@ class SocialRemoteDataSourceImpl(
                 .document(socialCircleMember.uid)
                 .set(
                     mapOf(
-                        "memberPseudo" to socialCircleMember.pseudo,
-                        "username" to socialCircleMember.name,
-                        "avatarUrl" to socialCircleMember.avatarUrl,
-                        "commonMoviesCount" to socialCircleMember.commonMoviesCount,
-                        "moviesLiked" to socialCircleMember.moviesLiked
+                        "addedAt" to FieldValue.serverTimestamp,
+                        "commonMoviesCount" to socialCircleMember.commonMoviesCount
                     ),
                     merge = true
                 )
@@ -358,11 +337,8 @@ class SocialRemoteDataSourceImpl(
                 set(
                     ownerCircleRef,
                     mapOf(
-                        "memberPseudo" to memberAddedToOwnerCircle.pseudo,
-                        "username" to memberAddedToOwnerCircle.name,
-                        "avatarUrl" to memberAddedToOwnerCircle.avatarUrl,
+                        "addedAt" to FieldValue.serverTimestamp,
                         "commonMoviesCount" to memberAddedToOwnerCircle.commonMoviesCount,
-                        "moviesLiked" to memberAddedToOwnerCircle.moviesLiked
                     ),
                     merge = true
                 )

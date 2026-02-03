@@ -117,12 +117,11 @@ class MovieDetailViewModel(
         interactor.checkForMovieMatch(uid, movieId)
             .onSuccess { result ->
                 if (result is MovieMatchResult.Match) {
-                    val names = result.matchingMemberNames.joinToString(", ")
                     eventHandler.sendEvent(
                         UiEvent.ShowSnackBar(
                             UIText.Resource(
                                 Res.string.social_movie_match_notification,
-                                listOf(names)
+                                listOf(result.matchingMembers)
                             )
                         )
                     )

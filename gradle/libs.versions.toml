@@ -42,6 +42,7 @@ uuid = "0.8.4"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
+jetbrainsKotlinJvmVersion = "2.3.0"
 
 [libraries]
 activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
@@ -138,3 +139,4 @@ hobbymatchmaker-buildlogic-multiplatform-test = { id = "hobbymatchmaker.buildlog
 ### Test
 kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvmVersion" }

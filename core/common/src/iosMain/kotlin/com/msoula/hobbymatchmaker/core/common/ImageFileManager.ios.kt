@@ -1,8 +1,6 @@
 package com.msoula.hobbymatchmaker.core.common
 
 import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import platform.Foundation.NSData
 import platform.Foundation.NSFileManager
@@ -11,9 +9,11 @@ import platform.Foundation.dataWithContentsOfURL
 import platform.Foundation.writeToURL
 
 @OptIn(ExperimentalForeignApi::class)
-actual class ImageFileManager {
+actual class ImageFileManager(
+    private val dispatcherProvider: DispatcherProvider
+) {
     actual suspend fun copyImageToInternalStorage(sourceUri: String, fileName: String): String? =
-        withContext(Dispatchers.IO) {
+        withContext(dispatcherProvider.io) {
             try {
                 val fileManager = NSFileManager.defaultManager
                 val documentsDirectory = fileManager.URLsForDirectory(

@@ -2,10 +2,10 @@ package com.msoula.hobbymatchmaker.core.database.services
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToOneOrNull
+import com.msoula.hobbymatchmaker.core.common.DispatcherProvider
 import com.msoula.hobbymatchmaker.core.database.HMMDatabase
+import com.msoula.hobbymatchmaker.core.database.mappers.toUserProfileDataEntity
 import com.msoula.hobbymatchmaker.core.database.models.UserProfileDataEntity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlin.time.Clock
@@ -13,7 +13,8 @@ import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 class UserProfileDAOImpl(
-    private val database: HMMDatabase
+    private val database: HMMDatabase,
+    private val dispatcherProvider: DispatcherProvider
 ) : UserProfileDAO {
     override suspend fun insertUserProfile(userProfile: UserProfileDataEntity) {
         database.hmm_databaseQueries.insertUserProfile(
@@ -67,20 +68,9 @@ class UserProfileDAOImpl(
         return database.hmm_databaseQueries
             .selectUserById(uid)
             .asFlow()
-            .mapToOneOrNull(Dispatchers.IO)
+            .mapToOneOrNull(dispatcherProvider.io)
             .map { row ->
-                row?.let {
-                    UserProfileDataEntity(
-                        uid = it.uid,
-                        name = it.name,
-                        pseudo = it.pseudo,
-                        avatarUrl = it.avatar_url,
-                        bio = it.bio,
-                        interests = it.interests_json,
-                        likedCount = it.liked_count.toInt(),
-                        circleCount = it.circle_count.toInt()
-                    )
-                }
+                row?.toUserProfileDataEntity()
             }
     }
 
@@ -89,17 +79,6 @@ class UserProfileDAOImpl(
             .selectUserByPseudo(pseudo)
             .executeAsOneOrNull()
 
-        return row?.let {
-            UserProfileDataEntity(
-                uid = it.uid,
-                name = it.name,
-                pseudo = it.pseudo,
-                avatarUrl = it.avatar_url,
-                bio = it.bio,
-                interests = it.interests_json,
-                likedCount = it.liked_count.toInt(),
-                circleCount = it.circle_count.toInt()
-            )
-        }
+        return row?.toUserProfileDataEntity()
     }
 }

@@ -7,5 +7,5 @@ import org.koin.dsl.module
 
 actual val platformModule = module {
     single { createDataStore(androidContext()) }
-    single { ImageFileManager(get()) }
+    single { ImageFileManager(get(), get()) }
 }

@@ -2,5 +2,24 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/composeApp/build/spmKmpPlugin/nativeIosShared/scratch/checkouts/AppAuth-iOS" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/composeApp/build/spmKmpPlugin/nativeIosShared/scratch/checkouts/GTMAppAuth" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/composeApp/build/spmKmpPlugin/nativeIosShared/scratch/checkouts/GoogleAppMeasurement" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/composeApp/build/spmKmpPlugin/nativeIosShared/scratch/checkouts/GoogleDataTransport" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/composeApp/build/spmKmpPlugin/nativeIosShared/scratch/checkouts/GoogleSignIn-iOS" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/composeApp/build/spmKmpPlugin/nativeIosShared/scratch/checkouts/GoogleUtilities" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/composeApp/build/spmKmpPlugin/nativeIosShared/scratch/checkouts/abseil-cpp-binary" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/composeApp/build/spmKmpPlugin/nativeIosShared/scratch/checkouts/app-check" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/composeApp/build/spmKmpPlugin/nativeIosShared/scratch/checkouts/firebase-ios-sdk" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/composeApp/build/spmKmpPlugin/nativeIosShared/scratch/checkouts/google-ads-on-device-conversion-ios-sdk" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/composeApp/build/spmKmpPlugin/nativeIosShared/scratch/checkouts/grpc-binary" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/composeApp/build/spmKmpPlugin/nativeIosShared/scratch/checkouts/gtm-session-fetcher" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/composeApp/build/spmKmpPlugin/nativeIosShared/scratch/checkouts/interop-ios-for-google-sdks" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/composeApp/build/spmKmpPlugin/nativeIosShared/scratch/checkouts/leveldb" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/composeApp/build/spmKmpPlugin/nativeIosShared/scratch/checkouts/nanopb" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/composeApp/build/spmKmpPlugin/nativeIosShared/scratch/checkouts/promises" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/composeApp/build/spmKmpPlugin/nativeIosShared/scratch/checkouts/swift-protobuf" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/composeApp/build/spmKmpPlugin/nativeIosShared/scratch/checkouts/swift-protobuf/Sources/protobuf/abseil" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/composeApp/build/spmKmpPlugin/nativeIosShared/scratch/checkouts/swift-protobuf/Sources/protobuf/protobuf" vcs="Git" />
   </component>
 </project>

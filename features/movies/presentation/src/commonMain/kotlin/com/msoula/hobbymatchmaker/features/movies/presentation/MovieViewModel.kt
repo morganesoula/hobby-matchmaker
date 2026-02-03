@@ -9,6 +9,8 @@ import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.connection_issue
+import com.msoula.hobbymatchmaker.core.design.models.MatchAnimationData
+import com.msoula.hobbymatchmaker.core.design.models.MatchingMemberInfo
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.design.util.EventHandler
 import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
@@ -166,9 +168,15 @@ class MovieViewModel(
         interactor.checkForMovieMatch(uid, movieId)
             .onSuccess { result ->
                 if (result is MovieMatchResult.Match) {
-                    val names = result.matchingMemberNames.joinToString(", ")
+                    val ownerAvatarUrl = interactor.getOwnerAvatarUrl(uid)
+                    val matchingMembers = result.matchingMembers.map { member ->
+                        MatchingMemberInfo(member.displayName, member.avatarUrl)
+                    }.toImmutableList()
+
                     eventHandler.sendEvent(
-                        UiEvent.ShowAnimation(names)
+                        UiEvent.ShowAnimation(
+                            MatchAnimationData(ownerAvatarUrl, matchingMembers)
+                        )
                     )
                 }
             }

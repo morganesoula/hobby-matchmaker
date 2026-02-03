@@ -29,6 +29,7 @@ import com.msoula.hobbymatchmaker.core.design.atoms.MovieListLoadingScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.StateContainer
 import com.msoula.hobbymatchmaker.core.design.icons.MaterialIconsMovie_filter
 import com.msoula.hobbymatchmaker.core.design.models.EmptyStateConfig
+import com.msoula.hobbymatchmaker.core.design.models.MatchAnimationData
 import com.msoula.hobbymatchmaker.core.design.models.MatchAnimationStep
 import com.msoula.hobbymatchmaker.core.design.molecules.NavigationTopBar
 import com.msoula.hobbymatchmaker.core.design.no_data
@@ -51,7 +52,7 @@ fun MovieContent(
     paginationState: PaginationStateModel,
     snackBarHostState: SnackbarHostState,
     showMatchAnimation: Boolean,
-    socialMembers: String,
+    matchingAnimationData: MatchAnimationData,
     onNavigate: (NavigationDestination) -> Unit,
     observeMovies: () -> Unit,
     onEvent: (CardEventModel) -> Unit,
@@ -131,9 +132,8 @@ fun MovieContent(
         if (showMatchAnimation) {
             MovieMatchAnimation(
                 step = animationStep,
-                users = socialMembers,
-                ownerAvatarUrl = "",
                 updateAnimationStep = { animationStep = it },
+                matchAnimationData = matchingAnimationData,
                 onFinished = {
                     animationStep = MatchAnimationStep.Idle
                     resetAnimation()

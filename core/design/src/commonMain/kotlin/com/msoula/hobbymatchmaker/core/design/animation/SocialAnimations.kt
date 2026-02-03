@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.CircleWithCustomPhoto
+import com.msoula.hobbymatchmaker.core.design.models.MatchAnimationData
 import com.msoula.hobbymatchmaker.core.design.models.MatchAnimationStep
 import com.msoula.hobbymatchmaker.core.design.social_movie_match_notification
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
@@ -44,8 +45,7 @@ import kotlin.math.roundToInt
 fun MovieMatchAnimation(
     step: MatchAnimationStep,
     updateAnimationStep: (MatchAnimationStep) -> Unit,
-    users: String,
-    ownerAvatarUrl: String,
+    matchAnimationData: MatchAnimationData,
     onFinished: () -> Unit
 ) {
     BoxWithConstraints(
@@ -164,7 +164,7 @@ fun MovieMatchAnimation(
             modifier = Modifier.offset {
                 IntOffset(leftX.value.roundToInt(), 0)
             },
-            customAvatarPath = ownerAvatarUrl
+            customAvatarPath = matchAnimationData.ownerAvatarUrl
         )
 
         Row(
@@ -172,11 +172,11 @@ fun MovieMatchAnimation(
                 IntOffset(rightX.value.roundToInt(), 0)
             }
         ) {
-            val memberArraySize = users.split(",")
-            repeat(memberArraySize.size) { index ->
+            repeat(matchAnimationData.matchingMembers.size) { index ->
                 CircleWithCustomPhoto(
                     modifier = Modifier
-                        .offset(x = (-12 * index).dp)
+                        .offset(x = (-12 * index).dp),
+                    customAvatarPath = matchAnimationData.matchingMembers[index].avatarUrl
                 )
             }
         }
@@ -239,7 +239,10 @@ fun MovieMatchAnimation(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = stringResource(Res.string.social_movie_match_notification, users),
+                    text = stringResource(
+                        Res.string.social_movie_match_notification,
+                        matchAnimationData.matchingMemberNames
+                    ),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.primary

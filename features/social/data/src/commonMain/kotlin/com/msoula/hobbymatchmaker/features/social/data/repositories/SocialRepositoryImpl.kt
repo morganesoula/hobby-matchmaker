@@ -2,7 +2,9 @@ package com.msoula.hobbymatchmaker.features.social.data.repositories
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.core.common.DispatcherProvider
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.SocialLocalDataSource
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.SocialRemoteDataSource
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toInviteData
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toSocialCircleMember
@@ -12,11 +14,18 @@ import com.msoula.hobbymatchmaker.features.social.domain.models.SocialInviteDoma
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.repositories.SocialRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 class SocialRepositoryImpl(
-    private val socialRemoteDataSource: SocialRemoteDataSource
+    private val socialRemoteDataSource: SocialRemoteDataSource,
+    private val socialLocalDataSource: SocialLocalDataSource,
+    dispatcherProvider: DispatcherProvider
 ) : SocialRepository {
+    private val customScope = dispatcherProvider.createScope()
+
     override suspend fun searchUsersByPseudo(
         pseudo: String,
         ownerId: String?
@@ -29,7 +38,22 @@ class SocialRepositoryImpl(
         }
 
     override fun observeSocialCircle(uid: String): Flow<List<SocialMemberDomainModel>> =
-        socialRemoteDataSource.observeSocialCircle(uid)
+        combine(
+            socialLocalDataSource.observeSocialCircle(),
+            socialRemoteDataSource.observeSocialCircle(uid)
+        ) { local, remote ->
+            when {
+                remote.isNotEmpty() -> {
+                    customScope.launch {
+                        socialLocalDataSource.syncCircle(remote)
+                    }
+                    remote
+                }
+
+                local.isNotEmpty() -> local
+                else -> emptyList()
+            }
+        }.distinctUntilChanged()
 
     override fun observeIncomingInvites(ownerUid: String): Flow<List<SocialInviteDomainModel>> {
         return socialRemoteDataSource.observeIncomingInvites(ownerUid)
