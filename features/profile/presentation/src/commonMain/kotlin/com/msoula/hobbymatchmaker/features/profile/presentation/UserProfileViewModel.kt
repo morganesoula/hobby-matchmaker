@@ -79,6 +79,7 @@ class UserProfileViewModel(
 
     init {
         observeProfile()
+        refreshProfileData()
     }
 
     fun observeProfile() {
@@ -97,6 +98,17 @@ class UserProfileViewModel(
                         _screenState.update { UserProfileUiStateModel.Success(uiModel) }
                     }
                 }
+        }
+    }
+
+    private fun refreshProfileData() {
+        scope.launch {
+            currentUserUid.value?.let { uid ->
+                interactor.refreshProfileData(uid)
+                    .onFailure { error ->
+                        Logger.e("Failed to refresh profile data: $error")
+                    }
+            }
         }
     }
 
@@ -147,7 +159,7 @@ class UserProfileViewModel(
 
             UserProfileUiEventModel.OnEditModeClicked -> toggleEditMode()
 
-            UserProfileUiEventModel.OnSignUpButtonClicked -> logOut("sign_up")
+            UserProfileUiEventModel.OnSignUpButtonClicked -> logOut()
         }
     }
 
@@ -191,7 +203,7 @@ class UserProfileViewModel(
         eventHandler.close()
     }
 
-    fun logOut(route: String) {
+    fun logOut() {
         scope.launch {
             interactor.logOut()
                 .onSuccess {

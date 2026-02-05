@@ -8,7 +8,7 @@ import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
 import com.msoula.hobbymatchmaker.features.movies.domain.models.PaginationInfo
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.CheckMovieSynopsisValueUseCase
-import com.msoula.hobbymatchmaker.features.movies.domain.useCases.FetchMoviesUseCase
+import com.msoula.hobbymatchmaker.features.movies.domain.useCases.RefreshMoviesUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.LoadMoreMoviesUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesSuccess
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesUseCase
@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.Flow
 class MovieInteractor(
     private val setMovieFavoriteUseCase: SetMovieFavoriteUseCase,
     private val observeAllMoviesUseCase: ObserveAllMoviesUseCase,
-    private val fetchMoviesUseCase: FetchMoviesUseCase,
+    private val refreshMoviesUseCase: RefreshMoviesUseCase,
     private val fetchFirebaseUserInfo: FetchFirebaseUserInfo,
     private val logOutUseCase: LogOutUseCase,
     private val checkMovieSynopsisValueUseCase: CheckMovieSynopsisValueUseCase,
@@ -36,7 +36,7 @@ class MovieInteractor(
         observeAllMoviesUseCase()
 
     suspend fun fetchMovies(language: String): AppResult<Unit, AppError> =
-        fetchMoviesUseCase(language)
+        refreshMoviesUseCase(language)
 
     suspend fun loadMoreMovies(language: String, page: Int): AppResult<PaginationInfo, AppError> =
         loadMoreMoviesUseCase(language, page)

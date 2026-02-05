@@ -4,6 +4,6 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.MovieRepository
 
-class FetchMoviesUseCase(private val movieRepository: MovieRepository) {
-    suspend operator fun invoke(language: String): AppResult<Unit, AppError> = movieRepository.fetchMovies(language)
+class RefreshMoviesUseCase(private val movieRepository: MovieRepository) {
+    suspend operator fun invoke(language: String): AppResult<Unit, AppError> = movieRepository.refreshMovies(language)
 }

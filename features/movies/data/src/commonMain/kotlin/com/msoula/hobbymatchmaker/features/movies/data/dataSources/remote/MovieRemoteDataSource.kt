@@ -6,7 +6,7 @@ import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.PaginatedMovieResult
 
 interface MovieRemoteDataSource {
-    suspend fun fetchMovies(language: String): AppResult<List<MovieRemoteModel>, AppError>
+    suspend fun refreshMovies(language: String): AppResult<List<MovieRemoteModel>, AppError>
     suspend fun fetchMoviesPage(
         language: String,
         page: Int

@@ -5,5 +5,5 @@ import com.msoula.hobbymatchmaker.features.social.domain.repositories.SocialRepo
 class ObserveSocialCircleUseCase(
     private val socialRepository: SocialRepository
 ) {
-    suspend operator fun invoke(ownerUid: String) = socialRepository.observeSocialCircle(ownerUid)
+    operator fun invoke(ownerUid: String) = socialRepository.observeSocialCircle(ownerUid)
 }

@@ -352,7 +352,7 @@ fun AppNavHost(
                 val userProfileActions = remember(userProfileViewModel, socialViewModel) {
                     UserProfileActions(
                         closeEdition = { userProfileViewModel.closeEdition() },
-                        logOut = { userProfileViewModel.logOut(it) },
+                        logOut = { userProfileViewModel.logOut() },
                         onNavigate = { destination ->
                             when (destination) {
                                 NavigationDestination.SignUp -> navCallbacks.navigateAndClearToAuth()

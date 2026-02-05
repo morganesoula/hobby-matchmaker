@@ -23,7 +23,7 @@ interface MovieRepository {
         movieId: Long
     ): AppResult<Unit, AppError>
 
-    suspend fun fetchMovies(language: String): AppResult<Unit, AppError>
+    suspend fun refreshMovies(language: String): AppResult<Unit, AppError>
     suspend fun loadMoreMovies(language: String, page: Int): AppResult<PaginationInfo, AppError>
     suspend fun isSynopsisMovieAvailable(movieId: Long): AppResult<Boolean, AppError>
     suspend fun getFavoriteLocalMovieIds(): AppResult<List<Long>, AppError>

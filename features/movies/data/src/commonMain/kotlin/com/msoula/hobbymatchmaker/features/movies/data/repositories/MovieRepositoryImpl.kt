@@ -51,8 +51,8 @@ class MovieRepositoryImpl(
             movieId
         )
 
-    override suspend fun fetchMovies(language: String): AppResult<Unit, AppError> =
-        movieRemoteDataSource.fetchMovies(language).flatMap { movies ->
+    override suspend fun refreshMovies(language: String): AppResult<Unit, AppError> =
+        movieRemoteDataSource.refreshMovies(language).flatMap { movies ->
             movieLocalDataSource.upsertAll(movies.map { it.toMovieDB() }).flatMap {
                 supervisorScope {
                     movies.mapNotNull { m ->

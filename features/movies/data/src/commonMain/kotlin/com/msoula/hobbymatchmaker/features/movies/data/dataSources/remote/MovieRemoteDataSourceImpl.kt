@@ -15,7 +15,7 @@ class MovieRemoteDataSourceImpl(
     private val tmdbKtorService: TMDBKtorService
 ) : MovieRemoteDataSource {
 
-    override suspend fun fetchMovies(language: String): AppResult<List<MovieRemoteModel>, AppError> {
+    override suspend fun refreshMovies(language: String): AppResult<List<MovieRemoteModel>, AppError> {
         val pages = listOf(1, 2, 3)
         val movies = mutableListOf<MovieRemoteModel>()
 
