@@ -68,6 +68,7 @@ class SocialViewModel(
 
     init {
         observeSessionAndInvites()
+        refreshInvitesWhenAuthenticated()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -106,6 +107,27 @@ class SocialViewModel(
                 .collect { profile ->
                     currentUserPseudo = profile?.pseudo
                 }
+        }
+    }
+
+    private fun refreshInvitesWhenAuthenticated() {
+        scope.launch {
+            observeSessionStateUseCase().collect { state ->
+                when (state) {
+                    is SessionState.Authenticated -> {
+                        val uid = state.uid
+                        socialUseCases.refreshIncomingInvitesUseCase(uid)
+                            .onFailure {
+                                Logger.e("Failed to refresh incoming invites: $it")
+                            }
+                        socialUseCases.refreshSentInvitesUseCase(uid)
+                            .onFailure {
+                                Logger.e("Failed to refresh sent invites: $it")
+                            }
+                    }
+                    else -> {}
+                }
+            }
         }
     }
 
@@ -195,6 +217,7 @@ class SocialViewModel(
             )
         )
             .onSuccess {
+                socialUseCases.refreshSentInvitesUseCase(uid)
                 eventHandler.sendEvent(UiEvent.OnDataReady("invitation_sent"))
             }
             .onFailure { error ->
@@ -268,7 +291,10 @@ class SocialViewModel(
         observeSessionStateUseCase()
             .flatMapLatest { state ->
                 when (state) {
-                    is SessionState.Authenticated -> observe(state.uid)
+                    is SessionState.Authenticated -> {
+                        observe(state.uid)
+                    }
+
                     is SessionState.Guest, null ->
                         flowOf(AppResult.Success(emptyResult))
                 }

@@ -17,7 +17,10 @@ import com.msoula.hobbymatchmaker.core.database.models.MovieUpdatedDataEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class MovieDAOImpl(private val database: HMMDatabase, private val dispatcherProvider: DispatcherProvider) : MovieDAO {
+class MovieDAOImpl(
+    private val database: HMMDatabase,
+    private val dispatcherProvider: DispatcherProvider
+) : MovieDAO {
 
     override suspend fun insertMovie(movie: Movie) {
         database.hmm_databaseQueries.insertMovie(

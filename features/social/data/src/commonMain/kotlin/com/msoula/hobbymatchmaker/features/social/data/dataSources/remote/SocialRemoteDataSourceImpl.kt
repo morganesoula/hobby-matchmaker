@@ -5,9 +5,11 @@ import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.safeFirebaseCall
 import com.msoula.hobbymatchmaker.core.user.domain.repositories.UserDataRepository
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toSocialInviteDomainModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.Invite
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.SocialCircleMember
 import com.msoula.hobbymatchmaker.features.social.domain.models.InviteStatus
+import com.msoula.hobbymatchmaker.features.social.domain.models.SocialInviteDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialUserSummaryDomainModel
 import dev.gitlive.firebase.firestore.Direction
@@ -19,7 +21,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlin.collections.emptyList
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -170,6 +171,76 @@ class SocialRemoteDataSourceImpl(
             )
         }
 
+    @OptIn(ExperimentalTime::class)
+    override suspend fun refreshIncomingInvites(ownerUid: String): AppResult<List<SocialInviteDomainModel>, AppError> =
+        safeFirebaseCall {
+            val userSnapshot = firestore
+                .collection("users")
+                .document(ownerUid)
+                .get()
+
+            val pseudo = userSnapshot.get<String?>("information.pseudo")
+                ?: return@safeFirebaseCall emptyList()
+
+            val documents = firestore
+                .collection("socialInvites")
+                .where { "toPseudo" equalTo pseudo }
+                .where { "status" equalTo InviteStatus.PENDING }
+                .get()
+                .documents
+
+            documents.mapNotNull { document ->
+                val fromUid = document.get<String?>("fromUid") ?: return@mapNotNull null
+                val fromPseudo = document.get<String?>("fromPseudo") ?: return@mapNotNull null
+                val toPseudo = document.get<String?>("toPseudo") ?: return@mapNotNull null
+                val name = document.get<String?>("name") ?: return@mapNotNull null
+                val status = document.get<InviteStatus?>("status") ?: InviteStatus.PENDING
+                val createdAtStr = document.get<String?>("createdAt") ?: return@mapNotNull null
+                val updatedAtStr = document.get<String?>("updatedAt")
+
+                Invite(
+                    inviteId = document.id,
+                    fromUid = fromUid,
+                    fromPseudo = fromPseudo,
+                    toPseudo = toPseudo,
+                    name = name,
+                    status = status,
+                    createdAt = Instant.parse(createdAtStr),
+                    updatedAt = updatedAtStr?.let { Instant.parse(it) }
+                ).toSocialInviteDomainModel()
+            }
+        }
+
+    @OptIn(ExperimentalTime::class)
+    override suspend fun refreshSentInvites(ownerUid: String): AppResult<List<SocialInviteDomainModel>, AppError> =
+        safeFirebaseCall {
+            val documents = firestore
+                .collection("socialInvites")
+                .where { "fromUid" equalTo ownerUid }
+                .get()
+                .documents
+
+            documents.mapNotNull { document ->
+                val fromUid = document.get<String?>("fromUid") ?: return@mapNotNull null
+                val fromPseudo = document.get<String?>("fromPseudo") ?: return@mapNotNull null
+                val toPseudo = document.get<String?>("toPseudo") ?: return@mapNotNull null
+                val name = document.get<String?>("name") ?: return@mapNotNull null
+                val status = document.get<InviteStatus?>("status") ?: InviteStatus.PENDING
+                val createdAtStr = document.get<String?>("createdAt") ?: return@mapNotNull null
+                val updatedAtStr = document.get<String?>("updatedAt")
+
+                Invite(
+                    inviteId = document.id,
+                    fromUid = fromUid,
+                    fromPseudo = fromPseudo,
+                    toPseudo = toPseudo,
+                    name = name,
+                    status = status,
+                    createdAt = Instant.parse(createdAtStr),
+                    updatedAt = updatedAtStr?.let { Instant.parse(it) }
+                ).toSocialInviteDomainModel()
+            }
+        }
 
     @OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
     override fun observeIncomingInvites(ownerUid: String): Flow<List<Invite>> =
@@ -220,7 +291,7 @@ class SocialRemoteDataSourceImpl(
             }
 
     @OptIn(ExperimentalTime::class)
-    override fun observeSentInvited(ownerUid: String): Flow<List<Invite>> =
+    override fun observeSentInvites(ownerUid: String): Flow<List<Invite>> =
         firestore
             .collection("socialInvites")
             .where { "fromUid" equalTo ownerUid }

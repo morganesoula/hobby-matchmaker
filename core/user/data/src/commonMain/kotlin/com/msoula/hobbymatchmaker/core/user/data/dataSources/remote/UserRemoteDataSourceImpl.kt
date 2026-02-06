@@ -1,7 +1,6 @@
 package com.msoula.hobbymatchmaker.core.user.data.dataSources.remote
 
 import com.msoula.hobbymatchmaker.core.user.domain.models.UserSummaryDomainModel
-import dev.gitlive.firebase.firestore.DocumentSnapshot
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

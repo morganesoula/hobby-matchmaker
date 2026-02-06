@@ -32,11 +32,11 @@ fun SocialUserSummaryUiModel.toSocialMemberDomainModel(): SocialMemberDomainMode
 fun SocialInviteDomainModel.toInviteUiModel(): InviteUiModel =
     InviteUiModel(
         ownerId = this.fromUid,
-        ownerPseudo = this.toPseudo,
+        ownerPseudo = this.toPseudo ?: InviteUiModel.Initial.ownerPseudo,
         inviteId = this.inviteId,
         guestUid = this.fromUid,
         guestName = this.name ?: "",
-        guestPseudo = this.fromPseudo,
+        guestPseudo = this.fromPseudo ?: InviteUiModel.Initial.guestPseudo,
         guestAvatarUrl = "",
         inviteTime = this.createdAt.epochSeconds,
         inviteStatus = this.status

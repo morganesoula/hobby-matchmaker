@@ -9,6 +9,8 @@ import com.msoula.hobbymatchmaker.features.social.domain.useCases.GetUserAvatarU
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.ObserveIncomingInvitesUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.ObserveSentInvitesUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.ObserveSocialCircleUseCase
+import com.msoula.hobbymatchmaker.features.social.domain.useCases.RefreshIncomingInvitesUseCase
+import com.msoula.hobbymatchmaker.features.social.domain.useCases.RefreshSentInvitesUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.RefreshSocialCircleUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.RemoveMemberUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.SearchUsersByPseudoUseCase
@@ -23,7 +25,9 @@ val featuresModuleSocialDomain = module {
     factoryOf(::CancelInvitationUseCase)
     factoryOf(::DeclineInviteUseCase)
     factoryOf(::ObserveIncomingInvitesUseCase)
+    factoryOf(::RefreshIncomingInvitesUseCase)
     factoryOf(::ObserveSentInvitesUseCase)
+    factoryOf(::RefreshSentInvitesUseCase)
     factoryOf(::ObserveSocialCircleUseCase)
     factoryOf(::RefreshSocialCircleUseCase)
     factoryOf(::RemoveMemberUseCase)

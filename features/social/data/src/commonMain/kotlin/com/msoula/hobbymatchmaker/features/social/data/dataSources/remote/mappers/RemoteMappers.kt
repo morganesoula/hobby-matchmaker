@@ -25,8 +25,8 @@ fun SocialInviteDomainModel.toInviteData(): Invite {
     return Invite(
         inviteId = inviteId,
         fromUid = fromUid,
-        fromPseudo = fromPseudo,
-        toPseudo = toPseudo,
+        fromPseudo = fromPseudo ?: Invite.Initial.fromPseudo,
+        toPseudo = toPseudo ?: Invite.Initial.toPseudo,
         name = name,
         status = status,
         createdAt = createdAt,

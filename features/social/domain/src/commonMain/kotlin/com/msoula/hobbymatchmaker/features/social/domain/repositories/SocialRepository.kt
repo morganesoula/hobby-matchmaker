@@ -19,7 +19,9 @@ interface SocialRepository {
     fun observeSocialCircle(uid: String): Flow<List<SocialMemberDomainModel>>
     suspend fun refreshSocialCircle(uid: String): AppResult<Unit, AppError>
     fun observeIncomingInvites(ownerUid: String): Flow<List<SocialInviteDomainModel>>
+    suspend fun refreshIncomingInvites(ownerUid: String): AppResult<Unit, AppError>
     fun observeSentInvites(uid: String): Flow<List<SocialInviteDomainModel>>
+    suspend fun refreshSentInvites(uid: String): AppResult<Unit, AppError>
     suspend fun sendInvite(invite: SocialInviteDomainModel): AppResult<Unit, AppError>
     suspend fun cancelInvite(inviteId: String): AppResult<Unit, AppError>
     suspend fun acceptInvite(inviteId: String): AppResult<Unit, AppError>

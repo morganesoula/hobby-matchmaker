@@ -2,7 +2,10 @@ package com.msoula.hobbymatchmaker.features.social.data.dataSources.local
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.core.common.safeCallStorage
+import com.msoula.hobbymatchmaker.core.database.Social_invitation
 import com.msoula.hobbymatchmaker.core.database.models.SocialCircleMemberDataEntity
+import com.msoula.hobbymatchmaker.core.database.services.SocialInvitationDAO
 import com.msoula.hobbymatchmaker.core.database.services.SocialMemberDAO
 import com.msoula.hobbymatchmaker.core.session.data.dataSources.local.SessionLocalDataSource
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.mappers.toSocialCircleMemberDataEntity
@@ -16,6 +19,7 @@ import kotlinx.coroutines.flow.map
 
 class SocialLocalDataSourceImpl(
     private val sessionLocalDataSource: SessionLocalDataSource,
+    private val socialInvitationDAO: SocialInvitationDAO,
     private val socialMemberDAO: SocialMemberDAO
 ) : SocialLocalDataSource {
 
@@ -92,4 +96,20 @@ class SocialLocalDataSourceImpl(
             members.map { it.toSocialCircleMemberDataEntity(ownerUId) }
         )
     }
+
+    override fun observeIncomingInvites(toPseudo: String): Flow<List<Social_invitation>> =
+        socialInvitationDAO.observeIncomingInvites(toPseudo)
+
+    override suspend fun upsertIncomingInvites(invites: List<Social_invitation>): AppResult<Unit, AppError> =
+        safeCallStorage {
+            socialInvitationDAO.upsertInvites(invites)
+        }
+
+    override fun observeSentInvites(ownerUid: String): Flow<List<Social_invitation>> =
+        socialInvitationDAO.observeSentInvites(ownerUid)
+
+    override suspend fun upsertSentInvites(invites: List<Social_invitation>): AppResult<Unit, AppError> =
+        safeCallStorage {
+            socialInvitationDAO.upsertInvites(invites)
+        }
 }

@@ -5,10 +5,11 @@ import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.flatMap
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.SocialLocalDataSource
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.mappers.toSocialInvitation
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.mappers.toSocialInviteDomainModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.SocialRemoteDataSource
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toInviteData
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toSocialCircleMember
-import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toSocialInviteDomainModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toSocialMemberDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialInviteDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel
@@ -41,18 +42,28 @@ class SocialRepositoryImpl(
         }
 
     override fun observeIncomingInvites(ownerUid: String): Flow<List<SocialInviteDomainModel>> {
-        return socialRemoteDataSource.observeIncomingInvites(ownerUid)
+        return socialLocalDataSource.observeIncomingInvites(ownerUid)
             .map { list ->
                 list.map { invite -> invite.toSocialInviteDomainModel() }
             }
     }
 
+    override suspend fun refreshIncomingInvites(ownerUid: String): AppResult<Unit, AppError> =
+        socialRemoteDataSource.refreshIncomingInvites(ownerUid).flatMap { invites ->
+            socialLocalDataSource.upsertIncomingInvites(invites.map { it.toSocialInvitation() })
+        }
+
     override fun observeSentInvites(uid: String): Flow<List<SocialInviteDomainModel>> {
-        return socialRemoteDataSource.observeSentInvited(uid)
+        return socialLocalDataSource.observeSentInvites(uid)
             .map { list ->
                 list.map { invite -> invite.toSocialInviteDomainModel() }
             }
     }
+
+    override suspend fun refreshSentInvites(uid: String): AppResult<Unit, AppError> =
+        socialRemoteDataSource.refreshSentInvites(uid).flatMap { invites ->
+            socialLocalDataSource.upsertSentInvites(invites.map { it.toSocialInvitation() })
+        }
 
     override suspend fun sendInvite(invite: SocialInviteDomainModel) =
         socialRemoteDataSource.sendInvite(invite.toInviteData())

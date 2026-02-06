@@ -69,8 +69,20 @@ CREATE TABLE IF NOT EXISTS user_cache (
     updated_at INTEGER NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS social_invitation (
+    id TEXT NOT NULL PRIMARY KEY,
+    from_uid TEXT NOT NULL,
+    from_pseudo TEXT,
+    to_pseudo TEXT,
+    name TEXT,
+    status TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER
+);
+
  -- QUERIES --
 
+ --- Queries for movie ---
  insertMovie:
  INSERT INTO movie (
      movieId, title, posterFileName, synopsis, releaseDate, genres, localCoverFilePath,
@@ -182,6 +194,9 @@ SELECT movieId
 FROM movie
 WHERE isFavorite = 1;
 
+
+
+ --- Queries for user_profile ---
 selectUserById:
 SELECT *
 FROM user_profile
@@ -232,6 +247,8 @@ WHERE uid = :uid;
 deleteUserProfileById:
 DELETE FROM user_profile WHERE uid = ?;
 
+
+ --- Queries for social_circle_member ---
 insertSocialMember:
 INSERT OR IGNORE INTO social_circle_member (uid, member_uid, member_name, member_pseudo, member_avatar_url, added_at)
 VALUES (?, ?, ?, ?, ?, ?);
@@ -245,7 +262,9 @@ DELETE FROM social_circle_member WHERE uid = ?;
 selectSocialMembersByUid:
 SELECT * FROM social_circle_member WHERE uid = ?;
 
--- Queries for user_cache
+
+
+--- Queries for user_cache ---
 selectUserByUid:
 SELECT * FROM user_cache WHERE uid = ?;
 
@@ -267,6 +286,42 @@ DELETE FROM user_cache WHERE uid = ?;
 
 deleteAllUsers:
 DELETE FROM user_cache;
+
+
+
+--- Queries for social_invitation ---
+insertSocialInvitation:
+INSERT OR REPLACE INTO social_invitation(id, from_uid, from_pseudo, to_pseudo, name, status, created_at, updated_at)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+getInviteById:
+SELECT * FROM social_invitation
+WHERE id = ?;
+
+updateSocialInvitation:
+UPDATE social_invitation SET
+    status = :status,
+    from_uid = :from_uid,
+    from_pseudo = :from_pseudo,
+    to_pseudo = :to_pseudo,
+    name = :name,
+    status = :status,
+    created_at = :created_at,
+    updated_at = :updated_at
+WHERE id = :id;
+
+observeIncomingInvitations:
+SELECT * FROM social_invitation
+WHERE to_pseudo = ?;
+
+observeSentInvitations:
+SELECT * FROM social_invitation
+WHERE from_uid = ?;
+
+deleteSocialInvitation:
+DELETE FROM social_invitation
+WHERE from_uid = ?;
+
 
 CREATE INDEX IF NOT EXISTS movie_is_favorite ON movie(isFavorite);
 CREATE INDEX IF NOT EXISTS idx_user_profile_uid ON user_profile(uid);

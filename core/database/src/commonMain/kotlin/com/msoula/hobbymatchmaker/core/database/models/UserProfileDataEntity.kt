@@ -10,8 +10,3 @@ data class UserProfileDataEntity(
     val likedCount: Int,
     val circleCount: Int
 )
-
-data class UserProfileWithMembersDataEntity(
-    val profile: UserProfileDataEntity,
-    val members: List<SocialCircleMemberDataEntity>
-)
