@@ -20,7 +20,8 @@ import com.msoula.hobbymatchmaker.features.social.domain.models.SocialInviteDoma
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.ObserveIncomingInvitesSuccess
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.ObserveSentInvitesSuccess
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.SocialUseCases
-import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toInviteUiModel
+import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toIncomingInviteUiModel
+import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toSentInviteUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toSocialSummaryUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.InviteUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUiEventModel
@@ -88,15 +89,6 @@ class SocialViewModel(
 
         // Incoming invitations
         scope.launch {
-            observeWhenAuthenticated(
-                emptyResult = ObserveIncomingInvitesSuccess.Empty,
-                observe = { uid -> socialUseCases.observeIncomingInvitesUseCase(uid) }
-            ).collect { result ->
-                _incomingInvites.update { result.toInvitesUiState() }
-            }
-        }
-
-        scope.launch {
             observeSessionStateUseCase()
                 .flatMapLatest { state ->
                     when (state) {
@@ -104,8 +96,17 @@ class SocialViewModel(
                         is SessionState.Guest, null -> flowOf(null)
                     }
                 }
-                .collect { profile ->
+                .flatMapLatest { profile ->
                     currentUserPseudo = profile?.pseudo
+                    val pseudo = profile?.pseudo
+                    if (pseudo.isNullOrEmpty()) {
+                        flowOf(AppResult.Success(ObserveIncomingInvitesSuccess.Empty))
+                    } else {
+                        socialUseCases.observeIncomingInvitesUseCase(pseudo)
+                    }
+                }
+                .collect { result ->
+                    _incomingInvites.update { result.toInvitesUiState() }
                 }
         }
     }
@@ -125,6 +126,7 @@ class SocialViewModel(
                                 Logger.e("Failed to refresh sent invites: $it")
                             }
                     }
+
                     else -> {}
                 }
             }
@@ -138,11 +140,11 @@ class SocialViewModel(
                 is ObserveIncomingInvitesSuccess.Empty -> UiState.Empty
 
                 is ObserveSentInvitesSuccess.Success -> UiState.Success(
-                    data.invites.map { it.toInviteUiModel() }.toImmutableList()
+                    data.invites.map { it.toSentInviteUiModel() }.toImmutableList()
                 )
 
                 is ObserveIncomingInvitesSuccess.Success -> UiState.Success(
-                    data.invites.map { it.toInviteUiModel() }.toImmutableList()
+                    data.invites.map { it.toIncomingInviteUiModel() }.toImmutableList()
                 )
 
                 else -> UiState.Empty

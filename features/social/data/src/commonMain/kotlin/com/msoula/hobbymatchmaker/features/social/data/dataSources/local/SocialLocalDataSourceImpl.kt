@@ -3,13 +3,15 @@ package com.msoula.hobbymatchmaker.features.social.data.dataSources.local
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.safeCallStorage
-import com.msoula.hobbymatchmaker.core.database.Social_invitation
-import com.msoula.hobbymatchmaker.core.database.models.SocialCircleMemberDataEntity
 import com.msoula.hobbymatchmaker.core.database.services.SocialInvitationDAO
 import com.msoula.hobbymatchmaker.core.database.services.SocialMemberDAO
 import com.msoula.hobbymatchmaker.core.session.data.dataSources.local.SessionLocalDataSource
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.mappers.toSocialCircleMemberDataEntity
-import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.mappers.toSocialCircleMemberDataModel
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.mappers.toSocialInvitation
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.mappers.toSocialInvitationDataModel
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.models.SocialCircleMemberDataModel
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.models.SocialInvitationDataModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
@@ -24,27 +26,16 @@ class SocialLocalDataSourceImpl(
 ) : SocialLocalDataSource {
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun observeSocialCircle(): Flow<List<SocialMemberDomainModel>> =
+    override fun observeSocialCircle(): Flow<List<SocialCircleMemberDataModel>> =
         sessionLocalDataSource.observeCurrentUid()
             .filter { it.isNotEmpty() }
             .flatMapLatest { uid ->
-                socialMemberDAO.observeUserProfileMembers(uid)
-                    .map { entities ->
-                        entities.map { entity ->
-                            SocialMemberDomainModel(
-                                uid = entity.memberUid,
-                                pseudo = entity.memberPseudo
-                                    ?: SocialMemberDomainModel.Initial.pseudo,
-                                name = entity.memberName ?: SocialMemberDomainModel.Initial.name,
-                                avatarUrl = entity.memberAvatarUrl
-                                    ?: SocialMemberDomainModel.Initial.avatarUrl,
-                                commonMoviesCount = SocialMemberDomainModel.Initial.commonMoviesCount
-                            )
-                        }
-                    }
+                socialMemberDAO.observeUserProfileMembers(uid).map { members ->
+                    members.map { it.toSocialCircleMemberDataModel() }
+                }
             }
 
-    override suspend fun addToCircle(member: SocialMemberDomainModel): AppResult<Unit, AppError> {
+    /* override suspend fun addToCircle(member: SocialCircleMemberDataEntity): AppResult<Unit, AppError> {
         val ownerUid = sessionLocalDataSource.observeCurrentUid().first()
 
         if (ownerUid.isEmpty()) return AppResult.Failure(
@@ -58,16 +49,16 @@ class SocialLocalDataSourceImpl(
                 SocialCircleMemberDataEntity(
                     uid = ownerUid,
                     memberUid = member.uid,
-                    memberName = member.name,
-                    memberAvatarUrl = member.avatarUrl,
-                    memberPseudo = member.pseudo
+                    memberName = member.memberName,
+                    memberAvatarUrl = member.memberAvatarUrl,
+                    memberPseudo = member.memberPseudo
                 )
             )
             AppResult.Success(Unit)
         } catch (t: Throwable) {
             AppResult.Failure(AppError.Network.Unknown(t))
         }
-    }
+    } */
 
     override suspend fun removeFromCircle(memberUid: String): AppResult<Unit, AppError> {
         val ownerUid = sessionLocalDataSource.observeCurrentUid().first()
@@ -86,30 +77,34 @@ class SocialLocalDataSourceImpl(
         }
     }
 
-    override suspend fun syncCircle(members: List<SocialMemberDomainModel>) {
+    override suspend fun syncCircle(members: List<SocialCircleMemberDataModel>) {
         val ownerUId = sessionLocalDataSource.observeCurrentUid().first()
 
         if (ownerUId.isEmpty()) return
 
         socialMemberDAO.replaceAll(
             ownerUid = ownerUId,
-            members.map { it.toSocialCircleMemberDataEntity(ownerUId) }
+            members.map { it.toSocialCircleMemberDataEntity() }
         )
     }
 
-    override fun observeIncomingInvites(toPseudo: String): Flow<List<Social_invitation>> =
-        socialInvitationDAO.observeIncomingInvites(toPseudo)
-
-    override suspend fun upsertIncomingInvites(invites: List<Social_invitation>): AppResult<Unit, AppError> =
-        safeCallStorage {
-            socialInvitationDAO.upsertInvites(invites)
+    override fun observeIncomingInvites(toPseudo: String): Flow<List<SocialInvitationDataModel>> =
+        socialInvitationDAO.observeIncomingInvites(toPseudo).map { invitations ->
+            invitations.map { it.toSocialInvitationDataModel() }
         }
 
-    override fun observeSentInvites(ownerUid: String): Flow<List<Social_invitation>> =
-        socialInvitationDAO.observeSentInvites(ownerUid)
-
-    override suspend fun upsertSentInvites(invites: List<Social_invitation>): AppResult<Unit, AppError> =
+    override suspend fun upsertIncomingInvites(invites: List<SocialInvitationDataModel>): AppResult<Unit, AppError> =
         safeCallStorage {
-            socialInvitationDAO.upsertInvites(invites)
+            socialInvitationDAO.upsertInvites(invites.map { it.toSocialInvitation() })
+        }
+
+    override fun observeSentInvites(ownerUid: String): Flow<List<SocialInvitationDataModel>> =
+        socialInvitationDAO.observeSentInvites(ownerUid).map { invitations ->
+            invitations.map { it.toSocialInvitationDataModel() }
+        }
+
+    override suspend fun upsertSentInvites(invites: List<SocialInvitationDataModel>): AppResult<Unit, AppError> =
+        safeCallStorage {
+            socialInvitationDAO.upsertInvites(invites.map { it.toSocialInvitation() })
         }
 }

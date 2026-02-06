@@ -16,8 +16,8 @@ class SocialInvitationDAOImpl(
     private val database: HMMDatabase,
     private val dispatcherProvider: DispatcherProvider
 ) : SocialInvitationDAO {
-    override fun observeIncomingInvites(toUid: String): Flow<List<Social_invitation>> =
-        database.hmm_databaseQueries.observeIncomingInvitations(toUid).asFlow()
+    override fun observeIncomingInvites(toPseudo: String): Flow<List<Social_invitation>> =
+        database.hmm_databaseQueries.observeIncomingInvitations(toPseudo).asFlow()
             .mapToList(dispatcherProvider.io)
 
     override fun observeSentInvites(fromUid: String): Flow<List<Social_invitation>> =

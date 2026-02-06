@@ -2,8 +2,10 @@ package com.msoula.hobbymatchmaker.features.social.presentation.mappers
 
 import com.msoula.hobbymatchmaker.core.common.toTimeAgo
 import com.msoula.hobbymatchmaker.core.design.models.Invitation
+import com.msoula.hobbymatchmaker.features.social.domain.models.InviteStatus
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialInviteDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel
+import com.msoula.hobbymatchmaker.features.social.presentation.models.InviteStatusUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.InviteUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUserSummaryUiModel
 import kotlinx.collections.immutable.ImmutableList
@@ -19,27 +21,32 @@ fun SocialMemberDomainModel.toSocialSummaryUiModel(): SocialUserSummaryUiModel =
         commonMoviesCount = this.commonMoviesCount
     )
 
-fun SocialUserSummaryUiModel.toSocialMemberDomainModel(): SocialMemberDomainModel =
-    SocialMemberDomainModel(
-        uid = this.uid,
-        pseudo = this.pseudo,
-        name = this.name,
-        avatarUrl = this.avatarUrl,
-        commonMoviesCount = this.commonMoviesCount
-    )
-
 @OptIn(ExperimentalTime::class)
-fun SocialInviteDomainModel.toInviteUiModel(): InviteUiModel =
+fun SocialInviteDomainModel.toIncomingInviteUiModel(): InviteUiModel =
     InviteUiModel(
-        ownerId = this.fromUid,
-        ownerPseudo = this.toPseudo ?: InviteUiModel.Initial.ownerPseudo,
         inviteId = this.inviteId,
+        ownerId = "",
+        ownerPseudo = this.toPseudo ?: InviteUiModel.Initial.ownerPseudo,
         guestUid = this.fromUid,
         guestName = this.name ?: "",
         guestPseudo = this.fromPseudo ?: InviteUiModel.Initial.guestPseudo,
         guestAvatarUrl = "",
         inviteTime = this.createdAt.epochSeconds,
-        inviteStatus = this.status
+        inviteStatus = this.status.toInviteStatusUiModel()
+    )
+
+@OptIn(ExperimentalTime::class)
+fun SocialInviteDomainModel.toSentInviteUiModel(): InviteUiModel =
+    InviteUiModel(
+        inviteId = this.inviteId,
+        ownerId = this.fromUid,
+        ownerPseudo = this.fromPseudo ?: InviteUiModel.Initial.guestPseudo,
+        guestUid = "",
+        guestName = this.name ?: "",
+        guestPseudo = this.toPseudo ?: InviteUiModel.Initial.ownerPseudo,
+        guestAvatarUrl = "",
+        inviteTime = this.createdAt.epochSeconds,
+        inviteStatus = this.status.toInviteStatusUiModel()
     )
 
 @OptIn(ExperimentalTime::class)
@@ -60,16 +67,12 @@ fun ImmutableList<InviteUiModel>.toReceivedInvitations(): ImmutableList<Invitati
 }
 
 fun ImmutableList<InviteUiModel>.toSentInvitations(): ImmutableList<Invitation> {
-    return map { invite ->
-        Invitation(
-            ownerId = invite.ownerId,
-            invitationId = invite.inviteId,
-            invitationGuestUid = invite.guestUid,
-            invitationGuestName = invite.guestName,
-            invitationGuestPseudo = invite.ownerPseudo,
-            invitationGuestAvatarUrl = invite.guestAvatarUrl,
-            invitationTime = invite.inviteTime.toTimeAgo(),
-            invitationStatus = invite.inviteStatus.name
-        )
-    }.toImmutableList()
+    return map { it.toInvitation() }.toImmutableList()
 }
+
+fun InviteStatus.toInviteStatusUiModel(): InviteStatusUiModel =
+    when (this) {
+        InviteStatus.ACCEPTED -> InviteStatusUiModel.ACCEPTED
+        InviteStatus.DECLINED -> InviteStatusUiModel.DECLINED
+        InviteStatus.PENDING -> InviteStatusUiModel.PENDING
+    }

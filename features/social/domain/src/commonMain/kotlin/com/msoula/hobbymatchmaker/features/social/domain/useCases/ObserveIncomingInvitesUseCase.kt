@@ -22,8 +22,8 @@ class ObserveIncomingInvitesUseCase(
     private val socialRepository: SocialRepository,
     private val dispatcher: CoroutineDispatcher
 ) {
-    operator fun invoke(ownerUid: String) =
-        socialRepository.observeIncomingInvites(ownerUid)
+    operator fun invoke(toPseudo: String) =
+        socialRepository.observeIncomingInvites(toPseudo)
             .distinctUntilChanged()
             .mapLatest<List<SocialInviteDomainModel>, AppResult<ObserveIncomingInvitesSuccess, AppError>> { list ->
                 if (list.isEmpty()) {

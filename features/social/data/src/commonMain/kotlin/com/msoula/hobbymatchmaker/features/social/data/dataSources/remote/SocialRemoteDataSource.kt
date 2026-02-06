@@ -4,21 +4,19 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.Invite
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.SocialCircleMember
-import com.msoula.hobbymatchmaker.features.social.domain.models.SocialInviteDomainModel
-import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel
 import kotlinx.coroutines.flow.Flow
 
 interface SocialRemoteDataSource {
     suspend fun searchUsersByPseudo(
         pseudo: String,
         ownerUid: String?
-    ): AppResult<List<SocialMemberDomainModel>, AppError>
+    ): AppResult<List<SocialCircleMember>, AppError>
 
     suspend fun findUserByUid(uid: String): AppResult<SocialCircleMember, AppError>
-    fun observeSocialCircle(uid: String): Flow<List<SocialMemberDomainModel>>
+    fun observeSocialCircle(uid: String): Flow<List<SocialCircleMember>>
     suspend fun sendInvite(invite: Invite): AppResult<Unit, AppError>
-    suspend fun refreshIncomingInvites(ownerUid: String): AppResult<List<SocialInviteDomainModel>, AppError>
-    suspend fun refreshSentInvites(ownerUid: String): AppResult<List<SocialInviteDomainModel>, AppError>
+    suspend fun refreshIncomingInvites(ownerUid: String): AppResult<List<Invite>, AppError>
+    suspend fun refreshSentInvites(ownerUid: String): AppResult<List<Invite>, AppError>
     suspend fun markInviteAsAccepted(inviteId: String): AppResult<Unit, AppError>
     suspend fun markInviteAsDeclined(inviteId: String): AppResult<Unit, AppError>
     suspend fun cancelInvitation(inviteId: String): AppResult<Unit, AppError>
@@ -39,7 +37,7 @@ interface SocialRemoteDataSource {
         invitingMemberUid: String
     ): AppResult<Boolean, AppError>
 
-    suspend fun getSocialCircleSnapshot(uid: String): AppResult<List<SocialMemberDomainModel>, AppError>
+    suspend fun getSocialCircleSnapshot(uid: String): AppResult<List<SocialCircleMember>, AppError>
     fun observeIncomingInvites(ownerUid: String): Flow<List<Invite>>
     fun observeSentInvites(ownerUid: String): Flow<List<Invite>>
 }
