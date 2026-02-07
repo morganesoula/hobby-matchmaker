@@ -17,8 +17,8 @@ fun SocialMemberUiModel.toProfileSocialMembers(): ProfileSocialMembers {
 fun SocialMemberUiModel.toUserSummaryDomainModel(): UserSummaryDomainModel =
     UserSummaryDomainModel(
         uid = uid,
-        name = name,
+        name = name ?: UserSummaryDomainModel.Initial.name,
         pseudo = pseudo,
         avatarUrl = avatarUrl,
-        commonMoviesCount = commonMoviesCount
+        commonMoviesCount = commonMoviesCount ?: UserSummaryDomainModel.Initial.commonMoviesCount
     )

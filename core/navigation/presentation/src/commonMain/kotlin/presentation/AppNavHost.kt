@@ -42,12 +42,15 @@ import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailV
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.VideoPlayerState
 import com.msoula.hobbymatchmaker.features.movies.presentation.MovieContent
+import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMembers
 import com.msoula.hobbymatchmaker.features.movies.presentation.MovieViewModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.UserProfileContent
 import com.msoula.hobbymatchmaker.features.profile.presentation.UserProfileViewModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileActions
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileState
+import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiEventModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiStateModel
+import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUiEventModel
 import com.msoula.hobbymatchmaker.features.social.presentation.SocialContent
 import com.msoula.hobbymatchmaker.features.social.presentation.SocialViewModel
 import kotlinx.collections.immutable.toImmutableList
@@ -352,7 +355,7 @@ fun AppNavHost(
                 val userProfileActions = remember(userProfileViewModel, socialViewModel) {
                     UserProfileActions(
                         closeEdition = { userProfileViewModel.closeEdition() },
-                        logOut = { userProfileViewModel.logOut() },
+                        logOut = { userProfileViewModel.onEvent(UserProfileUiEventModel.OnSignUpButtonClicked) },
                         onNavigate = { destination ->
                             when (destination) {
                                 NavigationDestination.SignUp -> navCallbacks.navigateAndClearToAuth()
@@ -361,7 +364,12 @@ fun AppNavHost(
                             }
                         },
                         onEvent = userProfileViewModel::onEvent,
-                        onSocialEvent = socialViewModel::onEvent
+                        onSearchPeople = { query ->
+                            socialViewModel.onEvent(SocialUiEventModel.OnSearchPeople(query))
+                        },
+                        onInviteToSocialCircle = { pseudo, name ->
+                            socialViewModel.onEvent(SocialUiEventModel.OnInviteToSocialCircle(pseudo, name))
+                        }
                     )
                 }
 
@@ -376,9 +384,19 @@ fun AppNavHost(
                     )
                 }
 
+                val mappedSearchResults = searchedPseudos.map { member ->
+                    ProfileSocialMembers(
+                        uid = member.uid,
+                        name = member.name,
+                        pseudo = member.pseudo,
+                        avatarUrl = member.avatarUrl,
+                        commonMoviesCount = member.commonMoviesCount
+                    )
+                }.toImmutableList()
+
                 UserProfileContent(
                     snackBarHostState = snackBarHostState,
-                    searchedPseudos = searchedPseudos,
+                    searchedPseudos = mappedSearchResults,
                     profile = profile,
                     userProfileState = userProfileState,
                     userProfileActions = userProfileActions

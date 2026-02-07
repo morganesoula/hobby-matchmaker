@@ -13,16 +13,3 @@ fun UserProfileDomainModel.toUserProfileRemoteDataModel(): UserProfileRemoteData
         interests = this.interests
     )
 }
-
-fun UserProfileRemoteDataModel.toUserProfileDomainModel(): UserProfileDomainModel {
-    return UserProfileDomainModel(
-        uid = this.uid,
-        name = "",
-        pseudo = "",
-        avatarUrl = "",
-        bio = "",
-        interests = emptyList(),
-        likedMoviesCount = 0,
-        socialCircle = emptyList(),
-    )
-}

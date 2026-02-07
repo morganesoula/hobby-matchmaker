@@ -61,8 +61,6 @@ import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfi
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiEventModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiStateModel
-import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUiEventModel
-import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUserSummaryUiModel
 import io.github.vinceglb.filekit.dialogs.FileKitMode
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
@@ -76,7 +74,7 @@ import org.jetbrains.compose.resources.stringResource
 fun UserProfileContent(
     profile: UserProfileUiModel,
     snackBarHostState: SnackbarHostState,
-    searchedPseudos: ImmutableList<SocialUserSummaryUiModel>,
+    searchedPseudos: ImmutableList<ProfileSocialMembers>,
     userProfileState: UserProfileState,
     userProfileActions: UserProfileActions
 ) {
@@ -249,24 +247,11 @@ fun UserProfileContent(
                                     socialMembers = profile.socialMembers.map { it.toProfileSocialMembers() }
                                         .toImmutableList(),
                                     onSearchPeople = {
-                                        userProfileActions.onSocialEvent(
-                                            SocialUiEventModel.OnSearchPeople(
-                                                it
-                                            )
-                                        )
+                                        userProfileActions.onSearchPeople(it)
                                     },
-                                    searchResult = searchedPseudos.map { member ->
-                                        ProfileSocialMembers(
-                                            uid = member.uid,
-                                            name = member.name,
-                                            pseudo = member.pseudo,
-                                            avatarUrl = member.avatarUrl
-                                        )
-                                    }.toImmutableList(),
+                                    searchResult = searchedPseudos,
                                     onInviteToSocialCircle = { pseudo, name ->
-                                        userProfileActions.onSocialEvent(
-                                            SocialUiEventModel.OnInviteToSocialCircle(pseudo, name)
-                                        )
+                                        userProfileActions.onInviteToSocialCircle(pseudo, name)
                                     }
                                 )
                             },

@@ -17,10 +17,10 @@ data class UserProfileDomainModel(
 
 data class UserSummaryDomainModel(
     val uid: String = "",
-    val name: String? = "",
+    val name: String = "",
     val pseudo: String = "",
     val avatarUrl: String? = "",
-    val commonMoviesCount: Int? = 0
+    val commonMoviesCount: Int = 0
 ) {
     companion object {
         val Initial = UserSummaryDomainModel()

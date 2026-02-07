@@ -2,7 +2,6 @@ package com.msoula.hobbymatchmaker.features.profile.presentation.models
 
 import androidx.compose.runtime.Immutable
 import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
-import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUiEventModel
 
 @Immutable
 data class UserProfileActions(
@@ -10,5 +9,6 @@ data class UserProfileActions(
     val logOut: (String) -> Unit,
     val onNavigate: (NavigationDestination) -> Unit,
     val onEvent: (UserProfileUiEventModel) -> Unit,
-    val onSocialEvent: (SocialUiEventModel) -> Unit
+    val onSearchPeople: (String) -> Unit,
+    val onInviteToSocialCircle: (pseudo: String, name: String?) -> Unit
 )

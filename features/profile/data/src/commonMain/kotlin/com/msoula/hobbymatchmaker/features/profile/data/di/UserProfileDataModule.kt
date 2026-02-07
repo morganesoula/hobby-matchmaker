@@ -16,8 +16,6 @@ val featuresModuleUserProfileData = module {
     single<UserProfileRepository>(createdAtStart = true) {
         UserProfileRepositoryImpl(
             get(),
-            get(),
-            get(),
             get()
         )
     }
