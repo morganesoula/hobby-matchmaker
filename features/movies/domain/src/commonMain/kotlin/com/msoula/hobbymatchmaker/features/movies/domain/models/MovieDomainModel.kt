@@ -1,23 +1,16 @@
 package com.msoula.hobbymatchmaker.features.movies.domain.models
 
 data class MovieDomainModel(
-    var id: Long = 0L,
-    var title: String = "",
-    var coverFileName: String = "",
-    var localCoverFilePath: String = "",
-    var isFavorite: Boolean = false,
-    var isSeen: Boolean = false,
-    var overview: String? = null,
-    var note: Double = 0.0
+    val id: Long = 0L,
+    val title: String = "",
+    val coverFileName: String = "",
+    val localCoverFilePath: String = "",
+    val isFavorite: Boolean = false,
+    val isSeen: Boolean = false,
+    val overview: String? = null,
+    val note: Double = 0.0
 ) {
     companion object {
-        const val DEFAULT_ID: Long = -1L
-        const val DEFAULT_TITLE: String = ""
-        const val DEFAULT_COVER_FILE_NAME: String = ""
-        const val DEFAULT_LOCAL_COVER_FILE_PATH: String = ""
-        const val DEFAULT_IS_FAVORITE: Boolean = false
-        const val DEFAULT_IS_SEEN: Boolean = false
-        const val DEFAULT_OVERVIEW: String = ""
-        const val DEFAULT_NOTE: Double = 0.0
+        val Initial = MovieDomainModel()
     }
 }

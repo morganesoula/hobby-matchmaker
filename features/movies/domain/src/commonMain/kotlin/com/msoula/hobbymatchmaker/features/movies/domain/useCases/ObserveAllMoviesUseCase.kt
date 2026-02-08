@@ -13,9 +13,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 
-sealed class ObserveAllMoviesSuccess {
-    data class Success(val movies: List<MovieDomainModel>) : ObserveAllMoviesSuccess()
-}
+data class ObserveAllMoviesSuccess(val movies: List<MovieDomainModel>)
 
 class ObserveAllMoviesUseCase(
     private val movieRepository: MovieRepository,
@@ -25,11 +23,12 @@ class ObserveAllMoviesUseCase(
         return movieRepository.observeMovies()
             .distinctUntilChanged()
             .map<List<MovieDomainModel>, AppResult<ObserveAllMoviesSuccess, AppError>> { list ->
-                AppResult.Success(ObserveAllMoviesSuccess.Success(list))
+                AppResult.Success(ObserveAllMoviesSuccess(list))
             }
             .catch { e ->
                 Logger.e("ObserveAllMoviesUseCase - Error: $e")
-                val error: AppResult<ObserveAllMoviesSuccess, AppError> = AppResult.Failure(e.toStorageError())
+                val error: AppResult<ObserveAllMoviesSuccess, AppError> =
+                    AppResult.Failure(e.toStorageError())
                 emit(error)
             }
             .flowOn(dispatcher)

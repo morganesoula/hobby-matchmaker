@@ -29,13 +29,11 @@ import com.msoula.hobbymatchmaker.features.social.domain.models.MovieMatchResult
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class MovieViewModel(
     private val interactor: MovieInteractor,
     private val defaultMessageMapper: ErrorMessageMapper,
@@ -67,10 +65,12 @@ class MovieViewModel(
                     is AppResult.Success -> {
                         val movies = result.data
 
-                        if (movies is ObserveAllMoviesSuccess.Success && movies.movies.isEmpty() && !fetchLaunched) {
+                        if (movies.movies.isEmpty() && !fetchLaunched) {
                             fetchLaunched = true
                             launch {
-                                interactor.fetchMovies(language)
+                                interactor.fetchMovies(language).onFailure { error ->
+                                    _movieScreenState.update { mapError(error) }
+                                }
                             }
                         } else {
                             _movieScreenState.update { mapSuccess(movies) }
@@ -89,6 +89,9 @@ class MovieViewModel(
         scope.launch {
             if (interactor.shouldRefreshMovies()) {
                 interactor.fetchMovies(language)
+                    .onFailure { error ->
+                        _movieScreenState.update { mapError(error) }
+                    }
             }
         }
     }
@@ -182,13 +185,10 @@ class MovieViewModel(
             }
     }
 
-    private fun mapSuccess(success: ObserveAllMoviesSuccess): UiState<ImmutableList<MovieUiModel>> =
-        when (success) {
-            is ObserveAllMoviesSuccess.Success -> {
-                val movies = success.movies.map { it.toMovieUiModel() }.toImmutableList()
-                if (movies.isEmpty()) UiState.Empty else UiState.Success(movies.toImmutableList())
-            }
-        }
+    private fun mapSuccess(success: ObserveAllMoviesSuccess): UiState<ImmutableList<MovieUiModel>> {
+        val movies = success.movies.map { it.toMovieUiModel() }.toImmutableList()
+        return if (movies.isEmpty()) UiState.Empty else UiState.Success(movies)
+    }
 
     private fun mapError(error: AppError): UiState.Error =
         UiState.Error(

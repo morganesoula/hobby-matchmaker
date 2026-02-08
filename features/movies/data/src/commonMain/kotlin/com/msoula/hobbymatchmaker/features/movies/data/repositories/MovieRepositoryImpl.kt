@@ -6,9 +6,10 @@ import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.flatMap
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.MovieLocalDataSource
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.MovieSyncPreferences
-import com.msoula.hobbymatchmaker.features.movies.data.dataSources.mappers.toMovieDB
-import com.msoula.hobbymatchmaker.features.movies.data.dataSources.mappers.toMovieDomainModel
+import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.mappers.toMovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.MovieRemoteDataSource
+import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.mappers.toMovieDataModel
+import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.MovieRemoteModel
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.models.PaginationInfo
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.ImageRepository
@@ -53,28 +54,8 @@ class MovieRepositoryImpl(
 
     override suspend fun refreshMovies(language: String): AppResult<Unit, AppError> =
         movieRemoteDataSource.refreshMovies(language).flatMap { movies ->
-            movieLocalDataSource.upsertAll(movies.map { it.toMovieDB() }).flatMap {
-                supervisorScope {
-                    movies.mapNotNull { m ->
-                        val id = m.id ?: return@mapNotNull null
-                        val remotePath = m.poster ?: return@mapNotNull null
-
-                        async {
-                            try {
-                                val local = imageRepository.getRemoteImage(remotePath)
-                                if (!local.isNullOrBlank()) {
-                                    movieLocalDataSource.updateMovieWithLocalCoverFilePath(
-                                        coverFileName = remotePath,
-                                        localCoverFilePath = local,
-                                        movieId = id.toLong()
-                                    )
-                                }
-                            } catch (e: Exception) {
-                                Logger.e("MovieRepositoryImpl - Error downloading image: ${e.message}")
-                            }
-                        }
-                    }.awaitAll()
-                }
+            movieLocalDataSource.upsertAll(movies.map { it.toMovieDataModel() }).flatMap {
+                downloadAndUpdateImages(movies)
                 AppResult.Success(Unit)
             }
         }
@@ -84,29 +65,9 @@ class MovieRepositoryImpl(
         page: Int
     ): AppResult<PaginationInfo, AppError> =
         movieRemoteDataSource.fetchMoviesPage(language, page).flatMap { paginatedMovieResult ->
-            movieLocalDataSource.upsertAll(paginatedMovieResult.movies.map { it.toMovieDB() })
+            movieLocalDataSource.upsertAll(paginatedMovieResult.movies.map { it.toMovieDataModel() })
                 .flatMap {
-                    supervisorScope {
-                        paginatedMovieResult.movies.mapNotNull { movie ->
-                            val id = movie.id ?: return@mapNotNull null
-                            val remotePath = movie.poster ?: return@mapNotNull null
-
-                            async {
-                                try {
-                                    val local = imageRepository.getRemoteImage(remotePath)
-                                    if (!local.isNullOrBlank()) {
-                                        movieLocalDataSource.updateMovieWithLocalCoverFilePath(
-                                            coverFileName = remotePath,
-                                            localCoverFilePath = local,
-                                            movieId = id.toLong()
-                                        )
-                                    }
-                                } catch (e: Exception) {
-                                    Logger.e("MovieRepositoryImpl - Error downloading image: ${e.message}")
-                                }
-                            }
-                        }.awaitAll()
-                    }
+                    downloadAndUpdateImages(paginatedMovieResult.movies)
 
                     movieSyncPreferences.setLastSyncTimestamp(
                         Clock.System.now().toEpochMilliseconds()
@@ -121,6 +82,29 @@ class MovieRepositoryImpl(
                         )
                     )
                 }
+        }
+
+    private suspend fun downloadAndUpdateImages(movies: List<MovieRemoteModel>): List<Unit> =
+        supervisorScope {
+            movies.mapNotNull { movie ->
+                val id = movie.id ?: return@mapNotNull null
+                val remotePath = movie.poster ?: return@mapNotNull null
+
+                async {
+                    try {
+                        val local = imageRepository.getRemoteImage(remotePath)
+                        if (!local.isNullOrBlank()) {
+                            movieLocalDataSource.updateMovieWithLocalCoverFilePath(
+                                coverFileName = remotePath,
+                                localCoverFilePath = local,
+                                movieId = id.toLong()
+                            )
+                        }
+                    } catch (e: Exception) {
+                        Logger.e("MovieRepositoryImpl - Error downloading image: ${e.message}")
+                    }
+                }
+            }.awaitAll()
         }
 
     override suspend fun updateMovieFavoriteLocal(id: Long, isFavorite: Boolean) =

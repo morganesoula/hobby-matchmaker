@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.ImageRepository
 import kotlinx.coroutines.CoroutineDispatcher
@@ -19,9 +21,10 @@ class ImageRepositoryImpl(
     override suspend fun saveRemoteImageAndUpdateMovie(
         coverFileName: String,
         updateMovie: suspend (localImagePath: String) -> Unit
-    ) {
+    ): AppResult<Unit, AppError> {
         val localImagePath = downloadImage(coverFileName)
         localImagePath?.let { updateMovie(it) }
+        return AppResult.Success(Unit)
     }
 
     override suspend fun getRemoteImage(remotePosterPath: String) = downloadImage(remotePosterPath)

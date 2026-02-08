@@ -2,7 +2,6 @@ package com.msoula.hobbymatchmaker.features.movies.presentation.interactors
 
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.AuthState
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfo
-import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutUseCase
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
@@ -24,7 +23,6 @@ class MovieInteractor(
     private val observeAllMoviesUseCase: ObserveAllMoviesUseCase,
     private val refreshMoviesUseCase: RefreshMoviesUseCase,
     private val fetchFirebaseUserInfo: FetchFirebaseUserInfo,
-    private val logOutUseCase: LogOutUseCase,
     private val checkMovieSynopsisValueUseCase: CheckMovieSynopsisValueUseCase,
     private val shouldRefreshMoviesUseCase: ShouldRefreshMoviesUseCase,
     private val loadMoreMoviesUseCase: LoadMoreMoviesUseCase,
@@ -42,8 +40,6 @@ class MovieInteractor(
         loadMoreMoviesUseCase(language, page)
 
     suspend fun shouldRefreshMovies() = shouldRefreshMoviesUseCase()
-
-    suspend fun logOut() = logOutUseCase()
 
     suspend fun toggleFavorite(movieId: Long, isFavorite: Boolean): AppResult<Unit, AppError> {
         return when (val authResult = fetchFirebaseUserInfo()) {

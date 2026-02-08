@@ -1,5 +1,7 @@
 package com.msoula.hobbymatchmaker.features.movies.data.dataSources.local
 
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.ImageRepository
 import io.ktor.util.date.getTimeMillis
@@ -23,8 +25,9 @@ class ImageRepositoryImpl(
     override suspend fun saveRemoteImageAndUpdateMovie(
         coverFileName: String,
         updateMovie: suspend (localImagePath: String) -> Unit
-    ) {
+    ): AppResult<Unit, AppError> {
         downloadImage(coverFileName)?.let { updateMovie(it) }
+        return AppResult.Success(Unit)
     }
 
     override suspend fun getRemoteImage(remotePosterPath: String): String? {

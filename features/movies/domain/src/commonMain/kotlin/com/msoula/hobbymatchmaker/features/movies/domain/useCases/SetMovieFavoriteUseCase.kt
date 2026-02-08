@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.features.movies.domain.useCases
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.core.common.flatMap
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.MovieRepository
 
 class SetMovieFavoriteUseCase(
@@ -12,11 +13,9 @@ class SetMovieFavoriteUseCase(
         id: Long,
         isFavorite: Boolean
     ): AppResult<Unit, AppError> {
-        movieRepository.updateMovieFavoriteLocal(id, isFavorite)
-        return if (uuidUser.isNotBlank()) movieRepository.updateMovieFavoriteRemote(
-            uuidUser,
-            id,
-            isFavorite
-        ) else AppResult.Success(Unit)
+        return movieRepository.updateMovieFavoriteLocal(id, isFavorite).flatMap {
+            if (uuidUser.isNotBlank()) movieRepository.updateMovieFavoriteRemote(uuidUser, id, isFavorite)
+            else AppResult.Success(Unit)
+        }
     }
 }
