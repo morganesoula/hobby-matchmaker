@@ -16,15 +16,16 @@ import com.msoula.hobbymatchmaker.core.design.util.UIErrorHint
 import com.msoula.hobbymatchmaker.core.design.util.UIText
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.design.util.UiState
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieSuccess
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.interactors.MovieDetailInteractor
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.interactors.MovieMatchUiSuccess
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.interactors.MovieSuccess
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiEventModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.toMovieDetailUiModel
-import com.msoula.hobbymatchmaker.features.social.domain.models.MovieMatchResult
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -42,16 +43,20 @@ class MovieDetailViewModel(
     private val _screenState = MutableStateFlow<UiState<MovieDetailUiModel>>(UiState.Loading)
     val screenState = _screenState.asStateFlow()
 
+    private val retryTrigger = MutableStateFlow(0)
+
     private val language = getDeviceLocale()
-    private var currentMovie: MovieDetailUiModel? = MovieDetailUiModel.Initial
 
     init {
-        observeMovieDetail()
+        observeData()
     }
 
-    fun observeMovieDetail() {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun observeData() {
         scope.launch {
-            interactor.observeMovieDetail(movieId, language).collect { result ->
+            retryTrigger.flatMapLatest {
+                interactor.observeMovieDetail(movieId, language)
+            }.collect { result ->
                 _screenState.update {
                     when (result) {
                         is AppResult.Success -> mapDetailSuccess(result.data)
@@ -60,6 +65,11 @@ class MovieDetailViewModel(
                 }
             }
         }
+    }
+
+    fun retryObservation() {
+        _screenState.update { UiState.Loading }
+        retryTrigger.update { it + 1 }
     }
 
     fun onEvent(event: MovieDetailUiEventModel) {
@@ -76,7 +86,10 @@ class MovieDetailViewModel(
 
     private suspend fun playTrailer(isVideoUriKnown: Boolean) {
         if (interactor.canPlayTrailerDirectly(isVideoUriKnown)) {
-            eventHandler.sendEvent(UiEvent.OnDataReady(currentMovie?.videoKey.orEmpty()))
+            val currentState = _screenState.value
+            if (currentState is UiState.Success) {
+                eventHandler.sendEvent(UiEvent.OnDataReady(currentState.data.videoKey))
+            }
             return
         }
 
@@ -116,7 +129,7 @@ class MovieDetailViewModel(
     private suspend fun checkMatchAndNotify(uid: String, movieId: Long) {
         interactor.checkForMovieMatch(uid, movieId)
             .onSuccess { result ->
-                if (result is MovieMatchResult.Match) {
+                if (result is MovieMatchUiSuccess) {
                     eventHandler.sendEvent(
                         UiEvent.ShowSnackBar(
                             UIText.Resource(
@@ -129,15 +142,14 @@ class MovieDetailViewModel(
             }
     }
 
-    private suspend fun mapDetailSuccess(success: ObserveMovieSuccess): UiState<MovieDetailUiModel> =
+    private fun mapDetailSuccess(success: MovieSuccess): UiState<MovieDetailUiModel> =
         when (success) {
-            is ObserveMovieSuccess.Success -> {
-                val uiModel = success.data.toMovieDetailUiModel()
-                currentMovie = uiModel
+            is MovieSuccess.Success -> {
+                val uiModel = success.data
                 UiState.Success(uiModel)
             }
 
-            is ObserveMovieSuccess.DataLoadedInDB -> UiState.Loading
+            is MovieSuccess.Loaded -> UiState.Loading
         }
 
     private fun mapError(error: AppError) =

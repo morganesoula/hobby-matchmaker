@@ -1,5 +1,7 @@
 package com.msoula.hobbymatchmaker.core.user.data.dataSources.remote
 
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.user.domain.models.UserSummaryDomainModel
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
@@ -26,20 +28,23 @@ class UserRemoteDataSourceImpl(
                 )
             }
 
-    override suspend fun getUser(uid: String): UserSummaryDomainModel? {
+    override suspend fun getUser(uid: String): AppResult<UserSummaryDomainModel?, AppError> {
         val doc = firestore
             .collection("users")
             .document(uid)
             .get()
 
-        if (!doc.exists) return null
+        if (!doc.exists) return AppResult.Failure(AppError.Domain.NotFound)
 
-        return UserSummaryDomainModel(
-            uid = uid,
-            pseudo = doc.get<String?>("information.pseudo") ?: return null,
-            name = doc.get<String?>("information.name"),
-            avatarUrl = doc.get<String?>("information.avatarUrl"),
-            moviesLiked = doc.get<List<Long>?>("movies") ?: emptyList()
+        return AppResult.Success(
+            UserSummaryDomainModel(
+                uid = uid,
+                pseudo = doc.get<String?>("information.pseudo")
+                    ?: UserSummaryDomainModel.Initial.pseudo,
+                name = doc.get<String?>("information.name"),
+                avatarUrl = doc.get<String?>("information.avatarUrl"),
+                moviesLiked = doc.get<List<Long>?>("movies") ?: emptyList()
+            )
         )
     }
 

@@ -2,7 +2,7 @@ package com.msoula.hobbymatchmaker.features.social.data.dataSources.local.mapper
 
 import com.msoula.hobbymatchmaker.core.database.Social_invitation
 import com.msoula.hobbymatchmaker.core.database.models.SocialCircleMemberDataEntity
-import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.models.SocialCircleMemberDataModel
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.models.SocialCircleMemberLocalDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.models.SocialInvitationDataModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.InviteStatus
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialInviteDomainModel
@@ -52,8 +52,8 @@ fun SocialInvitationDataModel.toSocialInvitation(): Social_invitation =
         updated_at = this.updatedAt
     )
 
-fun SocialCircleMemberDataEntity.toSocialCircleMemberDataModel(): SocialCircleMemberDataModel =
-    SocialCircleMemberDataModel(
+fun SocialCircleMemberDataEntity.toSocialCircleMemberDataModel(): SocialCircleMemberLocalDataModel =
+    SocialCircleMemberLocalDataModel(
         ownerUid = this.uid,
         memberUid = this.memberUid,
         memberPseudo = this.memberPseudo,
@@ -61,7 +61,7 @@ fun SocialCircleMemberDataEntity.toSocialCircleMemberDataModel(): SocialCircleMe
         memberAvatarUrl = this.memberAvatarUrl
     )
 
-fun SocialCircleMemberDataModel.toSocialCircleMemberDataEntity(): SocialCircleMemberDataEntity =
+fun SocialCircleMemberLocalDataModel.toSocialCircleMemberDataEntity(): SocialCircleMemberDataEntity =
     SocialCircleMemberDataEntity(
         uid = this.ownerUid,
         memberUid = this.memberUid,

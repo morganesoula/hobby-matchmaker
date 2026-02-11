@@ -1,22 +1,23 @@
 package com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers
 
-import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.models.SocialCircleMemberDataModel
+import com.msoula.hobbymatchmaker.core.user.domain.models.UserSummaryDomainModel
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.models.SocialCircleMemberLocalDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.models.SocialInvitationDataModel
-import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.Invite
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.InviteDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.InviteStatusData
-import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.SocialCircleMember
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.SocialCircleMemberRemoteDataModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.InviteStatus
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialInviteDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
-fun SocialInviteDomainModel.toInviteData(): Invite {
-    return Invite(
+fun SocialInviteDomainModel.toInviteData(): InviteDataModel {
+    return InviteDataModel(
         inviteId = inviteId,
         fromUid = fromUid,
-        fromPseudo = fromPseudo ?: Invite.Initial.fromPseudo,
-        toPseudo = toPseudo ?: Invite.Initial.toPseudo,
+        fromPseudo = fromPseudo ?: InviteDataModel.Initial.fromPseudo,
+        toPseudo = toPseudo ?: InviteDataModel.Initial.toPseudo,
         name = name,
         status = status.toInviteStatusData(),
         createdAt = createdAt,
@@ -24,8 +25,8 @@ fun SocialInviteDomainModel.toInviteData(): Invite {
     )
 }
 
-fun SocialMemberDomainModel.toSocialCircleMember(ownerUid: String): SocialCircleMember {
-    return SocialCircleMember(
+fun SocialMemberDomainModel.toSocialCircleMember(ownerUid: String): SocialCircleMemberRemoteDataModel {
+    return SocialCircleMemberRemoteDataModel(
         uid = this.uid,
         ownerUid = ownerUid,
         pseudo = this.pseudo,
@@ -36,7 +37,7 @@ fun SocialMemberDomainModel.toSocialCircleMember(ownerUid: String): SocialCircle
     )
 }
 
-fun SocialCircleMember.toSocialMemberDomainModel(): SocialMemberDomainModel =
+fun SocialCircleMemberRemoteDataModel.toSocialMemberDomainModel(): SocialMemberDomainModel =
     SocialMemberDomainModel(
         uid = this.uid,
         pseudo = this.pseudo,
@@ -44,15 +45,26 @@ fun SocialCircleMember.toSocialMemberDomainModel(): SocialMemberDomainModel =
         avatarUrl = this.avatarUrl,
         moviesLiked = this.moviesLiked,
         commonMoviesCount = this.commonMoviesCount
+            ?: SocialMemberDomainModel.Initial.commonMoviesCount
     )
 
-fun SocialCircleMember.toSocialCircleMemberDataModel(): SocialCircleMemberDataModel =
-    SocialCircleMemberDataModel(
+fun SocialCircleMemberRemoteDataModel.toSocialCircleMemberDataModel(): SocialCircleMemberLocalDataModel =
+    SocialCircleMemberLocalDataModel(
         ownerUid = this.ownerUid,
         memberUid = this.uid,
         memberPseudo = this.pseudo,
         memberName = this.name,
         memberAvatarUrl = this.avatarUrl
+    )
+
+fun UserSummaryDomainModel.toSocialMemberDomainModel(commonMoviesCount: Int = 0) =
+    SocialMemberDomainModel(
+        uid = this.uid,
+        pseudo = this.pseudo,
+        name = this.name,
+        avatarUrl = this.avatarUrl,
+        moviesLiked = this.moviesLiked,
+        commonMoviesCount = commonMoviesCount
     )
 
 fun InviteStatus.toInviteStatusData(): InviteStatusData =
@@ -69,7 +81,7 @@ fun String.toInviteStatusData(): InviteStatusData =
         else -> InviteStatusData.DECLINED
     }
 
-fun Invite.toSocialInvitationDataModel(): SocialInvitationDataModel =
+fun InviteDataModel.toSocialInvitationDataModel(): SocialInvitationDataModel =
     SocialInvitationDataModel(
         id = this.inviteId,
         fromUid = this.fromUid,

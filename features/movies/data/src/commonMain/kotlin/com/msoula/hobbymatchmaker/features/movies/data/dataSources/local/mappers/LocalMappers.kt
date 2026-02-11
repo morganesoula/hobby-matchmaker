@@ -1,17 +1,16 @@
 package com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.mappers
 
 import com.msoula.hobbymatchmaker.core.database.Movie
-import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.models.MovieDataModel
+import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.models.MovieLocalDataModel
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
-import kotlin.collections.emptyList
 
-fun Movie.toMovieDataModel(): MovieDataModel =
-    MovieDataModel(
+fun Movie.toMovieDataModel(): MovieLocalDataModel =
+    MovieLocalDataModel(
         id = this.movieId,
-        title = this.title ?: MovieDataModel.Initial.title,
+        title = this.title ?: MovieLocalDataModel.Initial.title,
         overview = this.synopsis ?: "",
-        localPoster = this.localCoverFilePath ?: MovieDataModel.Initial.localPoster,
-        remotePoster = this.posterFileName ?: MovieDataModel.Initial.remotePoster,
+        localPoster = this.localCoverFilePath ?: MovieLocalDataModel.Initial.localPoster,
+        remotePoster = this.posterFileName ?: MovieLocalDataModel.Initial.remotePoster,
         releaseDate = this.releaseDate ?: "",
         genres = this.genres?.split(",") ?: emptyList(),
         isFavorite = this.isFavorite == 1L,
@@ -23,7 +22,7 @@ fun Movie.toMovieDataModel(): MovieDataModel =
         note = this.note
     )
 
-fun MovieDataModel.toMovie(): Movie =
+fun MovieLocalDataModel.toMovie(): Movie =
     Movie(
         movieId = this.id,
         title = this.title,
@@ -41,7 +40,7 @@ fun MovieDataModel.toMovie(): Movie =
         note = this.note
     )
 
-fun MovieDataModel.toMovieDomainModel(): MovieDomainModel =
+fun MovieLocalDataModel.toMovieDomainModel(): MovieDomainModel =
     MovieDomainModel(
         id = this.id,
         title = this.title,

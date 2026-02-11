@@ -2,7 +2,7 @@ package com.msoula.hobbymatchmaker.features.movies.domain.useCases
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
-import com.msoula.hobbymatchmaker.features.movies.domain.models.PaginationInfo
+import com.msoula.hobbymatchmaker.features.movies.domain.models.PaginationInfoDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.MovieRepository
 
 class LoadMoreMoviesUseCase(
@@ -11,6 +11,6 @@ class LoadMoreMoviesUseCase(
     suspend operator fun invoke(
         language: String,
         page: Int
-    ): AppResult<PaginationInfo, AppError> =
+    ): AppResult<PaginationInfoDomainModel, AppError> =
         movieRepository.loadMoreMovies(language, page)
 }

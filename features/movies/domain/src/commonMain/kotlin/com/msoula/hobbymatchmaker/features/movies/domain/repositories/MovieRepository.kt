@@ -3,7 +3,7 @@ package com.msoula.hobbymatchmaker.features.movies.domain.repositories
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
-import com.msoula.hobbymatchmaker.features.movies.domain.models.PaginationInfo
+import com.msoula.hobbymatchmaker.features.movies.domain.models.PaginationInfoDomainModel
 import kotlinx.coroutines.flow.Flow
 
 interface MovieRepository {
@@ -24,7 +24,7 @@ interface MovieRepository {
     ): AppResult<Unit, AppError>
 
     suspend fun refreshMovies(language: String): AppResult<Unit, AppError>
-    suspend fun loadMoreMovies(language: String, page: Int): AppResult<PaginationInfo, AppError>
+    suspend fun loadMoreMovies(language: String, page: Int): AppResult<PaginationInfoDomainModel, AppError>
     suspend fun isSynopsisMovieAvailable(movieId: Long): AppResult<Boolean, AppError>
     suspend fun getFavoriteLocalMovieIds(): AppResult<List<Long>, AppError>
     suspend fun syncUserFavoritesRemote(

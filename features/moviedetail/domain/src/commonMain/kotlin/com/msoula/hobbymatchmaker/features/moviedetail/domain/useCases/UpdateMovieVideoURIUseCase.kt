@@ -1,5 +1,7 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases
 
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.repositories.MovieDetailRepository
 
 class UpdateMovieVideoURIUseCase(
@@ -8,5 +10,5 @@ class UpdateMovieVideoURIUseCase(
     suspend operator fun invoke(
         movieId: Long,
         videoURI: String
-    ) = movieDetailRepository.updateMovieVideoURI(movieId, videoURI)
+    ): AppResult<Unit, AppError> = movieDetailRepository.updateMovieVideoURI(movieId, videoURI)
 }

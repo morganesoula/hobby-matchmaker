@@ -1,22 +1,22 @@
 package com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.mappers
 
-import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.models.MovieDataModel
-import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.MovieRemoteModel
+import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.models.MovieLocalDataModel
+import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.MovieRemoteDataModel
 
-fun MovieRemoteModel.toMovieDataModel(): MovieDataModel =
-    MovieDataModel(
-        id = this.id?.toLong() ?: MovieDataModel.Initial.id,
-        title = this.title ?: MovieDataModel.Initial.title,
-        overview = MovieDataModel.Initial.overview,
-        remotePoster = this.poster ?: MovieDataModel.Initial.remotePoster,
-        localPoster = MovieDataModel.Initial.localPoster,
-        releaseDate = MovieDataModel.Initial.releaseDate,
-        genres = MovieDataModel.Initial.genres,
-        isFavorite = MovieDataModel.Initial.isFavorite,
-        isSeen = MovieDataModel.Initial.isSeen,
+fun MovieRemoteDataModel.toMovieDataModel(): MovieLocalDataModel =
+    MovieLocalDataModel(
+        id = this.id?.toLong() ?: MovieLocalDataModel.Initial.id,
+        title = this.title ?: MovieLocalDataModel.Initial.title,
+        overview = MovieLocalDataModel.Initial.overview,
+        remotePoster = this.poster ?: MovieLocalDataModel.Initial.remotePoster,
+        localPoster = MovieLocalDataModel.Initial.localPoster,
+        releaseDate = MovieLocalDataModel.Initial.releaseDate,
+        genres = MovieLocalDataModel.Initial.genres,
+        isFavorite = MovieLocalDataModel.Initial.isFavorite,
+        isSeen = MovieLocalDataModel.Initial.isSeen,
         popularity = this.popularity,
-        status = MovieDataModel.Initial.status,
-        videoKey = MovieDataModel.Initial.videoKey,
-        duration = MovieDataModel.Initial.duration,
+        status = MovieLocalDataModel.Initial.status,
+        videoKey = MovieLocalDataModel.Initial.videoKey,
+        duration = MovieLocalDataModel.Initial.duration,
         note = this.note
     )

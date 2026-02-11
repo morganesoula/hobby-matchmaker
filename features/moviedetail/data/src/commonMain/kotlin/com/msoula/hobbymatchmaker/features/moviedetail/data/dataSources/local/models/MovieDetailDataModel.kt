@@ -1,11 +1,10 @@
-package com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.models
+package com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.local.models
 
-data class MovieDataModel(
+data class MovieDetailDataModel(
     val id: Long = 0L,
     val title: String = "",
     val overview: String = "",
-    val remotePoster: String = "",
-    val localPoster: String? = null,
+    val poster: String = "",
     val releaseDate: String = "",
     val genres: List<String> = emptyList(),
     val isFavorite: Boolean = false,
@@ -14,9 +13,11 @@ data class MovieDataModel(
     val status: String? = null,
     val videoKey: String? = null,
     val duration: Long? = null,
-    val note: Double? = null
+    val note: Double? = null,
+    val actors: List<ActorDataModel>? = null,
+    val hasCast: Boolean = false
 ) {
     companion object {
-        val Initial = MovieDataModel()
+        val Initial = MovieDetailDataModel()
     }
 }

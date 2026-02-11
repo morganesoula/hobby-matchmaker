@@ -6,13 +6,13 @@ import com.msoula.hobbymatchmaker.core.common.safeCallStorage
 import com.msoula.hobbymatchmaker.core.database.services.MovieDAOImpl
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.mappers.toMovie
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.mappers.toMovieDataModel
-import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.models.MovieDataModel
+import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.models.MovieLocalDataModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class MovieLocalDataSourceImpl(private val movieDAO: MovieDAOImpl) : MovieLocalDataSource {
 
-    override fun observeMovies(): Flow<List<MovieDataModel>> {
+    override fun observeMovies(): Flow<List<MovieLocalDataModel>> {
         return movieDAO.observeMovies().map { movies -> movies.map { it.toMovieDataModel() } }
     }
 
@@ -32,7 +32,7 @@ class MovieLocalDataSourceImpl(private val movieDAO: MovieDAOImpl) : MovieLocalD
         movieDAO.updateMovieFavorite(id, isFavoriteDB)
     }
 
-    override suspend fun insertMovie(movie: MovieDataModel): AppResult<Unit, AppError> =
+    override suspend fun insertMovie(movie: MovieLocalDataModel): AppResult<Unit, AppError> =
         safeCallStorage {
             movieDAO.insertMovie(movie.toMovie())
         }
@@ -45,7 +45,7 @@ class MovieLocalDataSourceImpl(private val movieDAO: MovieDAOImpl) : MovieLocalD
         movieDAO.updateMovieCover(coverFileName, localCoverFilePath, movieId)
     }
 
-    override suspend fun upsertAll(movies: List<MovieDataModel>): AppResult<Unit, AppError> =
+    override suspend fun upsertAll(movies: List<MovieLocalDataModel>): AppResult<Unit, AppError> =
         safeCallStorage {
             movieDAO.upsertMovies(movies.map { movie -> movie.toMovie() })
         }

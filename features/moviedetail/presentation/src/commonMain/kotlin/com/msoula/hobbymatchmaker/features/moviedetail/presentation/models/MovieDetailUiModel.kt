@@ -1,17 +1,7 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.presentation.models
 
 import com.msoula.hobbymatchmaker.core.common.extractYear
-import com.msoula.hobbymatchmaker.core.design.Res
-import com.msoula.hobbymatchmaker.core.design.movie_canceled
-import com.msoula.hobbymatchmaker.core.design.movie_in_production
-import com.msoula.hobbymatchmaker.core.design.movie_planned
-import com.msoula.hobbymatchmaker.core.design.movie_post_production
-import com.msoula.hobbymatchmaker.core.design.movie_released
-import com.msoula.hobbymatchmaker.core.design.movie_rumored
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.GenreDomainModel
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieActorDomainModel
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieDetailDomainModel
-import org.jetbrains.compose.resources.getString
 
 data class MovieDetailUiModel(
     val id: Long = -1,
@@ -23,7 +13,8 @@ data class MovieDetailUiModel(
     val releaseDate: String = "",
     val status: String = "",
     val popularity: Double = 0.0,
-    val cast: Map<String, String> = emptyMap(),
+    val hasCast: Boolean = true,
+    val cast: List<MovieDetailActorUiModel> = emptyList(),
     val videoKey: String = "",
     val duration: Int = -1
 ) {
@@ -32,9 +23,9 @@ data class MovieDetailUiModel(
     }
 }
 
-suspend fun MovieDetailDomainModel.toMovieDetailUiModel(): MovieDetailUiModel {
-    val local = this.localCoverFilePath.orEmpty()
-    val remote = this.coverFileName.orEmpty()
+fun MovieDetailDomainModel.toMovieDetailUiModel(): MovieDetailUiModel {
+    val local = this.localCoverFilePath
+    val remote = this.coverFileName
 
     val resolvedPoster = when {
         local.startsWith("file://", ignoreCase = true) -> local
@@ -47,36 +38,29 @@ suspend fun MovieDetailDomainModel.toMovieDetailUiModel(): MovieDetailUiModel {
         remote.startsWith("http", ignoreCase = true) -> remote
         remote.startsWith("/") -> "https://image.tmdb.org/t/p/w500$remote"
 
-        else -> MovieDetailDomainModel.DEFAULT_POSTER_PATH
+        else -> MovieDetailDomainModel.Initial.coverFileName
     }
 
     return MovieDetailUiModel(
-        id = this.id ?: MovieDetailDomainModel.DEFAULT_ID,
-        title = this.title ?: MovieDetailDomainModel.DEFAULT_TITLE,
-        isFavorite = this.isFavorite ?: MovieDetailDomainModel.DEFAULT_IS_FAVORITE,
-        synopsis = this.synopsis ?: MovieDetailDomainModel.DEFAULT_SYNOPSIS,
+        id = this.id,
+        title = this.title,
+        isFavorite = this.isFavorite,
+        synopsis = this.synopsis,
         posterPath = resolvedPoster,
-        genre = this.genre?.map { it.name } ?: listOf(GenreDomainModel.DEFAULT_NAME),
-        releaseDate = this.releaseDate?.extractYear()
-            ?: MovieDetailDomainModel.DEFAULT_RELEASE_DATE,
-        status = this.status?.mapStatus() ?: MovieDetailDomainModel.DEFAULT_STATUS,
-        popularity = this.popularity ?: MovieDetailDomainModel.DEFAULT_POPULARITY,
-        cast = this.cast?.associate { actor ->
-            (actor.name ?: MovieActorDomainModel.DEFAULT_NAME) to
-                (actor.role ?: MovieActorDomainModel.DEFAULT_ROLE)
-        } ?: emptyMap(),
-        videoKey = this.videoKey ?: MovieDetailDomainModel.DEFAULT_VIDEO_KEY,
-        duration = this.duration ?: MovieDetailDomainModel.DEFAULT_DURATION
+        genre = this.genre.map { it.name },
+        releaseDate = this.releaseDate.extractYear(),
+        status = this.status,
+        popularity = this.popularity,
+        cast = this.cast
+            .filter { it.name.isNotBlank() }
+            .map {
+                MovieDetailActorUiModel(
+                    name = it.name,
+                    role = it.role
+                )
+            },
+        videoKey = this.videoKey,
+        duration = this.duration,
+        hasCast = this.cast.isNotEmpty()
     )
 }
-
-private suspend fun String.mapStatus(): String =
-    when (this.trim()) {
-        "Rumored" -> getString(Res.string.movie_rumored)
-        "Planned" -> getString(Res.string.movie_planned)
-        "In Production" -> getString(Res.string.movie_in_production)
-        "Post Production" -> getString(Res.string.movie_post_production)
-        "Released" -> getString(Res.string.movie_released)
-        "Canceled" -> getString(Res.string.movie_canceled)
-        else -> this
-    }

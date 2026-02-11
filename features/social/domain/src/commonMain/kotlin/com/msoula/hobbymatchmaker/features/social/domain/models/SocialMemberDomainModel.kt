@@ -6,7 +6,7 @@ data class SocialMemberDomainModel(
     val name: String? = "",
     val avatarUrl: String? = "",
     val moviesLiked: List<Long>? = emptyList(),
-    val commonMoviesCount: Int? = 0
+    val commonMoviesCount: Int = 0
 ) {
     companion object {
         val Initial = SocialMemberDomainModel()

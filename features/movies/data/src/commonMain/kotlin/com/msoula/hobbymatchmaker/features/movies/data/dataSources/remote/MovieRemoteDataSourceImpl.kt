@@ -4,7 +4,7 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.common.safeFirebaseCall
-import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.MovieRemoteModel
+import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.MovieRemoteDataModel
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.PaginatedMovieResult
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.services.TMDBKtorService
 import dev.gitlive.firebase.firestore.FieldValue
@@ -15,9 +15,9 @@ class MovieRemoteDataSourceImpl(
     private val tmdbKtorService: TMDBKtorService
 ) : MovieRemoteDataSource {
 
-    override suspend fun refreshMovies(language: String): AppResult<List<MovieRemoteModel>, AppError> {
+    override suspend fun refreshMovies(language: String): AppResult<List<MovieRemoteDataModel>, AppError> {
         val pages = listOf(1, 2, 3)
-        val movies = mutableListOf<MovieRemoteModel>()
+        val movies = mutableListOf<MovieRemoteDataModel>()
 
         for (page in pages) {
             when (val result = fetchMoviesByPage(language, page)) {
@@ -69,7 +69,7 @@ class MovieRemoteDataSourceImpl(
     private suspend fun fetchMoviesByPage(
         language: String,
         page: Int
-    ): AppResult<List<MovieRemoteModel>, AppError> =
+    ): AppResult<List<MovieRemoteDataModel>, AppError> =
         tmdbKtorService.getMoviesByPopularityDesc(language, page)
             .mapSuccess { response -> response.results ?: emptyList() }
 }

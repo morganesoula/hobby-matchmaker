@@ -12,14 +12,14 @@ interface MovieDetailRepository {
     suspend fun fetchMovieDetail(
         movieId: Long,
         language: String
-    ): AppResult<MovieDetailDomainModel?, AppError>
+    ): AppResult<MovieDetailDomainModel, AppError>
 
     suspend fun fetchMovieCredit(
         movieId: Long,
         language: String
-    ): AppResult<List<MovieActorDomainModel>?, AppError>
+    ): AppResult<List<MovieActorDomainModel>, AppError>
 
-    fun observeMovieDetail(movieId: Long): Flow<MovieDetailDomainModel?>
+    fun observeMovieDetail(movieId: Long): Flow<AppResult<MovieDetailDomainModel, AppError>>
 
     suspend fun saveMovieDetail(movieDetailDomainModel: MovieDetailDomainModel): AppResult<Unit, AppError>
 
@@ -31,5 +31,5 @@ interface MovieDetailRepository {
     suspend fun fetchMovieTrailer(
         movieId: Long,
         language: String
-    ): AppResult<MovieVideoDomainModel?, AppError>
+    ): AppResult<MovieVideoDomainModel, AppError>
 }

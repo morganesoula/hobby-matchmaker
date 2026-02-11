@@ -9,9 +9,9 @@ import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.MovieSy
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.mappers.toMovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.MovieRemoteDataSource
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.mappers.toMovieDataModel
-import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.MovieRemoteModel
+import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.MovieRemoteDataModel
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
-import com.msoula.hobbymatchmaker.features.movies.domain.models.PaginationInfo
+import com.msoula.hobbymatchmaker.features.movies.domain.models.PaginationInfoDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.ImageRepository
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.MovieRepository
 import kotlinx.coroutines.async
@@ -63,7 +63,7 @@ class MovieRepositoryImpl(
     override suspend fun loadMoreMovies(
         language: String,
         page: Int
-    ): AppResult<PaginationInfo, AppError> =
+    ): AppResult<PaginationInfoDomainModel, AppError> =
         movieRemoteDataSource.fetchMoviesPage(language, page).flatMap { paginatedMovieResult ->
             movieLocalDataSource.upsertAll(paginatedMovieResult.movies.map { it.toMovieDataModel() })
                 .flatMap {
@@ -75,7 +75,7 @@ class MovieRepositoryImpl(
                     movieSyncPreferences.setLastLoadedPage(paginatedMovieResult.currentPage)
 
                     AppResult.Success(
-                        PaginationInfo(
+                        PaginationInfoDomainModel(
                             currentPage = paginatedMovieResult.currentPage,
                             totalPages = paginatedMovieResult.totalPages,
                             hasMore = paginatedMovieResult.hasMore
@@ -84,7 +84,7 @@ class MovieRepositoryImpl(
                 }
         }
 
-    private suspend fun downloadAndUpdateImages(movies: List<MovieRemoteModel>): List<Unit> =
+    private suspend fun downloadAndUpdateImages(movies: List<MovieRemoteDataModel>): List<Unit> =
         supervisorScope {
             movies.mapNotNull { movie ->
                 val id = movie.id ?: return@mapNotNull null

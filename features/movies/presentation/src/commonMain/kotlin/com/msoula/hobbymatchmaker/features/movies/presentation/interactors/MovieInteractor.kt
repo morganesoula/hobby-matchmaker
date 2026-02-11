@@ -5,7 +5,7 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFireb
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
-import com.msoula.hobbymatchmaker.features.movies.domain.models.PaginationInfo
+import com.msoula.hobbymatchmaker.features.movies.domain.models.PaginationInfoDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.CheckMovieSynopsisValueUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.LoadMoreMoviesUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesSuccess
@@ -36,7 +36,7 @@ class MovieInteractor(
     suspend fun fetchMovies(language: String): AppResult<Unit, AppError> =
         refreshMoviesUseCase(language)
 
-    suspend fun loadMoreMovies(language: String, page: Int): AppResult<PaginationInfo, AppError> =
+    suspend fun loadMoreMovies(language: String, page: Int): AppResult<PaginationInfoDomainModel, AppError> =
         loadMoreMoviesUseCase(language, page)
 
     suspend fun shouldRefreshMovies() = shouldRefreshMoviesUseCase()

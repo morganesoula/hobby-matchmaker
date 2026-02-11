@@ -310,7 +310,7 @@ fun AppNavHost(
                 onVideoPlayerDismissed = {
                     videoPlayerState = videoPlayerState.copy(isVisible = false)
                 },
-                observeMovieDetail = { movieDetailViewModel.observeMovieDetail() },
+                retryObservation = { movieDetailViewModel.retryObservation() },
                 onEvent = movieDetailViewModel::onEvent
             )
         }
@@ -368,7 +368,12 @@ fun AppNavHost(
                             socialViewModel.onEvent(SocialUiEventModel.OnSearchPeople(query))
                         },
                         onInviteToSocialCircle = { pseudo, name ->
-                            socialViewModel.onEvent(SocialUiEventModel.OnInviteToSocialCircle(pseudo, name))
+                            socialViewModel.onEvent(
+                                SocialUiEventModel.OnInviteToSocialCircle(
+                                    pseudo,
+                                    name
+                                )
+                            )
                         }
                     )
                 }

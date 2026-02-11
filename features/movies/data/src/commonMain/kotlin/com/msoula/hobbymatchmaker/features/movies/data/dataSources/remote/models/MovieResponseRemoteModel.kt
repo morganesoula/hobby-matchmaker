@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MovieResponseRemoteModel(
     @SerialName("page") val page: Int? = null,
-    @SerialName("results") val results: List<MovieRemoteModel>? = null,
+    @SerialName("results") val results: List<MovieRemoteDataModel>? = null,
     @SerialName("total_pages") val totalPages: Int? = null
 )

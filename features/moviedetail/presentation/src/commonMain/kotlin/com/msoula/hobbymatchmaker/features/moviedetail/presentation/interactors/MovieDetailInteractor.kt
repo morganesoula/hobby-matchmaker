@@ -6,21 +6,46 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
-import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ManageMovieTrailerUseCase
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.FetchMovieTrailerUseCase
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieDetailUseCase
+import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieSuccess
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MatchingMemberUiModel
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.toMovieDetailUiModel
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.SetMovieFavoriteUseCase
+import com.msoula.hobbymatchmaker.features.social.domain.models.MovieMatchResult
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.CheckMovieMatchUseCase
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class MovieDetailInteractor(
     private val observeMovieDetailUseCase: ObserveMovieDetailUseCase,
-    private val manageMovieTrailerUseCase: ManageMovieTrailerUseCase,
+    private val fetchMovieTrailerUseCase: FetchMovieTrailerUseCase,
     private val setMovieFavoriteUseCase: SetMovieFavoriteUseCase,
     private val fetchFirebaseUserInfo: FetchFirebaseUserInfo,
     private val checkMovieMatchUseCase: CheckMovieMatchUseCase,
     private val connectivityChecker: NetworkConnectivityChecker
 ) {
-    fun observeMovieDetail(movieId: Long, language: String) =
-        observeMovieDetailUseCase(movieId, language)
+    fun observeMovieDetail(
+        movieId: Long,
+        language: String
+    ): Flow<AppResult<MovieSuccess, AppError>> =
+        observeMovieDetailUseCase(movieId, language).map { result ->
+            when (result) {
+                is AppResult.Success -> {
+                    when (val data = result.data) {
+                        is ObserveMovieSuccess.Success -> AppResult.Success(
+                            MovieSuccess.Success(data.data.toMovieDetailUiModel())
+                        )
+
+                        is ObserveMovieSuccess.DataLoadedInDB -> AppResult.Success(MovieSuccess.Loaded)
+                    }
+                }
+
+                is AppResult.Failure -> AppResult.Failure(result.error)
+            }
+        }
+
 
     fun canPlayTrailerDirectly(
         isVideoUriKnown: Boolean
@@ -29,7 +54,7 @@ class MovieDetailInteractor(
     suspend fun fetchTrailer(
         movieId: Long,
         language: String
-    ) = manageMovieTrailerUseCase(movieId, language).mapSuccess { it.videoURI }
+    ) = fetchMovieTrailerUseCase(movieId, language).mapSuccess { it.videoURI }
 
     suspend fun toggleFavorite(movieId: Long, isFavorite: Boolean): AppResult<Unit, AppError> {
         return when (val authResult = fetchFirebaseUserInfo()) {
@@ -60,5 +85,22 @@ class MovieDetailInteractor(
     }
 
     suspend fun checkForMovieMatch(uid: String, movieId: Long) =
-        checkMovieMatchUseCase(uid, movieId)
+        checkMovieMatchUseCase(uid, movieId).mapSuccess { result ->
+            when (result) {
+                is MovieMatchResult.Match -> MovieMatchUiSuccess(result.matchingMemberDomainModels.map {
+                    MatchingMemberUiModel(
+                        it.displayName, it.avatarUrl
+                    )
+                })
+
+                else -> Unit
+            }
+        }
 }
+
+sealed interface MovieSuccess {
+    data class Success(val data: MovieDetailUiModel) : MovieSuccess
+    data object Loaded : MovieSuccess
+}
+
+class MovieMatchUiSuccess(val matchingMembers: List<MatchingMemberUiModel>)

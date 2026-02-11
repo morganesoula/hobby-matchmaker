@@ -1,8 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="data">
     <output-path>$PROJECT_DIR$/features/social/data/build/libs</output-path>
-    <root id="archive" name="data.jar">
-      <element id="module-output" name="HobbyMatchmaker.features.social.data.androidMain" />
-    </root>
+    <root id="archive" name="data.jar" />
   </artifact>
 </component>

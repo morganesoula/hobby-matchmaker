@@ -67,12 +67,19 @@ import com.msoula.hobbymatchmaker.core.design.models.Casting
 import com.msoula.hobbymatchmaker.core.design.molecules.MovieInformationMetaPill
 import com.msoula.hobbymatchmaker.core.design.molecules.MovieOverviewExpandable
 import com.msoula.hobbymatchmaker.core.design.molecules.MovieTitleMetaPill
+import com.msoula.hobbymatchmaker.core.design.movie_canceled
+import com.msoula.hobbymatchmaker.core.design.movie_in_production
+import com.msoula.hobbymatchmaker.core.design.movie_planned
+import com.msoula.hobbymatchmaker.core.design.movie_post_production
+import com.msoula.hobbymatchmaker.core.design.movie_released
+import com.msoula.hobbymatchmaker.core.design.movie_rumored
 import com.msoula.hobbymatchmaker.core.design.play_icon_accessibility
 import com.msoula.hobbymatchmaker.core.design.play_trailer
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -195,7 +202,7 @@ fun MovieDetailInformation(
                 )
                 .fillMaxSize()
         ) {
-            StatusChip(status = status)
+            StatusChip(status = mapStatus(status))
             SpacerHeight8()
             MovieTitleMetaPill(title = title)
             SpacerHeight8()
@@ -290,3 +297,15 @@ private fun rememberLegibilityScrim(): Brush {
         )
     }
 }
+
+@Composable
+private fun mapStatus(status: String): String =
+    when (status.trim()) {
+        "Rumored" -> stringResource(Res.string.movie_rumored)
+        "Planned" -> stringResource(Res.string.movie_planned)
+        "In Production" -> stringResource(Res.string.movie_in_production)
+        "Post Production" -> stringResource(Res.string.movie_post_production)
+        "Released" -> stringResource(Res.string.movie_released)
+        "Canceled" -> stringResource(Res.string.movie_canceled)
+        else -> status
+    }

@@ -1,10 +1,9 @@
 package com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models
 
 import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
-data class Invite @OptIn(ExperimentalTime::class) constructor(
+data class InviteDataModel(
     val inviteId: String = "",
     val fromUid: String = "",
     val fromPseudo: String = "",
@@ -14,7 +13,7 @@ data class Invite @OptIn(ExperimentalTime::class) constructor(
     val createdAt: Instant = Clock.System.now(),
     val updatedAt: Instant? = null
 ) {
-    companion object {
-        val Initial = Invite()
+    companion object Companion {
+        val Initial = InviteDataModel()
     }
 }

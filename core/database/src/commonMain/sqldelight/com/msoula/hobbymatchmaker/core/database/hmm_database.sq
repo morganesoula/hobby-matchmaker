@@ -15,7 +15,8 @@ CREATE TABLE movie (
     status TEXT,
     videoKey TEXT,
     duration INTEGER,
-    note REAL
+    note REAL,
+    has_cast INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE genre (
@@ -146,7 +147,8 @@ UPDATE movie SET
     status = :status,
     popularity = :popularity,
     genres = :genres,
-    duration = :duration
+    duration = :duration,
+    has_cast = :hasCast
 WHERE movieId = :movieId;
 
 observeMovies:
@@ -155,7 +157,7 @@ SELECT * FROM movie ORDER BY popularity DESC, movieId ASC;
 observeDetailMovie:
 SELECT m.movieId, m.title, m.genres, m.popularity, m.releaseDate, m.synopsis,
        m.status, m.localCoverFilePath, m.videoKey, m.duration, m.posterFileName,
-       m.isFavorite,
+       m.isFavorite, m.has_cast,
        a.actorId, a.name AS actorName, a.role AS actorRole
 FROM movie m
 LEFT JOIN movie_actor_cross_ref c ON m.movieId = c.movieId

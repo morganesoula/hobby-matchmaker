@@ -14,7 +14,7 @@ interface SocialRepository {
 
     suspend fun findUserByUid(
         uid: String
-    ): AppResult<SocialMemberDomainModel?, AppError>
+    ): AppResult<SocialMemberDomainModel, AppError>
 
     fun observeSocialCircle(uid: String): Flow<List<SocialMemberDomainModel>>
     suspend fun refreshSocialCircle(uid: String): AppResult<Unit, AppError>

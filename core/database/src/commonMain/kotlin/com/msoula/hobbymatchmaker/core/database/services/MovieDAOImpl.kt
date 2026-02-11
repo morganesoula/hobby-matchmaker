@@ -121,6 +121,7 @@ class MovieDAOImpl(
                 movieUpdated.popularity,
                 movieUpdated.genres,
                 movieUpdated.duration?.toLong(),
+                if (movieUpdated.hasCast) 1L else 0L,
                 movieUpdated.movieId
             )
 
@@ -208,7 +209,8 @@ class MovieDAOImpl(
     }
 
     override fun observeMovies(): Flow<List<Movie>> {
-        return database.hmm_databaseQueries.observeMovies().asFlow().mapToList(dispatcherProvider.io)
+        return database.hmm_databaseQueries.observeMovies().asFlow()
+            .mapToList(dispatcherProvider.io)
     }
 
     override fun observeMovieWithActor(movieId: Long): Flow<MovieDetailDataEntity> {

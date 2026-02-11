@@ -1,6 +1,9 @@
 package com.msoula.hobbymatchmaker.core.user.data.repositories
 
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.DispatcherProvider
+import com.msoula.hobbymatchmaker.core.common.flatMap
 import com.msoula.hobbymatchmaker.core.user.data.dataSources.local.UserLocalDataSource
 import com.msoula.hobbymatchmaker.core.user.data.dataSources.remote.UserRemoteDataSource
 import com.msoula.hobbymatchmaker.core.user.domain.models.UserSummaryDomainModel
@@ -50,18 +53,24 @@ class UserDataRepositoryImpl(
         }
     }
 
-    override suspend fun getUser(uid: String): UserSummaryDomainModel? {
-        cache.value[uid]?.let { return it }
+    override suspend fun getUser(uid: String): AppResult<UserSummaryDomainModel, AppError> {
+        cache.value[uid]?.let { return AppResult.Success(it) }
 
         userLocalDataSource.getUser(uid)?.let { user ->
             updateCache(user)
-            return user
+            return AppResult.Success(user)
         }
 
-        return userRemoteDataSource.getUser(uid)?.also { user ->
-            updateCache(user)
-            userLocalDataSource.upsertUser(user)
-        }
+        return userRemoteDataSource.getUser(uid)
+            .flatMap { user ->
+                user
+                    ?.also {
+                        updateCache(it)
+                        userLocalDataSource.upsertUser(it)
+                    }
+                    ?.let { AppResult.Success(it) }
+                    ?: AppResult.Failure(AppError.Domain.NotFound)
+            }
     }
 
     override suspend fun getUsers(uids: List<String>): Map<String, UserSummaryDomainModel> {

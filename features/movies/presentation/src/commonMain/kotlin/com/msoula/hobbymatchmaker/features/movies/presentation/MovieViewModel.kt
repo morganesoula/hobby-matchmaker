@@ -172,7 +172,7 @@ class MovieViewModel(
             .onSuccess { result ->
                 if (result is MovieMatchResult.Match) {
                     val ownerAvatarUrl = interactor.getOwnerAvatarUrl(uid)
-                    val matchingMembers = result.matchingMembers.map { member ->
+                    val matchingMembers = result.matchingMemberDomainModels.map { member ->
                         MatchingMemberInfo(member.displayName, member.avatarUrl)
                     }.toImmutableList()
 

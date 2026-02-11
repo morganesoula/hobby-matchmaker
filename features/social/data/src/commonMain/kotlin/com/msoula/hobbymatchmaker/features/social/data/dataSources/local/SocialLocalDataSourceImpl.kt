@@ -10,7 +10,7 @@ import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.mappers
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.mappers.toSocialCircleMemberDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.mappers.toSocialInvitation
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.mappers.toSocialInvitationDataModel
-import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.models.SocialCircleMemberDataModel
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.models.SocialCircleMemberLocalDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.models.SocialInvitationDataModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -26,7 +26,7 @@ class SocialLocalDataSourceImpl(
 ) : SocialLocalDataSource {
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun observeSocialCircle(): Flow<List<SocialCircleMemberDataModel>> =
+    override fun observeSocialCircle(): Flow<List<SocialCircleMemberLocalDataModel>> =
         sessionLocalDataSource.observeCurrentUid()
             .filter { it.isNotEmpty() }
             .flatMapLatest { uid ->
@@ -77,7 +77,7 @@ class SocialLocalDataSourceImpl(
         }
     }
 
-    override suspend fun syncCircle(members: List<SocialCircleMemberDataModel>) {
+    override suspend fun syncCircle(members: List<SocialCircleMemberLocalDataModel>) {
         val ownerUId = sessionLocalDataSource.observeCurrentUid().first()
 
         if (ownerUId.isEmpty()) return

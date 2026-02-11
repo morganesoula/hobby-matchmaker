@@ -6,11 +6,14 @@ import com.msoula.hobbymatchmaker.features.moviedetail.domain.models.MovieVideoD
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.repositories.MovieDetailRepository
 
 data class MovieTrailerReady(val videoURI: String)
-class ManageMovieTrailerUseCase(
+class FetchMovieTrailerUseCase(
     private val movieDetailRepository: MovieDetailRepository,
     private val updateMovieVideoURIUseCase: UpdateMovieVideoURIUseCase
 ) {
-    suspend operator fun invoke(movieId: Long, language: String): AppResult<MovieTrailerReady, AppError> {
+    suspend operator fun invoke(
+        movieId: Long,
+        language: String
+    ): AppResult<MovieTrailerReady, AppError> {
         return when (val result = movieDetailRepository.fetchMovieTrailer(movieId, language)) {
             is AppResult.Failure -> result
             is AppResult.Success -> {
@@ -25,12 +28,10 @@ class ManageMovieTrailerUseCase(
     }
 
     private fun formatVideoResponse(
-        videoResponse: MovieVideoDomainModel?
+        videoResponse: MovieVideoDomainModel
     ): String =
-        videoResponse?.let { videoModel ->
-            when (videoModel.site.lowercase()) {
-                "youtube" -> videoModel.key
-                else -> "https://vimeo.com/${videoModel.key}"
-            }
-        }.orEmpty()
+        when (videoResponse.site.lowercase()) {
+            "youtube" -> videoResponse.key
+            else -> "https://vimeo.com/${videoResponse.key}"
+        }
 }

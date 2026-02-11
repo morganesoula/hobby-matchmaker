@@ -10,7 +10,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.common.isIosPlatform
@@ -42,7 +41,7 @@ fun MovieDetailContent(
     videoPlayerState: VideoPlayerState,
     onVideoPlayerDismissed: () -> Unit,
     onNavigate: (NavigationDestination) -> Unit,
-    observeMovieDetail: () -> Unit,
+    retryObservation: () -> Unit,
     onEvent: (MovieDetailUiEventModel) -> Unit
 ) {
     Scaffold(
@@ -83,12 +82,11 @@ fun MovieDetailContent(
                     ErrorStateScreen(
                         error = error,
                         hint = hint,
-                        onRetry = observeMovieDetail
+                        onRetry = retryObservation
                     )
                 },
                 onSuccess = { movie ->
-                    val filteredCast =
-                        remember(movie.cast) { movie.cast.filterNot { it.key == "NO_CAST" } }
+                    val movieWithCast = movie.takeIf { it.hasCast }
 
                     MovieDetailInformation(
                         padding = padding,
@@ -103,7 +101,8 @@ fun MovieDetailContent(
                         movieId = movie.id,
                         isVideoUriKnown = videoPlayerState.videoId.isNotEmpty(),
                         overview = movie.synopsis,
-                        filteredCast = Casting(filteredCast),
+                        filteredCast = Casting(movieWithCast?.cast?.associate { (name, role) -> name to role }
+                            ?: emptyMap()),
                         isLoading = videoPlayerState.isLoading,
                         videoPlayerVisible = videoPlayerState.isVisible,
                         onVideoPlayerDismissed = onVideoPlayerDismissed,
@@ -121,7 +120,7 @@ fun MovieDetailContent(
                             )
                         },
                         actorSection = {
-                            ActorSection(casting = Casting(movie.cast))
+                            ActorSection(casting = Casting(movie.cast.associate { (name, role) -> name to role }))
                         }
                     )
                 }

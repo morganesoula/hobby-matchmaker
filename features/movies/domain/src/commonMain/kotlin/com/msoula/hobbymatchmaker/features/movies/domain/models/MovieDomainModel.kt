@@ -7,7 +7,7 @@ data class MovieDomainModel(
     val localCoverFilePath: String = "",
     val isFavorite: Boolean = false,
     val isSeen: Boolean = false,
-    val overview: String? = null,
+    val overview: String = "",
     val note: Double = 0.0
 ) {
     companion object {

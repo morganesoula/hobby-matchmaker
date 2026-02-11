@@ -2,25 +2,25 @@ package com.msoula.hobbymatchmaker.features.social.data.dataSources.remote
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
-import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.Invite
-import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.SocialCircleMember
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.InviteDataModel
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.SocialCircleEntryRemoteDataModel
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.SocialCircleMemberRemoteDataModel
 import kotlinx.coroutines.flow.Flow
 
 interface SocialRemoteDataSource {
     suspend fun searchUsersByPseudo(
         pseudo: String,
         ownerUid: String?
-    ): AppResult<List<SocialCircleMember>, AppError>
+    ): AppResult<List<SocialCircleMemberRemoteDataModel>, AppError>
 
-    suspend fun findUserByUid(uid: String): AppResult<SocialCircleMember, AppError>
-    fun observeSocialCircle(uid: String): Flow<List<SocialCircleMember>>
-    suspend fun sendInvite(invite: Invite): AppResult<Unit, AppError>
-    suspend fun refreshIncomingInvites(ownerUid: String): AppResult<List<Invite>, AppError>
-    suspend fun refreshSentInvites(ownerUid: String): AppResult<List<Invite>, AppError>
+    fun observeSocialCircle(uid: String): Flow<List<SocialCircleEntryRemoteDataModel>>
+    suspend fun sendInvite(inviteDataModel: InviteDataModel): AppResult<Unit, AppError>
+    suspend fun refreshIncomingInvites(ownerUid: String): AppResult<List<InviteDataModel>, AppError>
+    suspend fun refreshSentInvites(ownerUid: String): AppResult<List<InviteDataModel>, AppError>
     suspend fun markInviteAsAccepted(inviteId: String): AppResult<Unit, AppError>
     suspend fun markInviteAsDeclined(inviteId: String): AppResult<Unit, AppError>
     suspend fun cancelInvitation(inviteId: String): AppResult<Unit, AppError>
-    suspend fun addToSocialCircle(socialCircleMember: SocialCircleMember): AppResult<Unit, AppError>
+    suspend fun addToSocialCircle(socialCircleMemberDataModel: SocialCircleMemberRemoteDataModel): AppResult<Unit, AppError>
     suspend fun removeFromSocialCircle(
         ownerUid: String,
         memberUid: String
@@ -28,8 +28,8 @@ interface SocialRemoteDataSource {
 
     suspend fun acceptInviteAndAddMembers(
         inviteId: String,
-        memberAddedToOwnerCircle: SocialCircleMember,
-        ownerAddedToMemberCircle: SocialCircleMember
+        memberAddedToOwnerCircle: SocialCircleMemberRemoteDataModel,
+        ownerAddedToMemberCircle: SocialCircleMemberRemoteDataModel
     ): AppResult<Unit, AppError>
 
     suspend fun checkSocialCircleLimit(
@@ -37,7 +37,7 @@ interface SocialRemoteDataSource {
         invitingMemberUid: String
     ): AppResult<Boolean, AppError>
 
-    suspend fun getSocialCircleSnapshot(uid: String): AppResult<List<SocialCircleMember>, AppError>
-    fun observeIncomingInvites(ownerUid: String): Flow<List<Invite>>
-    fun observeSentInvites(ownerUid: String): Flow<List<Invite>>
+    suspend fun getSocialCircleSnapshot(uid: String): AppResult<List<SocialCircleEntryRemoteDataModel>, AppError>
+    fun observeIncomingInvites(ownerUid: String): Flow<List<InviteDataModel>>
+    fun observeSentInvites(ownerUid: String): Flow<List<InviteDataModel>>
 }

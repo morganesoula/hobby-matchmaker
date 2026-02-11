@@ -13,7 +13,12 @@ fun MovieDetailResponseRemoteModel.toMovieDetailDomainModel(): MovieDetailDomain
     MovieDetailDomainModel(
         id = this.id.toLong(),
         title = this.title,
-        genre = this.genres.map { genre -> GenreDomainModel(genre.id ?: -1, genre.name ?: "") },
+        genre = this.genres.map { genre ->
+            GenreDomainModel(
+                genre.id ?: -1,
+                genre.name ?: GenreDomainModel.DEFAULT_NAME
+            )
+        },
         popularity = this.popularity,
         releaseDate = this.releaseDate,
         synopsis = this.overview,
