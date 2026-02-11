@@ -45,7 +45,7 @@ class SignInViewModel(
     init {
         scope.launch {
             signInInteractor.observeDontAsk().collect { value ->
-                _dontAskCheckboxValue.value = value
+                _dontAskCheckboxValue.update { value }
             }
         }
     }
@@ -78,19 +78,35 @@ class SignInViewModel(
             }
 
             AuthenticationUIEvent.OnGoogleButtonClicked -> scope.launch {
+                val client = socialClients.clients[ProviderType.GOOGLE]
+                if (client == null) {
+                    eventHandler.sendEvent(
+                        UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(AppError.Authentication.Unknown))
+                    )
+                    return@launch
+                }
+
                 doSignIn {
                     signInInteractor.signInSocial(
                         ProviderType.GOOGLE,
-                        credentialProvider = { socialClients.clients[ProviderType.GOOGLE]!!.getCredential() }
+                        credentialProvider = { client.getCredential() }
                     )
                 }
             }
 
             AuthenticationUIEvent.OnAppleButtonClicked -> scope.launch {
+                val client = socialClients.clients[ProviderType.APPLE]
+                if (client == null) {
+                    eventHandler.sendEvent(
+                        UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(AppError.Authentication.Unknown))
+                    )
+                    return@launch
+                }
+
                 doSignIn {
                     signInInteractor.signInSocial(
                         ProviderType.APPLE,
-                        { socialClients.clients[ProviderType.APPLE]!!.getCredential() }
+                        credentialProvider = { client.getCredential() }
                     )
                 }
             }

@@ -27,14 +27,13 @@ class AuthenticationRemoteDataSourceImpl(
         providerType: ProviderType
     ): AppResult<RemoteAuthUser?, AppError> = authManager.signIn(providerType, credential)
 
-    override suspend fun linkWithCredential(credential: AuthCredential): AppResult<RemoteAuthUser?, AppError> =
-        if (auth.currentUser == null) {
-            AppResult.Failure(AppError.Domain.Unauthorized)
-        } else {
-            safeFirebaseCall {
-                auth.currentUser!!.linkWithCredential(credential).user?.toAuthFirebaseUser()
-            }
+    override suspend fun linkWithCredential(credential: AuthCredential): AppResult<RemoteAuthUser?, AppError> {
+        val currentUser = auth.currentUser ?: return AppResult.Failure(AppError.Domain.Unauthorized)
+
+        return safeFirebaseCall {
+            currentUser.linkWithCredential(credential).user?.toAuthFirebaseUser()
         }
+    }
 
     override suspend fun createUserWithEmailAndPassword(
         email: String,
