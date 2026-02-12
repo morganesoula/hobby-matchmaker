@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.core.authentication.data.repositories
 
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.AuthenticationRemoteDataSource
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.mappers.toAuthenticatedUser
+import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.mappers.toProviderTypeDataModel
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.AuthState
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.AuthenticatedUser
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
@@ -61,5 +62,6 @@ class AuthenticationRepositoryImpl(
         providerType: ProviderType,
         credentialProvider: suspend () -> Any?
     ): AppResult<AuthenticatedUser?, AppError> =
-        remoteDataSource.signInWithSocialProvider(providerType, credentialProvider)
+        remoteDataSource.signInWithSocialProvider(providerType.toProviderTypeDataModel(), credentialProvider)
+            .mapSuccess { it?.toAuthenticatedUser() }
 }

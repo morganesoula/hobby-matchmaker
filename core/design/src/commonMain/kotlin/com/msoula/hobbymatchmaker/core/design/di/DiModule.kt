@@ -8,6 +8,7 @@ import coil3.network.ktor3.KtorNetworkFetcherFactory
 import com.msoula.hobbymatchmaker.core.design.util.DefaultErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
 import io.ktor.client.HttpClient
+import okio.FileSystem
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
@@ -27,6 +28,7 @@ val coreModuleDi = module {
             }
             .diskCache {
                 DiskCache.Builder()
+                    .directory(FileSystem.SYSTEM_TEMPORARY_DIRECTORY / "image_cache")
                     .maxSizePercent(0.02)
                     .build()
             }

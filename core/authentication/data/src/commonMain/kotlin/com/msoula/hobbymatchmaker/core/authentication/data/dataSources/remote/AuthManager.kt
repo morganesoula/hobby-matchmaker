@@ -1,15 +1,15 @@
 package com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote
 
-import com.msoula.hobbymatchmaker.core.authentication.data.models.RemoteAuthUser
-import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
+import com.msoula.hobbymatchmaker.core.authentication.data.models.AuthUserRemoteDataModel
+import com.msoula.hobbymatchmaker.core.authentication.data.models.ProviderTypeDataModel
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import dev.gitlive.firebase.auth.AuthCredential
 
 interface AuthManager {
     suspend fun signIn(
-        providerType: ProviderType,
+        providerType: ProviderTypeDataModel,
         credential: AuthCredential
-    ): AppResult<RemoteAuthUser?, AppError>
+    ): AppResult<AuthUserRemoteDataModel?, AppError>
     suspend fun signOut(): AppResult<Unit, AppError>
 }

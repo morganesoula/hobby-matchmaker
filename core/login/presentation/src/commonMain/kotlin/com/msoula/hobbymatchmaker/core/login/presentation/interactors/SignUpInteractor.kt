@@ -21,5 +21,5 @@ class SignUpInteractor(
 
     suspend fun createAccount(email: String, password: String): AppResult<Unit, AppError> =
         signUpUseCase(Parameters.DoubleStringParam(email, password))
-            .mapSuccess { Unit }
+            .mapSuccess {}
 }

@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.core.user.data.dataSources.remote
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.core.common.data.FirestoreUsersCollection
 import com.msoula.hobbymatchmaker.core.user.domain.models.UserSummaryDomainModel
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
@@ -13,7 +14,7 @@ class UserRemoteDataSourceImpl(
 
     override fun observeUser(uid: String): Flow<UserSummaryDomainModel?> =
         firestore
-            .collection("users")
+            .collection(FirestoreUsersCollection)
             .document(uid)
             .snapshots
             .map { doc ->
@@ -30,7 +31,7 @@ class UserRemoteDataSourceImpl(
 
     override suspend fun getUser(uid: String): AppResult<UserSummaryDomainModel?, AppError> {
         val doc = firestore
-            .collection("users")
+            .collection(FirestoreUsersCollection)
             .document(uid)
             .get()
 
@@ -52,7 +53,7 @@ class UserRemoteDataSourceImpl(
         if (uids.isEmpty()) return emptyMap()
 
         val documents = firestore
-            .collection("users")
+            .collection(FirestoreUsersCollection)
             .where { "uid" inArray uids }
             .get()
             .documents

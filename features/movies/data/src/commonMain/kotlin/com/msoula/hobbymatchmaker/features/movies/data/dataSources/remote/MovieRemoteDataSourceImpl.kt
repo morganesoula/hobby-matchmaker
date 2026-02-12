@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.core.common.data.FirestoreUsersCollection
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.common.safeFirebaseCall
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.MovieRemoteDataModel
@@ -49,10 +50,10 @@ class MovieRemoteDataSourceImpl(
         isFavorite: Boolean
     ): AppResult<Unit, AppError> = safeFirebaseCall {
         if (isFavorite) {
-            firestore.collection("users").document(uuidUser)
+            firestore.collection(FirestoreUsersCollection).document(uuidUser)
                 .set(mapOf("movies" to FieldValue.arrayUnion(movieId)), merge = true)
         } else {
-            firestore.collection("users").document(uuidUser)
+            firestore.collection(FirestoreUsersCollection).document(uuidUser)
                 .set(mapOf("movies" to FieldValue.arrayRemove(movieId)), merge = true)
         }
     }
@@ -62,7 +63,9 @@ class MovieRemoteDataSourceImpl(
         ids: List<Long>
     ): AppResult<Unit, AppError> =
         safeFirebaseCall {
-            firestore.collection("users").document(uid)
+            firestore
+                .collection(FirestoreUsersCollection)
+                .document(uid)
                 .set(mapOf("movies" to ids), merge = true)
         }
 

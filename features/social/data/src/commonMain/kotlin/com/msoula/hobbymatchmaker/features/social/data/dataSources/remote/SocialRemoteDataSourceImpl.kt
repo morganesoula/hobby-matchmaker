@@ -3,6 +3,8 @@ package com.msoula.hobbymatchmaker.features.social.data.dataSources.remote
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Logger
+import com.msoula.hobbymatchmaker.core.common.data.FirestoreCircleCollection
+import com.msoula.hobbymatchmaker.core.common.data.FirestoreUsersCollection
 import com.msoula.hobbymatchmaker.core.common.safeFirebaseCall
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toInviteStatusData
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.InviteDataModel
@@ -18,7 +20,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlin.collections.emptyList
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -43,7 +44,7 @@ class SocialRemoteDataSourceImpl(
 
             val documents = try {
                 val startAtFieldValues = firestore
-                    .collection("users")
+                    .collection(FirestoreUsersCollection)
                     .orderBy("information.pseudoLowercase", Direction.ASCENDING)
                     .startAtFieldValues {
                         arrayOf<Any?>(searchTerm)
@@ -91,9 +92,9 @@ class SocialRemoteDataSourceImpl(
 
     override fun observeSocialCircle(uid: String): Flow<List<SocialCircleEntryRemoteDataModel>> =
         firestore
-            .collection("users")
+            .collection(FirestoreUsersCollection)
             .document(uid)
-            .collection("circle")
+            .collection(FirestoreCircleCollection)
             .snapshots
             .map { querySnapshot ->
                 querySnapshot.documents.map { document ->
@@ -125,7 +126,7 @@ class SocialRemoteDataSourceImpl(
     override suspend fun refreshIncomingInvites(ownerUid: String): AppResult<List<InviteDataModel>, AppError> =
         safeFirebaseCall {
             val userSnapshot = firestore
-                .collection("users")
+                .collection(FirestoreUsersCollection)
                 .document(ownerUid)
                 .get()
 
@@ -195,7 +196,7 @@ class SocialRemoteDataSourceImpl(
     @OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
     override fun observeIncomingInvites(ownerUid: String): Flow<List<InviteDataModel>> =
         firestore
-            .collection("users")
+            .collection(FirestoreUsersCollection)
             .document(ownerUid)
             .snapshots
             .flatMapLatest { userSnapshot ->
@@ -304,9 +305,9 @@ class SocialRemoteDataSourceImpl(
     override suspend fun addToSocialCircle(socialCircleMemberDataModel: SocialCircleMemberRemoteDataModel): AppResult<Unit, AppError> =
         safeFirebaseCall {
             firestore
-                .collection("users")
+                .collection(FirestoreUsersCollection)
                 .document(socialCircleMemberDataModel.ownerUid)
-                .collection("circle")
+                .collection(FirestoreCircleCollection)
                 .document(socialCircleMemberDataModel.uid)
                 .set(
                     mapOf(
@@ -323,9 +324,9 @@ class SocialRemoteDataSourceImpl(
     ): AppResult<Unit, AppError> =
         safeFirebaseCall {
             firestore
-                .collection("users")
+                .collection(FirestoreUsersCollection)
                 .document(ownerUid)
-                .collection("circle")
+                .collection(FirestoreCircleCollection)
                 .document(memberUid)
                 .delete()
         }
@@ -342,15 +343,15 @@ class SocialRemoteDataSourceImpl(
                     .document(inviteId)
 
                 val ownerCircleRef = firestore
-                    .collection("users")
+                    .collection(FirestoreUsersCollection)
                     .document(memberAddedToOwnerCircle.ownerUid)
-                    .collection("circle")
+                    .collection(FirestoreCircleCollection)
                     .document(memberAddedToOwnerCircle.uid)
 
                 val memberCircleRef = firestore
-                    .collection("users")
+                    .collection(FirestoreUsersCollection)
                     .document(ownerAddedToMemberCircle.ownerUid)
-                    .collection("circle")
+                    .collection(FirestoreCircleCollection)
                     .document(ownerAddedToMemberCircle.uid)
 
                 updateFields(inviteRef) { "status" to InviteStatusData.ACCEPTED }
@@ -384,7 +385,7 @@ class SocialRemoteDataSourceImpl(
     ): AppResult<Boolean, AppError> =
         safeFirebaseCall {
             val ownerLibrary = firestore
-                .collection("users")
+                .collection(FirestoreUsersCollection)
                 .document(ownerUid)
             val ownerDocument = ownerLibrary.get()
 
@@ -393,7 +394,7 @@ class SocialRemoteDataSourceImpl(
             }
 
             val memberLibrary = firestore
-                .collection("users")
+                .collection(FirestoreUsersCollection)
                 .document(invitingMemberUid)
             val memberDocument = memberLibrary.get()
 
@@ -401,8 +402,14 @@ class SocialRemoteDataSourceImpl(
                 throw Exception("User not found with uid: $invitingMemberUid")
             }
 
-            val ownerCircle = ownerLibrary.collection("circle").get().documents
-            val memberCircle = memberLibrary.collection("circle").get().documents
+            val ownerCircle = ownerLibrary
+                .collection(FirestoreCircleCollection)
+                .get()
+                .documents
+            val memberCircle = memberLibrary
+                .collection(FirestoreCircleCollection)
+                .get()
+                .documents
             ownerCircle.size < MAX_CIRCLE_SIZE && memberCircle.size < MAX_CIRCLE_SIZE
         }
 

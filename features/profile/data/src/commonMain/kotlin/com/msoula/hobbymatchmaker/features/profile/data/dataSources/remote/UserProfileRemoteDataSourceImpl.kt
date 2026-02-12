@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.features.profile.data.dataSources.remote
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.core.common.data.FirestoreUsersCollection
 import com.msoula.hobbymatchmaker.core.common.safeFirebaseCall
 import com.msoula.hobbymatchmaker.features.profile.data.models.UserProfileRemoteDataModel
 import dev.gitlive.firebase.firestore.FirebaseFirestore
@@ -21,14 +22,16 @@ class UserProfileRemoteDataSourceImpl(
         )
 
         return safeFirebaseCall {
-            firestore.collection("users").document(userProfileRemoteDataModel.uid)
+            firestore
+                .collection(FirestoreUsersCollection)
+                .document(userProfileRemoteDataModel.uid)
                 .set(mapOf("information" to user), merge = true)
         }
     }
 
     override suspend fun checkIfPseudoIsAvailable(userPseudo: String): AppResult<Boolean, AppError> =
         safeFirebaseCall {
-            val existingUser = firestore.collection("users")
+            val existingUser = firestore.collection(FirestoreUsersCollection)
                 .where { "information.pseudo" equalTo userPseudo }
                 .limit(1)
                 .get()

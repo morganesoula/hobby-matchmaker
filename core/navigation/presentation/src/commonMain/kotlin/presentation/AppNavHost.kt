@@ -22,6 +22,7 @@ import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.MinimalDialog
 import com.msoula.hobbymatchmaker.core.design.atoms.asStringSuspend
 import com.msoula.hobbymatchmaker.core.design.models.MatchAnimationData
+import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMembers
 import com.msoula.hobbymatchmaker.core.design.models.TabItem
 import com.msoula.hobbymatchmaker.core.design.reset_password
 import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
@@ -42,7 +43,6 @@ import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailV
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.VideoPlayerState
 import com.msoula.hobbymatchmaker.features.movies.presentation.MovieContent
-import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMembers
 import com.msoula.hobbymatchmaker.features.movies.presentation.MovieViewModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.UserProfileContent
 import com.msoula.hobbymatchmaker.features.profile.presentation.UserProfileViewModel
@@ -50,9 +50,9 @@ import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfi
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileState
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiEventModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiStateModel
-import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUiEventModel
 import com.msoula.hobbymatchmaker.features.social.presentation.SocialContent
 import com.msoula.hobbymatchmaker.features.social.presentation.SocialViewModel
+import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUiEventModel
 import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.getString
 import org.koin.compose.viewmodel.koinViewModel

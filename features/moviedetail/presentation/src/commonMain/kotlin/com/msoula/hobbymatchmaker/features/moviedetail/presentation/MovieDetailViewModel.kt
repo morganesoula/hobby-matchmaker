@@ -35,8 +35,7 @@ class MovieDetailViewModel(
     private val defaultMessageMapper: ErrorMessageMapper,
     externalScope: CoroutineScope? = null
 ) : ViewModel() {
-    val scope = externalScope ?: viewModelScope
-
+    private val scope = externalScope ?: viewModelScope
     private val eventHandler = EventHandler()
     val events = eventHandler.events
 

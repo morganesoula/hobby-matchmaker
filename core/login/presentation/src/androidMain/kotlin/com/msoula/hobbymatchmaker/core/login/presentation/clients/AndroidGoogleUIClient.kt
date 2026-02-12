@@ -11,7 +11,8 @@ import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialException
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import com.msoula.hobbymatchmaker.core.authentication.domain.errors.InvalidCredentialError
+import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.DefaultDispatcherProvider
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.login.presentation.BuildKonfig.WEB_CLIENT_ID
@@ -22,7 +23,7 @@ import kotlinx.coroutines.withContext
 class AndroidGoogleUIClient(
     private val credentialManager: CredentialManager,
     private val context: Context,
-): GoogleUIClient {
+) : GoogleUIClient {
 
     private val dispatcherProvider = DefaultDispatcherProvider()
 
@@ -37,15 +38,19 @@ class AndroidGoogleUIClient(
         .build()
 
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-    override suspend fun getGoogleCredentials(): AuthCredential? {
+    override suspend fun getGoogleCredentials(): AppResult<AuthCredential?, AppError> {
         return withContext(dispatcherProvider.io) {
             try {
-                val response = launchGetCredential() ?: return@withContext null
-                val (authCredential, _) = handleSignIn(response)
-                authCredential
+                val response = launchGetCredential()
+                response?.let {
+                    when (val result = handleSignIn(it)) {
+                        is AppResult.Success -> AppResult.Success(result.data.first)
+                        is AppResult.Failure -> AppResult.Failure(result.error)
+                    }
+                } ?: AppResult.Failure(AppError.Authentication.InvalidCredentials)
             } catch (e: Exception) {
                 Log.e("HMM", "Error getting credential: $e")
-                null
+                AppResult.Failure(AppError.Authentication.InvalidCredentials)
             }
         }
     }
@@ -63,7 +68,7 @@ class AndroidGoogleUIClient(
     }
 
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-    fun handleSignIn(result: GetCredentialResponse): Pair<AuthCredential, String?> {
+    fun handleSignIn(result: GetCredentialResponse): AppResult<Pair<AuthCredential, String?>, AppError> {
         val credential = result.credential
 
         return if (credential is CustomCredential && credential.type ==
@@ -75,10 +80,10 @@ class AndroidGoogleUIClient(
             val authCredential =
                 GoogleAuthProvider.credential(googleIdTokenCredential.idToken, null)
 
-            Pair(authCredential, email)
+            AppResult.Success(Pair(authCredential, email))
         } else {
             Logger.e("Unexpected credential type: ${credential::class.simpleName}")
-            throw InvalidCredentialError("Received an invalid credential type")
+            AppResult.Failure(AppError.Authentication.InvalidCredentials)
         }
     }
 }

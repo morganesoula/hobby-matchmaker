@@ -37,7 +37,8 @@ fun MovieLocalDataModel.toMovie(): Movie =
         status = this.status,
         videoKey = this.videoKey,
         duration = this.duration,
-        note = this.note
+        note = this.note,
+        has_cast = 0L
     )
 
 fun MovieLocalDataModel.toMovieDomainModel(): MovieDomainModel =

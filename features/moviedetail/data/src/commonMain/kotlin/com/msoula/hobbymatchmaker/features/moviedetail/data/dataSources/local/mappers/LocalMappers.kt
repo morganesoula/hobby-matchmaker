@@ -50,7 +50,7 @@ fun MovieDetailDataEntity.toMovieDetailDataModel(): MovieDetailDataModel =
         overview = this.movie.synopsis ?: MovieDetailDataModel.Initial.overview,
         poster = this.movie.posterFileName ?: MovieDetailDataModel.Initial.poster,
         releaseDate = this.movie.releaseDate ?: MovieDetailDataModel.Initial.releaseDate,
-        genres = this.movie.genres?.split(",") ?: emptyList(),
+        genres = this.movie.genres?.split(",")?.map { it.trim() }?.filter { it.isNotBlank() } ?: emptyList(),
         isFavorite = this.movie.isFavorite == 1L,
         isSeen = this.movie.isSeen == 1L,
         popularity = this.movie.popularity,
