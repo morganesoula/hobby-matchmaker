@@ -19,6 +19,8 @@ object Modules {
     const val COMMON = ":core:common"
     const val DATABASE = ":core:database"
     const val DESIGN = ":core:design"
+    const val HUB_DOMAIN = ":features:hub:domain"
+    const val HUB_PRESENTATION = ":features:hub:presentation"
     const val LOGIN_DOMAIN = ":core:login:domain"
     const val LOGIN_PRESENTATION = ":core:login:presentation"
     const val MOVIE_DATA = ":features:movies:data"

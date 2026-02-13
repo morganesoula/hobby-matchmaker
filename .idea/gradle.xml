@@ -48,6 +48,9 @@
             <option value="$PROJECT_DIR$/core/user/data" />
             <option value="$PROJECT_DIR$/core/user/domain" />
             <option value="$PROJECT_DIR$/features" />
+            <option value="$PROJECT_DIR$/features/hub" />
+            <option value="$PROJECT_DIR$/features/hub/domain" />
+            <option value="$PROJECT_DIR$/features/hub/presentation" />
             <option value="$PROJECT_DIR$/features/moviedetail" />
             <option value="$PROJECT_DIR$/features/moviedetail/data" />
             <option value="$PROJECT_DIR$/features/moviedetail/domain" />

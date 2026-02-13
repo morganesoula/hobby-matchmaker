@@ -54,6 +54,8 @@ kotlin {
             implementation(project(Modules.COMMON))
             implementation(project(Modules.DATABASE))
             implementation(project(Modules.DESIGN))
+            implementation(project(Modules.HUB_DOMAIN))
+            implementation(project(Modules.HUB_PRESENTATION))
             implementation(project(Modules.LOGIN_DOMAIN))
             implementation(project(Modules.LOGIN_PRESENTATION))
             implementation(project(Modules.MOVIE_DATA))
