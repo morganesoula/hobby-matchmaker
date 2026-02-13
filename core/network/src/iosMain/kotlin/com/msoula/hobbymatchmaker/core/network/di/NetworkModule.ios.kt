@@ -7,6 +7,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.darwin.Darwin
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.api.createClientPlugin
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
@@ -18,6 +19,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.URLProtocol
 import io.ktor.http.encodedPath
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.io.IOException
 import org.koin.dsl.module
 
 actual val coreModuleNetworkPlatformSpecific = module {
@@ -25,6 +27,8 @@ actual val coreModuleNetworkPlatformSpecific = module {
 
     single<HttpClient>(createdAtStart = true) {
         HttpClient(Darwin) {
+            val connectivityChecker = get<NetworkConnectivityChecker>()
+
             install(Logging) {
                 logger = object : Logger {
                     override fun log(message: String) {
@@ -51,6 +55,14 @@ actual val coreModuleNetworkPlatformSpecific = module {
                 retryOnException(maxRetries = 3, retryOnTimeout = true)
                 exponentialDelay()
             }
+
+            install(createClientPlugin("ConnectivityGuard") {
+                onRequest { _, _ ->
+                    if (!connectivityChecker.hasActiveConnection()) {
+                        throw IOException("No network connection")
+                    }
+                }
+            })
 
             defaultRequest {
                 url {

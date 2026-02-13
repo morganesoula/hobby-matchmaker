@@ -69,7 +69,10 @@ class UserProfileInteractor(
             )
         }
 
-    suspend fun checkPseudoAvailable(pseudo: String) = checkPseudo(pseudo)
+    suspend fun checkPseudoAvailable(pseudo: String): AppResult<Boolean, AppError> {
+        return checkPseudo(pseudo)
+    }
+
 
     suspend fun saveProfile(uid: String, profile: UserProfileUiModel) =
         upsertUser(profile.toUserProfileDomainModel(uid))
@@ -101,6 +104,5 @@ class UserProfileInteractor(
 
     suspend fun logOut() = logOutUseCase()
 
-    suspend fun refreshProfileData(uid: String): AppResult<Unit, AppError> =
-        refreshSocialCircleUseCase(uid)
+    suspend fun refreshProfileData(uid: String) = refreshSocialCircleUseCase(uid)
 }
