@@ -13,6 +13,19 @@
     <string name="apple_alt">Logo Apple</string>
     <string name="actor_name_content_description">Nom d'acteur</string>
 
+    // ERROR
+    <string name="login_error">Identifiant ou mot de passe incorrect</string>
+    <string name="signup_error">Cet email est déjà associé à un compte existant</string>
+    <string name="email_already_exists_error">Cet e-mail est déjà associé à un compte existant</string>
+    <string name="user_disabled_error">Ce compte est d\\u00E9sactiv\\u00E9</string>
+    <string name="too_many_requests_error">Trop de tentatives: merci de réessayer ultérieurement</string>
+    <string name="internal_error">Une erreur interne est survenue: les \\u00E9quipes de développement ont \\u00E9t\\u00E9 notifi\\u00E9es</string>
+    <string name="user_not_found_error">Utilisateur inconnu. Merci de vous inscrire</string>
+    <string name="reset_password_error">Impossible de réinitialiser votre mot de passe</string>
+    <string name="malformed_sign_in_error">Identifiants incorrects. Veuillez vérifier vos informations.</string>
+    <string name="connection_issue">Problème de connexion. Veuillez vérifier votre réseau</string>
+    <string name="error_issue_retry">Ressayer</string>
+
     // FORM
     <string name="firstname">Pr\u00E9nom</string>
     <string name="lastname">Nom de famille</string>
@@ -46,18 +59,19 @@
     <string name="sign_in_with_google">Se connecter avec Google</string>
     <string name="sign_in_with_apple">Se connecter avec Apple</string>
 
-    // ERROR
-    <string name="login_error">Identifiant ou mot de passe incorrect</string>
-    <string name="signup_error">Cet email est déjà associé à un compte existant</string>
-    <string name="email_already_exists_error">Cet e-mail est déjà associé à un compte existant</string>
-    <string name="user_disabled_error">Ce compte est d\\u00E9sactiv\\u00E9</string>
-    <string name="too_many_requests_error">Trop de tentatives: merci de réessayer ultérieurement</string>
-    <string name="internal_error">Une erreur interne est survenue: les \\u00E9quipes de développement ont \\u00E9t\\u00E9 notifi\\u00E9es</string>
-    <string name="user_not_found_error">Utilisateur inconnu. Merci de vous inscrire</string>
-    <string name="reset_password_error">Impossible de réinitialiser votre mot de passe</string>
-    <string name="malformed_sign_in_error">Identifiants incorrects. Veuillez vérifier vos informations.</string>
-    <string name="connection_issue">Problème de connexion. Veuillez vérifier votre réseau</string>
-    <string name="error_issue_retry">Ressayer</string>
+    // HUB
+    <string name="hub_recent_matches_title">Matchs Récents</string>
+    <string name="hub_recent_matches_shared_movies_single_txt">1 film commun</string>
+    <string name="hub_recent_matches_shared_movies_plural_txt">%1$d films communs</string>
+    <string name="hub_recent_matches_no_data_title">Pas encore de matchs ?</string>
+    <string name="hub_recent_matches_no_data_txt">Invitez des amis pour voir vos fims communs ici.</string>
+    <string name="hub_recent_matches_no_data_btn_txt">Inviter des amis</string>
+    <string name="hub_favorite_movies_title">Mes Films Favoris</string>
+    <string name="hub_favorite_movies_subtitle">Tapez sur un film pour savoir qui l'a aussi aimé</string>
+    <string name="hub_favorite_movies_shared_tag">MATCH</string>
+    <string name="hub_favorite_movies_no_data_title">Votre liste de favoris est vide</string>
+    <string name="hub_favorite_movies_no_data_txt">Parcourez et double tapez sur un film pour commencer à construire votre bibliothèque.</string>
+    <string name="hub_favorite_movies_no_data_btn_txt">Découvrir des films</string>
 
     // OTHER
     <string name="continue_as_guest_button_title">Continuer en tant qu'invité</string>

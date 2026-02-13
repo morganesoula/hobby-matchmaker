@@ -26,6 +26,7 @@ fun MovieDomainModel.toMovieUiModel(): MovieUiModel {
     return MovieUiModel(
         id = this.id,
         coverFilePath = resolved,
+        releaseDate = this.releaseDate,
         isFavorite = this.isFavorite,
         title = this.title,
         overview = this.overview ?: "",
@@ -35,12 +36,13 @@ fun MovieDomainModel.toMovieUiModel(): MovieUiModel {
 
 fun MovieUiModel.toCarouselItem(): MovieCarouselItem {
     return MovieCarouselItem(
-        id = id,
-        title = title,
-        overview = overview,
-        coverFilePath = coverFilePath,
-        note = note,
-        isFavorite = isFavorite
+        id = this.id,
+        title = this.title,
+        overview = this.overview,
+        releaseDate = this.releaseDate,
+        coverFilePath = this.coverFilePath,
+        note = this.note,
+        isFavorite = this.isFavorite
     )
 }
 

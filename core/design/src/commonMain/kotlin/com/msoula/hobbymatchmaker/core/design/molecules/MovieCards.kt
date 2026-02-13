@@ -5,7 +5,9 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -52,7 +54,9 @@ import com.msoula.hobbymatchmaker.core.design.atoms.HMMShimmerEffect
 import com.msoula.hobbymatchmaker.core.design.atoms.LoadingPosterPlaceholder
 import com.msoula.hobbymatchmaker.core.design.atoms.MovieGenericCard
 import com.msoula.hobbymatchmaker.core.design.atoms.RatingChip
+import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight4
 import com.msoula.hobbymatchmaker.core.design.icons.LucideHeart
+import com.msoula.hobbymatchmaker.core.design.models.MovieCarouselItem
 import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
 
@@ -194,5 +198,22 @@ fun MovieCard(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun HubFavoriteMovie(
+    movie: MovieCarouselItem
+) {
+    Column {
+        Text(
+            text = movie.title,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        SpacerHeight4()
+        Text(
+            text = movie.releaseDate,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = .8f)
+        )
     }
 }

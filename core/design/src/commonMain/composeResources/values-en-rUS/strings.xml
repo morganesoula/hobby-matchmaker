@@ -12,6 +12,20 @@
     <string name="apple_alt">Apple Logo</string>
     <string name="actor_name_content_description">Actor name</string>
 
+    // ERROR
+    <string name="login_error">Incorrect email or password</string>
+    <string name="signup_error">This email is already associated with an existing account</string>
+    <string name="email_already_exists_error">This email is already associated with an existing account</string>
+    <string name="user_disabled_error">This account is disabled</string>
+    <string name="too_many_requests_error">Too many attempts: please try again later</string>
+    <string name="internal_error">An internal error occurred: the development teams have been notified</string>
+    <string name="user_not_found_error">User not found. Please register first</string>
+    <string name="reset_password_error">Could not reset your password</string>
+    <string name="malformed_sign_in_error">Oops, please check your credentials</string>
+    <string name="connection_issue">Connection issue. Please check your network</string>
+    <string name="rest_password_other_error">An error occurred. Please contact the development team.</string>
+    <string name="error_issue_retry">Retry</string>
+
     // FORM
     <string name="firstname">First name</string>
     <string name="lastname">Last name</string>
@@ -45,19 +59,19 @@
     <string name="sign_in_with_google">Sign in with Google</string>
     <string name="sign_in_with_apple">Sign in with Apple</string>
 
-    // ERROR
-    <string name="login_error">Incorrect email or password</string>
-    <string name="signup_error">This email is already associated with an existing account</string>
-    <string name="email_already_exists_error">This email is already associated with an existing account</string>
-    <string name="user_disabled_error">This account is disabled</string>
-    <string name="too_many_requests_error">Too many attempts: please try again later</string>
-    <string name="internal_error">An internal error occurred: the development teams have been notified</string>
-    <string name="user_not_found_error">User not found. Please register first</string>
-    <string name="reset_password_error">Could not reset your password</string>
-    <string name="malformed_sign_in_error">Oops, please check your credentials</string>
-    <string name="connection_issue">Connection issue. Please check your network</string>
-    <string name="rest_password_other_error">An error occurred. Please contact the development team.</string>
-    <string name="error_issue_retry">Retry</string>
+    // HUB
+    <string name="hub_recent_matches_title">Recent Matches</string>
+    <string name="hub_recent_matches_shared_movies_single_txt">1 shared movie</string>
+    <string name="hub_recent_matches_shared_movies_plural_txt">%1$d shared movies</string>
+    <string name="hub_recent_matches_no_data_title">No match yet?</string>
+    <string name="hub_recent_matches_no_data_txt">Invite your friends to see what movies you both have in common.</string>
+    <string name="hub_recent_matches_no_data_btn_txt">Invite friends</string>
+    <string name="hub_favorite_movies_title">My Favorite Movies</string>
+    <string name="hub_favorite_movies_subtitle">Tap a movie to see who else likes it</string>
+    <string name="hub_favorite_movies_shared_tag">SHARED</string>
+    <string name="hub_favorite_movies_no_data_title">Your list of favorites is empty</string>
+    <string name="hub_favorite_movies_no_data_txt">Browse and double tap on a movie to start building your library.</string>
+    <string name="hub_favorite_movies_no_data_btn_txt">Discover movies</string>
 
     // OTHER
     <string name="continue_as_guest_button_title">Continue as guest</string>

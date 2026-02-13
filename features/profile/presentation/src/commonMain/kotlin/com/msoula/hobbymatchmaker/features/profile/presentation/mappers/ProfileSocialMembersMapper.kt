@@ -1,11 +1,11 @@
 package com.msoula.hobbymatchmaker.features.profile.presentation.mappers
 
-import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMembers
+import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMember
 import com.msoula.hobbymatchmaker.features.profile.domain.models.UserSummaryDomainModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.SocialMemberUiModel
 
-fun SocialMemberUiModel.toProfileSocialMembers(): ProfileSocialMembers {
-    return ProfileSocialMembers(
+fun SocialMemberUiModel.toProfileSocialMembers(): ProfileSocialMember {
+    return ProfileSocialMember(
         uid = uid,
         name = name,
         pseudo = pseudo,

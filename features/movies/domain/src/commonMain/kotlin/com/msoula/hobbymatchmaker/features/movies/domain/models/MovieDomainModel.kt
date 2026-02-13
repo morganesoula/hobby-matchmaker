@@ -5,6 +5,7 @@ data class MovieDomainModel(
     val title: String = "",
     val coverFileName: String = "",
     val localCoverFilePath: String = "",
+    val releaseDate: String = "",
     val isFavorite: Boolean = false,
     val isSeen: Boolean = false,
     val overview: String = "",

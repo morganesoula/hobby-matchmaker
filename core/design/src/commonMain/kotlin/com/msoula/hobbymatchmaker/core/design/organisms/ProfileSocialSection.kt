@@ -40,7 +40,7 @@ import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWidth8
 import com.msoula.hobbymatchmaker.core.design.authentified_no_social_members_description
 import com.msoula.hobbymatchmaker.core.design.cancel
 import com.msoula.hobbymatchmaker.core.design.icons.MaterialSymbolsPerson_add
-import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMembers
+import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMember
 import com.msoula.hobbymatchmaker.core.design.molecules.PseudoSearchBar
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.IconSize
@@ -55,9 +55,9 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ProfileSocialSection(
-    socialMembers: ImmutableList<ProfileSocialMembers>?,
+    socialMembers: ImmutableList<ProfileSocialMember>?,
     onSearchPeople: (pseudo: String) -> Unit,
-    searchResult: ImmutableList<ProfileSocialMembers> = persistentListOf(),
+    searchResult: ImmutableList<ProfileSocialMember> = persistentListOf(),
     onInviteToSocialCircle: (pseudo: String, name: String?) -> Unit
 ) {
     val textFieldState = rememberTextFieldState()

@@ -22,7 +22,7 @@ import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.MinimalDialog
 import com.msoula.hobbymatchmaker.core.design.atoms.asStringSuspend
 import com.msoula.hobbymatchmaker.core.design.models.MatchAnimationData
-import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMembers
+import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMember
 import com.msoula.hobbymatchmaker.core.design.models.TabItem
 import com.msoula.hobbymatchmaker.core.design.reset_password
 import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
@@ -401,7 +401,7 @@ fun AppNavHost(
                 }
 
                 val mappedSearchResults = searchedPseudos.map { member ->
-                    ProfileSocialMembers(
+                    ProfileSocialMember(
                         uid = member.uid,
                         name = member.name,
                         pseudo = member.pseudo,

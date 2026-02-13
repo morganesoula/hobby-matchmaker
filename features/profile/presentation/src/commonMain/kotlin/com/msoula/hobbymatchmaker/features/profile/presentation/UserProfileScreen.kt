@@ -34,7 +34,7 @@ import com.msoula.hobbymatchmaker.core.design.icons.BootstrapPerson
 import com.msoula.hobbymatchmaker.core.design.icons.HeroiconsSparkles
 import com.msoula.hobbymatchmaker.core.design.icons.LucideFilm
 import com.msoula.hobbymatchmaker.core.design.log_out
-import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMembers
+import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMember
 import com.msoula.hobbymatchmaker.core.design.molecules.BackNavigationTopBar
 import com.msoula.hobbymatchmaker.core.design.molecules.EditProfileTopBar
 import com.msoula.hobbymatchmaker.core.design.molecules.FeatureProfileCard
@@ -74,7 +74,7 @@ import org.jetbrains.compose.resources.stringResource
 fun UserProfileContent(
     profile: UserProfileUiModel,
     snackBarHostState: SnackbarHostState,
-    searchedPseudos: ImmutableList<ProfileSocialMembers>,
+    searchedPseudos: ImmutableList<ProfileSocialMember>,
     userProfileState: UserProfileState,
     userProfileActions: UserProfileActions
 ) {
