@@ -14,10 +14,8 @@ class FavoritesViewModel(
     private val errorMapper: ErrorMessageMapper
 ) : ViewModel() {
 
-    private val _favoritesState = MutableStateFlow<UiState<List<MovieUiModel>>>(UiState.Loading)
-    val favoritesState: StateFlow<UiState<List<MovieUiModel>>> = _favoritesState.asStateFlow()
-
-    override val screenState: StateFlow<UiState<*>> = favoritesState
+    val favoritesState: StateFlow<UiState<List<MovieUiModel>>>
+        field = MutableStateFlow<UiState<List<MovieUiModel>>>(UiState.Loading)
 
     init {
         loadFavorites()
@@ -25,18 +23,18 @@ class FavoritesViewModel(
 
     fun loadFavorites() {
         viewModelScope.launch {
-            _favoritesState.value = UiState.Loading
+            favoritesState.value = UiState.Loading
 
             getFavoritesUseCase()
                 .onSuccess { favorites ->
-                    _favoritesState.value = if (favorites.isEmpty()) {
+                    favoritesState.value = if (favorites.isEmpty()) {
                         UiState.Empty // 👈 Important : gérer le cas vide
                     } else {
                         UiState.Success(favorites)
                     }
                 }
                 .onFailure { error ->
-                    _favoritesState.value = UiState.Error(
+                    favoritesState.value = UiState.Error(
                         error = errorMapper.toUIText(error),
                         hint = UIErrorHint(retry = RetryPolicy.Manual)
                     )
@@ -133,19 +131,19 @@ class SearchViewModel(
     private val errorMapper: ErrorMessageMapper
 ) : ViewModel() {
 
-    private val _searchQuery = MutableStateFlow("")
-    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+    val searchQuery: StateFlow<String>
+        field = MutableStateFlow("")
 
-    private val _searchState = MutableStateFlow<UiState<List<MovieUiModel>>>(UiState.Empty)
-    val searchState: StateFlow<UiState<List<MovieUiModel>>> = _searchState.asStateFlow()
+    val searchState: StateFlow<UiState<List<MovieUiModel>>>
+        field = searchQuery
 
     override val screenState: StateFlow<UiState<*>> = searchState
 
     fun onSearchQueryChange(query: String) {
-        _searchQuery.value = query
+        searchQuery.value = query
 
         if (query.isBlank()) {
-            _searchState.value = UiState.Empty
+            searchState.value = UiState.Empty
             return
         }
 
@@ -159,23 +157,23 @@ class SearchViewModel(
 
     private fun search(query: String) {
         viewModelScope.launch {
-            _searchState.value = UiState.Loading
+            searchState.value = UiState.Loading
 
             delay(300) // Debounce
 
             // Vérifier que la query n'a pas changé
-            if (query != _searchQuery.value) return@launch
+            if (query != searchQuery.value) return@launch
 
             searchMoviesUseCase(query)
                 .onSuccess { results ->
-                    _searchState.value = if (results.isEmpty()) {
+                    searchState.value = if (results.isEmpty()) {
                         UiState.Empty
                     } else {
                         UiState.Success(results)
                     }
                 }
                 .onFailure { error ->
-                    _searchState.value = UiState.Error(
+                    searchState.value = UiState.Error(
                         error = errorMapper.toUIText(error),
                         hint = UIErrorHint(retry = RetryPolicy.Manual)
                     )
@@ -184,8 +182,8 @@ class SearchViewModel(
     }
 
     fun retry() {
-        if (_searchQuery.value.isNotBlank()) {
-            search(_searchQuery.value)
+        if (searchQuery.value.isNotBlank()) {
+            search(searchQuery.value)
         }
     }
 }
@@ -285,13 +283,13 @@ class ProfileViewModel(
     private val errorMapper: ErrorMessageMapper
 ) : ViewModel() {
 
-    private val _profileState = MutableStateFlow<UiState<UserProfile>>(UiState.Loading)
-    val profileState: StateFlow<UiState<UserProfile>> = _profileState.asStateFlow()
+    val profileState: StateFlow<UiState<UserProfile>>
+        field = MutableStateFlow<UiState<UserProfile>>(UiState.Loading)
 
     override val screenState: StateFlow<UiState<*>> = profileState
 
-    private val _isUpdating = MutableStateFlow(false)
-    val isUpdating: StateFlow<Boolean> = _isUpdating.asStateFlow()
+    val isUpdating: StateFlow<Boolean>
+        field = MutableStateFlow(false)
 
     init {
         loadProfile()
@@ -299,14 +297,14 @@ class ProfileViewModel(
 
     fun loadProfile() {
         viewModelScope.launch {
-            _profileState.value = UiState.Loading
+            profileState.value = UiState.Loading
 
             getUserProfileUseCase()
                 .onSuccess { profile ->
-                    _profileState.value = UiState.Success(profile)
+                    profileState.value = UiState.Success(profile)
                 }
                 .onFailure { error ->
-                    _profileState.value = UiState.Error(
+                    profileState.value = UiState.Error(
                         error = errorMapper.toUIText(error),
                         hint = UIErrorHint(retry = RetryPolicy.Manual)
                     )
@@ -316,11 +314,11 @@ class ProfileViewModel(
 
     fun updateProfile(name: String, email: String) {
         viewModelScope.launch {
-            _isUpdating.value = true
+            isUpdating.value = true
 
             updateProfileUseCase(name, email)
                 .onSuccess { updatedProfile ->
-                    _profileState.value = UiState.Success(updatedProfile)
+                    profileState.value = UiState.Success(updatedProfile)
                     sendEvent(
                         UiEvent.ShowSnackBar(
                             UIText.Resource(Res.string.profile_updated)
@@ -333,7 +331,7 @@ class ProfileViewModel(
                     )
                 }
                 .also {
-                    _isUpdating.value = false
+                    isUpdating.value = false
                 }
         }
     }
@@ -446,13 +444,11 @@ class MoviesWithPaginationViewModel(
     private val errorMapper: ErrorMessageMapper
 ) : ViewModel() {
 
-    private val _moviesState = MutableStateFlow<UiState<List<MovieUiModel>>>(UiState.Loading)
-    val moviesState: StateFlow<UiState<List<MovieUiModel>>> = _moviesState.asStateFlow()
+    val moviesState: StateFlow<UiState<List<MovieUiModel>>>
+        field = MutableStateFlow<UiState<List<MovieUiModel>>>(UiState.Loading)
 
-    override val screenState: StateFlow<UiState<*>> = moviesState
-
-    private val _isLoadingMore = MutableStateFlow(false)
-    val isLoadingMore: StateFlow<Boolean> = _isLoadingMore.asStateFlow()
+    val isLoadingMore: StateFlow<Boolean>
+        field = MutableStateFlow(false)
 
     private var currentPage = 1
     private var canLoadMore = true
@@ -463,12 +459,12 @@ class MoviesWithPaginationViewModel(
 
     fun loadMovies() {
         viewModelScope.launch {
-            _moviesState.value = UiState.Loading
+            moviesState.value = UiState.Loading
             currentPage = 1
 
             getMoviesUseCase(page = currentPage)
                 .onSuccess { movies ->
-                    _moviesState.value = if (movies.isEmpty()) {
+                    moviesState.value = if (movies.isEmpty()) {
                         UiState.Empty
                     } else {
                         canLoadMore = movies.size >= 20 // Taille de page
@@ -476,7 +472,7 @@ class MoviesWithPaginationViewModel(
                     }
                 }
                 .onFailure { error ->
-                    _moviesState.value = UiState.Error(
+                    moviesState.value = UiState.Error(
                         error = errorMapper.toUIText(error),
                         hint = UIErrorHint(retry = RetryPolicy.Manual)
                     )
@@ -485,18 +481,18 @@ class MoviesWithPaginationViewModel(
     }
 
     fun loadMore() {
-        if (!canLoadMore || _isLoadingMore.value) return
+        if (!canLoadMore || isLoadingMore.value) return
 
-        val currentMovies = (_moviesState.value as? UiState.Success)?.data ?: return
+        val currentMovies = (moviesState.value as? UiState.Success)?.data ?: return
 
         viewModelScope.launch {
-            _isLoadingMore.value = true
+            isLoadingMore.value = true
             currentPage++
 
             getMoviesUseCase(page = currentPage)
                 .onSuccess { newMovies ->
                     canLoadMore = newMovies.size >= 20
-                    _moviesState.value = UiState.Success(currentMovies + newMovies)
+                    moviesState.value = UiState.Success(currentMovies + newMovies)
                 }
                 .onFailure { error ->
                     currentPage-- // Revenir en arrière en cas d'erreur
@@ -505,7 +501,7 @@ class MoviesWithPaginationViewModel(
                     )
                 }
                 .also {
-                    _isLoadingMore.value = false
+                    isLoadingMore.value = false
                 }
         }
     }
@@ -613,13 +609,11 @@ class MoviesWithRefreshViewModel(
     private val errorMapper: ErrorMessageMapper
 ) : ViewModel() {
 
-    private val _moviesState = MutableStateFlow<UiState<List<MovieUiModel>>>(UiState.Loading)
-    val moviesState: StateFlow<UiState<List<MovieUiModel>>> = _moviesState.asStateFlow()
+    val moviesState: StateFlow<UiState<List<MovieUiModel>>>
+        field = MutableStateFlow<UiState<List<MovieUiModel>>>(UiState.Loading)
 
-    override val screenState: StateFlow<UiState<*>> = moviesState
-
-    private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+    val isRefreshing: StateFlow<Boolean>
+        field = MutableStateFlow(false)
 
     init {
         loadMovies()
@@ -627,18 +621,18 @@ class MoviesWithRefreshViewModel(
 
     fun loadMovies() {
         viewModelScope.launch {
-            _moviesState.value = UiState.Loading
+            moviesState.value = UiState.Loading
 
             getMoviesUseCase()
                 .onSuccess { movies ->
-                    _moviesState.value = if (movies.isEmpty()) {
+                    moviesState.value = if (movies.isEmpty()) {
                         UiState.Empty
                     } else {
                         UiState.Success(movies)
                     }
                 }
                 .onFailure { error ->
-                    _moviesState.value = UiState.Error(
+                    moviesState.value = UiState.Error(
                         error = errorMapper.toUIText(error),
                         hint = UIErrorHint(retry = RetryPolicy.Manual)
                     )
@@ -648,11 +642,11 @@ class MoviesWithRefreshViewModel(
 
     fun refresh() {
         viewModelScope.launch {
-            _isRefreshing.value = true
+            isRefreshing.value = true
 
             getMoviesUseCase()
                 .onSuccess { movies ->
-                    _moviesState.value = if (movies.isEmpty()) {
+                    moviesState.value = if (movies.isEmpty()) {
                         UiState.Empty
                     } else {
                         UiState.Success(movies)
@@ -666,7 +660,7 @@ class MoviesWithRefreshViewModel(
                     )
                 }
                 .also {
-                    _isRefreshing.value = false
+                    isRefreshing.value = false
                 }
         }
     }

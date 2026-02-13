@@ -5,6 +5,8 @@ import com.msoula.hobbymatchmaker.core.network.BuildKonfig.APP_SECRET
 import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.HttpRequestRetry
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
@@ -35,6 +37,19 @@ actual val coreModuleNetworkPlatformSpecific = module {
 
             install(ContentNegotiation) {
                 json(get())
+            }
+
+            install(HttpTimeout) {
+                requestTimeoutMillis = 30_000
+                connectTimeoutMillis = 10_000
+                socketTimeoutMillis = 10_000
+            }
+
+            install(HttpRequestRetry) {
+                maxRetries = 3
+                retryOnServerErrors(maxRetries = 3)
+                retryOnException(maxRetries = 3, retryOnTimeout = true)
+                exponentialDelay()
             }
 
             defaultRequest {

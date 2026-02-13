@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.getDeviceLocale
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
@@ -30,7 +31,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -46,12 +47,12 @@ class MovieViewModel(
 
     private val language = getDeviceLocale()
     private var fetchLaunched = false
-    private val _movieScreenState =
-        MutableStateFlow<UiState<ImmutableList<MovieUiModel>>>(UiState.Loading)
-    val movieScreenState = _movieScreenState.asStateFlow()
 
-    private val _paginationState = MutableStateFlow(PaginationStateModel.Initial)
-    val paginationState = _paginationState.asStateFlow()
+    val movieScreenState: StateFlow<UiState<ImmutableList<MovieUiModel>>>
+        field = MutableStateFlow<UiState<ImmutableList<MovieUiModel>>>(UiState.Loading)
+
+    val paginationState: StateFlow<PaginationStateModel>
+        field = MutableStateFlow<PaginationStateModel>(PaginationStateModel.Initial)
 
     init {
         observeMovies()
@@ -69,16 +70,16 @@ class MovieViewModel(
                             fetchLaunched = true
                             launch {
                                 interactor.fetchMovies(language).onFailure { error ->
-                                    _movieScreenState.update { mapError(error) }
+                                    movieScreenState.update { mapError(error) }
                                 }
                             }
                         } else {
-                            _movieScreenState.update { mapSuccess(movies) }
+                            movieScreenState.update { mapSuccess(movies) }
                         }
                     }
 
                     is AppResult.Failure -> {
-                        _movieScreenState.update { mapError(result.error) }
+                        movieScreenState.update { mapError(result.error) }
                     }
                 }
             }
@@ -90,22 +91,22 @@ class MovieViewModel(
             if (interactor.shouldRefreshMovies()) {
                 interactor.fetchMovies(language)
                     .onFailure { error ->
-                        _movieScreenState.update { mapError(error) }
+                        movieScreenState.update { mapError(error) }
                     }
             }
         }
     }
 
     fun loadMore() {
-        val current = _paginationState.value
+        val current = paginationState.value
         if (current.isLoadingMore || !current.hasMorePages) return
 
         scope.launch {
-            _paginationState.update { it.copy(isLoadingMore = true) }
+            paginationState.update { it.copy(isLoadingMore = true) }
 
             when (val result = interactor.loadMoreMovies(language, current.currentPage + 1)) {
                 is AppResult.Success -> {
-                    _paginationState.update {
+                    paginationState.update {
                         it.copy(
                             isLoadingMore = false,
                             currentPage = result.data.currentPage,
@@ -115,7 +116,7 @@ class MovieViewModel(
                 }
 
                 is AppResult.Failure -> {
-                    _paginationState.update {
+                    paginationState.update {
                         it.copy(isLoadingMore = false)
                     }
                     eventHandler.sendEvent(
@@ -146,7 +147,7 @@ class MovieViewModel(
     }
 
     private suspend fun toggleFavorite(movieId: Long) {
-        val currentState = _movieScreenState.value
+        val currentState = movieScreenState.value
         if (currentState !is UiState.Success) return
 
         val movie = currentState.data.firstOrNull { it.id == movieId } ?: return
@@ -182,6 +183,9 @@ class MovieViewModel(
                         )
                     )
                 }
+            }
+            .onFailure { error ->
+                Logger.e("Failed to check movie match: $error")
             }
     }
 

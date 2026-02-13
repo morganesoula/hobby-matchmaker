@@ -159,8 +159,8 @@ when (state) {
 **APRÈS :**
 ```kotlin
 // ViewModel
-private val _state = MutableStateFlow<UiState<List<Item>>>(UiState.Loading)
-val state: StateFlow<UiState<List<Item>>> = _state.asStateFlow()
+val state: StateFlow<UiState<List<Item>>>
+    field = MutableStateFlow<UiState<List<Item>>>(UiState.Loading)
 
 // Screen
 StateContainer(

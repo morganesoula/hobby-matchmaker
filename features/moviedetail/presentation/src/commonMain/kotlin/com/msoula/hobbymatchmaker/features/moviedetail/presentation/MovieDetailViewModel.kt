@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.features.moviedetail.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.getDeviceLocale
@@ -24,7 +25,7 @@ import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.Movie
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -39,8 +40,8 @@ class MovieDetailViewModel(
     private val eventHandler = EventHandler()
     val events = eventHandler.events
 
-    private val _screenState = MutableStateFlow<UiState<MovieDetailUiModel>>(UiState.Loading)
-    val screenState = _screenState.asStateFlow()
+    val screenState: StateFlow<UiState<MovieDetailUiModel>>
+        field = MutableStateFlow<UiState<MovieDetailUiModel>>(UiState.Loading)
 
     private val retryTrigger = MutableStateFlow(0)
 
@@ -56,7 +57,7 @@ class MovieDetailViewModel(
             retryTrigger.flatMapLatest {
                 interactor.observeMovieDetail(movieId, language)
             }.collect { result ->
-                _screenState.update {
+                screenState.update {
                     when (result) {
                         is AppResult.Success -> mapDetailSuccess(result.data)
                         is AppResult.Failure -> mapError(result.error)
@@ -67,7 +68,7 @@ class MovieDetailViewModel(
     }
 
     fun retryObservation() {
-        _screenState.update { UiState.Loading }
+        screenState.update { UiState.Loading }
         retryTrigger.update { it + 1 }
     }
 
@@ -78,14 +79,12 @@ class MovieDetailViewModel(
 
             is MovieDetailUiEventModel.OnMovieDoubleTap ->
                 scope.launch { toggleFavorite(event.movieId) }
-
-            else -> Unit
         }
     }
 
     private suspend fun playTrailer(isVideoUriKnown: Boolean) {
         if (interactor.canPlayTrailerDirectly(isVideoUriKnown)) {
-            val currentState = _screenState.value
+            val currentState = screenState.value
             if (currentState is UiState.Success) {
                 eventHandler.sendEvent(UiEvent.OnDataReady(currentState.data.videoKey))
             }
@@ -104,7 +103,7 @@ class MovieDetailViewModel(
     }
 
     private suspend fun toggleFavorite(movieId: Long) {
-        val currentState = _screenState.value
+        val currentState = screenState.value
         if (currentState !is UiState.Success) return
 
         val movie = currentState.data
@@ -138,6 +137,9 @@ class MovieDetailViewModel(
                         )
                     )
                 }
+            }
+            .onFailure { error ->
+                Logger.e("Failed to check movie match: $error")
             }
     }
 

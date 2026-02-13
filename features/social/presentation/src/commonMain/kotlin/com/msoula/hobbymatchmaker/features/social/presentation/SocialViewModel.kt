@@ -33,7 +33,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
@@ -54,18 +54,14 @@ class SocialViewModel(
     private var currentUserUid: String? = null
     private var currentUserPseudo: String? = null
 
-    private val _searchResults = MutableStateFlow<ImmutableList<SocialUserSummaryUiModel>>(
-        persistentListOf()
-    )
-    val searchResults = _searchResults.asStateFlow()
+    val searchResults: StateFlow<ImmutableList<SocialUserSummaryUiModel>>
+        field = MutableStateFlow<ImmutableList<SocialUserSummaryUiModel>>(persistentListOf())
 
-    private val _sentInvites =
-        MutableStateFlow<UiState<ImmutableList<InviteUiModel>>>(UiState.Loading)
-    val sentInvites = _sentInvites.asStateFlow()
+    val sentInvites: StateFlow<UiState<ImmutableList<InviteUiModel>>>
+        field = MutableStateFlow<UiState<ImmutableList<InviteUiModel>>>(UiState.Loading)
 
-    private val _incomingInvites =
-        MutableStateFlow<UiState<ImmutableList<InviteUiModel>>>(UiState.Loading)
-    val incomingInvites = _incomingInvites.asStateFlow()
+    val incomingInvites: StateFlow<UiState<ImmutableList<InviteUiModel>>>
+        field = MutableStateFlow<UiState<ImmutableList<InviteUiModel>>>(UiState.Loading)
 
     init {
         observeSessionAndInvites()
@@ -83,7 +79,7 @@ class SocialViewModel(
                     socialUseCases.observeSentInvitesUseCase(uid)
                 }
             ).collect { result ->
-                _sentInvites.update { result.toInvitesUiState() }
+                sentInvites.update { result.toInvitesUiState() }
             }
         }
 
@@ -106,7 +102,7 @@ class SocialViewModel(
                     }
                 }
                 .collect { result ->
-                    _incomingInvites.update { result.toInvitesUiState() }
+                    incomingInvites.update { result.toInvitesUiState() }
                 }
         }
     }
@@ -188,7 +184,7 @@ class SocialViewModel(
     private suspend fun searchUsers(pseudo: String) {
         socialUseCases.searchUsersByPseudoUseCase(pseudo, currentUserUid)
             .onSuccess { list ->
-                _searchResults.update { list.map { it.toSocialSummaryUiModel() }.toImmutableList() }
+                searchResults.update { list.map { it.toSocialSummaryUiModel() }.toImmutableList() }
             }
             .onFailure { error ->
                 eventHandler.sendEvent(
@@ -220,6 +216,9 @@ class SocialViewModel(
         )
             .onSuccess {
                 socialUseCases.refreshSentInvitesUseCase(uid)
+                    .onFailure {
+                        Logger.e("Failed to refresh sent invites after send: $it")
+                    }
                 eventHandler.sendEvent(UiEvent.OnDataReady("invitation_sent"))
             }
             .onFailure { error ->

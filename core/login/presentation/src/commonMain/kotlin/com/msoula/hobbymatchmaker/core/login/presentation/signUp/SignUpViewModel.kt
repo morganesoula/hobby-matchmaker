@@ -18,7 +18,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.signUp.models.SignUpSt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.update
@@ -36,12 +36,11 @@ class SignUpViewModel(
     private val eventHandler = EventHandler()
     val events = eventHandler.events
 
-    private val _formDataFlow = MutableStateFlow(SignUpStateModel())
-    val formDataFlow = _formDataFlow.asStateFlow()
+    val formDataFlow: StateFlow<SignUpStateModel>
+        field = MutableStateFlow<SignUpStateModel>(SignUpStateModel())
 
-    private val _signUpState: MutableStateFlow<UiState<Unit>> =
-        MutableStateFlow(UiState.Success(Unit))
-    val signUpState = _signUpState.asStateFlow()
+    val signUpState: StateFlow<UiState<Unit>>
+        field = MutableStateFlow<UiState<Unit>>(UiState.Success(Unit))
 
     init {
         scope.launch {
@@ -56,14 +55,14 @@ class SignUpViewModel(
     fun onEvent(event: AuthenticationUIEvent) {
         when (event) {
             is AuthenticationUIEvent.OnEmailChanged ->
-                _formDataFlow.update { it.copy(email = event.email.trim()) }
+                formDataFlow.update { it.copy(email = event.email.trim()) }
 
             is AuthenticationUIEvent.OnFirstNameChanged -> {
-                _formDataFlow.update { it.copy(firstName = event.firstName.trim()) }
+                formDataFlow.update { it.copy(firstName = event.firstName.trim()) }
             }
 
             is AuthenticationUIEvent.OnPasswordChanged ->
-                _formDataFlow.update { it.copy(password = event.password.trim()) }
+                formDataFlow.update { it.copy(password = event.password.trim()) }
 
             AuthenticationUIEvent.OnSignUp -> scope.launch {
                 doSignIn {
@@ -90,7 +89,7 @@ class SignUpViewModel(
         val valid = signUpInteractor
             .validateCredentials(email, password) && firstNameValidation.successful
 
-        _formDataFlow.update {
+        formDataFlow.update {
             it.copy(
                 submit = valid,
                 signUpError = if (formState.firstName.isNotEmpty()) firstNameValidation.errorMessage
@@ -102,22 +101,22 @@ class SignUpViewModel(
     private suspend fun doSignIn(
         action: suspend () -> AppResult<Unit, AppError>
     ) {
-        _signUpState.update { UiState.Loading }
+        signUpState.update { UiState.Loading }
 
         action()
             .onSuccess {
-                _signUpState.update { UiState.Success(Unit) }
+                signUpState.update { UiState.Success(Unit) }
                 eventHandler.sendEvent(UiEvent.Navigate(NavigationDestination.Movies))
             }
             .onFailure { error ->
-                _signUpState.update { UiState.Success(Unit) }
+                signUpState.update { UiState.Success(Unit) }
                 eventHandler.sendEvent(
                     UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(error))
                 )
             }
     }
 
-    private fun resetForm() = _formDataFlow.update { SignUpStateModel() }
+    private fun resetForm() = formDataFlow.update { SignUpStateModel() }
 
     override fun onCleared() {
         super.onCleared()

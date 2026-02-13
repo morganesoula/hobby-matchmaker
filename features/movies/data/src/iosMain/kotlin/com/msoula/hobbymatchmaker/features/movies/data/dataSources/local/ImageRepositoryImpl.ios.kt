@@ -7,6 +7,7 @@ import com.msoula.hobbymatchmaker.features.movies.domain.repositories.ImageRepos
 import io.ktor.util.date.getTimeMillis
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import platform.Foundation.NSCachesDirectory
 import platform.Foundation.NSData
@@ -14,8 +15,10 @@ import platform.Foundation.NSFileManager
 import platform.Foundation.NSFileSize
 import platform.Foundation.NSNumber
 import platform.Foundation.NSURL
+import platform.Foundation.NSURLSession
+import platform.Foundation.NSURLSessionConfiguration
 import platform.Foundation.NSUserDomainMask
-import platform.Foundation.dataWithContentsOfURL
+import platform.Foundation.dataTaskWithURL
 import platform.Foundation.writeToURL
 
 class ImageRepositoryImpl(
@@ -47,7 +50,8 @@ class ImageRepositoryImpl(
 
         return try {
             val imageData = withContext(coroutineDispatcher) {
-                NSData.dataWithContentsOfURL(NSURL.URLWithString(fullURL)!!)
+                val url = NSURL.URLWithString(fullURL) ?: return@withContext null
+                downloadDataWithTimeout(url)
             }
 
             if (imageData == null) {
@@ -70,6 +74,25 @@ class ImageRepositoryImpl(
         }
     }
 
+    private suspend fun downloadDataWithTimeout(url: NSURL): NSData? =
+        suspendCancellableCoroutine { continuation ->
+            val config = NSURLSessionConfiguration.defaultSessionConfiguration.apply {
+                timeoutIntervalForRequest = 8.0
+                timeoutIntervalForResource = 15.0
+            }
+            val session = NSURLSession.sessionWithConfiguration(config)
+            val task = session.dataTaskWithURL(url) { data, _, error ->
+                if (error != null) {
+                    continuation.resume(null) {}
+                } else {
+                    continuation.resume(data) {}
+                }
+            }
+
+            continuation.invokeOnCancellation { task.cancel() }
+            task.resume()
+        }
+
     @OptIn(ExperimentalForeignApi::class)
     private fun saveImageToLocal(
         imageData: NSData,
@@ -82,36 +105,43 @@ class ImageRepositoryImpl(
                 fm.URLsForDirectory(NSCachesDirectory, NSUserDomainMask).first() as NSURL
             val imagesDirUrl = baseDirUrl.URLByAppendingPathComponent("Images", isDirectory = true)
 
-            if (!fm.fileExistsAtPath(imagesDirUrl?.path!!)) {
-                fm.createDirectoryAtPath(
-                    imagesDirUrl.path!!,
-                    withIntermediateDirectories = true,
-                    attributes = null,
-                    error = null
-                )
-            }
-
-            val fileUrl =
-                imagesDirUrl.URLByAppendingPathComponent(cleanImageName, isDirectory = false)
-
-            if (fm.fileExistsAtPath(fileUrl?.path!!)) {
-                val attrs = fm.attributesOfItemAtPath(fileUrl.path!!, null)
-                val size = (attrs?.get(NSFileSize) as? NSNumber)?.longLongValue ?: 0L
-                if (size > 0L) {
-                    val absolute = fileUrl.absoluteString
-                    Logger.d("Image already cached: $absolute (size=$size)")
-                    return absolute
+            imagesDirUrl?.let { dir ->
+                dir.path?.let { path ->
+                    if (!fm.fileExistsAtPath(path)) {
+                        fm.createDirectoryAtPath(
+                            path,
+                            withIntermediateDirectories = true,
+                            attributes = null,
+                            error = null
+                        )
+                    }
                 }
             }
 
-            val ok = imageData.writeToURL(fileUrl, atomically = true)
-            val exists = fm.fileExistsAtPath(fileUrl.path!!)
-            val attrs = fm.attributesOfItemAtPath(fileUrl.path!!, null)
-            val size = (attrs?.get(NSFileSize) as? NSNumber)?.longLongValue ?: 0L
-            val absolute = fileUrl.absoluteString
+            val fileUrl =
+                imagesDirUrl?.URLByAppendingPathComponent(cleanImageName, isDirectory = false)
 
-            Logger.d("Saved ok=$ok exists=$exists size=$size at $absolute")
-            if (!ok || !exists || size <= 0L) null else absolute
+            fileUrl?.let { url ->
+                url.path?.let { path ->
+                    if (fm.fileExistsAtPath(path)) {
+                        val attrs = fm.attributesOfItemAtPath(path, null)
+                        val size = (attrs?.get(NSFileSize) as? NSNumber)?.longLongValue ?: 0L
+                        if (size > 0L) {
+                            val absolute = url.absoluteString
+                            Logger.d("Image already cached: $absolute (size=$size)")
+                            return absolute
+                        }
+                    }
+                    val ok = imageData.writeToURL(url, atomically = true)
+                    val exists = fm.fileExistsAtPath(path)
+                    val attrs = fm.attributesOfItemAtPath(path, null)
+                    val size = (attrs?.get(NSFileSize) as? NSNumber)?.longLongValue ?: 0L
+                    val absolute = url.absoluteString
+
+                    Logger.d("Saved ok=$ok exists=$exists size=$size at $absolute")
+                    if (!ok || !exists || size <= 0L) null else absolute
+                }
+            }
         } catch (e: Exception) {
             Logger.e("Exception while writing image: ${e.message}")
             null

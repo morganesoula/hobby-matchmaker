@@ -12,7 +12,7 @@ import com.msoula.hobbymatchmaker.core.splashscreen.presentation.model.SplashUiS
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.SyncLocalFavoritesToCloudUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -26,8 +26,8 @@ class SplashViewModel(
 ) : ViewModel() {
     private val syncLocalFavoritesToCloudUseCase by syncLocalFavoritesToCloudUseCase
 
-    private val _state = MutableStateFlow<SplashUiState>(SplashUiState.Loading)
-    val state = _state.asStateFlow()
+    val state: StateFlow<SplashUiState>
+        field = MutableStateFlow<SplashUiState>(SplashUiState.Loading)
 
     init {
         viewModelScope.launch {
@@ -40,7 +40,7 @@ class SplashViewModel(
                     val isFirebaseSessionValid = validateFirebaseSession()
 
                     if (isFirebaseSessionValid) {
-                        _state.update { SplashUiState.GoToMovies }
+                        state.update { SplashUiState.GoToMovies }
 
                         launch {
                             runCatching { syncLocalFavoritesToCloudUseCase() }
@@ -48,13 +48,13 @@ class SplashViewModel(
                         }
                     } else {
                         clearCurrentUserProfileUuidUseCase()
-                        _state.update { SplashUiState.GoToAuth }
+                        state.update { SplashUiState.GoToAuth }
                     }
                 } else {
-                    _state.update { SplashUiState.GoToAuth }
+                    state.update { SplashUiState.GoToAuth }
                 }
             } catch (t: Throwable) {
-                _state.update { SplashUiState.Error(t.message ?: "Unknown error") }
+                state.update { SplashUiState.Error(t.message ?: "Unknown error") }
             }
         }
     }

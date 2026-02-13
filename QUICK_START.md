@@ -14,9 +14,9 @@ class MyViewModel(
     private val errorMapper: ErrorMessageMapper
 ) {
 
-    // 1. Créer un StateFlow avec UiState<T>
-    private val _myState = MutableStateFlow<UiState<MyData>>(UiState.Loading)
-    val myState: StateFlow<UiState<MyData>> = _myState.asStateFlow()
+    // 1. Créer un StateFlow avec UiState<T> -- Using Kotlin 2.3.0
+    val myState: StateFlow<UiState<MyData>>
+        field = MutableStateFlow<UiState<MyData>>(UiState.Loading)
 
     override val screenState: StateFlow<UiState<*>> = myState
 
@@ -27,18 +27,18 @@ class MyViewModel(
     // 2. Charger les données
     fun loadData() {
         viewModelScope.launch {
-            _myState.value = UiState.Loading
+            myState.value = UiState.Loading
 
             useCase()
                 .onSuccess { data ->
-                    _myState.value = if (data.isEmpty()) {
+                    myState.value = if (data.isEmpty()) {
                         UiState.Empty
                     } else {
                         UiState.Success(data)
                     }
                 }
                 .onFailure { error ->
-                    _myState.value = UiState.Error(
+                    myState.value = UiState.Error(
                         error = errorMapper.toUIText(error),
                         hint = UIErrorHint(retry = RetryPolicy.Manual)
                     )

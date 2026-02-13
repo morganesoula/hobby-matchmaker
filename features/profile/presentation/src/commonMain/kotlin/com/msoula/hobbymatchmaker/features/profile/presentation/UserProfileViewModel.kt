@@ -21,7 +21,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -43,22 +42,20 @@ class UserProfileViewModel(
     private val eventHandler = EventHandler()
     val events = eventHandler.events
 
-    private val _isEditMode = MutableStateFlow(false)
-    val isEditMode = _isEditMode.asStateFlow()
+    val isEditMode: StateFlow<Boolean>
+        field = MutableStateFlow<Boolean>(false)
 
-    private val _editableProfile = MutableStateFlow<UserProfileUiModel?>(null)
+    val editableProfile: StateFlow<UserProfileUiModel?>
+        field = MutableStateFlow<UserProfileUiModel?>(null)
 
-    val editableProfile = _editableProfile.asStateFlow()
-    private val _originalProfile = MutableStateFlow<UserProfileUiModel?>(null)
+    val originalProfile: StateFlow<UserProfileUiModel?>
+        field = MutableStateFlow<UserProfileUiModel?>(null)
 
-    private val _isPseudoAvailable = MutableStateFlow<Boolean?>(null)
+    val isPseudoAvailable: StateFlow<Boolean?>
+        field = MutableStateFlow<Boolean?>(null)
 
-    val isPseudoAvailable = _isPseudoAvailable.asStateFlow()
-
-    private val _screenState =
-        MutableStateFlow<UserProfileUiStateModel>(UserProfileUiStateModel.Loading)
-
-    val screenState = _screenState.asStateFlow()
+    val screenState: StateFlow<UserProfileUiStateModel>
+        field = MutableStateFlow<UserProfileUiStateModel>(UserProfileUiStateModel.Loading)
 
     private val currentUserUid: StateFlow<String?> = sessionInteractor.observeSessionState()
         .map { state ->
@@ -92,10 +89,10 @@ class UserProfileViewModel(
                 .collect { profile ->
                     profile?.let {
                         val uiModel = it.toUserProfileUiModel()
-                        _screenState.update { UserProfileUiStateModel.Success(uiModel) }
+                        screenState.update { UserProfileUiStateModel.Success(uiModel) }
 
-                        if (!_isEditMode.value) {
-                            _editableProfile.update { uiModel }
+                        if (!isEditMode.value) {
+                            editableProfile.update { uiModel }
                         }
                     }
                 }
@@ -116,13 +113,13 @@ class UserProfileViewModel(
     fun onEvent(event: UserProfileUiEventModel) {
         when (event) {
             is UserProfileUiEventModel.OnBioChanged ->
-                _editableProfile.update { current -> current?.copy(bio = event.value) }
+                editableProfile.update { current -> current?.copy(bio = event.value) }
 
             is UserProfileUiEventModel.OnNameChanged ->
-                _editableProfile.update { current -> current?.copy(name = event.value) }
+                editableProfile.update { current -> current?.copy(name = event.value) }
 
             is UserProfileUiEventModel.OnInterestsChanged -> {
-                _editableProfile.update { current -> current?.copy(interests = event.value) }
+                editableProfile.update { current -> current?.copy(interests = event.value) }
             }
 
             is UserProfileUiEventModel.OnAvatarSelected -> {
@@ -130,20 +127,20 @@ class UserProfileViewModel(
             }
 
             is UserProfileUiEventModel.OnPseudoChanged -> {
-                _editableProfile.update { current -> current?.copy(pseudo = event.value) }
-                _isPseudoAvailable.update { null }
+                editableProfile.update { current -> current?.copy(pseudo = event.value) }
+                isPseudoAvailable.update { null }
             }
 
             UserProfileUiEventModel.OnPseudoDefined -> {
-                _editableProfile.value?.let {
+                editableProfile.value?.let {
                     scope.launch {
-                        if (it.pseudo != _originalProfile.value?.pseudo)
+                        if (it.pseudo != originalProfile.value?.pseudo)
                             userProfileInteractor.checkPseudoAvailable(it.pseudo)
                                 .onSuccess { available ->
-                                    _isPseudoAvailable.update { available }
+                                    isPseudoAvailable.update { available }
                                 }
                                 .onFailure { error ->
-                                    _isPseudoAvailable.update { null }
+                                    isPseudoAvailable.update { null }
                                     eventHandler.sendEvent(
                                         UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
                                     )
@@ -161,18 +158,18 @@ class UserProfileViewModel(
     }
 
     private fun toggleEditMode() {
-        _originalProfile.update { _editableProfile.value }
-        _isEditMode.update { true }
+        originalProfile.update { editableProfile.value }
+        isEditMode.update { true }
     }
 
     private fun saveProfile() {
         scope.launch {
-            val editable = _editableProfile.value ?: return@launch
+            val editable = editableProfile.value ?: return@launch
             val uid = currentUserUid.value ?: return@launch
 
             userProfileInteractor.saveProfile(uid, editable)
                 .onSuccess {
-                    _originalProfile.update { editable }
+                    originalProfile.update { editable }
 
                     eventHandler.sendEvent(
                         UiEvent.OnDataReady("profile_updated")
@@ -215,21 +212,21 @@ class UserProfileViewModel(
     }
 
     fun closeEdition() {
-        _editableProfile.update { _originalProfile.value }
-        _isEditMode.update { false }
-        _isPseudoAvailable.update { null }
+        editableProfile.update { originalProfile.value }
+        isEditMode.update { false }
+        isPseudoAvailable.update { null }
     }
 
     @OptIn(ExperimentalTime::class)
     private fun onAvatarSelected(avatarPath: String) {
         scope.launch {
             val uid = currentUserUid.value
-            val old = _editableProfile.value?.avatarUrl
+            val old = editableProfile.value?.avatarUrl
 
             uid?.let { safeUid ->
                 userProfileInteractor.saveAvatar(safeUid, old, avatarPath)
                     .onSuccess { newPath ->
-                        _editableProfile.update { it?.copy(avatarUrl = newPath) }
+                        editableProfile.update { it?.copy(avatarUrl = newPath) }
                     }
                     .onFailure { error ->
                         eventHandler.sendEvent(

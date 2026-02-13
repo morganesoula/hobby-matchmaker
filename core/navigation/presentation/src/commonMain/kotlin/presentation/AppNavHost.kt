@@ -63,11 +63,15 @@ private val VideoPlayerStateSaver = Saver<VideoPlayerState, List<Any>>(
         listOf(state.videoId, state.isVisible, state.isLoading)
     },
     restore = { list ->
-        VideoPlayerState(
-            videoId = list[0] as String,
-            isVisible = list[1] as Boolean,
-            isLoading = list[2] as Boolean
-        )
+        if (list.size >= 3) {
+            VideoPlayerState(
+                videoId = list[0] as? String ?: "",
+                isVisible = list[1] as? Boolean ?: false,
+                isLoading = list[2] as? Boolean ?: false
+            )
+        } else {
+            VideoPlayerState.Initial
+        }
     }
 )
 
@@ -149,7 +153,13 @@ fun AppNavHost(
                     dontAskCheckbox = dontAskCheckbox,
                     onEvent = signInViewModel::onEvent,
                     snackBarHostState = snackbarHostState,
-                    facebookUIClient = (socialClients.clients[ProviderType.FACEBOOK] as FacebookUIClientImpl).facebookUIClient
+                    facebookUIClient = requireNotNull(
+                        (socialClients
+                            .clients[ProviderType.FACEBOOK] as? FacebookUIClientImpl)
+                            ?.facebookUIClient
+                    ) {
+                        "Facebook UI client is not configured in SocialClients"
+                    }
                 )
             }
 
@@ -288,9 +298,10 @@ fun AppNavHost(
             }
 
             LaunchedEffect(Unit) {
-                if (movieDetailState is UiState.Success) {
+                val currentState = movieDetailState
+                if (currentState is UiState.Success<MovieDetailUiModel>) {
                     videoPlayerState = VideoPlayerState(
-                        videoId = (movieDetailState as UiState.Success<MovieDetailUiModel>).data.videoKey,
+                        videoId = currentState.data.videoKey,
                         isVisible = false,
                         isLoading = false
                     )

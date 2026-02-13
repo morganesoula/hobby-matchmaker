@@ -17,7 +17,7 @@ fun <T, R> AppResult<T, AppError>.toUIState(
     when (this) {
         is AppResult.Success -> mapper(data)
         is AppResult.Failure ->
-            UiState.Error(errorMessageMapper.toUIText(error))
+            UiState.Error(errorMessageMapper.toUIText(error), error.hint())
     }
 
 fun AppError.hint(): UIErrorHint = when (this) {

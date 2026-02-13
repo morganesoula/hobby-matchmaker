@@ -19,7 +19,6 @@ import com.msoula.hobbymatchmaker.core.login.presentation.signIn.models.SocialCl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -33,19 +32,20 @@ class SignInViewModel(
     private val scope = externalScope ?: viewModelScope
     private val eventHandler = EventHandler()
     val events = eventHandler.events
-    private val _formDataFlow = MutableStateFlow(SignInFormStateModel())
-    val formDataFlow = _formDataFlow.asStateFlow()
-    private val _signInState: MutableStateFlow<UiState<Unit>> =
-        MutableStateFlow(UiState.Success(Unit))
-    val signInState: StateFlow<UiState<Unit>> = _signInState.asStateFlow()
 
-    private val _dontAskCheckboxValue = MutableStateFlow(false)
-    val dontAskCheckboxValue: StateFlow<Boolean> = _dontAskCheckboxValue.asStateFlow()
+    val formDataFlow: StateFlow<SignInFormStateModel>
+        field = MutableStateFlow<SignInFormStateModel>(SignInFormStateModel())
+
+    val signInState: StateFlow<UiState<Unit>>
+        field = MutableStateFlow<UiState<Unit>>(UiState.Success(Unit))
+
+    val dontAskCheckboxValue: StateFlow<Boolean>
+        field = MutableStateFlow<Boolean>(false)
 
     init {
         scope.launch {
             signInInteractor.observeDontAsk().collect { value ->
-                _dontAskCheckboxValue.update { value }
+                dontAskCheckboxValue.update { value }
             }
         }
     }
@@ -53,12 +53,12 @@ class SignInViewModel(
     fun onEvent(event: AuthenticationUIEvent) {
         when (event) {
             is AuthenticationUIEvent.OnEmailChanged -> {
-                _formDataFlow.update { it.copy(email = event.email.trimEnd()) }
+                formDataFlow.update { it.copy(email = event.email.trimEnd()) }
                 validateInput()
             }
 
             is AuthenticationUIEvent.OnEmailResetChanged -> {
-                _formDataFlow.update {
+                formDataFlow.update {
                     it.copy(
                         emailReset = event.emailReset.trimEnd(),
                         submitEmailReset = validateEmailReset(event.emailReset)
@@ -67,7 +67,7 @@ class SignInViewModel(
             }
 
             is AuthenticationUIEvent.OnPasswordChanged -> {
-                _formDataFlow.update { it.copy(password = event.password.trimEnd()) }
+                formDataFlow.update { it.copy(password = event.password.trimEnd()) }
                 validateInput()
             }
 
@@ -139,7 +139,7 @@ class SignInViewModel(
                 }
             }
 
-            AuthenticationUIEvent.OnScreenChanged -> _formDataFlow.update { SignInFormStateModel() }
+            AuthenticationUIEvent.OnScreenChanged -> formDataFlow.update { SignInFormStateModel() }
             else -> Unit
         }
     }
@@ -149,7 +149,7 @@ class SignInViewModel(
         val password = formDataFlow.value.password
         val valid = signInInteractor.validateCredentials(email, password)
 
-        _formDataFlow.update { it.copy(submit = valid) }
+        formDataFlow.update { it.copy(submit = valid) }
     }
 
     private fun validateEmailReset(emailReset: String): Boolean =
@@ -157,15 +157,15 @@ class SignInViewModel(
 
     private suspend fun resetPassword() {
         if (!formDataFlow.value.submitEmailReset) return
-        _signInState.update { UiState.Loading }
+        signInState.update { UiState.Loading }
 
         signInInteractor.resetPassword(formDataFlow.value.emailReset)
             .onSuccess {
-                _signInState.update { UiState.Success(Unit) }
+                signInState.update { UiState.Success(Unit) }
                 eventHandler.sendEvent(UiEvent.CloseDialog("reset_password"))
             }
             .onFailure { error ->
-                _signInState.update { UiState.Success(Unit) }
+                signInState.update { UiState.Success(Unit) }
                 eventHandler.sendEvent(
                     UiEvent.ShowSnackBar(
                         defaultErrorMessageMapper.toUIText(
@@ -179,14 +179,14 @@ class SignInViewModel(
     private suspend fun doSignIn(
         action: suspend () -> AppResult<Unit, AppError>
     ) {
-        _signInState.update { UiState.Loading }
+        signInState.update { UiState.Loading }
 
         action()
             .onSuccess {
                 eventHandler.sendEvent(UiEvent.Navigate(NavigationDestination.Movies))
             }
             .onFailure { error ->
-                _signInState.update { UiState.Success(Unit) }
+                signInState.update { UiState.Success(Unit) }
                 eventHandler.sendEvent(
                     UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(error))
                 )

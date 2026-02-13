@@ -54,7 +54,7 @@ fun SocialContent(
                         ErrorStateScreen(
                             error = error,
                             hint = hint,
-                            onRetry = {}
+                            onRetry = { observeSessionAndInvites() }
                         )
                     },
                     onSuccess = { invites ->

@@ -43,8 +43,8 @@ class MovieViewModel(
     private val errorMapper: ErrorMessageMapper
 ) : ViewModel() {
 
-    private val _moviesState = MutableStateFlow<UiState<List<MovieUiModel>>>(UiState.Loading)
-    val moviesState: StateFlow<UiState<List<MovieUiModel>>> = _moviesState.asStateFlow()
+    val moviesState: StateFlow<UiState<List<MovieUiModel>>>
+        field = MutableStateFlow<UiState<List<MovieUiModel>>>(UiState.Loading)
 
     init {
         loadMovies()
@@ -52,18 +52,18 @@ class MovieViewModel(
 
     fun loadMovies() {
         viewModelScope.launch {
-            _moviesState.value = UiState.Loading
+            moviesState.value = UiState.Loading
 
             getMoviesUseCase()
                 .onSuccess { movies ->
-                    _moviesState.value = if (movies.isEmpty()) {
+                    moviesState.value = if (movies.isEmpty()) {
                         UiState.Empty
                     } else {
                         UiState.Success(movies)
                     }
                 }
                 .onFailure { error ->
-                    _moviesState.value = UiState.Error(
+                    moviesState.value = UiState.Error(
                         error = errorMapper.toUIText(error),
                         hint = UIErrorHint(retry = RetryPolicy.Manual)
                     )
@@ -82,8 +82,8 @@ class MovieDetailViewModel(
     private val errorMapper: ErrorMessageMapper
 ) : ViewModel() {
 
-    private val _movieDetailState = MutableStateFlow<UiState<MovieDetailUiModel>>(UiState.Loading)
-    val movieDetailState: StateFlow<UiState<MovieDetailUiModel>> = _movieDetailState.asStateFlow()
+    val movieDetailState: StateFlow<UiState<MovieDetailUiModel>>
+        field = MutableStateFlow<UiState<MovieDetailUiModel>>(UiState.Loading)
 
     init {
         loadMovieDetail()
@@ -91,14 +91,14 @@ class MovieDetailViewModel(
 
     fun loadMovieDetail() {
         viewModelScope.launch {
-            _movieDetailState.value = UiState.Loading
+            movieDetailState.value = UiState.Loading
 
             getMovieDetailUseCase(movieId)
                 .onSuccess { detail ->
-                    _movieDetailState.value = UiState.Success(detail)
+                    movieDetailState.value = UiState.Success(detail)
                 }
                 .onFailure { error ->
-                    _movieDetailState.value = UiState.Error(
+                    movieDetailState.value = UiState.Error(
                         error = errorMapper.toUIText(error),
                         hint = UIErrorHint(retry = RetryPolicy.Manual)
                     )
@@ -534,10 +534,8 @@ class MovieViewModel(
     private val errorMapper: ErrorMessageMapper
 ) : ViewModel() {
 
-    private val _screenState = MutableStateFlow<UiState<List<MovieUiModel>>>(UiState.Loading)
-    override val screenState: StateFlow<UiState<*>> = _screenState.asStateFlow()
-
-    val moviesState: StateFlow<UiState<List<MovieUiModel>>> = _screenState
+    val movieState: StateFlow<UiState<*>>
+        field = MutableStateFlow<UiState<*>>(UiState.Loading)
 
     init {
         loadMovies()
@@ -545,18 +543,18 @@ class MovieViewModel(
 
     fun loadMovies() {
         viewModelScope.launch {
-            _screenState.value = UiState.Loading
+            movieState.value = UiState.Loading
 
             getMoviesUseCase()
                 .onSuccess { movies ->
-                    _screenState.value = if (movies.isEmpty()) {
+                    movieState.value = if (movies.isEmpty()) {
                         UiState.Empty
                     } else {
                         UiState.Success(movies)
                     }
                 }
                 .onFailure { error ->
-                    _screenState.value = UiState.Error(
+                    movieState.value = UiState.Error(
                         error = errorMapper.toUIText(error),
                         hint = UIErrorHint(retry = RetryPolicy.Manual)
                     )
@@ -652,10 +650,8 @@ class MovieDetailViewModel(
     private val errorMapper: ErrorMessageMapper
 ) : ViewModel() {
 
-    private val _screenState = MutableStateFlow<UiState<MovieDetailUiModel>>(UiState.Loading)
-    override val screenState: StateFlow<UiState<*>> = _screenState.asStateFlow()
-
-    val detailState: StateFlow<UiState<MovieDetailUiModel>> = _screenState
+    val detailState: StateFlow<UiState<*>>
+        field = MutableStateFlow<UiState<MovieDetailUiModel>>(UiState.Loading)
 
     init {
         loadDetail()
@@ -663,14 +659,14 @@ class MovieDetailViewModel(
 
     fun loadDetail() {
         viewModelScope.launch {
-            _screenState.value = UiState.Loading
+            detailState.value = UiState.Loading
 
             getMovieDetailUseCase(movieId)
                 .onSuccess { detail ->
-                    _screenState.value = UiState.Success(detail)
+                    detailState.value = UiState.Success(detail)
                 }
                 .onFailure { error ->
-                    _screenState.value = UiState.Error(
+                    detailState.value = UiState.Error(
                         error = errorMapper.toUIText(error),
                         hint = UIErrorHint(retry = RetryPolicy.Manual)
                     )
