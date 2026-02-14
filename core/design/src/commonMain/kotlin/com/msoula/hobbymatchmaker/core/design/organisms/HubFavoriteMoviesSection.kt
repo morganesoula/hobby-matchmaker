@@ -25,10 +25,10 @@ import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun HubFavoriteMovies(
-    modifier: Modifier = Modifier,
+fun HubFavoriteMoviesSection(
     likedMovies: ImmutableList<MovieCarouselItem>,
-    navigateToMoviesScreen: () -> Unit
+    navigateToMoviesScreen: () -> Unit,
+    navigateToMovieDetail: (movieId: Long) -> Unit
 ) {
     Column {
         MediumTitle(
@@ -47,7 +47,7 @@ fun HubFavoriteMovies(
                 columns = GridCells.Fixed(2)
             ) {
                 items(likedMovies) { movie ->
-                    HubFavoriteMovie(movie)
+                    HubFavoriteMovie(movie = movie, onMovieCardTapped = navigateToMovieDetail)
                 }
             }
         } else {

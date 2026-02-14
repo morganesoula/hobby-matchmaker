@@ -5,7 +5,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -48,6 +47,7 @@ import coil3.compose.SubcomposeAsyncImageContent
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.msoula.hobbymatchmaker.core.common.Logger
+import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.ErrorPosterPlaceholder
 import com.msoula.hobbymatchmaker.core.design.atoms.FavoriteButton
 import com.msoula.hobbymatchmaker.core.design.atoms.HMMShimmerEffect
@@ -55,9 +55,12 @@ import com.msoula.hobbymatchmaker.core.design.atoms.LoadingPosterPlaceholder
 import com.msoula.hobbymatchmaker.core.design.atoms.MovieGenericCard
 import com.msoula.hobbymatchmaker.core.design.atoms.RatingChip
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight4
+import com.msoula.hobbymatchmaker.core.design.hub_favorite_movies_shared_tag
 import com.msoula.hobbymatchmaker.core.design.icons.LucideHeart
 import com.msoula.hobbymatchmaker.core.design.models.MovieCarouselItem
+import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import kotlinx.coroutines.delay
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
 @Composable
@@ -203,9 +206,63 @@ fun MovieCard(
 
 @Composable
 fun HubFavoriteMovie(
-    movie: MovieCarouselItem
+    modifier: Modifier = Modifier,
+    movie: MovieCarouselItem,
+    onMovieCardTapped: (movieId: Long) -> Unit
 ) {
+    val imageLoader: ImageLoader = koinInject()
+
     Column {
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .pointerInput(movie.id) {
+                    detectTapGestures(
+                        onTap = {
+                            //TODO Add is shared condition
+                            onMovieCardTapped(movie.id)
+                        }
+                    )
+                }
+        ) {
+            SubcomposeAsyncImage(
+                imageLoader = imageLoader,
+                model = ImageRequest.Builder(LocalPlatformContext.current)
+                    .data(movie.coverFilePath)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(5)),
+                contentScale = ContentScale.Crop,
+                loading = {
+                    HMMShimmerEffect()
+                    LoadingPosterPlaceholder()
+                },
+                error = {
+                    Logger.e("Error while syncing poster image")
+                    ErrorPosterPlaceholder()
+                },
+                success = { SubcomposeAsyncImageContent() }
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp)
+                    .align(Alignment.TopEnd),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(Res.string.hub_favorite_movies_shared_tag),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.padding(CustomSize.Eight)
+                        .background(color = MaterialTheme.colorScheme.primary)
+                )
+            }
+        }
+
         Text(
             text = movie.title,
             color = MaterialTheme.colorScheme.onBackground

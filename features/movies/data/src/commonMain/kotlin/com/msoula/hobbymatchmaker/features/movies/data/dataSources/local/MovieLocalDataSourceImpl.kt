@@ -4,8 +4,10 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.safeCallStorage
 import com.msoula.hobbymatchmaker.core.database.services.MovieDAOImpl
+import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.mappers.toFavoriteMovieDataModel
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.mappers.toMovie
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.mappers.toMovieDataModel
+import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.models.FavoriteMovieLocalDataModel
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.models.MovieLocalDataModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -17,7 +19,7 @@ class MovieLocalDataSourceImpl(private val movieDAO: MovieDAOImpl) : MovieLocalD
     }
 
     override fun observeMoviesLikedCount(): Flow<Long> {
-        return movieDAO.observeMoviesFavoriteCount()
+        return movieDAO.observeFavoriteMoviesCount()
     }
 
     override fun observeLikedMoviesIds(): Flow<List<Long>> {
@@ -59,4 +61,9 @@ class MovieLocalDataSourceImpl(private val movieDAO: MovieDAOImpl) : MovieLocalD
         safeCallStorage {
             movieDAO.getFavoriteLocalMovieIds()
         }
+
+    override fun observeFavoriteMovies(): Flow<List<FavoriteMovieLocalDataModel>> =
+        movieDAO.observeFavoriteMovies()
+            .map { movies -> movies.map { it.toFavoriteMovieDataModel() } }
+
 }

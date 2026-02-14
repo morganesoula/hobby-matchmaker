@@ -3,6 +3,7 @@ package com.msoula.hobbymatchmaker.core.database.mappers
 import com.msoula.hobbymatchmaker.core.database.Actor
 import com.msoula.hobbymatchmaker.core.database.Movie
 import com.msoula.hobbymatchmaker.core.database.ObserveDetailMovie
+import com.msoula.hobbymatchmaker.core.database.models.FavoriteMovieDataEntity
 import com.msoula.hobbymatchmaker.core.database.models.MovieDetailDataEntity
 
 fun ObserveDetailMovie.toMovieDetailDataEntity(list: List<ObserveDetailMovie>): MovieDetailDataEntity =
@@ -32,4 +33,14 @@ fun ObserveDetailMovie.toMovieDetailDataEntity(list: List<ObserveDetailMovie>): 
                     role = it.actorRole
                 )
             }
+    )
+
+fun Movie.toFavoriteMovieDataEntity(): FavoriteMovieDataEntity =
+    FavoriteMovieDataEntity(
+        id = this.movieId,
+        title = this.title ?: FavoriteMovieDataEntity.Initial.title,
+        posterLocalPath = this.localCoverFilePath
+            ?: FavoriteMovieDataEntity.Initial.posterLocalPath,
+        releaseDate = this.releaseDate ?: FavoriteMovieDataEntity.Initial.releaseDate,
+        isShared = false
     )

@@ -3,6 +3,7 @@ package com.msoula.hobbymatchmaker.features.movies.domain.di
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.CheckMovieSynopsisValueUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.LoadMoreMoviesUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesUseCase
+import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveFavoriteMoviesUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveLikedMoviesCountUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveLikedMoviesIdsUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.RefreshMoviesUseCase
@@ -22,4 +23,5 @@ val featuresModuleMovieDomain = module {
     factoryOf(::ShouldRefreshMoviesUseCase)
     factoryOf(::ObserveLikedMoviesIdsUseCase)
     factoryOf(::ObserveLikedMoviesCountUseCase)
+    factoryOf(::ObserveFavoriteMoviesUseCase)
 }

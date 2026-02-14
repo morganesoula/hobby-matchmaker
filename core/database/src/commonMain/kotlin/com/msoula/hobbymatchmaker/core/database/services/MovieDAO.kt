@@ -5,6 +5,7 @@ import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.database.Actor
 import com.msoula.hobbymatchmaker.core.database.Movie
 import com.msoula.hobbymatchmaker.core.database.Movie_actor_cross_ref
+import com.msoula.hobbymatchmaker.core.database.models.FavoriteMovieDataEntity
 import com.msoula.hobbymatchmaker.core.database.models.MovieDetailDataEntity
 import com.msoula.hobbymatchmaker.core.database.models.MovieUpdatedDataEntity
 import kotlinx.coroutines.flow.Flow
@@ -41,6 +42,7 @@ interface MovieDAO {
 
     suspend fun isMovieSynopsisAvailable(movieId: Long): Boolean
     suspend fun getFavoriteLocalMovieIds(): List<Long>?
-    fun observeMoviesFavoriteCount(): Flow<Long>
+    fun observeFavoriteMoviesCount(): Flow<Long>
     fun observeLikedMoviesIds(): Flow<List<Long>>
+    fun observeFavoriteMovies(): Flow<List<FavoriteMovieDataEntity>>
 }

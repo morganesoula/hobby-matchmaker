@@ -11,7 +11,9 @@ import com.msoula.hobbymatchmaker.core.database.Actor
 import com.msoula.hobbymatchmaker.core.database.HMMDatabase
 import com.msoula.hobbymatchmaker.core.database.Movie
 import com.msoula.hobbymatchmaker.core.database.Movie_actor_cross_ref
+import com.msoula.hobbymatchmaker.core.database.mappers.toFavoriteMovieDataEntity
 import com.msoula.hobbymatchmaker.core.database.mappers.toMovieDetailDataEntity
+import com.msoula.hobbymatchmaker.core.database.models.FavoriteMovieDataEntity
 import com.msoula.hobbymatchmaker.core.database.models.MovieDetailDataEntity
 import com.msoula.hobbymatchmaker.core.database.models.MovieUpdatedDataEntity
 import kotlinx.coroutines.flow.Flow
@@ -240,8 +242,8 @@ class MovieDAOImpl(
         return database.hmm_databaseQueries.getFavoriteIds().executeAsList()
     }
 
-    override fun observeMoviesFavoriteCount(): Flow<Long> {
-        return database.hmm_databaseQueries.observeMoviesFavoriteCount().asFlow().mapToOne(
+    override fun observeFavoriteMoviesCount(): Flow<Long> {
+        return database.hmm_databaseQueries.observeFavoriteMoviesCount().asFlow().mapToOne(
             dispatcherProvider.io
         )
     }
@@ -249,5 +251,15 @@ class MovieDAOImpl(
     override fun observeLikedMoviesIds(): Flow<List<Long>> {
         return database.hmm_databaseQueries.getFavoriteIds().asFlow()
             .mapToList(dispatcherProvider.io)
+    }
+
+    override fun observeFavoriteMovies(): Flow<List<FavoriteMovieDataEntity>> {
+        return database.hmm_databaseQueries.observeFavoriteMovies()
+            .asFlow()
+            .mapToList(dispatcherProvider.io)
+            .map { rows ->
+                if (rows.isEmpty()) throw IllegalStateException("Movie not found")
+                rows.map { movie -> movie.toFavoriteMovieDataEntity() }
+            }
     }
 }

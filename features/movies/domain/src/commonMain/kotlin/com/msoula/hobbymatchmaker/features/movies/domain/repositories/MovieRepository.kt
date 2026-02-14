@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.features.movies.domain.repositories
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.features.movies.domain.models.FavoriteMovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.models.PaginationInfoDomainModel
 import kotlinx.coroutines.flow.Flow
@@ -33,4 +34,5 @@ interface MovieRepository {
     ): AppResult<Unit, AppError>
 
     suspend fun getLastMovieSyncTimestamp(): Long
+    fun observeFavoriteMovies(): Flow<List<FavoriteMovieDomainModel>>
 }

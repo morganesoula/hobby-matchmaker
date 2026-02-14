@@ -1,7 +1,10 @@
 package com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.mappers
 
 import com.msoula.hobbymatchmaker.core.database.Movie
+import com.msoula.hobbymatchmaker.core.database.models.FavoriteMovieDataEntity
+import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.models.FavoriteMovieLocalDataModel
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.models.MovieLocalDataModel
+import com.msoula.hobbymatchmaker.features.movies.domain.models.FavoriteMovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 
 fun Movie.toMovieDataModel(): MovieLocalDataModel =
@@ -51,4 +54,20 @@ fun MovieLocalDataModel.toMovieDomainModel(): MovieDomainModel =
         isSeen = this.isSeen,
         overview = this.overview,
         note = this.note ?: MovieDomainModel.Initial.note
+    )
+
+fun FavoriteMovieDataEntity.toFavoriteMovieDataModel(): FavoriteMovieLocalDataModel =
+    FavoriteMovieLocalDataModel(
+        id = this.id,
+        title = this.title,
+        posterPath = this.posterLocalPath,
+        releaseDate = this.releaseDate
+    )
+
+fun FavoriteMovieLocalDataModel.toFavoriteMovieDomainModel(): FavoriteMovieDomainModel =
+    FavoriteMovieDomainModel(
+        id = this.id,
+        title = this.title,
+        releaseDate = this.releaseDate,
+        posterPath = this.posterPath
     )

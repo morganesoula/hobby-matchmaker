@@ -164,10 +164,16 @@ LEFT JOIN movie_actor_cross_ref c ON m.movieId = c.movieId
 LEFT JOIN actor a ON c.actorId = a.actorId
 WHERE m.movieId = ?;
 
-observeMoviesFavoriteCount:
+observeFavoriteMoviesCount:
 SELECT COUNT(*)
 FROM movie
 WHERE isFavorite = 1;
+
+observeFavoriteMovies:
+SELECT *
+FROM movie
+WHERE isFavorite = 1
+ORDER BY popularity DESC;
 
 insertMovieActorCrossRef:
 INSERT INTO movie_actor_cross_ref (movieId, actorId)

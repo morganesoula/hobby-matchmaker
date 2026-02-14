@@ -6,10 +6,12 @@ import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.flatMap
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.MovieLocalDataSource
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.MovieSyncPreferences
+import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.mappers.toFavoriteMovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.mappers.toMovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.MovieRemoteDataSource
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.mappers.toMovieDataModel
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.MovieRemoteDataModel
+import com.msoula.hobbymatchmaker.features.movies.domain.models.FavoriteMovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.models.MovieDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.models.PaginationInfoDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.ImageRepository
@@ -130,4 +132,8 @@ class MovieRepositoryImpl(
 
     override suspend fun getLastMovieSyncTimestamp() =
         movieSyncPreferences.getLastSyncTimestamp()
+
+    override fun observeFavoriteMovies(): Flow<List<FavoriteMovieDomainModel>> =
+        movieLocalDataSource.observeFavoriteMovies()
+            .map { list -> list.map { it.toFavoriteMovieDomainModel() } }
 }
