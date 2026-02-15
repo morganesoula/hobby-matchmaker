@@ -27,7 +27,6 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun HubFavoriteMoviesSection(
     likedMovies: ImmutableList<MovieCarouselItem>,
-    navigateToMoviesScreen: () -> Unit,
     navigateToMovieDetail: (movieId: Long) -> Unit
 ) {
     Column {
@@ -50,15 +49,33 @@ fun HubFavoriteMoviesSection(
                     HubFavoriteMovie(movie = movie, onMovieCardTapped = navigateToMovieDetail)
                 }
             }
-        } else {
-            Card {
-                NoDataCard(
-                    noDataTitle = stringResource(Res.string.hub_favorite_movies_no_data_title),
-                    noDataText = stringResource(Res.string.hub_favorite_movies_no_data_txt),
-                    noDataBtnText = stringResource(Res.string.hub_favorite_movies_no_data_btn_txt),
-                    onNoDataButtonClicked = navigateToMoviesScreen
-                )
-            }
+        }
+    }
+}
+
+@Composable
+fun HubNoFavoriteMoviesSection(
+    navigateToMoviesScreen: () -> Unit
+) {
+    Column {
+        MediumTitle(
+            modifier = Modifier.fillMaxWidth(),
+            text = stringResource(Res.string.hub_favorite_movies_title)
+        )
+        SpacerHeight4()
+        SmallBodyText(
+            modifier = Modifier.fillMaxWidth(),
+            text = stringResource(Res.string.hub_favorite_movies_subtitle)
+        )
+        SpacerHeight8()
+
+        Card {
+            NoDataCard(
+                noDataTitle = stringResource(Res.string.hub_favorite_movies_no_data_title),
+                noDataText = stringResource(Res.string.hub_favorite_movies_no_data_txt),
+                noDataBtnText = stringResource(Res.string.hub_favorite_movies_no_data_btn_txt),
+                onNoDataButtonClicked = navigateToMoviesScreen
+            )
         }
     }
 }

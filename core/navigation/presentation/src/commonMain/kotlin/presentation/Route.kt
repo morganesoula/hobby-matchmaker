@@ -3,6 +3,8 @@ package com.msoula.hobbymatchmaker.core.navigation.presentation
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.msoula.hobbymatchmaker.core.design.icons.BootstrapSendCheck
 import com.msoula.hobbymatchmaker.core.design.icons.FeatherInbox
+import com.msoula.hobbymatchmaker.core.design.icons.LucideFilm
+import com.msoula.hobbymatchmaker.core.design.icons.VscodeCodiconsLightbulb
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -21,6 +23,14 @@ object SignIn
 @Serializable
 @SerialName("sign_up")
 object SignUp
+
+@Serializable
+@SerialName("main")
+object Main
+
+@Serializable
+@SerialName("hub")
+object Hub
 
 @Serializable
 @SerialName("movies")
@@ -45,4 +55,13 @@ enum class Destination(
 ) {
     RECEIVED("Received", FeatherInbox, "Received"),
     SENT("Sent", BootstrapSendCheck, "Sent")
+}
+
+enum class MainTab(
+    val route: Any,
+    val label: String,
+    val icon: ImageVector
+) {
+    MOVIES(Movies, "Movies", LucideFilm),
+    HUB(Hub, "Hub", VscodeCodiconsLightbulb)
 }

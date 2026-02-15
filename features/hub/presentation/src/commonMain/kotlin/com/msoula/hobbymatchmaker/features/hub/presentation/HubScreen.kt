@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.StateContainer
 import com.msoula.hobbymatchmaker.core.design.organisms.HubFavoriteMoviesSection
+import com.msoula.hobbymatchmaker.core.design.organisms.HubNoFavoriteMoviesSection
 import com.msoula.hobbymatchmaker.core.design.templates.HubLayout
 import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.features.hub.presentation.mappers.toMovieCarouselItem
@@ -27,7 +28,9 @@ fun HubContent(
             hubFavoriteMovies = {
                 StateContainer(
                     state = hubFavoriteMovies,
-                    onEmpty = {},
+                    onEmpty = {
+                        HubNoFavoriteMoviesSection(navigateToMoviesScreen)
+                    },
                     onError = { error, hint ->
                         ErrorStateScreen(
                             error = error,
@@ -39,7 +42,6 @@ fun HubContent(
                         HubFavoriteMoviesSection(
                             likedMovies = movies.map { movie -> movie.toMovieCarouselItem() }
                                 .toImmutableList(),
-                            navigateToMoviesScreen = navigateToMoviesScreen,
                             navigateToMovieDetail = navigateToMovieDetail,
                         )
                     },

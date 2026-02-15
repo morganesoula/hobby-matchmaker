@@ -1,6 +1,12 @@
 package com.msoula.hobbymatchmaker.core.navigation.presentation
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -12,8 +18,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
@@ -200,69 +208,10 @@ fun AppNavHost(
             }
         }
 
-        composable<Movies> {
-            val movieViewModel: MovieViewModel = koinViewModel()
-
-            val movieState by movieViewModel.movieScreenState.collectAsState()
-            val paginationState by movieViewModel.paginationState.collectAsState()
-
-            val snackBarHostState = remember { SnackbarHostState() }
-
-            var matchingAnimationData by remember { mutableStateOf(MatchAnimationData.Empty) }
-
-            LaunchedEffect(Unit) {
-            }
-
-            var matchAnimVisibility by remember {
-                mutableStateOf(false)
-            }
-
-            LaunchedEffect(Unit) {
-                movieViewModel.events.collect { event ->
-                    when (event) {
-                        is UiEvent.Navigate ->
-                            when (val dest = event.destination) {
-                                is NavigationDestination.MovieDetail -> nav.navigate(
-                                    MovieDetail(
-                                        dest.movieId
-                                    )
-                                )
-
-                                NavigationDestination.SignIn -> navCallbacks.navigateAndClearToAuth()
-                                else -> Unit
-                            }
-
-                        is UiEvent.ShowSnackBar ->
-                            snackBarHostState.showSnackbar(event.message.asStringSuspend())
-
-                        is UiEvent.ShowAnimation -> {
-                            matchAnimVisibility = true
-                            matchingAnimationData = event.data
-                        }
-
-                        else -> {}
-                    }
-                }
-            }
-
-            MovieContent(
-                modifier = Modifier,
-                movieState = movieState,
-                paginationState = paginationState,
-                matchingAnimationData = matchingAnimationData,
-                onNavigate = { destination ->
-                    when (destination) {
-                        NavigationDestination.Profile -> nav.navigate(Profile)
-                        NavigationDestination.Social -> nav.navigate(Social)
-                        else -> Unit
-                    }
-                },
-                snackBarHostState = snackBarHostState,
-                showMatchAnimation = matchAnimVisibility,
-                observeMovies = movieViewModel::observeMovies,
-                onEvent = movieViewModel::onCardEvent,
-                onLoadMore = movieViewModel::loadMore,
-                resetAnimation = { matchAnimVisibility = false }
+        composable<Main> {
+            MainScaffold(
+                rootNavController = nav,
+                navCallbacks = navCallbacks
             )
         }
 
@@ -467,3 +416,117 @@ fun AppNavHost(
         }
     }
 }
+
+@Composable
+fun MainScaffold(
+    rootNavController: NavController,
+    navCallbacks: NavigationCallbacks
+) {
+    val tabNavController = rememberNavController()
+    val currentBackStack by tabNavController.currentBackStackEntryAsState()
+    val currentDestination = currentBackStack?.destination
+
+    Scaffold(
+        bottomBar = {
+            NavigationBar {
+                MainTab.entries.forEach { tab ->
+                    val selected = currentDestination
+                        ?.route
+                        ?.contains(tab.route::class.simpleName ?: "") == true
+
+                    NavigationBarItem(
+                        selected = selected,
+                        onClick = {
+                            tabNavController.navigate(tab.route) {
+                                launchSingleTop = true
+                                restoreState = true
+                                popUpTo(tabNavController.graph.startDestinationId) {
+                                    saveState = true
+                                }
+                            }
+                        },
+                        icon = { Icon(tab.icon, contentDescription = tab.label) },
+                        label = { Text(tab.label) }
+                    )
+                }
+            }
+        }
+    ) { padding ->
+        NavHost(
+            navController = tabNavController,
+            startDestination = Movies,
+            modifier = Modifier.padding(padding)
+        ) {
+            composable<Movies> {
+                val movieViewModel: MovieViewModel = koinViewModel()
+
+                val movieState by movieViewModel.movieScreenState.collectAsState()
+                val paginationState by movieViewModel.paginationState.collectAsState()
+
+                val snackBarHostState = remember { SnackbarHostState() }
+
+                var matchingAnimationData by remember { mutableStateOf(MatchAnimationData.Empty) }
+
+                LaunchedEffect(Unit) {
+                }
+
+                var matchAnimVisibility by remember {
+                    mutableStateOf(false)
+                }
+
+                LaunchedEffect(Unit) {
+                    movieViewModel.events.collect { event ->
+                        when (event) {
+                            is UiEvent.Navigate ->
+                                when (val dest = event.destination) {
+                                    is NavigationDestination.MovieDetail -> rootNavController.navigate(
+                                        MovieDetail(
+                                            dest.movieId
+                                        )
+                                    )
+
+                                    NavigationDestination.SignIn -> navCallbacks.navigateAndClearToAuth()
+                                    else -> Unit
+                                }
+
+                            is UiEvent.ShowSnackBar ->
+                                snackBarHostState.showSnackbar(event.message.asStringSuspend())
+
+                            is UiEvent.ShowAnimation -> {
+                                matchAnimVisibility = true
+                                matchingAnimationData = event.data
+                            }
+
+                            else -> {}
+                        }
+                    }
+                }
+
+                MovieContent(
+                    modifier = Modifier,
+                    movieState = movieState,
+                    paginationState = paginationState,
+                    matchingAnimationData = matchingAnimationData,
+                    onNavigate = { destination ->
+                        when (destination) {
+                            NavigationDestination.Profile -> rootNavController.navigate(Profile)
+                            NavigationDestination.Social -> rootNavController.navigate(Social)
+                            else -> Unit
+                        }
+                    },
+                    snackBarHostState = snackBarHostState,
+                    showMatchAnimation = matchAnimVisibility,
+                    observeMovies = movieViewModel::observeMovies,
+                    onEvent = movieViewModel::onCardEvent,
+                    onLoadMore = movieViewModel::loadMore,
+                    resetAnimation = { matchAnimVisibility = false }
+                )
+            }
+
+            composable<Hub> {
+
+            }
+        }
+    }
+}
+

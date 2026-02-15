@@ -3,7 +3,7 @@ package com.msoula.hobbymatchmaker.core.navigation.presentation.utils
 import androidx.compose.runtime.Immutable
 import androidx.navigation.NavController
 import com.msoula.hobbymatchmaker.core.navigation.presentation.Auth
-import com.msoula.hobbymatchmaker.core.navigation.presentation.Movies
+import com.msoula.hobbymatchmaker.core.navigation.presentation.Main
 import com.msoula.hobbymatchmaker.core.navigation.presentation.Profile
 import com.msoula.hobbymatchmaker.core.navigation.presentation.Splash
 
@@ -26,21 +26,21 @@ class NavigationCallbacks(
     }
 
     val navigateToMoviesFromSplash: () -> Unit = {
-        navController.navigate(Movies) {
+        navController.navigate(Main) {
             popUpTo<Splash> { inclusive = true }
             launchSingleTop = true
         }
     }
 
     val navigateToMoviesFromProfile: () -> Unit = {
-        navController.navigate(Movies) {
+        navController.navigate(Main) {
             popUpTo<Profile> { inclusive = true }
             launchSingleTop = true
         }
     }
 
     val navigateToMoviesFromAuth: () -> Unit = {
-        navController.navigate(Movies) {
+        navController.navigate(Main) {
             popUpTo<Auth> { inclusive = true }
             launchSingleTop = true
         }

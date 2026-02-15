@@ -5,9 +5,9 @@ import com.msoula.hobbymatchmaker.core.network.BuildKonfig.APP_SECRET
 import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
-import io.ktor.client.plugins.api.createClientPlugin
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.api.createClientPlugin
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
