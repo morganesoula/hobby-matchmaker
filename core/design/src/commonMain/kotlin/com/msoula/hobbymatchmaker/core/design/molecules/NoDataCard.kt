@@ -1,18 +1,27 @@
 package com.msoula.hobbymatchmaker.core.design.molecules
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.msoula.hobbymatchmaker.core.design.atoms.SecondaryButton
-import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight4
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextAlign
+import com.msoula.hobbymatchmaker.core.design.atoms.EngagingButton
+import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
+import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
+import com.msoula.hobbymatchmaker.core.design.theme.IconSize
 
 @Composable
 fun NoDataCard(
@@ -20,29 +29,53 @@ fun NoDataCard(
     noDataTitle: String,
     noDataText: String,
     noDataBtnText: String,
+    icon: ImageVector,
     onNoDataButtonClicked: () -> Unit
 ) {
     Card(
-        modifier = modifier.fillMaxWidth()
-            .padding(start = CustomSize.Eight, end = CustomSize.Eight),
+        modifier = modifier.padding(start = CustomSize.Sixteen, end = CustomSize.Sixteen),
+        colors = CardDefaults.cardColors(
+            containerColor =
+                MaterialTheme.colorScheme.surfaceVariant
+        ),
         shape = RoundedCornerShape(CustomSize.Sixteen)
     ) {
         Column(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .padding(CustomSize.Sixteen),
+            horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                noDataTitle,
-                color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.titleMedium
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .background(
+                        MaterialTheme.colorScheme.primary.copy(alpha = .1f),
+                        CircleShape
+                    )
+                    .size(IconSize.SixtyFour)
+                    .padding(CustomSize.Sixteen)
             )
-            SpacerHeight4()
+            SpacerHeight16()
             Text(
-                noDataText,
-                color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.bodyMedium
+                text = noDataTitle,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
             )
-            SpacerHeight4()
-            SecondaryButton(
+            SpacerHeight8()
+            Text(
+                text = noDataText,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = .8f),
+                minLines = 2,
+                textAlign = TextAlign.Center
+            )
+            SpacerHeight16()
+            EngagingButton(
                 text = noDataBtnText,
                 onClick = { onNoDataButtonClicked() }
             )

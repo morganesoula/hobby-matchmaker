@@ -36,7 +36,7 @@ class ObserveMovieDetailUseCase(
                     is AppResult.Success -> {
                         val detail = result.data
 
-                        if (detail.synopsis.isBlank() || !detail.hasCast) {
+                        if (!detail.hasCast) {
                             handleSync(movieId, language, detail)
                         } else {
                             emit(AppResult.Success(ObserveMovieSuccess.Success(detail)))

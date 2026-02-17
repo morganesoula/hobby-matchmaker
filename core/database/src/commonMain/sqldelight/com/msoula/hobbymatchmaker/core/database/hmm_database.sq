@@ -176,7 +176,7 @@ WHERE isFavorite = 1
 ORDER BY popularity DESC;
 
 insertMovieActorCrossRef:
-INSERT INTO movie_actor_cross_ref (movieId, actorId)
+INSERT OR IGNORE INTO movie_actor_cross_ref (movieId, actorId)
 VALUES (?, ?);
 
 deleteMovieActorCrossRefsByMovie:

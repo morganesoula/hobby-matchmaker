@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -54,7 +55,6 @@ import com.msoula.hobbymatchmaker.core.design.atoms.HMMShimmerEffect
 import com.msoula.hobbymatchmaker.core.design.atoms.LoadingPosterPlaceholder
 import com.msoula.hobbymatchmaker.core.design.atoms.MovieGenericCard
 import com.msoula.hobbymatchmaker.core.design.atoms.RatingChip
-import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight4
 import com.msoula.hobbymatchmaker.core.design.hub_favorite_movies_shared_tag
 import com.msoula.hobbymatchmaker.core.design.icons.LucideHeart
 import com.msoula.hobbymatchmaker.core.design.models.MovieCarouselItem
@@ -249,7 +249,7 @@ fun HubFavoriteMovie(
 
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .wrapContentWidth()
                     .padding(10.dp)
                     .align(Alignment.TopEnd),
                 verticalAlignment = Alignment.CenterVertically
@@ -257,8 +257,14 @@ fun HubFavoriteMovie(
                 Text(
                     text = stringResource(Res.string.hub_favorite_movies_shared_tag),
                     color = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.padding(CustomSize.Eight)
-                        .background(color = MaterialTheme.colorScheme.primary)
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.primary, RoundedCornerShape(
+                                CustomSize.Eight
+                            )
+                        )
+                        .padding(CustomSize.Four)
                 )
             }
         }
@@ -266,11 +272,6 @@ fun HubFavoriteMovie(
         Text(
             text = movie.title,
             color = MaterialTheme.colorScheme.onBackground
-        )
-        SpacerHeight4()
-        Text(
-            text = movie.releaseDate,
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = .8f)
         )
     }
 }

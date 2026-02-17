@@ -52,7 +52,7 @@ fun MovieLocalDataModel.toMovieDomainModel(): MovieDomainModel =
         localCoverFilePath = this.localPoster ?: MovieDomainModel.Initial.localCoverFilePath,
         isFavorite = this.isFavorite,
         isSeen = this.isSeen,
-        overview = this.overview,
+        overview = this.overview.orEmpty(),
         note = this.note ?: MovieDomainModel.Initial.note
     )
 

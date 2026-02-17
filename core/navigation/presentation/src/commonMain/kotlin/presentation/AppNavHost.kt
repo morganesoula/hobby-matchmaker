@@ -18,7 +18,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -46,6 +45,8 @@ import com.msoula.hobbymatchmaker.core.navigation.presentation.models.SocialClie
 import com.msoula.hobbymatchmaker.core.navigation.presentation.utils.NavigationCallbacks
 import com.msoula.hobbymatchmaker.core.splashscreen.presentation.SplashScreenContent
 import com.msoula.hobbymatchmaker.core.splashscreen.presentation.SplashViewModel
+import com.msoula.hobbymatchmaker.features.hub.presentation.HubContent
+import com.msoula.hobbymatchmaker.features.hub.presentation.HubViewModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailContent
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailViewModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
@@ -210,7 +211,6 @@ fun AppNavHost(
 
         composable<Main> {
             MainScaffold(
-                rootNavController = nav,
                 navCallbacks = navCallbacks
             )
         }
@@ -419,7 +419,6 @@ fun AppNavHost(
 
 @Composable
 fun MainScaffold(
-    rootNavController: NavController,
     navCallbacks: NavigationCallbacks
 ) {
     val tabNavController = rememberNavController()
@@ -479,10 +478,8 @@ fun MainScaffold(
                         when (event) {
                             is UiEvent.Navigate ->
                                 when (val dest = event.destination) {
-                                    is NavigationDestination.MovieDetail -> rootNavController.navigate(
-                                        MovieDetail(
-                                            dest.movieId
-                                        )
+                                    is NavigationDestination.MovieDetail -> navCallbacks.navigateToMovieDetailFromMoviesOrHub(
+                                        dest.movieId
                                     )
 
                                     NavigationDestination.SignIn -> navCallbacks.navigateAndClearToAuth()
@@ -509,8 +506,8 @@ fun MainScaffold(
                     matchingAnimationData = matchingAnimationData,
                     onNavigate = { destination ->
                         when (destination) {
-                            NavigationDestination.Profile -> rootNavController.navigate(Profile)
-                            NavigationDestination.Social -> rootNavController.navigate(Social)
+                            NavigationDestination.Profile -> navCallbacks.navigateToProfileFromMovies()
+                            NavigationDestination.Social -> navCallbacks.navigateToSocialFromMovies()
                             else -> Unit
                         }
                     },
@@ -524,7 +521,19 @@ fun MainScaffold(
             }
 
             composable<Hub> {
+                val hubViewModel: HubViewModel = koinViewModel()
+                val hubFavoriteMoviesState by hubViewModel.hubFavoriteMoviesState.collectAsState()
+                val hubRecentMatchesState by hubViewModel.hubRecentMatchesState.collectAsState()
 
+                HubContent(
+                    hubFavoriteMovies = hubFavoriteMoviesState,
+                    hubRecentMatches = hubRecentMatchesState,
+                    observeFavoriteMovies = { hubViewModel.observeFavoriteMovies() },
+                    observeRecentMatches = { hubViewModel.observeRecentMatches() },
+                    navigateToMoviesScreen = { navCallbacks.navigateToMoviesFromHub() },
+                    navigateToMovieDetail = { navCallbacks.navigateToMovieDetailFromMoviesOrHub(it) },
+                    navigateToProfileScreen = { navCallbacks.navigateToProfileFromHub() }
+                )
             }
         }
     }

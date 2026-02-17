@@ -7,7 +7,7 @@ fun MovieRemoteDataModel.toMovieDataModel(): MovieLocalDataModel =
     MovieLocalDataModel(
         id = this.id?.toLong() ?: MovieLocalDataModel.Initial.id,
         title = this.title ?: MovieLocalDataModel.Initial.title,
-        overview = MovieLocalDataModel.Initial.overview,
+        overview = null,
         remotePoster = this.poster ?: MovieLocalDataModel.Initial.remotePoster,
         localPoster = MovieLocalDataModel.Initial.localPoster,
         releaseDate = MovieLocalDataModel.Initial.releaseDate,

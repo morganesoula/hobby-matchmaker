@@ -11,6 +11,8 @@ import com.msoula.hobbymatchmaker.features.hub.presentation.interactors.Favorite
 import com.msoula.hobbymatchmaker.features.hub.presentation.interactors.HubInteractor
 import com.msoula.hobbymatchmaker.features.hub.presentation.models.HubFavoriteMoviesUIModel
 import com.msoula.hobbymatchmaker.features.hub.presentation.models.HubRecentMatchesUIModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,22 +29,24 @@ class HubViewModel(
     private val eventHandler = EventHandler()
     val events = eventHandler.events
 
-    val hubFavoriteMoviesState: StateFlow<UiState<List<HubFavoriteMoviesUIModel>>>
-        field = MutableStateFlow<UiState<List<HubFavoriteMoviesUIModel>>>(UiState.Loading)
+    val hubFavoriteMoviesState: StateFlow<UiState<ImmutableList<HubFavoriteMoviesUIModel>>>
+        field = MutableStateFlow<UiState<ImmutableList<HubFavoriteMoviesUIModel>>>(UiState.Loading)
 
-    val hubRecentMatchesState: StateFlow<UiState<List<HubRecentMatchesUIModel>>>
-        field = MutableStateFlow<UiState<List<HubRecentMatchesUIModel>>>(UiState.Loading)
+    val hubRecentMatchesState: StateFlow<UiState<ImmutableList<HubRecentMatchesUIModel>>>
+        field = MutableStateFlow<UiState<ImmutableList<HubRecentMatchesUIModel>>>(UiState.Loading)
 
     init {
         observeRecentMatches()
         observeFavoriteMovies()
     }
 
-    private fun observeRecentMatches() {
-
+    fun observeRecentMatches() {
+        hubRecentMatchesState.update {
+            UiState.Empty
+        }
     }
 
-    private fun observeFavoriteMovies() {
+    fun observeFavoriteMovies() {
         scope.launch {
             hubInteractor.observeFavoriteMovies()
                 .collect { result ->
@@ -55,7 +59,7 @@ class HubViewModel(
                                 is FavoriteMoviesSuccess.Success ->
                                     hubFavoriteMoviesState.update {
                                         UiState.Success(
-                                            data.movies
+                                            data.movies.toImmutableList()
                                         )
                                     }
                             }

@@ -1,7 +1,9 @@
 package com.msoula.hobbymatchmaker.features.hub.presentation.mappers
 
 import com.msoula.hobbymatchmaker.core.design.models.MovieCarouselItem
+import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMember
 import com.msoula.hobbymatchmaker.features.hub.presentation.models.HubFavoriteMoviesUIModel
+import com.msoula.hobbymatchmaker.features.hub.presentation.models.HubRecentMatchesUIModel
 import com.msoula.hobbymatchmaker.features.movies.domain.models.FavoriteMovieDomainModel
 
 fun FavoriteMovieDomainModel.toHubFavoriteMoviesUIModel(): HubFavoriteMoviesUIModel =
@@ -21,4 +23,13 @@ fun HubFavoriteMoviesUIModel.toMovieCarouselItem(): MovieCarouselItem =
         releaseDate = this.releaseDate,
         note = 0.0,
         isFavorite = false
+    )
+
+fun HubRecentMatchesUIModel.toProfileSocialMember(): ProfileSocialMember =
+    ProfileSocialMember(
+        uid = "",
+        name = this.name,
+        pseudo = this.pseudo,
+        avatarUrl = this.avatarUrl,
+        commonMoviesCount = 0
     )

@@ -94,6 +94,33 @@ fun SecondaryButton(
 }
 
 @Composable
+fun EngagingButton(
+    modifier: Modifier = Modifier,
+    text: String,
+    onClick: () -> Unit
+) {
+    Button(
+        onClick = { onClick() },
+        colors = ButtonDefaults.buttonColors(
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            containerColor = MaterialTheme.colorScheme.primary
+        ),
+        shape = RoundedCornerShape(CustomSize.Eight),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = CustomSize.TwentyFour),
+    ) {
+        Text(
+            text = text,
+            modifier = modifier.padding(CustomSize.Eight),
+            fontSize = CustomFontSize.Sixteen,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
 fun SocialMediaButton(
     modifier: Modifier = Modifier,
     text: String,

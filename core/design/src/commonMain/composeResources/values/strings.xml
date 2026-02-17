@@ -67,7 +67,7 @@
     <string name="hub_recent_matches_no_data_txt">Invitez des amis pour voir vos fims communs ici.</string>
     <string name="hub_recent_matches_no_data_btn_txt">Inviter des amis</string>
     <string name="hub_favorite_movies_title">Mes Films Favoris</string>
-    <string name="hub_favorite_movies_subtitle">Tapez sur un film pour savoir qui l'a aussi aimé</string>
+    <string name="hub_favorite_movies_subtitle">Tapez sur un film "Match" pour savoir qui l'a aussi aimé</string>
     <string name="hub_favorite_movies_shared_tag">MATCH</string>
     <string name="hub_favorite_movies_no_data_title">Votre liste de favoris est vide</string>
     <string name="hub_favorite_movies_no_data_txt">Parcourez et double tapez sur un film pour commencer à construire votre bibliothèque.</string>

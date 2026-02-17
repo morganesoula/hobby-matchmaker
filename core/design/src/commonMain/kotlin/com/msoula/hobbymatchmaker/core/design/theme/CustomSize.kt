@@ -34,4 +34,6 @@ object IconSize {
     val Sixteen = 16.dp
     val TwentyFour = 24.dp
     val FortyEight = 48.dp
+    val SixtyFour = 64.dp
+    val NinetySix = 96.dp
 }

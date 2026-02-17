@@ -258,8 +258,9 @@ class MovieDAOImpl(
             .asFlow()
             .mapToList(dispatcherProvider.io)
             .map { rows ->
-                if (rows.isEmpty()) throw IllegalStateException("Movie not found")
-                rows.map { movie -> movie.toFavoriteMovieDataEntity() }
+                if (!rows.isEmpty()) {
+                    rows.map { movie -> movie.toFavoriteMovieDataEntity() }
+                } else emptyList()
             }
     }
 }

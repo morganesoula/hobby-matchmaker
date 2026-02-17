@@ -3,7 +3,7 @@ package com.msoula.hobbymatchmaker.features.movies.data.dataSources.local.models
 data class MovieLocalDataModel(
     val id: Long = 0L,
     val title: String = "",
-    val overview: String = "",
+    val overview: String? = null,
     val remotePoster: String = "",
     val localPoster: String? = null,
     val releaseDate: String = "",
