@@ -326,9 +326,13 @@ observeSentInvitations:
 SELECT * FROM social_invitation
 WHERE from_uid = ?;
 
-deleteSocialInvitation:
+deleteSentInvitations:
 DELETE FROM social_invitation
 WHERE from_uid = ?;
+
+deleteIncomingInvitations:
+DELETE FROM social_invitation
+WHERE to_pseudo = ?;
 
 
 CREATE INDEX IF NOT EXISTS movie_is_favorite ON movie(isFavorite);

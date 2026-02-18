@@ -247,25 +247,27 @@ fun HubFavoriteMovie(
                 success = { SubcomposeAsyncImageContent() }
             )
 
-            Row(
-                modifier = Modifier
-                    .wrapContentWidth()
-                    .padding(10.dp)
-                    .align(Alignment.TopEnd),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(Res.string.hub_favorite_movies_shared_tag),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    style = MaterialTheme.typography.bodySmall,
+            if (movie.isShared) {
+                Row(
                     modifier = Modifier
-                        .background(
-                            color = MaterialTheme.colorScheme.primary, RoundedCornerShape(
-                                CustomSize.Eight
+                        .wrapContentWidth()
+                        .padding(10.dp)
+                        .align(Alignment.TopEnd),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(Res.string.hub_favorite_movies_shared_tag),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.primary, RoundedCornerShape(
+                                    CustomSize.Eight
+                                )
                             )
-                        )
-                        .padding(CustomSize.Four)
-                )
+                            .padding(CustomSize.Four)
+                    )
+                }
             }
         }
 

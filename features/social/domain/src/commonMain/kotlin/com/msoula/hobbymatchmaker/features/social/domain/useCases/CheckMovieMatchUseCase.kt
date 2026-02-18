@@ -22,7 +22,10 @@ class CheckMovieMatchUseCase(
                         val displayName =
                             member.pseudo.ifBlank { member.name } ?: return@mapNotNull null
                         if (displayName.isBlank()) return@mapNotNull null
-                        MatchingMemberDomainModel(displayName = displayName, avatarUrl = member.avatarUrl)
+                        MatchingMemberDomainModel(
+                            displayName = displayName,
+                            avatarUrl = member.avatarUrl
+                        )
                     }
 
                 if (matchingMemberDomainModels.isEmpty()) {

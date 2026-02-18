@@ -16,7 +16,9 @@ data class MovieDetailUiModel(
     val hasCast: Boolean = true,
     val cast: List<MovieDetailActorUiModel> = emptyList(),
     val videoKey: String = "",
-    val duration: Int = -1
+    val duration: Int = -1,
+    val isShared: Boolean = false,
+    val sharedMembers: List<MatchingMemberUiModel> = emptyList()
 ) {
     companion object {
         val Initial = MovieDetailUiModel()

@@ -3,7 +3,7 @@ package com.msoula.hobbymatchmaker.core.splashscreen.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.AuthState
-import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfo
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfoUseCase
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ClearCurrentUserProfileUuidUseCase
@@ -20,7 +20,7 @@ import kotlinx.coroutines.withTimeout
 
 class SplashViewModel(
     private val observeIsConnectedUseCase: ObserveIsConnectedUseCase,
-    private val fetchFirebaseUserInfo: FetchFirebaseUserInfo,
+    private val fetchFirebaseUserInfo: FetchFirebaseUserInfoUseCase,
     private val clearCurrentUserProfileUuidUseCase: ClearCurrentUserProfileUuidUseCase,
     syncLocalFavoritesToCloudUseCase: Lazy<SyncLocalFavoritesToCloudUseCase>
 ) : ViewModel() {

@@ -9,6 +9,7 @@ import com.msoula.hobbymatchmaker.core.design.util.EventHandler
 import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.features.hub.presentation.interactors.FavoriteMoviesSuccess
 import com.msoula.hobbymatchmaker.features.hub.presentation.interactors.HubInteractor
+import com.msoula.hobbymatchmaker.features.hub.presentation.interactors.RecentMatchesSuccess
 import com.msoula.hobbymatchmaker.features.hub.presentation.models.HubFavoriteMoviesUIModel
 import com.msoula.hobbymatchmaker.features.hub.presentation.models.HubRecentMatchesUIModel
 import kotlinx.collections.immutable.ImmutableList
@@ -41,8 +42,23 @@ class HubViewModel(
     }
 
     fun observeRecentMatches() {
-        hubRecentMatchesState.update {
-            UiState.Empty
+        scope.launch {
+            hubRecentMatchesState.update {
+                when (val result = hubInteractor.getMatchedFriends()) {
+                    is AppResult.Success -> {
+                        when (val data = result.data) {
+                            is RecentMatchesSuccess.Empty -> UiState.Empty
+                            is RecentMatchesSuccess.Success -> UiState.Success(data.friends.toImmutableList())
+                        }
+                    }
+
+                    is AppResult.Failure -> UiState.Error(
+                        defaultMessageMapper.toUIText(
+                            result.error
+                        )
+                    )
+                }
+            }
         }
     }
 
@@ -50,24 +66,21 @@ class HubViewModel(
         scope.launch {
             hubInteractor.observeFavoriteMovies()
                 .collect { result ->
-                    when (val result = result) {
-                        is AppResult.Success -> {
-                            when (val data = result.data) {
-                                is FavoriteMoviesSuccess.Empty ->
-                                    hubFavoriteMoviesState.update { UiState.Empty }
+                    hubFavoriteMoviesState.update {
+                        when (val result = result) {
+                            is AppResult.Success -> {
+                                when (val data = result.data) {
+                                    is FavoriteMoviesSuccess.Empty -> UiState.Empty
 
-                                is FavoriteMoviesSuccess.Success ->
-                                    hubFavoriteMoviesState.update {
+                                    is FavoriteMoviesSuccess.Success ->
                                         UiState.Success(
                                             data.movies.toImmutableList()
                                         )
-                                    }
+                                }
                             }
-                        }
 
-                        is AppResult.Failure -> {
-                            Logger.e("Error observing favorite movies: ${result.error}")
-                            hubFavoriteMoviesState.update {
+                            is AppResult.Failure -> {
+                                Logger.e("Error observing favorite movies: ${result.error}")
                                 UiState.Error(
                                     defaultMessageMapper.toUIText(
                                         result.error

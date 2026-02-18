@@ -5,6 +5,7 @@ import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.data.FirestoreCircleCollection
 import com.msoula.hobbymatchmaker.core.common.data.FirestoreUsersCollection
+import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.common.safeFirebaseCall
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toInviteStatusData
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.InviteDataModel
@@ -100,7 +101,11 @@ class SocialRemoteDataSourceImpl(
                 querySnapshot.documents.map { document ->
                     SocialCircleEntryRemoteDataModel(
                         memberUid = document.id,
-                        commonMoviesCount = document.get<Int?>("commonMoviesCount") ?: 0
+                        commonMoviesCount = document.get<Int?>("commonMoviesCount") ?: 0,
+                        avatarUrl = document.get<String?>("avatarUrl") ?: "",
+                        memberPseudo = document.get<String>("memberPseudo"),
+                        memberName = document.get<String?>("username") ?: "",
+                        moviesLiked = document.get<List<Long>?>("moviesLiked") ?: emptyList()
                     )
                 }
             }
@@ -360,7 +365,11 @@ class SocialRemoteDataSourceImpl(
                     ownerCircleRef,
                     mapOf(
                         "addedAt" to FieldValue.serverTimestamp,
+                        "memberPseudo" to memberAddedToOwnerCircle.pseudo,
+                        "username" to memberAddedToOwnerCircle.name,
+                        "avatarUrl" to memberAddedToOwnerCircle.avatarUrl,
                         "commonMoviesCount" to memberAddedToOwnerCircle.commonMoviesCount,
+                        "moviesLiked" to memberAddedToOwnerCircle.moviesLiked
                     ),
                     merge = true
                 )
@@ -368,6 +377,7 @@ class SocialRemoteDataSourceImpl(
                 set(
                     memberCircleRef,
                     mapOf(
+                        "addedAt" to FieldValue.serverTimestamp,
                         "memberPseudo" to ownerAddedToMemberCircle.pseudo,
                         "username" to ownerAddedToMemberCircle.name,
                         "avatarUrl" to ownerAddedToMemberCircle.avatarUrl,
@@ -415,4 +425,26 @@ class SocialRemoteDataSourceImpl(
 
     override suspend fun getSocialCircleSnapshot(uid: String): AppResult<List<SocialCircleEntryRemoteDataModel>, AppError> =
         AppResult.Success(observeSocialCircle(uid).first())
+
+    override suspend fun updateMovieLikedInCircleEntries(
+        ownerUid: String,
+        movieId: Long,
+        isFavorite: Boolean
+    ): AppResult<Unit, AppError> =
+        getSocialCircleSnapshot(ownerUid).mapSuccess { list ->
+            list.forEach { entry ->
+                firestore
+                    .collection(FirestoreUsersCollection)
+                    .document(entry.memberUid)
+                    .collection(FirestoreCircleCollection)
+                    .document(ownerUid)
+                    .set(
+                        mapOf(
+                            "moviesLiked" to if (isFavorite) FieldValue.arrayUnion(movieId) else FieldValue.arrayRemove(
+                                movieId
+                            )
+                        ), merge = true
+                    )
+            }
+        }
 }

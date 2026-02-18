@@ -40,7 +40,7 @@ class MovieDetailViewModel(
     private val eventHandler = EventHandler()
     val events = eventHandler.events
 
-    val screenState: StateFlow<UiState<MovieDetailUiModel>>
+    val movieDetailState: StateFlow<UiState<MovieDetailUiModel>>
         field = MutableStateFlow<UiState<MovieDetailUiModel>>(UiState.Loading)
 
     private val retryTrigger = MutableStateFlow(0)
@@ -57,7 +57,7 @@ class MovieDetailViewModel(
             retryTrigger.flatMapLatest {
                 interactor.observeMovieDetail(movieId, language)
             }.collect { result ->
-                screenState.update {
+                movieDetailState.update {
                     when (result) {
                         is AppResult.Success -> mapDetailSuccess(result.data)
                         is AppResult.Failure -> mapError(result.error)
@@ -68,7 +68,7 @@ class MovieDetailViewModel(
     }
 
     fun retryObservation() {
-        screenState.update { UiState.Loading }
+        movieDetailState.update { UiState.Loading }
         retryTrigger.update { it + 1 }
     }
 
@@ -84,7 +84,7 @@ class MovieDetailViewModel(
 
     private suspend fun playTrailer(isVideoUriKnown: Boolean) {
         if (interactor.canPlayTrailerDirectly(isVideoUriKnown)) {
-            val currentState = screenState.value
+            val currentState = movieDetailState.value
             if (currentState is UiState.Success) {
                 eventHandler.sendEvent(UiEvent.OnDataReady(currentState.data.videoKey))
             }
@@ -103,7 +103,7 @@ class MovieDetailViewModel(
     }
 
     private suspend fun toggleFavorite(movieId: Long) {
-        val currentState = screenState.value
+        val currentState = movieDetailState.value
         if (currentState !is UiState.Success) return
 
         val movie = currentState.data
@@ -116,6 +116,7 @@ class MovieDetailViewModel(
                 if (newFavoriteState && uid != null) {
                     checkMatchAndNotify(uid, movieId)
                 }
+                fetchSharedMembers(movie)
             }
             .onFailure { error ->
                 eventHandler.sendEvent(
@@ -147,6 +148,7 @@ class MovieDetailViewModel(
         when (success) {
             is MovieSuccess.Success -> {
                 val uiModel = success.data
+                fetchSharedMembers(uiModel)
                 UiState.Success(uiModel)
             }
 
@@ -158,6 +160,27 @@ class MovieDetailViewModel(
             error = defaultMessageMapper.toUIText(error),
             hint = UIErrorHint(retry = RetryPolicy.Manual)
         )
+
+    private fun fetchSharedMembers(movie: MovieDetailUiModel) {
+        scope.launch {
+            val uid = interactor.getAuthenticatedUid() ?: return@launch
+            interactor.checkForMovieMatch(uid, movie.id)
+                .onSuccess { result ->
+                    if (result is MovieMatchUiSuccess) {
+                        movieDetailState.update { currentState ->
+                            if (currentState is UiState.Success) {
+                                UiState.Success(
+                                    currentState.data.copy(
+                                        sharedMembers = result.matchingMembers,
+                                        isShared = result.matchingMembers.isNotEmpty()
+                                    )
+                                )
+                            } else currentState
+                        }
+                    }
+                }
+        }
+    }
 
     override fun onCleared() {
         super.onCleared()

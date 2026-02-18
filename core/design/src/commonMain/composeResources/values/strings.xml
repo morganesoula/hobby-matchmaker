@@ -73,6 +73,10 @@
     <string name="hub_favorite_movies_no_data_txt">Parcourez et double tapez sur un film pour commencer à construire votre bibliothèque.</string>
     <string name="hub_favorite_movies_no_data_btn_txt">Découvrir des films</string>
 
+    // MOVIE DETAIL
+    <string name="movie_detail_friend_section_main_title">Amis qui ont aimé ce film</string>
+    <string name="movie_detail_friend_section_no_data_title">Aucun ami n'a encore aimé ce film</string>
+
     // OTHER
     <string name="continue_as_guest_button_title">Continuer en tant qu'invité</string>
     <string name="continue_as_guest_dialog_title">Essayer en tant qu'invité</string>

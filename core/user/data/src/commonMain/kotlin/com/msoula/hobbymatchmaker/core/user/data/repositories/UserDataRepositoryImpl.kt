@@ -97,7 +97,7 @@ class UserDataRepositoryImpl(
 
         if (stillMissing.isEmpty()) return result
 
-        stillMissing.chunked(30).forEach { chunk ->
+        stillMissing.chunked(10).forEach { chunk ->
             val remoteUsers = userRemoteDataSource.getUsers(chunk)
             remoteUsers.forEach { (uid, user) ->
                 result[uid] = user
@@ -122,6 +122,9 @@ class UserDataRepositoryImpl(
         cache.update { it - uid }
         userLocalDataSource.deleteUser(uid)
     }
+
+    override suspend fun invalidateUsers(uids: List<String>) =
+        uids.forEach { invalidateCache(it) }
 
     private fun startRemoteObservation(uid: String) {
         customScope.launch {

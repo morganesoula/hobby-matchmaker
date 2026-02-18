@@ -69,5 +69,6 @@ fun FavoriteMovieLocalDataModel.toFavoriteMovieDomainModel(): FavoriteMovieDomai
         id = this.id,
         title = this.title,
         releaseDate = this.releaseDate,
-        posterPath = this.posterPath
+        posterPath = this.posterPath,
+        isShared = false
     )

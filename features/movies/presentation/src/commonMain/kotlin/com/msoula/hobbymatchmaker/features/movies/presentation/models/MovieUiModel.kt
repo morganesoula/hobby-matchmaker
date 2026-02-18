@@ -11,7 +11,8 @@ data class MovieUiModel(
     val playFavoriteAnimation: Boolean = true,
     val title: String = "",
     val overview: String = "",
-    val note: Double = 0.0
+    val note: Double = 0.0,
+    val isShared: Boolean = false
 ) {
     companion object {
         val Initial = MovieUiModel()

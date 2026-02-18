@@ -4,6 +4,7 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.data.FirestoreUsersCollection
 import com.msoula.hobbymatchmaker.core.user.domain.models.UserSummaryDomainModel
+import dev.gitlive.firebase.firestore.FieldPath
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -54,7 +55,9 @@ class UserRemoteDataSourceImpl(
 
         val documents = firestore
             .collection(FirestoreUsersCollection)
-            .where { "uid" inArray uids }
+            .where {
+                FieldPath.documentId inArray uids
+            }
             .get()
             .documents
 

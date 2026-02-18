@@ -1,7 +1,7 @@
 package com.msoula.hobbymatchmaker.features.moviedetail.presentation.interactors
 
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.AuthState
-import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfo
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfoUseCase
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
@@ -15,6 +15,7 @@ import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.toMov
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.SetMovieFavoriteUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.models.MovieMatchResult
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.CheckMovieMatchUseCase
+import com.msoula.hobbymatchmaker.features.social.domain.useCases.SyncFavoriteToCircleUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -22,8 +23,9 @@ class MovieDetailInteractor(
     private val observeMovieDetailUseCase: ObserveMovieDetailUseCase,
     private val fetchMovieTrailerUseCase: FetchMovieTrailerUseCase,
     private val setMovieFavoriteUseCase: SetMovieFavoriteUseCase,
-    private val fetchFirebaseUserInfo: FetchFirebaseUserInfo,
+    private val fetchFirebaseUserInfo: FetchFirebaseUserInfoUseCase,
     private val checkMovieMatchUseCase: CheckMovieMatchUseCase,
+    private val syncFavoriteToCircleUseCase: SyncFavoriteToCircleUseCase,
     private val connectivityChecker: NetworkConnectivityChecker
 ) {
     fun observeMovieDetail(
@@ -67,6 +69,7 @@ class MovieDetailInteractor(
                     )
                 }
 
+                syncFavoriteToCircleUseCase(uid, movieId, isFavorite)
                 setMovieFavoriteUseCase(uid, movieId, isFavorite)
             }
         }
@@ -89,7 +92,7 @@ class MovieDetailInteractor(
             when (result) {
                 is MovieMatchResult.Match -> MovieMatchUiSuccess(result.matchingMemberDomainModels.map {
                     MatchingMemberUiModel(
-                        it.displayName, it.avatarUrl
+                        name = it.displayName, avatarUrl = it.avatarUrl
                     )
                 })
 

@@ -17,6 +17,12 @@ interface SocialRepository {
     ): AppResult<SocialMemberDomainModel, AppError>
 
     fun observeSocialCircle(uid: String): Flow<List<SocialMemberDomainModel>>
+    suspend fun syncMovieLikedToCircle(
+        uid: String,
+        movieId: Long,
+        isFavorite: Boolean
+    ): AppResult<Unit, AppError>
+
     suspend fun refreshSocialCircle(uid: String): AppResult<Unit, AppError>
     fun observeIncomingInvites(toPseudo: String): Flow<List<SocialInviteDomainModel>>
     suspend fun refreshIncomingInvites(ownerUid: String): AppResult<Unit, AppError>

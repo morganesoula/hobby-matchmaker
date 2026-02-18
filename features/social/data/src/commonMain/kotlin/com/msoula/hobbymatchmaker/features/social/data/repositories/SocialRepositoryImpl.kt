@@ -13,11 +13,15 @@ import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mapper
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toSocialCircleMember
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toSocialInvitationDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toSocialMemberDomainModel
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.SocialCircleEntryRemoteDataModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialInviteDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.repositories.SocialRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 class SocialRepositoryImpl(
     private val socialRemoteDataSource: SocialRemoteDataSource,
@@ -40,40 +44,57 @@ class SocialRepositoryImpl(
             }
 
     override fun observeSocialCircle(uid: String): Flow<List<SocialMemberDomainModel>> =
-        socialLocalDataSource.observeSocialCircle()
-            .map { entities ->
-                entities.map { entity ->
-                    SocialMemberDomainModel(
-                        uid = entity.memberUid,
-                        pseudo = entity.memberPseudo
-                            ?: SocialMemberDomainModel.Initial.pseudo,
-                        name = entity.memberName ?: SocialMemberDomainModel.Initial.name,
-                        avatarUrl = entity.memberAvatarUrl
-                            ?: SocialMemberDomainModel.Initial.avatarUrl,
-                        commonMoviesCount = SocialMemberDomainModel.Initial.commonMoviesCount
-                    )
-                }
+        channelFlow {
+            launch {
+                socialRemoteDataSource.observeSocialCircle(uid)
+                    .collectLatest { remoteMembers ->
+                        val localModels = mapRemoteToLocal(remoteMembers, uid)
+                        socialLocalDataSource.syncCircle(localModels)
+                    }
             }
+
+            socialLocalDataSource.observeSocialCircle()
+                .map { entities ->
+                    entities.map { entity ->
+                        SocialMemberDomainModel(
+                            uid = entity.memberUid,
+                            pseudo = entity.memberPseudo
+                                ?: SocialMemberDomainModel.Initial.pseudo,
+                            name = entity.memberName ?: SocialMemberDomainModel.Initial.name,
+                            avatarUrl = entity.memberAvatarUrl
+                                ?: SocialMemberDomainModel.Initial.avatarUrl,
+                            commonMoviesCount = SocialMemberDomainModel.Initial.commonMoviesCount
+                        )
+                    }
+                }
+                .collect { send(it) }
+        }
+
+    override suspend fun syncMovieLikedToCircle(uid: String, movieId: Long, isFavorite: Boolean) =
+        socialRemoteDataSource.updateMovieLikedInCircleEntries(uid, movieId, isFavorite)
 
     override suspend fun refreshSocialCircle(uid: String): AppResult<Unit, AppError> =
         socialRemoteDataSource
             .getSocialCircleSnapshot(uid)
             .flatMap { remoteMembers ->
-                val users = userDataRepository.getUsers(remoteMembers.map { it.memberUid })
-                val localModels = remoteMembers.mapNotNull { member ->
-                    users[member.memberUid]?.let { user ->
-                        SocialCircleMemberLocalDataModel(
-                            ownerUid = uid,
-                            memberUid = member.memberUid,
-                            memberPseudo = user.pseudo,
-                            memberName = user.name,
-                            memberAvatarUrl = user.avatarUrl
-                        )
-                    }
-                }
+                val localModels = mapRemoteToLocal(remoteMembers, uid)
                 socialLocalDataSource.syncCircle(localModels)
                 AppResult.Success(Unit)
             }
+
+    private fun mapRemoteToLocal(
+        remoteMembers: List<SocialCircleEntryRemoteDataModel>,
+        uid: String
+    ): List<SocialCircleMemberLocalDataModel> =
+        remoteMembers.map { member ->
+            SocialCircleMemberLocalDataModel(
+                ownerUid = uid,
+                memberUid = member.memberUid,
+                memberPseudo = member.memberPseudo,
+                memberName = member.memberName,
+                memberAvatarUrl = member.avatarUrl
+            )
+        }
 
     override fun observeIncomingInvites(toPseudo: String): Flow<List<SocialInviteDomainModel>> {
         return socialLocalDataSource.observeIncomingInvites(toPseudo)
@@ -84,9 +105,16 @@ class SocialRepositoryImpl(
 
     override suspend fun refreshIncomingInvites(ownerUid: String): AppResult<Unit, AppError> =
         socialRemoteDataSource.refreshIncomingInvites(ownerUid).flatMap { invites ->
-            socialLocalDataSource.upsertIncomingInvites(
-                invites.map { it.toSocialInvitationDataModel() }
-            )
+            val mapped = invites.map { it.toSocialInvitationDataModel() }
+            val toPseudo = mapped.firstOrNull()?.toPseudo
+                ?: userDataRepository.getUser(ownerUid)
+                    .let { result -> (result as? AppResult.Success)?.data?.pseudo }
+
+            if (toPseudo != null) {
+                socialLocalDataSource.replaceIncomingInvites(toPseudo, mapped)
+            } else {
+                socialLocalDataSource.upsertIncomingInvites(mapped)
+            }
         }
 
     override fun observeSentInvites(uid: String): Flow<List<SocialInviteDomainModel>> {
@@ -98,7 +126,9 @@ class SocialRepositoryImpl(
 
     override suspend fun refreshSentInvites(uid: String): AppResult<Unit, AppError> =
         socialRemoteDataSource.refreshSentInvites(uid).flatMap { invites ->
-            socialLocalDataSource.upsertSentInvites(invites.map { it.toSocialInvitationDataModel() })
+            socialLocalDataSource.replaceSentInvites(
+                uid,
+                invites.map { it.toSocialInvitationDataModel() })
         }
 
     override suspend fun sendInvite(invite: SocialInviteDomainModel) =
@@ -151,10 +181,10 @@ class SocialRepositoryImpl(
             .getSocialCircleSnapshot(uid)
             .mapSuccess { members ->
                 val memberUIds = members.map { it.memberUid }
+                userDataRepository.invalidateUsers(memberUIds)
                 val usersByUid = userDataRepository.getUsers(memberUIds)
                 members.mapNotNull { member ->
                     val user = usersByUid[member.memberUid] ?: return@mapNotNull null
-
                     user.toSocialMemberDomainModel(member.commonMoviesCount)
                 }
             }

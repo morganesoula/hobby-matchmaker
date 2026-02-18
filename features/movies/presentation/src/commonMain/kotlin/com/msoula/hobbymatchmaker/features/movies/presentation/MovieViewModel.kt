@@ -157,8 +157,12 @@ class MovieViewModel(
 
         interactor.toggleFavorite(movieId, newFavoriteState)
             .onSuccess {
-                if (newFavoriteState && uid != null) {
-                    checkAndNotifyMatch(uid, movieId)
+                if (uid != null) {
+                    scope.launch { interactor.syncFavoriteToCircle(uid, movieId, newFavoriteState) }
+
+                    if (newFavoriteState) {
+                        checkAndNotifyMatch(uid, movieId)
+                    }
                 }
             }
             .onFailure { error ->

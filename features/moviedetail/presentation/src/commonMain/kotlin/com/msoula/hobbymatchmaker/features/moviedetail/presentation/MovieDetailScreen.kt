@@ -25,10 +25,12 @@ import com.msoula.hobbymatchmaker.core.design.molecules.BackNavigationTopBar
 import com.msoula.hobbymatchmaker.core.design.no_data
 import com.msoula.hobbymatchmaker.core.design.not_found
 import com.msoula.hobbymatchmaker.core.design.organisms.ActorSection
+import com.msoula.hobbymatchmaker.core.design.organisms.FriendSection
 import com.msoula.hobbymatchmaker.core.design.organisms.MovieDetailInformation
 import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
 import com.msoula.hobbymatchmaker.core.design.util.UIText
 import com.msoula.hobbymatchmaker.core.design.util.UiState
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.mappers.toProfileSocialMember
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiEventModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.VideoPlayerState
@@ -121,6 +123,10 @@ fun MovieDetailContent(
                         },
                         actorSection = {
                             ActorSection(casting = Casting(movie.cast.associate { (name, role) -> name to role }))
+                        },
+                        friendSection = {
+                            FriendSection(movie.sharedMembers.map { member -> member.toProfileSocialMember() }
+                                .toImmutableList())
                         }
                     )
                 }

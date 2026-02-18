@@ -7,5 +7,6 @@ data class MovieCarouselItem(
     val coverFilePath: String,
     val releaseDate: String,
     val note: Double,
-    val isFavorite: Boolean
+    val isFavorite: Boolean,
+    val isShared: Boolean
 )

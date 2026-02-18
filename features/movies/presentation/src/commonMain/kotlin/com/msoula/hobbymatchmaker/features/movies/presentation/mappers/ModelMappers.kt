@@ -42,7 +42,8 @@ fun MovieUiModel.toCarouselItem(): MovieCarouselItem {
         releaseDate = this.releaseDate,
         coverFilePath = this.coverFilePath,
         note = this.note,
-        isFavorite = this.isFavorite
+        isFavorite = this.isFavorite,
+        isShared = this.isShared
     )
 }
 

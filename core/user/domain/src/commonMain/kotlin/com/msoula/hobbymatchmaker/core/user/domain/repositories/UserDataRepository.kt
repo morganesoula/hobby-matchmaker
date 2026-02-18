@@ -12,4 +12,5 @@ interface UserDataRepository {
     suspend fun getUsers(uids: List<String>): Map<String, UserSummaryDomainModel>
     suspend fun prefetchUsers(uids: List<String>)
     suspend fun invalidateCache(uid: String)
+    suspend fun invalidateUsers(uids: List<String>)
 }

@@ -38,6 +38,13 @@ interface SocialRemoteDataSource {
     ): AppResult<Boolean, AppError>
 
     suspend fun getSocialCircleSnapshot(uid: String): AppResult<List<SocialCircleEntryRemoteDataModel>, AppError>
+
+    suspend fun updateMovieLikedInCircleEntries(
+        ownerUid: String,
+        movieId: Long,
+        isFavorite: Boolean
+    ): AppResult<Unit, AppError>
+
     fun observeIncomingInvites(ownerUid: String): Flow<List<InviteDataModel>>
     fun observeSentInvites(ownerUid: String): Flow<List<InviteDataModel>>
 }

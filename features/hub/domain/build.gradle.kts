@@ -11,6 +11,8 @@ kotlin {
         commonMain.dependencies {
             // Modules
             implementation(project(Modules.COMMON))
+            implementation(project(Modules.MOVIE_DOMAIN))
+            implementation(project(Modules.SOCIAL_DOMAIN))
         }
     }
 }

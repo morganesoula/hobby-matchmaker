@@ -222,7 +222,7 @@ fun AppNavHost(
                 parameters = { parametersOf(movieId) }
             )
 
-            val movieDetailState by movieDetailViewModel.screenState.collectAsState()
+            val movieDetailState by movieDetailViewModel.movieDetailState.collectAsState()
             val snackBarHostState = remember { SnackbarHostState() }
             var videoPlayerState by rememberSaveable(stateSaver = VideoPlayerStateSaver) {
                 mutableStateOf(VideoPlayerState.Initial)

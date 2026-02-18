@@ -232,6 +232,12 @@ class SocialViewModel(
         socialUseCases.cancelInvitationUseCase(inviteId)
             .onSuccess {
                 Logger.d("Invitation $inviteId canceled successfully")
+                currentUserUid?.let { uid ->
+                    socialUseCases.refreshSentInvitesUseCase(uid)
+                        .onFailure {
+                            Logger.e("Failed to refresh sent invites after cancel: $it")
+                        }
+                }
             }
             .onFailure { error ->
                 eventHandler.sendEvent(
@@ -244,6 +250,12 @@ class SocialViewModel(
         socialUseCases.declineInviteUseCase(inviteId)
             .onSuccess {
                 Logger.d("Invitation $inviteId declined successfully")
+                currentUserUid?.let { uid ->
+                    socialUseCases.refreshIncomingInvitesUseCase(uid)
+                        .onFailure {
+                            Logger.e("Failed to refresh incoming invites after decline: $it")
+                        }
+                }
             }
             .onFailure { error ->
                 eventHandler.sendEvent(
@@ -264,6 +276,10 @@ class SocialViewModel(
                         )
                             .onSuccess {
                                 Logger.d("Invitation $inviteId accept successfully")
+                                socialUseCases.refreshIncomingInvitesUseCase(ownerUid)
+                                    .onFailure {
+                                        Logger.e("Failed to refresh incoming invites after accept: $it")
+                                    }
                             }
                             .onFailure { error ->
                                 eventHandler.sendEvent(

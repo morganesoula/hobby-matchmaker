@@ -35,14 +35,13 @@ fun NoDataCard(
     Card(
         modifier = modifier.padding(start = CustomSize.Sixteen, end = CustomSize.Sixteen),
         colors = CardDefaults.cardColors(
-            containerColor =
-                MaterialTheme.colorScheme.surfaceVariant
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
         shape = RoundedCornerShape(CustomSize.Sixteen)
     ) {
         Column(
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .background(MaterialTheme.colorScheme.surfaceContainer)
                 .padding(CustomSize.Sixteen),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center

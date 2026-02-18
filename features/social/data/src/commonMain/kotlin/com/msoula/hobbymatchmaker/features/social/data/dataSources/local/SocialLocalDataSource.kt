@@ -15,4 +15,6 @@ interface SocialLocalDataSource {
     fun observeSentInvites(ownerUid: String): Flow<List<SocialInvitationDataModel>>
     suspend fun upsertIncomingInvites(invites: List<SocialInvitationDataModel>): AppResult<Unit, AppError>
     suspend fun upsertSentInvites(invites: List<SocialInvitationDataModel>): AppResult<Unit, AppError>
+    suspend fun replaceSentInvites(fromUid: String, invites: List<SocialInvitationDataModel>): AppResult<Unit, AppError>
+    suspend fun replaceIncomingInvites(toPseudo: String, invites: List<SocialInvitationDataModel>): AppResult<Unit, AppError>
 }

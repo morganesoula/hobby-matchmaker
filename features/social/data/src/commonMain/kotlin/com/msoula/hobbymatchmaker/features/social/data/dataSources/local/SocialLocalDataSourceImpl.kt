@@ -107,4 +107,16 @@ class SocialLocalDataSourceImpl(
         safeCallStorage {
             socialInvitationDAO.upsertInvites(invites.map { it.toSocialInvitation() })
         }
+
+    override suspend fun replaceSentInvites(
+        fromUid: String,
+        invites: List<SocialInvitationDataModel>
+    ): AppResult<Unit, AppError> =
+        socialInvitationDAO.replaceSentInvites(fromUid, invites.map { it.toSocialInvitation() })
+
+    override suspend fun replaceIncomingInvites(
+        toPseudo: String,
+        invites: List<SocialInvitationDataModel>
+    ): AppResult<Unit, AppError> =
+        socialInvitationDAO.replaceIncomingInvites(toPseudo, invites.map { it.toSocialInvitation() })
 }

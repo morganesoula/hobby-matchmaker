@@ -5,6 +5,7 @@ import com.msoula.hobbymatchmaker.features.social.domain.useCases.CancelInvitati
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.CheckMovieMatchUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.CheckSocialCircleLimitUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.DeclineInviteUseCase
+import com.msoula.hobbymatchmaker.features.social.domain.useCases.GetSharedMovieIdsUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.GetUserAvatarUrlUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.ObserveIncomingInvitesUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.ObserveSentInvitesUseCase
@@ -16,6 +17,7 @@ import com.msoula.hobbymatchmaker.features.social.domain.useCases.RemoveMemberUs
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.SearchUsersByPseudoUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.SendInviteUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.SocialUseCases
+import com.msoula.hobbymatchmaker.features.social.domain.useCases.SyncFavoriteToCircleUseCase
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 
@@ -36,4 +38,6 @@ val featuresModuleSocialDomain = module {
     factoryOf(::SocialUseCases)
     factoryOf(::CheckMovieMatchUseCase)
     factoryOf(::GetUserAvatarUrlUseCase)
+    factoryOf(::SyncFavoriteToCircleUseCase)
+    factoryOf(::GetSharedMovieIdsUseCase)
 }

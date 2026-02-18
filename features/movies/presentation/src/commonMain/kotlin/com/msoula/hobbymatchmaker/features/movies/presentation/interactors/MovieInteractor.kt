@@ -1,7 +1,7 @@
 package com.msoula.hobbymatchmaker.features.movies.presentation.interactors
 
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.AuthState
-import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfo
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfoUseCase
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
@@ -16,18 +16,20 @@ import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ShouldRefreshM
 import com.msoula.hobbymatchmaker.features.social.domain.models.MovieMatchResult
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.CheckMovieMatchUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.GetUserAvatarUrlUseCase
+import com.msoula.hobbymatchmaker.features.social.domain.useCases.SyncFavoriteToCircleUseCase
 import kotlinx.coroutines.flow.Flow
 
 class MovieInteractor(
     private val setMovieFavoriteUseCase: SetMovieFavoriteUseCase,
     private val observeAllMoviesUseCase: ObserveAllMoviesUseCase,
     private val refreshMoviesUseCase: RefreshMoviesUseCase,
-    private val fetchFirebaseUserInfo: FetchFirebaseUserInfo,
+    private val fetchFirebaseUserInfo: FetchFirebaseUserInfoUseCase,
     private val checkMovieSynopsisValueUseCase: CheckMovieSynopsisValueUseCase,
     private val shouldRefreshMoviesUseCase: ShouldRefreshMoviesUseCase,
     private val loadMoreMoviesUseCase: LoadMoreMoviesUseCase,
     private val checkMovieMatchUseCase: CheckMovieMatchUseCase,
     private val getUserAvatarUrlUseCase: GetUserAvatarUrlUseCase,
+    private val syncFavoriteToCircleUseCase: SyncFavoriteToCircleUseCase,
     private val connectivityChecker: NetworkConnectivityChecker
 ) {
     fun observeMovies(): Flow<AppResult<ObserveAllMoviesSuccess, AppError>> =
@@ -36,7 +38,10 @@ class MovieInteractor(
     suspend fun fetchMovies(language: String): AppResult<Unit, AppError> =
         refreshMoviesUseCase(language)
 
-    suspend fun loadMoreMovies(language: String, page: Int): AppResult<PaginationInfoDomainModel, AppError> =
+    suspend fun loadMoreMovies(
+        language: String,
+        page: Int
+    ): AppResult<PaginationInfoDomainModel, AppError> =
         loadMoreMoviesUseCase(language, page)
 
     suspend fun shouldRefreshMovies() = shouldRefreshMoviesUseCase()
@@ -55,6 +60,9 @@ class MovieInteractor(
             }
         }
     }
+
+    suspend fun syncFavoriteToCircle(ownerUid: String, movieId: Long, isFavorite: Boolean) =
+        syncFavoriteToCircleUseCase(ownerUid, movieId, isFavorite)
 
     suspend fun canAccessMovieDetail(movieId: Long): Boolean {
         val local = when (val localResult = checkMovieSynopsisValueUseCase(movieId)) {

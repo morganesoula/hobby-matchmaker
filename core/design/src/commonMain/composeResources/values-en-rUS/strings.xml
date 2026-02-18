@@ -73,6 +73,10 @@
     <string name="hub_favorite_movies_no_data_txt">Browse and double tap on a movie to start building your library.</string>
     <string name="hub_favorite_movies_no_data_btn_txt">Discover movies</string>
 
+    // MOVIE DETAIL
+    <string name="movie_detail_friend_section_main_title">Friends who liked this movie</string>
+    <string name="movie_detail_friend_section_no_data_title">No friend liked this movie yet</string>
+
     // OTHER
     <string name="continue_as_guest_button_title">Continue as guest</string>
     <string name="continue_as_guest_dialog_title">Try as guest</string>

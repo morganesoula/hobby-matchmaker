@@ -1,6 +1,6 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.di
 
-import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfo
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfoUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.IsFirstSignInUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LinkInWithCredentialUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutUseCase
@@ -18,6 +18,6 @@ val coreModuleAuthenticationDomain = module {
     factoryOf(::SignUpUseCase)
     factoryOf(::LinkInWithCredentialUseCase)
     factoryOf(::IsFirstSignInUseCase)
-    factoryOf(::FetchFirebaseUserInfo)
+    factoryOf(::FetchFirebaseUserInfoUseCase)
     factoryOf(::SignInWithSocialProviderUseCase)
 }

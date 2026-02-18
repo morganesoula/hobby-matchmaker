@@ -14,6 +14,7 @@ import com.msoula.hobbymatchmaker.core.session.data.di.coreModuleSessionData
 import com.msoula.hobbymatchmaker.core.session.domain.di.coreModuleSessionDomain
 import com.msoula.hobbymatchmaker.core.splashscreen.presentation.di.coreModuleSplashPresentation
 import com.msoula.hobbymatchmaker.core.user.data.di.coreModuleUserData
+import com.msoula.hobbymatchmaker.features.hub.domain.di.featuresModuleHubDomain
 import com.msoula.hobbymatchmaker.features.hub.presentation.di.featuresModuleHubPresentation
 import com.msoula.hobbymatchmaker.features.moviedetail.data.dataSources.di.featuresModuleMovieDetailData
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.di.featuresModuleMovieDetailDomain
@@ -55,5 +56,6 @@ fun appModule() = listOf(
     featuresModuleUserProfileDomain,
     featuresModuleUserProfilePresentation,
     coreModuleSplashPresentation,
-    featuresModuleHubPresentation
+    featuresModuleHubPresentation,
+    featuresModuleHubDomain
 )

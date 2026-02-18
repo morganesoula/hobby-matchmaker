@@ -63,4 +63,58 @@ class SocialInvitationDAOImpl(
             AppResult.Failure(AppError.Storage.WriteFailed)
         }
     }
+
+    override suspend fun replaceSentInvites(
+        fromUid: String,
+        invites: List<Social_invitation>
+    ): AppResult<Unit, AppError> {
+        return try {
+            database.transaction {
+                database.hmm_databaseQueries.deleteSentInvitations(fromUid)
+                invites.forEach { invite ->
+                    database.hmm_databaseQueries.insertSocialInvitation(
+                        id = invite.id,
+                        from_uid = invite.from_uid,
+                        from_pseudo = invite.from_pseudo,
+                        to_pseudo = invite.to_pseudo,
+                        name = invite.name,
+                        status = invite.status,
+                        created_at = invite.created_at,
+                        updated_at = invite.updated_at
+                    )
+                }
+            }
+            AppResult.Success(Unit)
+        } catch (e: Exception) {
+            Logger.e("SocialInvitationDAOImpl - replaceSentInvites transaction failed: $e")
+            AppResult.Failure(AppError.Storage.WriteFailed)
+        }
+    }
+
+    override suspend fun replaceIncomingInvites(
+        toPseudo: String,
+        invites: List<Social_invitation>
+    ): AppResult<Unit, AppError> {
+        return try {
+            database.transaction {
+                database.hmm_databaseQueries.deleteIncomingInvitations(toPseudo)
+                invites.forEach { invite ->
+                    database.hmm_databaseQueries.insertSocialInvitation(
+                        id = invite.id,
+                        from_uid = invite.from_uid,
+                        from_pseudo = invite.from_pseudo,
+                        to_pseudo = invite.to_pseudo,
+                        name = invite.name,
+                        status = invite.status,
+                        created_at = invite.created_at,
+                        updated_at = invite.updated_at
+                    )
+                }
+            }
+            AppResult.Success(Unit)
+        } catch (e: Exception) {
+            Logger.e("SocialInvitationDAOImpl - replaceIncomingInvites transaction failed: $e")
+            AppResult.Failure(AppError.Storage.WriteFailed)
+        }
+    }
 }

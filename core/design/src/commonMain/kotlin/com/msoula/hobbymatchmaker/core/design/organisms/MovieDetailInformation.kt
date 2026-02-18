@@ -104,7 +104,8 @@ fun MovieDetailInformation(
     onVideoPlayerDismissed: () -> Unit,
     onPlayTrailerClicked: (Long, Boolean) -> Unit,
     onMovieDoubleTap: (movieId: Long) -> Unit,
-    actorSection: @Composable () -> Unit
+    actorSection: @Composable () -> Unit,
+    friendSection: @Composable () -> Unit
 ) {
     val imageLoader: ImageLoader = koinInject()
 
@@ -256,7 +257,11 @@ fun MovieDetailInformation(
             SpacerHeight16()
             MovieOverviewExpandable(overview = overview)
 
-            if (filteredCast.cast.isNotEmpty()) actorSection()
+            if (filteredCast.cast.isNotEmpty()) {
+                actorSection()
+                SpacerHeight16()
+            }
+            friendSection()
         }
 
         Row(

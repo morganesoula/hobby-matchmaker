@@ -9,4 +9,6 @@ interface SocialInvitationDAO {
     fun observeIncomingInvites(toPseudo: String): Flow<List<Social_invitation>>
     fun observeSentInvites(fromUid: String): Flow<List<Social_invitation>>
     suspend fun upsertInvites(invites: List<Social_invitation>): AppResult<Unit, AppError>
+    suspend fun replaceSentInvites(fromUid: String, invites: List<Social_invitation>): AppResult<Unit, AppError>
+    suspend fun replaceIncomingInvites(toPseudo: String, invites: List<Social_invitation>): AppResult<Unit, AppError>
 }

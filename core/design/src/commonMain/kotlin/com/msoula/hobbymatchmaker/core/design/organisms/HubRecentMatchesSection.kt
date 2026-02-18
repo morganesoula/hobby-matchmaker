@@ -9,7 +9,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.MainTitle
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
@@ -34,7 +33,7 @@ fun HubRecentMatches(
         modifier = modifier.padding(horizontal = CustomSize.Sixteen)
     ) {
         MainTitle(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(top = CustomSize.Eight),
             text = stringResource(Res.string.hub_recent_matches_title)
         )
         SpacerHeight8()
