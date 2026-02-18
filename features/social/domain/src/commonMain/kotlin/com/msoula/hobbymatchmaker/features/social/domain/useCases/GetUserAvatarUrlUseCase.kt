@@ -9,7 +9,7 @@ class GetUserAvatarUrlUseCase(
 ) {
     suspend operator fun invoke(uid: String): AppResult<String?, AppError> {
         return when (val result = socialRepository.findUserByUid(uid)) {
-            is AppResult.Success -> AppResult.Success(result.data?.avatarUrl)
+            is AppResult.Success -> AppResult.Success(result.data.avatarUrl)
             is AppResult.Failure -> AppResult.Failure(result.error)
         }
     }

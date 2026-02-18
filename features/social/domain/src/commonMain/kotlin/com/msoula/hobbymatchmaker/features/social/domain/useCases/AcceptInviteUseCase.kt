@@ -16,11 +16,8 @@ class AcceptInviteUseCase(
     ): AppResult<Unit, AppError> {
         return socialRepository.findUserByUid(ownerUid)
             .flatMap { owner ->
-                owner ?: return@flatMap AppResult.Failure(AppError.Domain.NotFound)
                 socialRepository.findUserByUid(guestUid)
                     .flatMap { member ->
-                        member ?: return@flatMap AppResult.Failure(AppError.Domain.NotFound)
-
                         val commonMoviesCount = SocialMatchingUtils.calculateCommonMoviesCount(
                             owner.moviesLiked, member.moviesLiked
                         )
