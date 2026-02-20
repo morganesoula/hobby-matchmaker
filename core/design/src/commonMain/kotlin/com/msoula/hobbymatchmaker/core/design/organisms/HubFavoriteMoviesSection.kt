@@ -2,9 +2,11 @@ package com.msoula.hobbymatchmaker.core.design.organisms
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.MaterialTheme
@@ -36,28 +38,31 @@ fun HubFavoriteMoviesSection(
     likedMovies: ImmutableList<MovieCarouselItem>,
     navigateToMovieDetail: (movieId: Long) -> Unit
 ) {
-    Column(
-        modifier = modifier.padding(horizontal = CustomSize.Sixteen)
-    ) {
-        MainTitle(
-            modifier = Modifier.fillMaxWidth(),
-            text = stringResource(Res.string.hub_favorite_movies_title)
-        )
-        SpacerHeight4()
-        MediumTitle(
-            modifier = Modifier.fillMaxWidth(),
-            text = stringResource(Res.string.hub_favorite_movies_subtitle)
-        )
-        SpacerHeight8()
-
-        if (likedMovies.isNotEmpty()) {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                items(likedMovies) { movie ->
-                    HubFavoriteMovie(movie = movie, onMovieCardTapped = navigateToMovieDetail)
+    if (likedMovies.isNotEmpty()) {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = modifier
+                .fillMaxSize()
+                .padding(horizontal = CustomSize.Sixteen),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Column {
+                    MainTitle(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(Res.string.hub_favorite_movies_title)
+                    )
+                    SpacerHeight4()
+                    MediumTitle(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(Res.string.hub_favorite_movies_subtitle)
+                    )
+                    SpacerHeight8()
                 }
+            }
+
+            items(likedMovies) { movie ->
+                HubFavoriteMovie(movie = movie, onMovieCardTapped = navigateToMovieDetail)
             }
         }
     }

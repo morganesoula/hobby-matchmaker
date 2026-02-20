@@ -45,9 +45,14 @@ class SocialRepositoryImpl(
 
     override fun observeSocialCircle(uid: String): Flow<List<SocialMemberDomainModel>> =
         channelFlow {
+            val remoteDataByMemberUid = mutableMapOf<String, SocialCircleEntryRemoteDataModel>()
+
             launch {
                 socialRemoteDataSource.observeSocialCircle(uid)
                     .collectLatest { remoteMembers ->
+                        remoteMembers.forEach { member ->
+                            remoteDataByMemberUid[member.memberUid] = member
+                        }
                         val localModels = mapRemoteToLocal(remoteMembers, uid)
                         socialLocalDataSource.syncCircle(localModels)
                     }
@@ -56,6 +61,7 @@ class SocialRepositoryImpl(
             socialLocalDataSource.observeSocialCircle()
                 .map { entities ->
                     entities.map { entity ->
+                        val remoteData = remoteDataByMemberUid[entity.memberUid]
                         SocialMemberDomainModel(
                             uid = entity.memberUid,
                             pseudo = entity.memberPseudo
@@ -63,7 +69,10 @@ class SocialRepositoryImpl(
                             name = entity.memberName ?: SocialMemberDomainModel.Initial.name,
                             avatarUrl = entity.memberAvatarUrl
                                 ?: SocialMemberDomainModel.Initial.avatarUrl,
-                            commonMoviesCount = SocialMemberDomainModel.Initial.commonMoviesCount
+                            commonMoviesCount = remoteData?.commonMoviesCount
+                                ?: SocialMemberDomainModel.Initial.commonMoviesCount,
+                            moviesLiked = remoteData?.moviesLiked
+                                ?: SocialMemberDomainModel.Initial.moviesLiked
                         )
                     }
                 }

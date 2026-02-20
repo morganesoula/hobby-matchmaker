@@ -47,6 +47,7 @@ import com.msoula.hobbymatchmaker.core.splashscreen.presentation.SplashScreenCon
 import com.msoula.hobbymatchmaker.core.splashscreen.presentation.SplashViewModel
 import com.msoula.hobbymatchmaker.features.hub.presentation.HubContent
 import com.msoula.hobbymatchmaker.features.hub.presentation.HubViewModel
+import com.msoula.hobbymatchmaker.features.hub.presentation.models.HubSection
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailContent
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailViewModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
@@ -528,8 +529,8 @@ fun MainScaffold(
                 HubContent(
                     hubFavoriteMovies = hubFavoriteMoviesState,
                     hubRecentMatches = hubRecentMatchesState,
-                    observeFavoriteMovies = { hubViewModel.observeFavoriteMovies() },
-                    observeRecentMatches = { hubViewModel.observeRecentMatches() },
+                    observeFavoriteMovies = { hubViewModel.retryObservation(HubSection.FAVORITE_MOVIES) },
+                    getRecentMatches = { hubViewModel.retryObservation(HubSection.RECENT_MATCHES) },
                     navigateToMoviesScreen = { navCallbacks.navigateToMoviesFromHub() },
                     navigateToMovieDetail = { navCallbacks.navigateToMovieDetailFromMoviesOrHub(it) },
                     navigateToProfileScreen = { navCallbacks.navigateToProfileFromHub() }

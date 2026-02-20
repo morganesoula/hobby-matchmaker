@@ -27,6 +27,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -53,10 +55,9 @@ class MovieDetailViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeData() {
-        scope.launch {
-            retryTrigger.flatMapLatest {
-                interactor.observeMovieDetail(movieId, language)
-            }.collect { result ->
+        retryTrigger
+            .flatMapLatest { interactor.observeMovieDetail(movieId, language) }
+            .onEach { result ->
                 movieDetailState.update {
                     when (result) {
                         is AppResult.Success -> mapDetailSuccess(result.data)
@@ -64,7 +65,7 @@ class MovieDetailViewModel(
                     }
                 }
             }
-        }
+            .launchIn(scope)
     }
 
     fun retryObservation() {

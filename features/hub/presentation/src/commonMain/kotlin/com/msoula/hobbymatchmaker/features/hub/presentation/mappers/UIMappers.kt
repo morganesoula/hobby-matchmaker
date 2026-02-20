@@ -30,7 +30,7 @@ fun HubFavoriteMoviesUIModel.toMovieCarouselItem(): MovieCarouselItem =
 
 fun HubRecentMatchesUIModel.toProfileSocialMember(): ProfileSocialMember =
     ProfileSocialMember(
-        uid = "",
+        uid = this.uid,
         name = this.name,
         pseudo = this.pseudo,
         avatarUrl = this.avatarUrl,
@@ -39,6 +39,7 @@ fun HubRecentMatchesUIModel.toProfileSocialMember(): ProfileSocialMember =
 
 fun MatchedFriendDomainModel.toHubRecentMatchesUIModel(): HubRecentMatchesUIModel =
     HubRecentMatchesUIModel(
+        uid = this.uid,
         name = this.displayName,
         pseudo = this.pseudo,
         avatarUrl = this.avatarUrl,

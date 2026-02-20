@@ -4,25 +4,22 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.StateContainer
+import com.msoula.hobbymatchmaker.core.design.models.MovieCarouselItem
+import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMember
 import com.msoula.hobbymatchmaker.core.design.organisms.HubFavoriteMoviesSection
 import com.msoula.hobbymatchmaker.core.design.organisms.HubNoFavoriteMoviesSection
 import com.msoula.hobbymatchmaker.core.design.organisms.HubNoRecentMatchesSection
 import com.msoula.hobbymatchmaker.core.design.organisms.HubRecentMatches
 import com.msoula.hobbymatchmaker.core.design.templates.HubLayout
 import com.msoula.hobbymatchmaker.core.design.util.UiState
-import com.msoula.hobbymatchmaker.features.hub.presentation.mappers.toMovieCarouselItem
-import com.msoula.hobbymatchmaker.features.hub.presentation.mappers.toProfileSocialMember
-import com.msoula.hobbymatchmaker.features.hub.presentation.models.HubFavoriteMoviesUIModel
-import com.msoula.hobbymatchmaker.features.hub.presentation.models.HubRecentMatchesUIModel
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun HubContent(
-    hubFavoriteMovies: UiState<ImmutableList<HubFavoriteMoviesUIModel>>,
-    hubRecentMatches: UiState<ImmutableList<HubRecentMatchesUIModel>>,
+    hubFavoriteMovies: UiState<ImmutableList<MovieCarouselItem>>,
+    hubRecentMatches: UiState<ImmutableList<ProfileSocialMember>>,
     observeFavoriteMovies: () -> Unit,
-    observeRecentMatches: () -> Unit,
+    getRecentMatches: () -> Unit,
     navigateToMoviesScreen: () -> Unit,
     navigateToMovieDetail: (movieId: Long) -> Unit,
     navigateToProfileScreen: () -> Unit
@@ -40,12 +37,11 @@ fun HubContent(
                         ErrorStateScreen(
                             error = error,
                             hint = hint,
-                            onRetry = { observeRecentMatches() })
+                            onRetry = { getRecentMatches() })
                     },
                     onSuccess = { members ->
                         HubRecentMatches(
-                            members = members.map { member -> member.toProfileSocialMember() }
-                                .toImmutableList()
+                            members = members
                         )
                     }
                 )
@@ -65,11 +61,10 @@ fun HubContent(
                     },
                     onSuccess = { movies ->
                         HubFavoriteMoviesSection(
-                            likedMovies = movies.map { movie -> movie.toMovieCarouselItem() }
-                                .toImmutableList(),
+                            likedMovies = movies,
                             navigateToMovieDetail = navigateToMovieDetail
                         )
-                    },
+                    }
                 )
             }
         )

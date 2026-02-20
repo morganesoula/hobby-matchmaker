@@ -29,6 +29,7 @@ class ObserveMatchedFriendsUseCase(
                                         uid = member.uid,
                                         displayName = member.name
                                             ?: member.pseudo,
+                                        pseudo = member.pseudo,
                                         avatarUrl = member.avatarUrl,
                                         sharedMovieIds = sharedMovieIds,
                                         commonMoviesCount = sharedMovieIds.size

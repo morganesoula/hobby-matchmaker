@@ -53,13 +53,13 @@ fun HubRecentMatches(
 @Composable
 fun HubNoRecentMatchesSection(
     modifier: Modifier = Modifier,
-    navigateToProfileScreen: () -> Unit,
+    navigateToProfileScreen: () -> Unit
 ) {
     Column(
         modifier = modifier.padding(horizontal = CustomSize.Sixteen)
     ) {
         Text(
-            modifier = modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
                 .padding(top = CustomSize.Sixteen),
             text = stringResource(Res.string.hub_recent_matches_title),
             style = MaterialTheme.typography.titleLarge

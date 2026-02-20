@@ -1,5 +1,8 @@
 package com.msoula.hobbymatchmaker.core.design.models
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class MovieCarouselItem(
     val id: Long,
     val title: String,
