@@ -219,7 +219,6 @@ fun HubFavoriteMovie(
                 .pointerInput(movie.id) {
                     detectTapGestures(
                         onTap = {
-                            //TODO Add is shared condition
                             onMovieCardTapped(movie.id)
                         }
                     )

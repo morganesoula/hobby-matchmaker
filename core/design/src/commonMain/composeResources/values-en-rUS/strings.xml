@@ -66,6 +66,8 @@
     <string name="hub_recent_matches_no_data_title">No match yet?</string>
     <string name="hub_recent_matches_no_data_txt">Invite your friends to see what movies you both have in common.</string>
     <string name="hub_recent_matches_no_data_btn_txt">Invite friends</string>
+    <string name="hub_recent_matches_common_movies_title">Common Movies</string>
+    <string name="hub_recent_matches_common_movies_no_data_txt">No common movies found yet.</string>
     <string name="hub_favorite_movies_title">My Favorite Movies</string>
     <string name="hub_favorite_movies_subtitle">Tap a "Shared" movie to see who else likes it</string>
     <string name="hub_favorite_movies_shared_tag">SHARED</string>

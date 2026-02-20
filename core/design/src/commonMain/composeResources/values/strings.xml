@@ -72,6 +72,8 @@
     <string name="hub_favorite_movies_no_data_title">Votre liste de favoris est vide</string>
     <string name="hub_favorite_movies_no_data_txt">Parcourez et double tapez sur un film pour commencer à construire votre bibliothèque.</string>
     <string name="hub_favorite_movies_no_data_btn_txt">Découvrir des films</string>
+    <string name="hub_recent_matches_common_movies_title">Films en commun</string>
+    <string name="hub_recent_matches_common_movies_no_data_txt">Vous n'avez pas encore de films en commun.</string>
 
     // MOVIE DETAIL
     <string name="movie_detail_friend_section_main_title">Amis qui ont aimé ce film</string>
