@@ -27,7 +27,8 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun HubRecentMatches(
     modifier: Modifier = Modifier,
-    members: ImmutableList<ProfileSocialMember>
+    members: ImmutableList<ProfileSocialMember>,
+    onMemberClicked: (member: ProfileSocialMember) -> Unit
 ) {
     Column(
         modifier = modifier.padding(horizontal = CustomSize.Sixteen)
@@ -43,7 +44,10 @@ fun HubRecentMatches(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 items(members) { member ->
-                    MemberItem(member)
+                    MemberItem(
+                        member = member,
+                        onMemberClicked = onMemberClicked
+                    )
                 }
             }
         }

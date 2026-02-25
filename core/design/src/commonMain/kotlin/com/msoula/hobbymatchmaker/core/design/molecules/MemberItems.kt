@@ -1,12 +1,15 @@
 package com.msoula.hobbymatchmaker.core.design.molecules
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.CircleWithCustomPhoto
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight4
@@ -18,14 +21,22 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun MemberItem(
+    modifier: Modifier = Modifier,
     member: ProfileSocialMember,
-    displayMoviesCount: Boolean = true
+    displayMoviesCount: Boolean = true,
+    onMemberClicked: (member: ProfileSocialMember) -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier.clickable {
+            Logger.d("Member clicked with pseudo ${member.pseudo}")
+            onMemberClicked(member)
+        }
     ) {
-        CircleWithCustomPhoto(customAvatarPath = member.avatarUrl)
+        CircleWithCustomPhoto(
+            customAvatarPath = member.avatarUrl
+        )
         SpacerHeight8()
         Text(
             text = member.name ?: member.pseudo,

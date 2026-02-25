@@ -7,8 +7,10 @@ import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
 import com.msoula.hobbymatchmaker.features.hub.domain.useCases.ObserveMatchedFriendsUseCase
+import com.msoula.hobbymatchmaker.features.hub.domain.useCases.ObserveSharedFavoriteMoviesUseCase
 import com.msoula.hobbymatchmaker.features.hub.presentation.mappers.toHubFavoriteMoviesUIModel
 import com.msoula.hobbymatchmaker.features.hub.presentation.mappers.toHubRecentMatchesUIModel
+import com.msoula.hobbymatchmaker.features.hub.presentation.mappers.toMovieCarouselItem
 import com.msoula.hobbymatchmaker.features.hub.presentation.models.FavoriteMoviesSuccess
 import com.msoula.hobbymatchmaker.features.hub.presentation.models.RecentMatchesSuccess
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveFavoriteMoviesUseCase
@@ -20,6 +22,7 @@ import kotlinx.coroutines.flow.map
 class HubInteractor(
     private val observeFavoriteMoviesUseCase: ObserveFavoriteMoviesUseCase,
     private val observeMatchedFriendsUseCase: ObserveMatchedFriendsUseCase,
+    private val observeSharedFavoriteMoviesUseCase: ObserveSharedFavoriteMoviesUseCase,
     private val fetchFirebaseUserInfo: FetchFirebaseUserInfoUseCase,
     private val getSharedMovieIdsUseCase: GetSharedMovieIdsUseCase,
     private val connectivityChecker: NetworkConnectivityChecker
@@ -82,4 +85,11 @@ class HubInteractor(
             is AppResult.Failure -> null
         }
     }
+
+    fun observeSharedFavoriteMovies(ids: List<Long>) = observeSharedFavoriteMoviesUseCase(ids)
+        .map { movies ->
+            movies.map {
+                it.toHubFavoriteMoviesUIModel(isShared = true).toMovieCarouselItem()
+            }
+        }
 }

@@ -23,16 +23,15 @@ class ObserveMatchedFriendsUseCase(
                             val sharedMovieIds =
                                 member.moviesLiked?.intersect(favoriteSet)?.toList()
 
-                            sharedMovieIds?.let {
-                                if (it.isNotEmpty()) {
+                            sharedMovieIds?.let { sharedIds ->
+                                if (sharedIds.isNotEmpty()) {
                                     MatchedFriendDomainModel(
                                         uid = member.uid,
                                         displayName = member.name
                                             ?: member.pseudo,
                                         pseudo = member.pseudo,
                                         avatarUrl = member.avatarUrl,
-                                        sharedMovieIds = sharedMovieIds,
-                                        commonMoviesCount = sharedMovieIds.size
+                                        sharedMovieIds = sharedMovieIds
                                     )
                                 } else null
                             }

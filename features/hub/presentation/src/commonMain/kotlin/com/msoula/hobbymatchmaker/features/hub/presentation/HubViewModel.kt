@@ -13,6 +13,7 @@ import com.msoula.hobbymatchmaker.features.hub.presentation.interactors.HubInter
 import com.msoula.hobbymatchmaker.features.hub.presentation.mappers.toMovieCarouselItem
 import com.msoula.hobbymatchmaker.features.hub.presentation.mappers.toProfileSocialMember
 import com.msoula.hobbymatchmaker.features.hub.presentation.models.FavoriteMoviesSuccess
+import com.msoula.hobbymatchmaker.features.hub.presentation.models.HubEvent
 import com.msoula.hobbymatchmaker.features.hub.presentation.models.HubSection
 import com.msoula.hobbymatchmaker.features.hub.presentation.models.RecentMatchesSuccess
 import kotlinx.collections.immutable.ImmutableList
@@ -45,6 +46,15 @@ class HubViewModel(
 
     private val favoriteMoviesRetryTrigger = MutableStateFlow(0)
     private val recentMatchesRetryTrigger = MutableStateFlow(0)
+
+    val showRecentMatchDetail: StateFlow<Boolean>
+        field = MutableStateFlow<Boolean>(false)
+
+    val selectedMatch: StateFlow<ProfileSocialMember?>
+        field = MutableStateFlow<ProfileSocialMember?>(ProfileSocialMember())
+
+    val selectedMatchMoviesState: StateFlow<UiState<ImmutableList<MovieCarouselItem>>>
+        field = MutableStateFlow<UiState<ImmutableList<MovieCarouselItem>>>(UiState.Loading)
 
     init {
         observeFavoriteMovies()
@@ -93,10 +103,11 @@ class HubViewModel(
                         is AppResult.Success -> {
                             when (val data = result.data) {
                                 is RecentMatchesSuccess.Empty -> UiState.Empty
-                                is RecentMatchesSuccess.Success ->
+                                is RecentMatchesSuccess.Success -> {
                                     UiState.Success(data.friends.map { member ->
                                         member.toProfileSocialMember()
                                     }.toImmutableList())
+                                }
                             }
                         }
 
@@ -124,6 +135,32 @@ class HubViewModel(
             HubSection.RECENT_MATCHES -> {
                 hubRecentMatchesState.update { UiState.Loading }
                 recentMatchesRetryTrigger.update { it + 1 }
+            }
+        }
+    }
+
+    fun onEvent(event: HubEvent) {
+        when (event) {
+            is HubEvent.OnRecentMatchClicked -> {
+                selectedMatch.update { event.member }
+                selectedMatchMoviesState.update { UiState.Loading }
+                showRecentMatchDetail.update { true }
+
+                event.member.sharedMovieIds?.takeIf { it.isNotEmpty() }?.let { ids ->
+                    hubInteractor.observeSharedFavoriteMovies(ids)
+                        .onEach { movies ->
+                            selectedMatchMoviesState.update {
+                                if (movies.isEmpty()) UiState.Empty
+                                else UiState.Success(movies.toImmutableList())
+                            }
+                        }
+                        .launchIn(scope)
+                } ?: selectedMatchMoviesState.update { UiState.Empty }
+            }
+
+            is HubEvent.OnModalDismissed -> {
+                showRecentMatchDetail.update { false }
+                selectedMatch.update { ProfileSocialMember() }
             }
         }
     }

@@ -34,7 +34,8 @@ fun HubRecentMatchesUIModel.toProfileSocialMember(): ProfileSocialMember =
         name = this.name,
         pseudo = this.pseudo,
         avatarUrl = this.avatarUrl,
-        commonMoviesCount = this.sharedWithCount
+        commonMoviesCount = this.sharedMovieIds.size,
+        sharedMovieIds = this.sharedMovieIds
     )
 
 fun MatchedFriendDomainModel.toHubRecentMatchesUIModel(): HubRecentMatchesUIModel =
@@ -43,6 +44,5 @@ fun MatchedFriendDomainModel.toHubRecentMatchesUIModel(): HubRecentMatchesUIMode
         name = this.displayName,
         pseudo = this.pseudo,
         avatarUrl = this.avatarUrl,
-        sharedMovieIds = this.sharedMovieIds,
-        sharedWithCount = this.commonMoviesCount
+        sharedMovieIds = this.sharedMovieIds
     )

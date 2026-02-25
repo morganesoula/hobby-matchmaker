@@ -37,7 +37,10 @@ fun FriendSection(
             if (friends.isNotEmpty()) {
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(CustomSize.Eight)) {
                     items(friends, key = { it.uid }) { friend ->
-                        MemberItem(friend, displayMoviesCount = false)
+                        MemberItem(
+                            member = friend,
+                            displayMoviesCount = false,
+                            onMemberClicked = {})
                     }
                 }
             } else {

@@ -9,22 +9,18 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.CircleWithCustomPhoto
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
 import com.msoula.hobbymatchmaker.core.design.hub_recent_matches_common_movies_no_data_txt
 import com.msoula.hobbymatchmaker.core.design.hub_recent_matches_common_movies_title
-import com.msoula.hobbymatchmaker.core.design.hub_recent_matches_no_data_txt
 import com.msoula.hobbymatchmaker.core.design.models.RecentMatchMember
 import com.msoula.hobbymatchmaker.core.design.molecules.HubFavoriteMovie
-import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_common_movies_count_plural
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MemberDetailModalBottomSheet(
-    modifier: Modifier = Modifier,
     member: RecentMatchMember,
     onDismiss: () -> Unit
 ) {
@@ -54,7 +50,6 @@ fun MemberDetailModalBottomSheet(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MemberDetailNoMoviesModalBottomSheet(
-    modifier: Modifier = Modifier,
     member: RecentMatchMember,
     onDismiss: () -> Unit
 ) {

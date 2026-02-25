@@ -6,7 +6,7 @@ data class HubRecentMatchesUIModel(
     val pseudo: String = "",
     val avatarUrl: String? = null,
     val sharedMovieIds: List<Long> = emptyList(),
-    val sharedWithCount: Int = 0
+    val commonMovies: List<HubFavoriteMoviesUIModel> = emptyList()
 ) {
     companion object {
         val Initial = HubRecentMatchesUIModel()

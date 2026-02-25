@@ -6,23 +6,32 @@ import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.StateContainer
 import com.msoula.hobbymatchmaker.core.design.models.MovieCarouselItem
 import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMember
+import com.msoula.hobbymatchmaker.core.design.models.RecentMatchMember
 import com.msoula.hobbymatchmaker.core.design.organisms.HubFavoriteMoviesSection
 import com.msoula.hobbymatchmaker.core.design.organisms.HubNoFavoriteMoviesSection
 import com.msoula.hobbymatchmaker.core.design.organisms.HubNoRecentMatchesSection
 import com.msoula.hobbymatchmaker.core.design.organisms.HubRecentMatches
+import com.msoula.hobbymatchmaker.core.design.organisms.MemberDetailModalBottomSheet
+import com.msoula.hobbymatchmaker.core.design.organisms.MemberDetailNoMoviesModalBottomSheet
 import com.msoula.hobbymatchmaker.core.design.templates.HubLayout
 import com.msoula.hobbymatchmaker.core.design.util.UiState
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun HubContent(
     hubFavoriteMovies: UiState<ImmutableList<MovieCarouselItem>>,
     hubRecentMatches: UiState<ImmutableList<ProfileSocialMember>>,
+    showRecentMatchDetail: Boolean,
     observeFavoriteMovies: () -> Unit,
     getRecentMatches: () -> Unit,
+    onModalDismissed: () -> Unit,
+    onMemberClicked: (member: ProfileSocialMember) -> Unit,
     navigateToMoviesScreen: () -> Unit,
     navigateToMovieDetail: (movieId: Long) -> Unit,
-    navigateToProfileScreen: () -> Unit
+    navigateToProfileScreen: () -> Unit,
+    selectedMatch: ProfileSocialMember?,
+    selectedMatchMoviesState: UiState<ImmutableList<MovieCarouselItem>>
 ) {
     Scaffold { paddingValues ->
         HubLayout(
@@ -41,7 +50,8 @@ fun HubContent(
                     },
                     onSuccess = { members ->
                         HubRecentMatches(
-                            members = members
+                            members = members,
+                            onMemberClicked = onMemberClicked
                         )
                     }
                 )
@@ -68,5 +78,35 @@ fun HubContent(
                 )
             }
         )
+    }
+
+    if (showRecentMatchDetail) {
+        selectedMatch?.let { match ->
+            when (selectedMatchMoviesState) {
+                is UiState.Success -> MemberDetailModalBottomSheet(
+                    member = RecentMatchMember(
+                        uid = match.uid,
+                        name = match.name,
+                        pseudo = match.pseudo,
+                        avatarUrl = match.avatarUrl ?: "",
+                        commonMovies = selectedMatchMoviesState.data
+                    ),
+                    onDismiss = onModalDismissed
+                )
+
+                is UiState.Empty -> MemberDetailNoMoviesModalBottomSheet(
+                    member = RecentMatchMember(
+                        uid = match.uid,
+                        name = match.name,
+                        pseudo = match.pseudo,
+                        avatarUrl = match.avatarUrl ?: "",
+                        commonMovies = persistentListOf()
+                    ),
+                    onDismiss = onModalDismissed
+                )
+
+                else -> {}
+            }
+        }
     }
 }

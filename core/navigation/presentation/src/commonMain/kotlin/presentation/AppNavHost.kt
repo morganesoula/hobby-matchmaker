@@ -47,6 +47,7 @@ import com.msoula.hobbymatchmaker.core.splashscreen.presentation.SplashScreenCon
 import com.msoula.hobbymatchmaker.core.splashscreen.presentation.SplashViewModel
 import com.msoula.hobbymatchmaker.features.hub.presentation.HubContent
 import com.msoula.hobbymatchmaker.features.hub.presentation.HubViewModel
+import com.msoula.hobbymatchmaker.features.hub.presentation.models.HubEvent
 import com.msoula.hobbymatchmaker.features.hub.presentation.models.HubSection
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailContent
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailViewModel
@@ -525,15 +526,23 @@ fun MainScaffold(
                 val hubViewModel: HubViewModel = koinViewModel()
                 val hubFavoriteMoviesState by hubViewModel.hubFavoriteMoviesState.collectAsState()
                 val hubRecentMatchesState by hubViewModel.hubRecentMatchesState.collectAsState()
+                val showRecentMatchDetail by hubViewModel.showRecentMatchDetail.collectAsState()
+                val selectedMatch by hubViewModel.selectedMatch.collectAsState()
+                val selectedMatchMoviesState by hubViewModel.selectedMatchMoviesState.collectAsState()
 
                 HubContent(
                     hubFavoriteMovies = hubFavoriteMoviesState,
                     hubRecentMatches = hubRecentMatchesState,
+                    showRecentMatchDetail = showRecentMatchDetail,
                     observeFavoriteMovies = { hubViewModel.retryObservation(HubSection.FAVORITE_MOVIES) },
                     getRecentMatches = { hubViewModel.retryObservation(HubSection.RECENT_MATCHES) },
+                    onModalDismissed = { hubViewModel.onEvent(HubEvent.OnModalDismissed) },
+                    onMemberClicked = { hubViewModel.onEvent(HubEvent.OnRecentMatchClicked(it)) },
                     navigateToMoviesScreen = { navCallbacks.navigateToMoviesFromHub() },
                     navigateToMovieDetail = { navCallbacks.navigateToMovieDetailFromMoviesOrHub(it) },
-                    navigateToProfileScreen = { navCallbacks.navigateToProfileFromHub() }
+                    navigateToProfileScreen = { navCallbacks.navigateToProfileFromHub() },
+                    selectedMatch = selectedMatch,
+                    selectedMatchMoviesState = selectedMatchMoviesState
                 )
             }
         }

@@ -136,4 +136,15 @@ class MovieRepositoryImpl(
     override fun observeFavoriteMovies(): Flow<List<FavoriteMovieDomainModel>> =
         movieLocalDataSource.observeFavoriteMovies()
             .map { list -> list.map { it.toFavoriteMovieDomainModel() } }
+
+    override fun observeSharedFavoriteMovies(ids: List<Long>): Flow<List<FavoriteMovieDomainModel>> {
+        val idsSets = ids.toSet()
+
+        return movieLocalDataSource.observeFavoriteMovies()
+            .map { localList ->
+                localList
+                    .filter { it.id in idsSets }
+                    .map { it.toFavoriteMovieDomainModel() }
+            }
+    }
 }

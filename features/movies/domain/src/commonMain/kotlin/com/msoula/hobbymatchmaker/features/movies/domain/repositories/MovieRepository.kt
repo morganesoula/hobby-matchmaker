@@ -25,7 +25,11 @@ interface MovieRepository {
     ): AppResult<Unit, AppError>
 
     suspend fun refreshMovies(language: String): AppResult<Unit, AppError>
-    suspend fun loadMoreMovies(language: String, page: Int): AppResult<PaginationInfoDomainModel, AppError>
+    suspend fun loadMoreMovies(
+        language: String,
+        page: Int
+    ): AppResult<PaginationInfoDomainModel, AppError>
+
     suspend fun isSynopsisMovieAvailable(movieId: Long): AppResult<Boolean, AppError>
     suspend fun getFavoriteLocalMovieIds(): AppResult<List<Long>, AppError>
     suspend fun syncUserFavoritesRemote(
@@ -35,4 +39,5 @@ interface MovieRepository {
 
     suspend fun getLastMovieSyncTimestamp(): Long
     fun observeFavoriteMovies(): Flow<List<FavoriteMovieDomainModel>>
+    fun observeSharedFavoriteMovies(ids: List<Long>): Flow<List<FavoriteMovieDomainModel>>
 }

@@ -6,7 +6,6 @@ data class MatchedFriendDomainModel(
     val pseudo: String = "",
     val avatarUrl: String? = null,
     val sharedMovieIds: List<Long> = emptyList(),
-    val commonMoviesCount: Int = 0
 ) {
     companion object {
         val Initial = MatchedFriendDomainModel()
