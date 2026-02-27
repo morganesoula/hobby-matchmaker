@@ -188,13 +188,15 @@ class SocialRepositoryImpl(
     override suspend fun getSocialCircleSnapshot(uid: String): AppResult<List<SocialMemberDomainModel>, AppError> =
         socialRemoteDataSource
             .getSocialCircleSnapshot(uid)
-            .mapSuccess { members ->
+            .flatMap { members ->
                 val memberUIds = members.map { it.memberUid }
                 userDataRepository.invalidateUsers(memberUIds)
-                val usersByUid = userDataRepository.getUsers(memberUIds)
-                members.mapNotNull { member ->
-                    val user = usersByUid[member.memberUid] ?: return@mapNotNull null
-                    user.toSocialMemberDomainModel(member.commonMoviesCount)
+
+                userDataRepository.getUsers(memberUIds).mapSuccess { usersMap ->
+                    members.mapNotNull { member ->
+                        val user = usersMap[member.memberUid] ?: return@mapNotNull null
+                        user.toSocialMemberDomainModel(member.commonMoviesCount)
+                    }
                 }
             }
 }

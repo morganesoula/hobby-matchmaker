@@ -84,7 +84,7 @@ class MovieDetailViewModel(
     }
 
     private suspend fun playTrailer(isVideoUriKnown: Boolean) {
-        if (interactor.canPlayTrailerDirectly(isVideoUriKnown)) {
+        if (isVideoUriKnown) {
             val currentState = movieDetailState.value
             if (currentState is UiState.Success) {
                 eventHandler.sendEvent(UiEvent.OnDataReady(currentState.data.videoKey))

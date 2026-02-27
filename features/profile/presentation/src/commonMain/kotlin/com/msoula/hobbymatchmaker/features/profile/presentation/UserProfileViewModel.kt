@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.features.profile.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutUseCase
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
@@ -10,12 +11,17 @@ import com.msoula.hobbymatchmaker.core.design.util.EventHandler
 import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.session.domain.models.SessionState
-import com.msoula.hobbymatchmaker.features.profile.presentation.interactors.SessionInteractor
-import com.msoula.hobbymatchmaker.features.profile.presentation.interactors.UserProfileInteractor
+import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveSessionStateUseCase
+import com.msoula.hobbymatchmaker.features.profile.domain.useCases.IsPseudoAvailableUseCase
+import com.msoula.hobbymatchmaker.features.profile.domain.useCases.SyncUserProfileUseCase
+import com.msoula.hobbymatchmaker.features.profile.domain.useCases.UpsertUserProfileUseCase
+import com.msoula.hobbymatchmaker.features.profile.presentation.orchestrators.UserProfileOrchestrator
+import com.msoula.hobbymatchmaker.features.profile.presentation.mappers.toUserProfileDomainModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.mappers.toUserProfileUiModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiEventModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiStateModel
+import com.msoula.hobbymatchmaker.features.social.domain.useCases.RefreshSocialCircleUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,9 +37,14 @@ import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class UserProfileViewModel(
-    private val userProfileInteractor: UserProfileInteractor,
-    private val sessionInteractor: SessionInteractor,
+    private val userProfileInteractor: UserProfileOrchestrator,
     private val defaultMessageMapper: ErrorMessageMapper,
+    private val checkPseudoUseCase: IsPseudoAvailableUseCase,
+    private val logOutUseCase: LogOutUseCase,
+    private val upsertUserUseCase: UpsertUserProfileUseCase,
+    private val syncUserUseCase: SyncUserProfileUseCase,
+    private val refreshSocialCircleUseCase: RefreshSocialCircleUseCase,
+    private val observeSessionStateUseCase: ObserveSessionStateUseCase,
     externalScope: CoroutineScope? = null
 ) : ViewModel() {
 
@@ -57,7 +68,7 @@ class UserProfileViewModel(
     val screenState: StateFlow<UserProfileUiStateModel>
         field = MutableStateFlow<UserProfileUiStateModel>(UserProfileUiStateModel.Loading)
 
-    private val currentUserUid: StateFlow<String?> = sessionInteractor.observeSessionState()
+    private val currentUserUid: StateFlow<String?> = observeSessionStateUseCase()
         .map { state ->
             when (state) {
                 is SessionState.Authenticated -> {
@@ -76,7 +87,7 @@ class UserProfileViewModel(
 
     private fun observeProfile() {
         scope.launch {
-            sessionInteractor.observeSessionState()
+            observeSessionStateUseCase()
                 .flatMapLatest { state ->
                     when (state) {
                         is SessionState.Authenticated -> userProfileInteractor.observeCurrentUser(
@@ -87,12 +98,11 @@ class UserProfileViewModel(
                     }
                 }
                 .collect { profile ->
-                    profile?.let {
-                        val uiModel = it.toUserProfileUiModel()
-                        screenState.update { UserProfileUiStateModel.Success(uiModel) }
+                    profile?.let { profileUi ->
+                        screenState.update { UserProfileUiStateModel.Success(profileUi) }
 
                         if (!isEditMode.value) {
-                            editableProfile.update { uiModel }
+                            editableProfile.update { profileUi }
                         }
                     }
                 }
@@ -102,7 +112,7 @@ class UserProfileViewModel(
     private fun refreshProfileData() {
         scope.launch {
             currentUserUid.value?.let { uid ->
-                userProfileInteractor.refreshProfileData(uid)
+                refreshSocialCircleUseCase(uid)
                     .onFailure { error ->
                         Logger.e("Failed to refresh profile data: $error")
                     }
@@ -135,7 +145,7 @@ class UserProfileViewModel(
                 editableProfile.value?.let {
                     scope.launch {
                         if (it.pseudo != originalProfile.value?.pseudo)
-                            userProfileInteractor.checkPseudoAvailable(it.pseudo)
+                            checkPseudoUseCase(it.pseudo)
                                 .onSuccess { available ->
                                     isPseudoAvailable.update { available }
                                 }
@@ -167,7 +177,7 @@ class UserProfileViewModel(
             val editable = editableProfile.value ?: return@launch
             val uid = currentUserUid.value ?: return@launch
 
-            userProfileInteractor.saveProfile(uid, editable)
+            upsertUserUseCase(editable.toUserProfileDomainModel(uid))
                 .onSuccess {
                     originalProfile.update { editable }
 
@@ -176,7 +186,7 @@ class UserProfileViewModel(
                     )
 
                     scope.launch {
-                        userProfileInteractor.syncProfile(uid, editable)
+                        syncUserUseCase(editable.toUserProfileDomainModel(uid))
                             .onFailure {
                                 Logger.e("Failed to sync profile remotely - $uid")
                             }
@@ -197,7 +207,7 @@ class UserProfileViewModel(
 
     private fun logOut() {
         scope.launch {
-            userProfileInteractor.logOut()
+            logOutUseCase()
                 .onSuccess {
                     eventHandler.sendEvent(
                         UiEvent.Navigate(NavigationDestination.SignIn)

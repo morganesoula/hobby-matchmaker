@@ -4,6 +4,7 @@ import com.msoula.hobbymatchmaker.features.social.domain.useCases.AcceptInviteUs
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.CancelInvitationUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.CheckMovieMatchUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.CheckSocialCircleLimitUseCase
+import com.msoula.hobbymatchmaker.features.social.domain.useCases.ComputeCommonMoviesUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.DeclineInviteUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.GetSharedMovieIdsUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.GetUserAvatarUrlUseCase
@@ -40,4 +41,5 @@ val featuresModuleSocialDomain = module {
     factoryOf(::GetUserAvatarUrlUseCase)
     factoryOf(::SyncFavoriteToCircleUseCase)
     factoryOf(::GetSharedMovieIdsUseCase)
+    factoryOf(::ComputeCommonMoviesUseCase)
 }

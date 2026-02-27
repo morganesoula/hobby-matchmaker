@@ -7,35 +7,41 @@ import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.features.hub.domain.models.MatchedFriendDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.repositories.MovieRepository
 import com.msoula.hobbymatchmaker.features.social.domain.repositories.SocialRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class ObserveMatchedFriendsUseCase(
     private val socialRepository: SocialRepository,
     private val movieRepository: MovieRepository
 ) {
-    suspend operator fun invoke(ownerUid: String): AppResult<List<MatchedFriendDomainModel>, AppError> =
-        socialRepository.getSocialCircleSnapshot(ownerUid)
-            .flatMap { members ->
-                movieRepository.getFavoriteLocalMovieIds()
-                    .mapSuccess { favoriteMovieIds ->
-                        val favoriteSet = favoriteMovieIds.toSet()
+    operator fun invoke(ownerUid: String): Flow<AppResult<List<MatchedFriendDomainModel>, AppError>> =
+        flow {
+            emit(
+                socialRepository.getSocialCircleSnapshot(ownerUid)
+                    .flatMap { members ->
+                        movieRepository.getFavoriteLocalMovieIds()
+                            .mapSuccess { favoriteMovieIds ->
+                                val favoriteSet = favoriteMovieIds.toSet()
 
-                        members.mapNotNull { member ->
-                            val sharedMovieIds =
-                                member.moviesLiked?.intersect(favoriteSet)?.toList()
+                                members.mapNotNull { member ->
+                                    val sharedMovieIds =
+                                        member.moviesLiked?.intersect(favoriteSet)?.toList()
 
-                            sharedMovieIds?.let { sharedIds ->
-                                if (sharedIds.isNotEmpty()) {
-                                    MatchedFriendDomainModel(
-                                        uid = member.uid,
-                                        displayName = member.name
-                                            ?: member.pseudo,
-                                        pseudo = member.pseudo,
-                                        avatarUrl = member.avatarUrl,
-                                        sharedMovieIds = sharedMovieIds
-                                    )
-                                } else null
+                                    sharedMovieIds?.let { sharedIds ->
+                                        if (sharedIds.isNotEmpty()) {
+                                            MatchedFriendDomainModel(
+                                                uid = member.uid,
+                                                displayName = member.name.takeIf { it?.isNotBlank() == true }
+                                                    ?: member.pseudo,
+                                                pseudo = member.pseudo,
+                                                avatarUrl = member.avatarUrl,
+                                                sharedMovieIds = sharedMovieIds
+                                            )
+                                        } else null
+                                    }
+                                }
                             }
-                        }
                     }
-            }
+            )
+        }
 }

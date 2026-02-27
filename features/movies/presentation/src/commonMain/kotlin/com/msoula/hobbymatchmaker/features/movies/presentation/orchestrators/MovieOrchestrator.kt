@@ -1,10 +1,9 @@
-package com.msoula.hobbymatchmaker.features.movies.presentation.interactors
+package com.msoula.hobbymatchmaker.features.movies.presentation.orchestrators
 
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.AuthState
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfoUseCase
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
-import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
 import com.msoula.hobbymatchmaker.features.movies.domain.models.PaginationInfoDomainModel
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.CheckMovieSynopsisValueUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.LoadMoreMoviesUseCase
@@ -19,7 +18,7 @@ import com.msoula.hobbymatchmaker.features.social.domain.useCases.GetUserAvatarU
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.SyncFavoriteToCircleUseCase
 import kotlinx.coroutines.flow.Flow
 
-class MovieInteractor(
+class MovieOrchestrator(
     private val setMovieFavoriteUseCase: SetMovieFavoriteUseCase,
     private val observeAllMoviesUseCase: ObserveAllMoviesUseCase,
     private val refreshMoviesUseCase: RefreshMoviesUseCase,
@@ -29,8 +28,7 @@ class MovieInteractor(
     private val loadMoreMoviesUseCase: LoadMoreMoviesUseCase,
     private val checkMovieMatchUseCase: CheckMovieMatchUseCase,
     private val getUserAvatarUrlUseCase: GetUserAvatarUrlUseCase,
-    private val syncFavoriteToCircleUseCase: SyncFavoriteToCircleUseCase,
-    private val connectivityChecker: NetworkConnectivityChecker
+    private val syncFavoriteToCircleUseCase: SyncFavoriteToCircleUseCase
 ) {
     fun observeMovies(): Flow<AppResult<ObserveAllMoviesSuccess, AppError>> =
         observeAllMoviesUseCase()
@@ -64,16 +62,11 @@ class MovieInteractor(
     suspend fun syncFavoriteToCircle(ownerUid: String, movieId: Long, isFavorite: Boolean) =
         syncFavoriteToCircleUseCase(ownerUid, movieId, isFavorite)
 
-    suspend fun canAccessMovieDetail(movieId: Long): Boolean {
-        val local = when (val localResult = checkMovieSynopsisValueUseCase(movieId)) {
+    suspend fun canAccessMovieDetail(movieId: Long): Boolean =
+        when (val localResult = checkMovieSynopsisValueUseCase(movieId)) {
             is AppResult.Success -> localResult.data
             is AppResult.Failure -> false
         }
-
-        val online = connectivityChecker.hasActiveConnection()
-
-        return local || online
-    }
 
     suspend fun getAuthenticatedUid(): String? {
         return when (val authResult = fetchFirebaseUserInfo()) {

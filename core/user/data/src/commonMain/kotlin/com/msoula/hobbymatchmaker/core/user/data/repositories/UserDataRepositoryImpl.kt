@@ -73,8 +73,8 @@ class UserDataRepositoryImpl(
             }
     }
 
-    override suspend fun getUsers(uids: List<String>): Map<String, UserSummaryDomainModel> {
-        if (uids.isEmpty()) return emptyMap()
+    override suspend fun getUsers(uids: List<String>): AppResult<Map<String, UserSummaryDomainModel>, AppError> {
+        if (uids.isEmpty()) return AppResult.Success(emptyMap())
 
         val result = mutableMapOf<String, UserSummaryDomainModel>()
         val missing = mutableListOf<String>()
@@ -83,7 +83,7 @@ class UserDataRepositoryImpl(
             cache.value[uid]?.let { result[uid] = it } ?: missing.add(uid)
         }
 
-        if (missing.isEmpty()) return result
+        if (missing.isEmpty()) return AppResult.Success(result)
 
         val stillMissing = mutableListOf<String>()
         val localUsers = userLocalDataSource.getUsers(missing)
@@ -95,21 +95,26 @@ class UserDataRepositoryImpl(
             } ?: stillMissing.add(uid)
         }
 
-        if (stillMissing.isEmpty()) return result
+        if (stillMissing.isEmpty()) return AppResult.Success(result)
 
         stillMissing.chunked(10).forEach { chunk ->
-            val remoteUsers = userRemoteDataSource.getUsers(chunk)
-            remoteUsers.forEach { (uid, user) ->
-                result[uid] = user
-                updateCache(user)
-            }
+            when (val remoteUsers = userRemoteDataSource.getUsers(chunk)) {
+                is AppResult.Success -> {
+                    remoteUsers.data.forEach { (uid, user) ->
+                        result[uid] = user
+                        updateCache(user)
+                    }
 
-            customScope.launch {
-                userLocalDataSource.upsertUsers(remoteUsers.values.toList())
+                    customScope.launch {
+                        userLocalDataSource.upsertUsers(remoteUsers.data.values.toList())
+                    }
+                }
+
+                is AppResult.Failure -> return AppResult.Failure(remoteUsers.error)
             }
         }
 
-        return result
+        return AppResult.Success(result)
     }
 
     override suspend fun prefetchUsers(uids: List<String>) {

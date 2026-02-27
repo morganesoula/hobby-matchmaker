@@ -21,7 +21,7 @@ import com.msoula.hobbymatchmaker.core.design.util.UIText
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesSuccess
-import com.msoula.hobbymatchmaker.features.movies.presentation.interactors.MovieInteractor
+import com.msoula.hobbymatchmaker.features.movies.presentation.orchestrators.MovieOrchestrator
 import com.msoula.hobbymatchmaker.features.movies.presentation.mappers.toMovieUiModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiModel
@@ -36,7 +36,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MovieViewModel(
-    private val interactor: MovieInteractor,
+    private val interactor: MovieOrchestrator,
     private val defaultMessageMapper: ErrorMessageMapper,
     externalScope: CoroutineScope? = null
 ) : ViewModel() {

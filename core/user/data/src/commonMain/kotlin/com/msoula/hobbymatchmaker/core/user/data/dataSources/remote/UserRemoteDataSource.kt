@@ -8,5 +8,5 @@ import kotlinx.coroutines.flow.Flow
 interface UserRemoteDataSource {
     fun observeUser(uid: String): Flow<UserSummaryDomainModel?>
     suspend fun getUser(uid: String): AppResult<UserSummaryDomainModel?, AppError>
-    suspend fun getUsers(uids: List<String>): Map<String, UserSummaryDomainModel>
+    suspend fun getUsers(uids: List<String>): AppResult<Map<String, UserSummaryDomainModel>, AppError>
 }

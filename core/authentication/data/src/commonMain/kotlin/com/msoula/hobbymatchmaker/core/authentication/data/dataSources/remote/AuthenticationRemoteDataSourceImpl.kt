@@ -6,8 +6,9 @@ import com.msoula.hobbymatchmaker.core.authentication.data.models.ProviderTypeDa
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.data.FirestoreUsersCollection
-import com.msoula.hobbymatchmaker.core.common.safeFirebaseCall
 import com.msoula.hobbymatchmaker.core.common.toGenericAppError
+import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
+import com.msoula.hobbymatchmaker.core.network.safeNetworkCall
 import dev.gitlive.firebase.auth.AuthCredential
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.firestore.FirebaseFirestore
@@ -15,7 +16,8 @@ import dev.gitlive.firebase.firestore.FirebaseFirestore
 class AuthenticationRemoteDataSourceImpl(
     private val auth: FirebaseAuth,
     private val firestore: FirebaseFirestore,
-    private val authManager: AuthManager
+    private val authManager: AuthManager,
+    private val connectivityChecker: NetworkConnectivityChecker
 ) : AuthenticationRemoteDataSource {
 
     override suspend fun authenticationSignOut(): AppResult<Unit, AppError> = authManager.signOut()
@@ -23,7 +25,7 @@ class AuthenticationRemoteDataSourceImpl(
     override suspend fun linkWithCredential(credential: AuthCredential): AppResult<AuthUserRemoteDataModel?, AppError> {
         val currentUser = auth.currentUser ?: return AppResult.Failure(AppError.Domain.Unauthorized)
 
-        return safeFirebaseCall {
+        return safeNetworkCall(connectivityChecker) {
             currentUser.linkWithCredential(credential).user?.toAuthFirebaseUser()
         }
     }
@@ -32,7 +34,7 @@ class AuthenticationRemoteDataSourceImpl(
         email: String,
         password: String
     ): AppResult<String, AppError> =
-        safeFirebaseCall {
+        safeNetworkCall(connectivityChecker) {
             val user = auth.createUserWithEmailAndPassword(email, password).user
             user?.uid ?: throw IllegalStateException("UID missing after sign-up")
         }
@@ -41,18 +43,19 @@ class AuthenticationRemoteDataSourceImpl(
         email: String,
         password: String
     ): AppResult<String, AppError> =
-        safeFirebaseCall {
+        safeNetworkCall(connectivityChecker) {
             val user = auth.signInWithEmailAndPassword(email, password).user
             user?.uid ?: throw IllegalStateException("UID missing after sign-in")
         }
 
     override suspend fun resetPassword(email: String): AppResult<Unit, AppError> =
-        safeFirebaseCall {
+        safeNetworkCall(connectivityChecker) {
             auth.sendPasswordResetEmail(email)
         }
 
     override suspend fun isFirstSignIn(uid: String): AppResult<Boolean, AppError> =
-        if (uid.isBlank()) AppResult.Success(true) else safeFirebaseCall {
+        if (uid.isBlank()) AppResult.Success(true)
+        else safeNetworkCall(connectivityChecker) {
             val snapshot = firestore
                 .collection(FirestoreUsersCollection)
                 .document(uid)
@@ -62,9 +65,7 @@ class AuthenticationRemoteDataSourceImpl(
         }
 
     override suspend fun fetchFirebaseUserInfo(): AppResult<AuthUserRemoteDataModel?, AppError> =
-        safeFirebaseCall {
-            auth.currentUser?.toAuthFirebaseUser()
-        }
+        AppResult.Success(auth.currentUser?.toAuthFirebaseUser())
 
     override suspend fun signInWithSocialProvider(
         providerType: ProviderTypeDataModel,

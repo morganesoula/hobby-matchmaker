@@ -38,32 +38,30 @@ fun HubFavoriteMoviesSection(
     likedMovies: ImmutableList<MovieCarouselItem>,
     navigateToMovieDetail: (movieId: Long) -> Unit
 ) {
-    if (likedMovies.isNotEmpty()) {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = modifier
-                .fillMaxSize()
-                .padding(horizontal = CustomSize.Sixteen),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                Column {
-                    MainTitle(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(Res.string.hub_favorite_movies_title)
-                    )
-                    SpacerHeight4()
-                    MediumTitle(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(Res.string.hub_favorite_movies_subtitle)
-                    )
-                    SpacerHeight8()
-                }
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = CustomSize.Sixteen),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            Column {
+                MainTitle(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(Res.string.hub_favorite_movies_title)
+                )
+                SpacerHeight4()
+                MediumTitle(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(Res.string.hub_favorite_movies_subtitle)
+                )
+                SpacerHeight8()
             }
+        }
 
-            items(likedMovies) { movie ->
-                HubFavoriteMovie(movie = movie, onMovieCardTapped = navigateToMovieDetail)
-            }
+        items(likedMovies) { movie ->
+            HubFavoriteMovie(movie = movie, onMovieCardTapped = navigateToMovieDetail)
         }
     }
 }

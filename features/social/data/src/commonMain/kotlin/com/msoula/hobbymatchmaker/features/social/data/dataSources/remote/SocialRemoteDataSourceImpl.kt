@@ -6,7 +6,8 @@ import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.data.FirestoreCircleCollection
 import com.msoula.hobbymatchmaker.core.common.data.FirestoreUsersCollection
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
-import com.msoula.hobbymatchmaker.core.common.safeFirebaseCall
+import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
+import com.msoula.hobbymatchmaker.core.network.safeNetworkCall
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toInviteStatusData
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.InviteDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.InviteStatusData
@@ -25,21 +26,18 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 class SocialRemoteDataSourceImpl(
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val connectivityChecker: NetworkConnectivityChecker
 ) : SocialRemoteDataSource {
-
     private val MAX_CIRCLE_SIZE = 5
 
     override suspend fun searchUsersByPseudo(
         pseudo: String,
         ownerUid: String?
     ): AppResult<List<SocialCircleMemberRemoteDataModel>, AppError> =
-        safeFirebaseCall {
-            Logger.d("SocialRemoteDataSource - Pseudo is: $pseudo and ownerUid: $ownerUid")
+        safeNetworkCall(connectivityChecker) {
             val searchTerm = pseudo.trim().lowercase()
-            if (searchTerm.isEmpty()) return@safeFirebaseCall emptyList()
-
-            Logger.d("SocialRemoteDataSource - Search term is: $searchTerm")
+            if (searchTerm.isEmpty()) return@safeNetworkCall emptyList()
 
             val endTerm = searchTerm + '\uf8ff'
 
@@ -74,7 +72,6 @@ class SocialRemoteDataSourceImpl(
                     if (uid == ownerUid) return@mapNotNull null
 
                     if (userPseudo != null && userPseudo.lowercase().contains(searchTerm)) {
-                        Logger.d("SocialRemoteDataSource: Found user with pseudo: $userPseudo")
                         SocialCircleMemberRemoteDataModel(
                             uid = uid,
                             name = name,
@@ -112,7 +109,7 @@ class SocialRemoteDataSourceImpl(
 
     @OptIn(ExperimentalTime::class)
     override suspend fun sendInvite(inviteDataModel: InviteDataModel): AppResult<Unit, AppError> =
-        safeFirebaseCall {
+        safeNetworkCall(connectivityChecker) {
             val inviteId = "${inviteDataModel.fromUid}_${inviteDataModel.toPseudo}"
             firestore.collection("socialInvites").document(inviteId).set(
                 mapOf(
@@ -129,14 +126,14 @@ class SocialRemoteDataSourceImpl(
 
     @OptIn(ExperimentalTime::class)
     override suspend fun refreshIncomingInvites(ownerUid: String): AppResult<List<InviteDataModel>, AppError> =
-        safeFirebaseCall {
+        safeNetworkCall(connectivityChecker) {
             val userSnapshot = firestore
                 .collection(FirestoreUsersCollection)
                 .document(ownerUid)
                 .get()
 
             val pseudo = userSnapshot.get<String?>("information.pseudo")
-                ?: return@safeFirebaseCall emptyList()
+                ?: return@safeNetworkCall emptyList()
 
             val documents = firestore
                 .collection("socialInvites")
@@ -169,7 +166,7 @@ class SocialRemoteDataSourceImpl(
 
     @OptIn(ExperimentalTime::class)
     override suspend fun refreshSentInvites(ownerUid: String): AppResult<List<InviteDataModel>, AppError> =
-        safeFirebaseCall {
+        safeNetworkCall(connectivityChecker) {
             val documents = firestore
                 .collection("socialInvites")
                 .where { "fromUid" equalTo ownerUid }
@@ -281,7 +278,7 @@ class SocialRemoteDataSourceImpl(
             }
 
     override suspend fun markInviteAsAccepted(inviteId: String): AppResult<Unit, AppError> =
-        safeFirebaseCall {
+        safeNetworkCall(connectivityChecker) {
             val inviteRef = firestore
                 .collection("socialInvites")
                 .document(inviteId)
@@ -292,7 +289,7 @@ class SocialRemoteDataSourceImpl(
         }
 
     override suspend fun markInviteAsDeclined(inviteId: String): AppResult<Unit, AppError> =
-        safeFirebaseCall {
+        safeNetworkCall(connectivityChecker) {
             firestore
                 .collection("socialInvites")
                 .document(inviteId)
@@ -300,7 +297,7 @@ class SocialRemoteDataSourceImpl(
         }
 
     override suspend fun cancelInvitation(inviteId: String): AppResult<Unit, AppError> =
-        safeFirebaseCall {
+        safeNetworkCall(connectivityChecker) {
             firestore
                 .collection("socialInvites")
                 .document(inviteId)
@@ -308,7 +305,7 @@ class SocialRemoteDataSourceImpl(
         }
 
     override suspend fun addToSocialCircle(socialCircleMemberDataModel: SocialCircleMemberRemoteDataModel): AppResult<Unit, AppError> =
-        safeFirebaseCall {
+        safeNetworkCall(connectivityChecker) {
             firestore
                 .collection(FirestoreUsersCollection)
                 .document(socialCircleMemberDataModel.ownerUid)
@@ -327,7 +324,7 @@ class SocialRemoteDataSourceImpl(
         ownerUid: String,
         memberUid: String
     ): AppResult<Unit, AppError> =
-        safeFirebaseCall {
+        safeNetworkCall(connectivityChecker) {
             firestore
                 .collection(FirestoreUsersCollection)
                 .document(ownerUid)
@@ -341,7 +338,7 @@ class SocialRemoteDataSourceImpl(
         memberAddedToOwnerCircle: SocialCircleMemberRemoteDataModel,
         ownerAddedToMemberCircle: SocialCircleMemberRemoteDataModel
     ): AppResult<Unit, AppError> =
-        safeFirebaseCall {
+        safeNetworkCall(connectivityChecker) {
             firestore.runTransaction {
                 val inviteRef = firestore
                     .collection("socialInvites")
@@ -393,14 +390,14 @@ class SocialRemoteDataSourceImpl(
         ownerUid: String,
         invitingMemberUid: String
     ): AppResult<Boolean, AppError> =
-        safeFirebaseCall {
+        safeNetworkCall(connectivityChecker) {
             val ownerLibrary = firestore
                 .collection(FirestoreUsersCollection)
                 .document(ownerUid)
             val ownerDocument = ownerLibrary.get()
 
             if (!ownerDocument.exists) {
-                throw Exception("User not found with uid: $ownerUid")
+                throw IllegalArgumentException("User not found with uid: $ownerUid")
             }
 
             val memberLibrary = firestore
@@ -409,7 +406,7 @@ class SocialRemoteDataSourceImpl(
             val memberDocument = memberLibrary.get()
 
             if (!memberDocument.exists) {
-                throw Exception("User not found with uid: $invitingMemberUid")
+                throw IllegalArgumentException("User not found with uid: $invitingMemberUid")
             }
 
             val ownerCircle = ownerLibrary
@@ -430,7 +427,7 @@ class SocialRemoteDataSourceImpl(
         ownerUid: String,
         movieId: Long,
         isFavorite: Boolean
-    ): AppResult<Unit, AppError> =
+    ): AppResult<Unit, AppError> = safeNetworkCall(connectivityChecker) {
         getSocialCircleSnapshot(ownerUid).mapSuccess { list ->
             list.forEach { entry ->
                 firestore
@@ -447,4 +444,5 @@ class SocialRemoteDataSourceImpl(
                     )
             }
         }
+    }
 }

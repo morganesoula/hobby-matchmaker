@@ -39,16 +39,14 @@ fun HubRecentMatches(
         )
         SpacerHeight8()
 
-        if (members.isNotEmpty()) {
-            LazyRow(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                items(members) { member ->
-                    MemberItem(
-                        member = member,
-                        onMemberClicked = onMemberClicked
-                    )
-                }
+        LazyRow(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            items(members) { member ->
+                MemberItem(
+                    member = member,
+                    onMemberClicked = onMemberClicked
+                )
             }
         }
     }

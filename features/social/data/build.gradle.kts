@@ -15,6 +15,7 @@ kotlin {
         commonMain.dependencies {
             implementation(project(Modules.COMMON))
             implementation(project(Modules.DATABASE))
+            implementation(project(Modules.NETWORK))
             implementation(project(Modules.SESSION_DATA))
             implementation(project(Modules.SOCIAL_DOMAIN))
             implementation(project(Modules.USER_DOMAIN))

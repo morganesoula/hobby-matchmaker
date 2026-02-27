@@ -7,6 +7,8 @@ import dev.gitlive.firebase.FirebaseTooManyRequestsException
 import dev.gitlive.firebase.firestore.FirebaseFirestoreException
 import dev.gitlive.firebase.firestore.FirestoreExceptionCode
 import dev.gitlive.firebase.firestore.code
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.ServerResponseException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.io.IOException
@@ -16,8 +18,10 @@ fun Throwable.toGenericAppError(): AppError = when (this) {
     is CancellationException -> AppError.Network.Canceled
     is TimeoutCancellationException -> AppError.Network.Timeout
     is SerializationException -> AppError.Network.Serialization
-    is IOException -> AppError.Network.Unreachable
+    is ClientRequestException -> AppError.Network.Http(response.status.value, message)
+    is ServerResponseException -> AppError.Network.Http(response.status.value, message)
 
+    is IOException -> AppError.Network.Unreachable
     is IllegalArgumentException -> AppError.Domain.Validation(message ?: "Invalid argument")
     else -> AppError.Network.Unknown(this)
 }

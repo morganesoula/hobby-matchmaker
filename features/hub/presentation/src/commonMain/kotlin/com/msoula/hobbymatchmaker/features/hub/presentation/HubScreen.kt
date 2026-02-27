@@ -1,6 +1,6 @@
 package com.msoula.hobbymatchmaker.features.hub.presentation
 
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.StateContainer
@@ -20,6 +20,7 @@ import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun HubContent(
+    paddingValues: PaddingValues,
     hubFavoriteMovies: UiState<ImmutableList<MovieCarouselItem>>,
     hubRecentMatches: UiState<ImmutableList<ProfileSocialMember>>,
     showRecentMatchDetail: Boolean,
@@ -33,54 +34,52 @@ fun HubContent(
     selectedMatch: ProfileSocialMember?,
     selectedMatchMoviesState: UiState<ImmutableList<MovieCarouselItem>>
 ) {
-    Scaffold { paddingValues ->
-        HubLayout(
-            paddingValues = paddingValues,
-            hubRecentMatches = {
-                StateContainer(
-                    state = hubRecentMatches,
-                    onEmpty = {
-                        HubNoRecentMatchesSection(navigateToProfileScreen = navigateToProfileScreen)
-                    },
-                    onError = { error, hint ->
-                        ErrorStateScreen(
-                            error = error,
-                            hint = hint,
-                            onRetry = { getRecentMatches() })
-                    },
-                    onSuccess = { members ->
-                        HubRecentMatches(
-                            members = members,
-                            onMemberClicked = onMemberClicked
-                        )
-                    }
-                )
-            },
-            hubFavoriteMovies = {
-                StateContainer(
-                    state = hubFavoriteMovies,
-                    onEmpty = {
-                        HubNoFavoriteMoviesSection(navigateToMoviesScreen = navigateToMoviesScreen)
-                    },
-                    onError = { error, hint ->
-                        ErrorStateScreen(
-                            error = error,
-                            hint = hint,
-                            onRetry = { observeFavoriteMovies() }
-                        )
-                    },
-                    onSuccess = { movies ->
-                        HubFavoriteMoviesSection(
-                            likedMovies = movies,
-                            navigateToMovieDetail = navigateToMovieDetail
-                        )
-                    }
-                )
-            }
-        )
-    }
+    HubLayout(
+        paddingValues = paddingValues,
+        hubRecentMatches = {
+            StateContainer(
+                state = hubRecentMatches,
+                onEmpty = {
+                    HubNoRecentMatchesSection(navigateToProfileScreen = navigateToProfileScreen)
+                },
+                onError = { error, hint ->
+                    ErrorStateScreen(
+                        error = error,
+                        hint = hint,
+                        onRetry = { getRecentMatches() })
+                },
+                onSuccess = { members ->
+                    HubRecentMatches(
+                        members = members,
+                        onMemberClicked = onMemberClicked
+                    )
+                }
+            )
+        },
+        hubFavoriteMovies = {
+            StateContainer(
+                state = hubFavoriteMovies,
+                onEmpty = {
+                    HubNoFavoriteMoviesSection(navigateToMoviesScreen = navigateToMoviesScreen)
+                },
+                onError = { error, hint ->
+                    ErrorStateScreen(
+                        error = error,
+                        hint = hint,
+                        onRetry = { observeFavoriteMovies() }
+                    )
+                },
+                onSuccess = { movies ->
+                    HubFavoriteMoviesSection(
+                        likedMovies = movies,
+                        navigateToMovieDetail = navigateToMovieDetail
+                    )
+                }
+            )
+        }
+    )
 
-    if (showRecentMatchDetail) {
+    if (showRecentMatchDetail && (selectedMatchMoviesState is UiState.Success || selectedMatchMoviesState is UiState.Empty)) {
         selectedMatch?.let { match ->
             when (selectedMatchMoviesState) {
                 is UiState.Success -> MemberDetailModalBottomSheet(

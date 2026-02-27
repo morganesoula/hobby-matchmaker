@@ -1,21 +1,24 @@
 package com.msoula.hobbymatchmaker.features.profile.presentation.di
 
 import com.msoula.hobbymatchmaker.features.profile.presentation.UserProfileViewModel
-import com.msoula.hobbymatchmaker.features.profile.presentation.interactors.SessionInteractor
-import com.msoula.hobbymatchmaker.features.profile.presentation.interactors.UserProfileInteractor
+import com.msoula.hobbymatchmaker.features.profile.presentation.orchestrators.UserProfileOrchestrator
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val featuresModuleUserProfilePresentation = module {
-    factoryOf(::UserProfileInteractor)
-    factoryOf(::SessionInteractor)
+    factoryOf(::UserProfileOrchestrator)
 
     viewModel {
         UserProfileViewModel(
             userProfileInteractor = get(),
-            sessionInteractor = get(),
             defaultMessageMapper = get(),
+            checkPseudoUseCase = get(),
+            logOutUseCase = get(),
+            upsertUserUseCase = get(),
+            syncUserUseCase = get(),
+            refreshSocialCircleUseCase = get(),
+            observeSessionStateUseCase = get(),
             externalScope = null
         )
     }

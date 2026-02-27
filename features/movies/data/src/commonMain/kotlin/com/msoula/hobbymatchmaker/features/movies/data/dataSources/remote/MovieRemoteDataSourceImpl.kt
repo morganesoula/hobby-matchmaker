@@ -4,7 +4,8 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.data.FirestoreUsersCollection
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
-import com.msoula.hobbymatchmaker.core.common.safeFirebaseCall
+import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
+import com.msoula.hobbymatchmaker.core.network.safeNetworkCall
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.MovieRemoteDataModel
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.PaginatedMovieResult
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.services.TMDBKtorService
@@ -13,7 +14,8 @@ import dev.gitlive.firebase.firestore.FirebaseFirestore
 
 class MovieRemoteDataSourceImpl(
     private val firestore: FirebaseFirestore,
-    private val tmdbKtorService: TMDBKtorService
+    private val tmdbKtorService: TMDBKtorService,
+    private val connectivityChecker: NetworkConnectivityChecker
 ) : MovieRemoteDataSource {
 
     override suspend fun refreshMovies(language: String): AppResult<List<MovieRemoteDataModel>, AppError> {
@@ -48,7 +50,7 @@ class MovieRemoteDataSourceImpl(
         uuidUser: String,
         movieId: Long,
         isFavorite: Boolean
-    ): AppResult<Unit, AppError> = safeFirebaseCall {
+    ): AppResult<Unit, AppError> = safeNetworkCall(connectivityChecker) {
         if (isFavorite) {
             firestore.collection(FirestoreUsersCollection).document(uuidUser)
                 .set(mapOf("movies" to FieldValue.arrayUnion(movieId)), merge = true)
@@ -62,7 +64,7 @@ class MovieRemoteDataSourceImpl(
         uid: String,
         ids: List<Long>
     ): AppResult<Unit, AppError> =
-        safeFirebaseCall {
+        safeNetworkCall(connectivityChecker) {
             firestore
                 .collection(FirestoreUsersCollection)
                 .document(uid)

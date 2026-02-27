@@ -5,7 +5,6 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFireb
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
-import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.FetchMovieTrailerUseCase
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieDetailUseCase
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieSuccess
@@ -25,8 +24,7 @@ class MovieDetailInteractor(
     private val setMovieFavoriteUseCase: SetMovieFavoriteUseCase,
     private val fetchFirebaseUserInfo: FetchFirebaseUserInfoUseCase,
     private val checkMovieMatchUseCase: CheckMovieMatchUseCase,
-    private val syncFavoriteToCircleUseCase: SyncFavoriteToCircleUseCase,
-    private val connectivityChecker: NetworkConnectivityChecker
+    private val syncFavoriteToCircleUseCase: SyncFavoriteToCircleUseCase
 ) {
     fun observeMovieDetail(
         movieId: Long,
@@ -47,11 +45,6 @@ class MovieDetailInteractor(
                 is AppResult.Failure -> AppResult.Failure(result.error)
             }
         }
-
-
-    fun canPlayTrailerDirectly(
-        isVideoUriKnown: Boolean
-    ): Boolean = isVideoUriKnown && connectivityChecker.hasActiveConnection()
 
     suspend fun fetchTrailer(
         movieId: Long,

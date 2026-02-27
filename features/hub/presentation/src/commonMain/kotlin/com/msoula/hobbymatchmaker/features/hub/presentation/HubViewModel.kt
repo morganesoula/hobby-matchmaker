@@ -20,10 +20,14 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 
@@ -50,6 +54,8 @@ class HubViewModel(
     val showRecentMatchDetail: StateFlow<Boolean>
         field = MutableStateFlow<Boolean>(false)
 
+    private val selectedMemberTrigger = MutableStateFlow<ProfileSocialMember?>(null)
+
     val selectedMatch: StateFlow<ProfileSocialMember?>
         field = MutableStateFlow<ProfileSocialMember?>(ProfileSocialMember())
 
@@ -59,6 +65,7 @@ class HubViewModel(
     init {
         observeFavoriteMovies()
         observeRecentMatches()
+        observeSelectedMatch()
     }
 
     private fun observeFavoriteMovies() {
@@ -125,6 +132,26 @@ class HubViewModel(
             .launchIn(scope)
     }
 
+    private fun observeSelectedMatch() {
+        selectedMemberTrigger
+            .filterNotNull()
+            .flatMapLatest { member ->
+                val ids = member.sharedMovieIds?.takeIf { it.isNotEmpty() }
+
+                if (ids == null) {
+                    flowOf(UiState.Empty)
+                } else {
+                    hubInteractor.observeSharedFavoriteMovies(ids)
+                        .map { movies ->
+                            if (movies.isEmpty()) UiState.Empty
+                            else UiState.Success(movies.toImmutableList())
+                        }
+                }
+            }
+            .onEach { state -> selectedMatchMoviesState.update { state } }
+            .launchIn(scope)
+    }
+
     fun retryObservation(section: HubSection) {
         when (section) {
             HubSection.FAVORITE_MOVIES -> {
@@ -145,22 +172,12 @@ class HubViewModel(
                 selectedMatch.update { event.member }
                 selectedMatchMoviesState.update { UiState.Loading }
                 showRecentMatchDetail.update { true }
-
-                event.member.sharedMovieIds?.takeIf { it.isNotEmpty() }?.let { ids ->
-                    hubInteractor.observeSharedFavoriteMovies(ids)
-                        .onEach { movies ->
-                            selectedMatchMoviesState.update {
-                                if (movies.isEmpty()) UiState.Empty
-                                else UiState.Success(movies.toImmutableList())
-                            }
-                        }
-                        .launchIn(scope)
-                } ?: selectedMatchMoviesState.update { UiState.Empty }
+                selectedMemberTrigger.update { event.member }
             }
 
             is HubEvent.OnModalDismissed -> {
                 showRecentMatchDetail.update { false }
-                selectedMatch.update { ProfileSocialMember() }
+                selectedMatch.update { null }
             }
         }
     }

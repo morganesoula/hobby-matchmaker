@@ -25,6 +25,10 @@ kotlin {
             // DataStore
             implementation(libs.findLibrary("datastore-preferences").get())
 
+            //Ktor
+            implementation(libs.findBundle("ktor").get())
+
+            // Kotlin
             implementation(libs.findLibrary("kotlinx-datetime").get())
             implementation(libs.findLibrary("kotlinx-io").get())
         }
