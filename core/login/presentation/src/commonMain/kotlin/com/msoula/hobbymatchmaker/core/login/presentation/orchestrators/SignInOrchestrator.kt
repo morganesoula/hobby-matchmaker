@@ -1,4 +1,4 @@
-package com.msoula.hobbymatchmaker.core.login.presentation.interactors
+package com.msoula.hobbymatchmaker.core.login.presentation.orchestrators
 
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ResetPasswordUseCase
@@ -9,7 +9,7 @@ import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.login.domain.useCases.LoginValidateFormUseCase
 import kotlinx.coroutines.flow.Flow
 
-class SignInInteractor(
+class SignInOrchestrator(
     private val authFormValidationUseCases: LoginValidateFormUseCase,
     private val resetPasswordUseCase: ResetPasswordUseCase,
     private val sessionManager: SessionManager,

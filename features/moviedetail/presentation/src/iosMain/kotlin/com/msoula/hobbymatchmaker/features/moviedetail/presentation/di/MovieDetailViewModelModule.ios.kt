@@ -9,6 +9,8 @@ actual val featuresModuleMovieDetailPresentationPlatformSpecific = module {
         MovieDetailViewModel(
             movieId = movieId,
             interactor = get(),
+            syncFavoriteToCircleUseCase = get(),
+            checkMovieMatchUseCase = get(),
             defaultMessageMapper = get()
         )
     }

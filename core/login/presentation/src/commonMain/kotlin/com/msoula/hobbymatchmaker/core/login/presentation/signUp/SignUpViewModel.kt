@@ -3,8 +3,11 @@ package com.msoula.hobbymatchmaker.core.login.presentation.signUp
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignUpUseCase
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.core.common.Parameters
+import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
@@ -12,14 +15,13 @@ import com.msoula.hobbymatchmaker.core.design.util.EventHandler
 import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.design.util.UiState
-import com.msoula.hobbymatchmaker.core.login.presentation.interactors.SignUpInteractor
+import com.msoula.hobbymatchmaker.core.login.domain.useCases.LoginValidateFormUseCase
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
 import com.msoula.hobbymatchmaker.core.login.presentation.signUp.models.SignUpStateModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -27,7 +29,8 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(FlowPreview::class)
 class SignUpViewModel(
-    private val signUpInteractor: SignUpInteractor,
+    private val validation: LoginValidateFormUseCase,
+    private val signUpUseCase: SignUpUseCase,
     private val defaultErrorMessageMapper: ErrorMessageMapper,
     externalScope: CoroutineScope? = null
 ) : ViewModel() {
@@ -46,9 +49,7 @@ class SignUpViewModel(
         scope.launch {
             formDataFlow
                 .debounce(250.milliseconds)
-                .collectLatest { newState ->
-                    validateInput(newState)
-                }
+                .collect { newState -> validateInput(newState) }
         }
     }
 
@@ -66,10 +67,12 @@ class SignUpViewModel(
 
             AuthenticationUIEvent.OnSignUp -> scope.launch {
                 doSignIn {
-                    signUpInteractor.createAccount(
-                        formDataFlow.value.email,
-                        formDataFlow.value.password
-                    )
+                    signUpUseCase(
+                        Parameters.DoubleStringParam(
+                            formDataFlow.value.email,
+                            formDataFlow.value.password
+                        )
+                    ).mapSuccess {}
                 }
             }
 
@@ -85,9 +88,9 @@ class SignUpViewModel(
         val password = formState.password
         val firstName = formState.firstName
 
-        val firstNameValidation = signUpInteractor.validateFirstName(firstName)
-        val valid = signUpInteractor
-            .validateCredentials(email, password) && firstNameValidation.successful
+        val firstNameValidation = validation.validateFirstName(firstName)
+        val valid = validation.validateEmail(email).successful &&
+            validation.validatePassword(password).successful && firstNameValidation.successful
 
         formDataFlow.update {
             it.copy(
@@ -109,7 +112,7 @@ class SignUpViewModel(
                 eventHandler.sendEvent(UiEvent.Navigate(NavigationDestination.Movies))
             }
             .onFailure { error ->
-                signUpState.update { UiState.Success(Unit) }
+                signUpState.update { UiState.Error(defaultErrorMessageMapper.toUIText(error)) }
                 eventHandler.sendEvent(
                     UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(error))
                 )

@@ -13,6 +13,7 @@ class MovieSyncPreferencesImpl(
 ) : MovieSyncPreferences {
 
     companion object {
+        private const val NO_SYNC_TIMESTAMP = 0L
         val LAST_SYNC_TIMESTAMP_KEY =
             longPreferencesKey("last_sync_timestamp_key")
 
@@ -21,7 +22,7 @@ class MovieSyncPreferencesImpl(
     }
 
     override suspend fun getLastSyncTimestamp(): Long =
-        dataStore.data.first()[LAST_SYNC_TIMESTAMP_KEY] ?: 1L
+        dataStore.data.first()[LAST_SYNC_TIMESTAMP_KEY] ?: NO_SYNC_TIMESTAMP
 
     override suspend fun setLastSyncTimestamp(timestamp: Long) =
         safeLocalWrite {

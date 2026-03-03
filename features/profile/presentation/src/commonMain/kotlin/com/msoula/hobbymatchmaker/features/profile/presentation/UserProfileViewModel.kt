@@ -3,6 +3,7 @@ package com.msoula.hobbymatchmaker.features.profile.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutUseCase
+import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
@@ -15,18 +16,19 @@ import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveSessionSta
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.IsPseudoAvailableUseCase
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.SyncUserProfileUseCase
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.UpsertUserProfileUseCase
-import com.msoula.hobbymatchmaker.features.profile.presentation.orchestrators.UserProfileOrchestrator
 import com.msoula.hobbymatchmaker.features.profile.presentation.mappers.toUserProfileDomainModel
-import com.msoula.hobbymatchmaker.features.profile.presentation.mappers.toUserProfileUiModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiEventModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiStateModel
+import com.msoula.hobbymatchmaker.features.profile.presentation.orchestrators.UserProfileOrchestrator
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.RefreshSocialCircleUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -69,15 +71,7 @@ class UserProfileViewModel(
         field = MutableStateFlow<UserProfileUiStateModel>(UserProfileUiStateModel.Loading)
 
     private val currentUserUid: StateFlow<String?> = observeSessionStateUseCase()
-        .map { state ->
-            when (state) {
-                is SessionState.Authenticated -> {
-                    state.uid
-                }
-
-                else -> null
-            }
-        }
+        .map { state -> (state as? SessionState.Authenticated)?.uid }
         .stateIn(scope, SharingStarted.Eagerly, null)
 
     init {
@@ -87,23 +81,20 @@ class UserProfileViewModel(
 
     private fun observeProfile() {
         scope.launch {
-            observeSessionStateUseCase()
-                .flatMapLatest { state ->
-                    when (state) {
-                        is SessionState.Authenticated -> userProfileInteractor.observeCurrentUser(
-                            state.uid
-                        )
-
-                        else -> flowOf(null)
-                    }
+            currentUserUid
+                .flatMapLatest { uid ->
+                    if (uid != null) userProfileInteractor.observeCurrentUser(uid)
+                    else flowOf(null)
                 }
                 .collect { profile ->
-                    profile?.let { profileUi ->
-                        screenState.update { UserProfileUiStateModel.Success(profileUi) }
+                    if (profile == null) {
+                        screenState.update { UserProfileUiStateModel.Loading }
+                        return@collect
+                    }
 
-                        if (!isEditMode.value) {
-                            editableProfile.update { profileUi }
-                        }
+                    screenState.update { UserProfileUiStateModel.Success(profile) }
+                    if (!isEditMode.value) {
+                        editableProfile.update { profile }
                     }
                 }
         }
@@ -111,12 +102,11 @@ class UserProfileViewModel(
 
     private fun refreshProfileData() {
         scope.launch {
-            currentUserUid.value?.let { uid ->
-                refreshSocialCircleUseCase(uid)
-                    .onFailure { error ->
-                        Logger.e("Failed to refresh profile data: $error")
-                    }
-            }
+            val uid = currentUserUid.filterNotNull().first()
+            refreshSocialCircleUseCase(uid)
+                .onFailure { error ->
+                    Logger.e("Failed to refresh profile data: $error")
+                }
         }
     }
 
@@ -142,20 +132,19 @@ class UserProfileViewModel(
             }
 
             UserProfileUiEventModel.OnPseudoDefined -> {
-                editableProfile.value?.let {
-                    scope.launch {
-                        if (it.pseudo != originalProfile.value?.pseudo)
-                            checkPseudoUseCase(it.pseudo)
-                                .onSuccess { available ->
-                                    isPseudoAvailable.update { available }
-                                }
-                                .onFailure { error ->
-                                    isPseudoAvailable.update { null }
-                                    eventHandler.sendEvent(
-                                        UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
-                                    )
-                                }
-                    }
+                val profile = editableProfile.value ?: return
+                scope.launch {
+                    if (profile.pseudo != originalProfile.value?.pseudo)
+                        checkPseudoUseCase(profile.pseudo)
+                            .onSuccess { available ->
+                                isPseudoAvailable.update { available }
+                            }
+                            .onFailure { error ->
+                                isPseudoAvailable.update { null }
+                                eventHandler.sendEvent(
+                                    UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
+                                )
+                            }
                 }
             }
 
@@ -175,18 +164,19 @@ class UserProfileViewModel(
     private fun saveProfile() {
         scope.launch {
             val editable = editableProfile.value ?: return@launch
-            val uid = currentUserUid.value ?: return@launch
+            val uid = currentUserUid.value ?: run {
+                Logger.e("SaveProfile called with null uid")
+                return@launch
+            }
+            val editableToDomain = editable.toUserProfileDomainModel(uid)
 
-            upsertUserUseCase(editable.toUserProfileDomainModel(uid))
+            upsertUserUseCase(editableToDomain)
                 .onSuccess {
                     originalProfile.update { editable }
 
-                    eventHandler.sendEvent(
-                        UiEvent.OnDataReady("profile_updated")
-                    )
-
-                    scope.launch {
-                        syncUserUseCase(editable.toUserProfileDomainModel(uid))
+                    eventHandler.sendEvent(UiEvent.OnDataReady("profile_updated"))
+                    launch {
+                        syncUserUseCase(editableToDomain)
                             .onFailure {
                                 Logger.e("Failed to sync profile remotely - $uid")
                             }
@@ -230,20 +220,23 @@ class UserProfileViewModel(
     @OptIn(ExperimentalTime::class)
     private fun onAvatarSelected(avatarPath: String) {
         scope.launch {
-            val uid = currentUserUid.value
+            val uid = currentUserUid.value ?: run {
+                eventHandler.sendEvent(
+                    UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(AppError.Domain.Unauthorized))
+                )
+                return@launch
+            }
             val old = editableProfile.value?.avatarUrl
 
-            uid?.let { safeUid ->
-                userProfileInteractor.saveAvatar(safeUid, old, avatarPath)
-                    .onSuccess { newPath ->
-                        editableProfile.update { it?.copy(avatarUrl = newPath) }
-                    }
-                    .onFailure { error ->
-                        eventHandler.sendEvent(
-                            UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
-                        )
-                    }
-            }
+            userProfileInteractor.saveAvatar(uid, old, avatarPath)
+                .onSuccess { newPath ->
+                    editableProfile.update { it?.copy(avatarUrl = newPath) }
+                }
+                .onFailure { error ->
+                    eventHandler.sendEvent(
+                        UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
+                    )
+                }
         }
     }
 }

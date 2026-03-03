@@ -12,18 +12,20 @@ import com.msoula.hobbymatchmaker.core.design.util.EventHandler
 import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.design.util.UiState
-import com.msoula.hobbymatchmaker.core.login.presentation.interactors.SignInInteractor
 import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationUIEvent
+import com.msoula.hobbymatchmaker.core.login.presentation.orchestrators.SignInOrchestrator
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.models.SignInFormStateModel
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.models.SocialClientsVM
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SignInViewModel(
-    private val signInInteractor: SignInInteractor,
+    private val signInInteractor: SignInOrchestrator,
     private val socialClients: SocialClientsVM,
     private val defaultErrorMessageMapper: ErrorMessageMapper,
     externalScope: CoroutineScope? = null
@@ -39,16 +41,9 @@ class SignInViewModel(
     val signInState: StateFlow<UiState<Unit>>
         field = MutableStateFlow<UiState<Unit>>(UiState.Success(Unit))
 
-    val dontAskCheckboxValue: StateFlow<Boolean>
-        field = MutableStateFlow<Boolean>(false)
-
-    init {
-        scope.launch {
-            signInInteractor.observeDontAsk().collect { value ->
-                dontAskCheckboxValue.update { value }
-            }
-        }
-    }
+    val dontAskCheckboxValue: StateFlow<Boolean> =
+        signInInteractor.observeDontAsk()
+            .stateIn(scope, SharingStarted.WhileSubscribed(5000), false)
 
     fun onEvent(event: AuthenticationUIEvent) {
         when (event) {
@@ -77,39 +72,11 @@ class SignInViewModel(
                 }
             }
 
-            AuthenticationUIEvent.OnGoogleButtonClicked -> scope.launch {
-                val client = socialClients.clients[ProviderType.GOOGLE]
-                if (client == null) {
-                    eventHandler.sendEvent(
-                        UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(AppError.Authentication.Unknown))
-                    )
-                    return@launch
-                }
+            AuthenticationUIEvent.OnGoogleButtonClicked ->
+                handleSocialSignIn(ProviderType.GOOGLE)
 
-                doSignIn {
-                    signInInteractor.signInSocial(
-                        ProviderType.GOOGLE,
-                        credentialProvider = { client.getCredential() }
-                    )
-                }
-            }
-
-            AuthenticationUIEvent.OnAppleButtonClicked -> scope.launch {
-                val client = socialClients.clients[ProviderType.APPLE]
-                if (client == null) {
-                    eventHandler.sendEvent(
-                        UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(AppError.Authentication.Unknown))
-                    )
-                    return@launch
-                }
-
-                doSignIn {
-                    signInInteractor.signInSocial(
-                        ProviderType.APPLE,
-                        credentialProvider = { client.getCredential() }
-                    )
-                }
-            }
+            AuthenticationUIEvent.OnAppleButtonClicked ->
+                handleSocialSignIn(ProviderType.APPLE)
 
             is AuthenticationUIEvent.OnFacebookButtonClicked -> scope.launch {
                 doSignIn {
@@ -141,6 +108,22 @@ class SignInViewModel(
 
             AuthenticationUIEvent.OnScreenChanged -> formDataFlow.update { SignInFormStateModel() }
             else -> Unit
+        }
+    }
+
+    private fun handleSocialSignIn(provider: ProviderType) {
+        scope.launch {
+            val client = socialClients.clients[provider]
+            if (client == null) {
+                eventHandler.sendEvent(
+                    UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(AppError.Authentication.Unknown))
+                )
+                return@launch
+            }
+
+            doSignIn {
+                signInInteractor.signInSocial(provider) { client.getCredential() }
+            }
         }
     }
 
@@ -183,13 +166,11 @@ class SignInViewModel(
 
         action()
             .onSuccess {
+                signInState.update { UiState.Success(Unit) }
                 eventHandler.sendEvent(UiEvent.Navigate(NavigationDestination.Movies))
             }
             .onFailure { error ->
-                signInState.update { UiState.Success(Unit) }
-                eventHandler.sendEvent(
-                    UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(error))
-                )
+                signInState.update { UiState.Error(defaultErrorMessageMapper.toUIText(error)) }
             }
     }
 

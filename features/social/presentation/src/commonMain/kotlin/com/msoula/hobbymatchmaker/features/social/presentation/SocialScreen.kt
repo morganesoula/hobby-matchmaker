@@ -30,7 +30,6 @@ fun SocialContent(
     sentInvites: UiState<ImmutableList<InviteUiModel>>,
     incomingInvites: UiState<ImmutableList<InviteUiModel>>,
     tabs: ImmutableList<TabItem>,
-    observeSessionAndInvites: () -> Unit,
     onEvent: (SocialUiEventModel) -> Unit
 ) {
     Scaffold { paddingValues ->
@@ -54,7 +53,7 @@ fun SocialContent(
                         ErrorStateScreen(
                             error = error,
                             hint = hint,
-                            onRetry = { observeSessionAndInvites() }
+                            onRetry = { onEvent(SocialUiEventModel.OnRetrySocialCircle) }
                         )
                     },
                     onSuccess = { invites ->
@@ -95,7 +94,7 @@ fun SocialContent(
                         ErrorStateScreen(
                             error = error,
                             hint = hint,
-                            onRetry = { observeSessionAndInvites() }
+                            onRetry = { onEvent(SocialUiEventModel.OnRetrySocialCircle) }
                         )
                     },
                     onSuccess = { invites ->

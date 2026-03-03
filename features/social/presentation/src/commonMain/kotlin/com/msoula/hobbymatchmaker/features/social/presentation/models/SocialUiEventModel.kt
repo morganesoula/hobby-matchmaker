@@ -6,4 +6,5 @@ sealed interface SocialUiEventModel {
     data class OnAcceptInvitation(val inviteId: String, val guestUid: String) : SocialUiEventModel
     data class OnDeclineInvitation(val inviteId: String) : SocialUiEventModel
     data class OnCancelInvitation(val inviteId: String) : SocialUiEventModel
+    data object OnRetrySocialCircle : SocialUiEventModel
 }

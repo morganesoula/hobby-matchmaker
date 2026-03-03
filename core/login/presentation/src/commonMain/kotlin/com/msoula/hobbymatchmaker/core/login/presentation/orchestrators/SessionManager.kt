@@ -1,4 +1,4 @@
-package com.msoula.hobbymatchmaker.core.login.presentation.interactors
+package com.msoula.hobbymatchmaker.core.login.presentation.orchestrators
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult

@@ -14,9 +14,8 @@ import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.core.design.util.toUIState
 import com.msoula.hobbymatchmaker.core.session.domain.models.SessionState
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveSessionStateUseCase
+import com.msoula.hobbymatchmaker.features.profile.domain.models.UserProfileNoCircleDomainModel
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.ObserveCurrentUserProfileStateUseCase
-import com.msoula.hobbymatchmaker.features.social.domain.models.InviteStatus
-import com.msoula.hobbymatchmaker.features.social.domain.models.SocialInviteDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.ObserveIncomingInvitesSuccess
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.ObserveSentInvitesSuccess
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.SocialUseCases
@@ -31,15 +30,16 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.time.Clock
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class SocialViewModel(
     private val observeSessionStateUseCase: ObserveSessionStateUseCase,
     private val observeCurrentUser: ObserveCurrentUserProfileStateUseCase,
@@ -51,8 +51,23 @@ class SocialViewModel(
     private val eventHandler = EventHandler()
     val events = eventHandler.events
 
-    private var currentUserUid: String? = null
-    private var currentUserPseudo: String? = null
+    private val sessionState: StateFlow<SessionState?> = observeSessionStateUseCase()
+        .stateIn(scope, SharingStarted.Eagerly, null)
+
+    private val currentUserProfile: StateFlow<UserProfileNoCircleDomainModel?> = sessionState
+        .flatMapLatest { state ->
+            when (state) {
+                is SessionState.Authenticated -> observeCurrentUser(state.uid)
+                else -> flowOf(null)
+            }
+        }
+        .stateIn(scope, SharingStarted.Eagerly, null)
+
+    private val currentUserUid: String?
+        get() = (sessionState.value as? SessionState.Authenticated)?.uid
+
+    private val currentUserPseudo: String?
+        get() = currentUserProfile.value?.pseudo
 
     val searchResults: StateFlow<ImmutableList<SocialUserSummaryUiModel>>
         field = MutableStateFlow<ImmutableList<SocialUserSummaryUiModel>>(persistentListOf())
@@ -69,31 +84,27 @@ class SocialViewModel(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun observeSessionAndInvites() {
+    private fun observeSessionAndInvites() {
         // Sent invitations
         scope.launch {
-            observeWhenAuthenticated(
-                emptyResult = ObserveSentInvitesSuccess.Empty,
-                observe = { uid ->
-                    currentUserUid = uid
-                    socialUseCases.observeSentInvitesUseCase(uid)
+            sessionState
+                .flatMapLatest { state ->
+                    when (state) {
+                        is SessionState.Authenticated ->
+                            socialUseCases.observeSentInvitesUseCase(state.uid)
+
+                        else -> flowOf(AppResult.Success(ObserveSentInvitesSuccess.Empty))
+                    }
                 }
-            ).collect { result ->
-                sentInvites.update { result.toInvitesUiState() }
-            }
+                .collect { result ->
+                    sentInvites.update { result.toInvitesUiState() }
+                }
         }
 
         // Incoming invitations
         scope.launch {
-            observeSessionStateUseCase()
-                .flatMapLatest { state ->
-                    when (state) {
-                        is SessionState.Authenticated -> observeCurrentUser(state.uid)
-                        is SessionState.Guest, null -> flowOf(null)
-                    }
-                }
+            currentUserProfile
                 .flatMapLatest { profile ->
-                    currentUserPseudo = profile?.pseudo
                     val pseudo = profile?.pseudo
                     if (pseudo.isNullOrEmpty()) {
                         flowOf(AppResult.Success(ObserveIncomingInvitesSuccess.Empty))
@@ -109,23 +120,20 @@ class SocialViewModel(
 
     private fun refreshInvitesWhenAuthenticated() {
         scope.launch {
-            observeSessionStateUseCase().collect { state ->
-                when (state) {
-                    is SessionState.Authenticated -> {
-                        val uid = state.uid
-                        socialUseCases.refreshIncomingInvitesUseCase(uid)
-                            .onFailure {
-                                Logger.e("Failed to refresh incoming invites: $it")
-                            }
-                        socialUseCases.refreshSentInvitesUseCase(uid)
-                            .onFailure {
-                                Logger.e("Failed to refresh sent invites: $it")
-                            }
-                    }
+            sessionState
+                .collect { state ->
+                    when (state) {
+                        is SessionState.Authenticated -> {
+                            val uid = state.uid
+                            socialUseCases.refreshIncomingInvitesUseCase(uid)
+                                .onFailure { Logger.e("Failed to refresh incoming invites: $it") }
+                            socialUseCases.refreshSentInvitesUseCase(uid)
+                                .onFailure { Logger.e("Failed to refresh sent invites: $it") }
+                        }
 
-                    else -> {}
+                        else -> {}
+                    }
                 }
-            }
         }
     }
 
@@ -143,7 +151,10 @@ class SocialViewModel(
                     data.invites.map { it.toIncomingInviteUiModel() }.toImmutableList()
                 )
 
-                else -> UiState.Empty
+                else -> {
+                    Logger.e("Unhandled invite result type: ${data::class.simpleName}")
+                    UiState.Empty
+                }
             }
         }
 
@@ -178,6 +189,14 @@ class SocialViewModel(
                     cancelInvitation(event.inviteId)
                 }
             }
+
+            is SocialUiEventModel.OnRetrySocialCircle ->
+                scope.launch {
+                    currentUserUid?.let { uid ->
+                        socialUseCases.refreshIncomingInvitesUseCase(uid)
+                        socialUseCases.refreshSentInvitesUseCase(uid)
+                    }
+                }
         }
     }
 
@@ -202,18 +221,7 @@ class SocialViewModel(
             return
         }
 
-        socialUseCases.sendInvitesUseCase(
-            SocialInviteDomainModel(
-                inviteId = "",
-                fromUid = uid,
-                fromPseudo = currentUserPseudo ?: "",
-                toPseudo = pseudo,
-                name = name,
-                status = InviteStatus.PENDING,
-                createdAt = Clock.System.now(),
-                updatedAt = null
-            )
-        )
+        socialUseCases.sendInvitesUseCase(uid, currentUserPseudo, pseudo, name)
             .onSuccess {
                 socialUseCases.refreshSentInvitesUseCase(uid)
                     .onFailure {
@@ -265,55 +273,37 @@ class SocialViewModel(
     }
 
     private suspend fun acceptInvitation(inviteId: String, guestUid: String) {
-        currentUserUid?.let { ownerUid ->
-            socialUseCases.checkSocialCircleLimitUseCase(ownerUid, guestUid)
-                .onSuccess { slotAvailable ->
-                    if (slotAvailable) {
-                        socialUseCases.acceptInviteUseCase(
-                            inviteId,
-                            ownerUid,
-                            guestUid
-                        )
-                            .onSuccess {
-                                Logger.d("Invitation $inviteId accept successfully")
-                                socialUseCases.refreshIncomingInvitesUseCase(ownerUid)
-                                    .onFailure {
-                                        Logger.e("Failed to refresh incoming invites after accept: $it")
-                                    }
-                            }
-                            .onFailure { error ->
-                                eventHandler.sendEvent(
-                                    UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
-                                )
-                            }
-                    } else {
-                        eventHandler.sendEvent(UiEvent.CapacityReached)
-                    }
-                }
-                .onFailure { error ->
-                    eventHandler.sendEvent(
-                        UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
-                    )
-                }
-        } ?: eventHandler.sendEvent(
-            UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(AppError.Domain.Unauthorized))
-        )
-    }
+        val ownerUid = currentUserUid ?: run {
+            eventHandler.sendEvent(
+                UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(AppError.Domain.Unauthorized))
+            )
+            return
+        }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private fun <T> observeWhenAuthenticated(
-        emptyResult: T,
-        observe: (uid: String) -> Flow<AppResult<T, AppError>>
-    ): Flow<AppResult<T, AppError>> =
-        observeSessionStateUseCase()
-            .flatMapLatest { state ->
-                when (state) {
-                    is SessionState.Authenticated -> {
-                        observe(state.uid)
-                    }
-
-                    is SessionState.Guest, null ->
-                        flowOf(AppResult.Success(emptyResult))
+        socialUseCases.checkSocialCircleLimitUseCase(ownerUid, guestUid)
+            .onSuccess { slotAvailable ->
+                if (slotAvailable) {
+                    socialUseCases.acceptInviteUseCase(inviteId, ownerUid, guestUid)
+                        .onSuccess {
+                            Logger.d("Invitation $inviteId accept successfully")
+                            socialUseCases.refreshIncomingInvitesUseCase(ownerUid)
+                                .onFailure {
+                                    Logger.e("Failed to refresh incoming invites after accept: $it")
+                                }
+                        }
+                        .onFailure { error ->
+                            eventHandler.sendEvent(
+                                UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
+                            )
+                        }
+                } else {
+                    eventHandler.sendEvent(UiEvent.CapacityReached)
                 }
             }
+            .onFailure { error ->
+                eventHandler.sendEvent(
+                    UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
+                )
+            }
+    }
 }

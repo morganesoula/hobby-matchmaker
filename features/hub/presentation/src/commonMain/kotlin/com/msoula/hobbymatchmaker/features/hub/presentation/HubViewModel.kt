@@ -9,18 +9,17 @@ import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMember
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.design.util.EventHandler
 import com.msoula.hobbymatchmaker.core.design.util.UiState
-import com.msoula.hobbymatchmaker.features.hub.presentation.interactors.HubInteractor
 import com.msoula.hobbymatchmaker.features.hub.presentation.mappers.toMovieCarouselItem
 import com.msoula.hobbymatchmaker.features.hub.presentation.mappers.toProfileSocialMember
 import com.msoula.hobbymatchmaker.features.hub.presentation.models.FavoriteMoviesSuccess
 import com.msoula.hobbymatchmaker.features.hub.presentation.models.HubEvent
 import com.msoula.hobbymatchmaker.features.hub.presentation.models.HubSection
 import com.msoula.hobbymatchmaker.features.hub.presentation.models.RecentMatchesSuccess
+import com.msoula.hobbymatchmaker.features.hub.presentation.orchestrators.HubOrchestrator
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -33,7 +32,7 @@ import kotlinx.coroutines.flow.update
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HubViewModel(
-    private val hubInteractor: HubInteractor,
+    private val hubInteractor: HubOrchestrator,
     private val defaultMessageMapper: ErrorMessageMapper,
     externalScope: CoroutineScope? = null
 ) : ViewModel() {
@@ -57,7 +56,7 @@ class HubViewModel(
     private val selectedMemberTrigger = MutableStateFlow<ProfileSocialMember?>(null)
 
     val selectedMatch: StateFlow<ProfileSocialMember?>
-        field = MutableStateFlow<ProfileSocialMember?>(ProfileSocialMember())
+        field = MutableStateFlow<ProfileSocialMember?>(null)
 
     val selectedMatchMoviesState: StateFlow<UiState<ImmutableList<MovieCarouselItem>>>
         field = MutableStateFlow<UiState<ImmutableList<MovieCarouselItem>>>(UiState.Loading)

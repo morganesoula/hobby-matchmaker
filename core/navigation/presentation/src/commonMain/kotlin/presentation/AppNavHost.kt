@@ -410,9 +410,6 @@ fun AppNavHost(
                 sentInvites = sentInvites,
                 incomingInvites = incomingInvites,
                 tabs = socialTabs,
-                observeSessionAndInvites = {
-                    socialViewModel.observeSessionAndInvites()
-                },
                 onEvent = socialViewModel::onEvent
             )
         }
@@ -515,8 +512,7 @@ fun MainScaffold(
                     },
                     snackBarHostState = snackBarHostState,
                     showMatchAnimation = matchAnimVisibility,
-                    observeMovies = movieViewModel::observeMovies,
-                    onEvent = movieViewModel::onCardEvent,
+                    onEvent = movieViewModel::onEvent,
                     onLoadMore = movieViewModel::loadMore,
                     resetAnimation = { matchAnimVisibility = false }
                 )

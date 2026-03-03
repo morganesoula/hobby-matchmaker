@@ -23,6 +23,7 @@ class CheckMovieMatchUseCase(
                             member.pseudo.ifBlank { member.name } ?: return@mapNotNull null
                         if (displayName.isBlank()) return@mapNotNull null
                         MatchingMemberDomainModel(
+                            uid = member.uid,
                             displayName = displayName,
                             avatarUrl = member.avatarUrl
                         )

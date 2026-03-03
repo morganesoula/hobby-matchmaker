@@ -1,4 +1,4 @@
-package com.msoula.hobbymatchmaker.features.hub.presentation.interactors
+package com.msoula.hobbymatchmaker.features.hub.presentation.orchestrators
 
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.AuthState
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfoUseCase
@@ -14,10 +14,11 @@ import com.msoula.hobbymatchmaker.features.hub.presentation.models.RecentMatches
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveFavoriteMoviesUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.GetSharedMovieIdsUseCase
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
-class HubInteractor(
+class HubOrchestrator(
     private val observeFavoriteMoviesUseCase: ObserveFavoriteMoviesUseCase,
     private val observeMatchedFriendsUseCase: ObserveMatchedFriendsUseCase,
     private val observeSharedFavoriteMoviesUseCase: ObserveSharedFavoriteMoviesUseCase,
@@ -54,31 +55,32 @@ class HubInteractor(
             }
         }
 
-    suspend fun observeMatchedFriends(): Flow<AppResult<RecentMatchesSuccess, AppError>> {
-        return when (val result = getOrFetchUid()) {
-            is AppResult.Success -> {
-                result.data?.let {
-                    observeMatchedFriendsUseCase(it).map { data ->
-                        when (data) {
-                            is AppResult.Success -> {
-                                if (data.data.isEmpty()) {
-                                    AppResult.Success(RecentMatchesSuccess.Empty)
-                                } else {
-                                    AppResult.Success(RecentMatchesSuccess.Success(data.data.map { it.toHubRecentMatchesUIModel() }))
-                                }
-                            }
-
-                            is AppResult.Failure -> return@map AppResult.Failure(data.error)
-                        }
-
-                    }
-                } ?: flowOf(AppResult.Failure(AppError.Authentication.Unknown))
+    fun observeMatchedFriends(): Flow<AppResult<RecentMatchesSuccess, AppError>> = flow {
+        val uid = when (val result = getOrFetchUid()) {
+            is AppResult.Failure -> {
+                emit(AppResult.Failure(result.error))
+                return@flow
             }
 
-            is AppResult.Failure -> return flowOf(AppResult.Failure(result.error))
+            is AppResult.Success -> result.data
+        } ?: run {
+            emit(AppResult.Failure(AppError.Authentication.Unknown))
+            return@flow
         }
-    }
 
+        emitAll(
+            observeMatchedFriendsUseCase(uid).map { data ->
+                when (data) {
+                    is AppResult.Success -> {
+                        if (data.data.isEmpty()) AppResult.Success(RecentMatchesSuccess.Empty)
+                        else AppResult.Success(RecentMatchesSuccess.Success(data.data.map { it.toHubRecentMatchesUIModel() }))
+                    }
+
+                    is AppResult.Failure -> AppResult.Failure(data.error)
+                }
+            }
+        )
+    }
 
     private suspend fun getOrFetchUid(): AppResult<String?, AppError> {
         if (currentUid != null) return AppResult.Success(currentUid)
@@ -99,10 +101,11 @@ class HubInteractor(
             is AppResult.Failure -> AppResult.Failure(result.error)
         }
 
-    fun observeSharedFavoriteMovies(ids: List<Long>) = observeSharedFavoriteMoviesUseCase(ids)
-        .map { movies ->
-            movies.map {
-                it.toHubFavoriteMoviesUIModel(isShared = true).toMovieCarouselItem()
+    fun observeSharedFavoriteMovies(ids: List<Long>) =
+        observeSharedFavoriteMoviesUseCase(ids)
+            .map { movies ->
+                movies.map {
+                    it.toHubFavoriteMoviesUIModel(isShared = true).toMovieCarouselItem()
+                }
             }
-        }
 }

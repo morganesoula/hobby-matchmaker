@@ -1,4 +1,4 @@
-package com.msoula.hobbymatchmaker.core.login.presentation.interactors
+package com.msoula.hobbymatchmaker.core.login.presentation.orchestrators
 
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.SignInSuccess

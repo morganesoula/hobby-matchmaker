@@ -21,22 +21,25 @@ import com.msoula.hobbymatchmaker.core.design.util.UIText
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveAllMoviesSuccess
-import com.msoula.hobbymatchmaker.features.movies.presentation.orchestrators.MovieOrchestrator
 import com.msoula.hobbymatchmaker.features.movies.presentation.mappers.toMovieUiModel
-import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
+import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.PaginationStateModel
+import com.msoula.hobbymatchmaker.features.movies.presentation.orchestrators.MovieCatalogOrchestrator
+import com.msoula.hobbymatchmaker.features.movies.presentation.orchestrators.MovieUserActionOrchestrator
 import com.msoula.hobbymatchmaker.features.social.domain.models.MovieMatchResult
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MovieViewModel(
-    private val interactor: MovieOrchestrator,
+    private val userActionOrchestrator: MovieUserActionOrchestrator,
+    private val catalogOrchestrator: MovieCatalogOrchestrator,
     private val defaultMessageMapper: ErrorMessageMapper,
     externalScope: CoroutineScope? = null
 ) : ViewModel() {
@@ -45,8 +48,9 @@ class MovieViewModel(
     private val eventHandler = EventHandler()
     val events = eventHandler.events
 
+    private var moviesJob: Job? = null
+
     private val language = getDeviceLocale()
-    private var fetchLaunched = false
 
     val movieScreenState: StateFlow<UiState<ImmutableList<MovieUiModel>>>
         field = MutableStateFlow<UiState<ImmutableList<MovieUiModel>>>(UiState.Loading)
@@ -56,23 +60,21 @@ class MovieViewModel(
 
     init {
         observeMovies()
-        checkAndRefreshIfStale()
+        scope.launch {
+            checkAndRefreshIfStale()
+        }
     }
 
-    fun observeMovies() {
-        scope.launch {
-            interactor.observeMovies().collect { result ->
+    private fun observeMovies() {
+        moviesJob?.cancel()
+        moviesJob = scope.launch {
+            catalogOrchestrator.observeMovies().collect { result ->
                 when (result) {
                     is AppResult.Success -> {
                         val movies = result.data
 
-                        if (movies.movies.isEmpty() && !fetchLaunched) {
-                            fetchLaunched = true
-                            launch {
-                                interactor.fetchMovies(language).onFailure { error ->
-                                    movieScreenState.update { mapError(error) }
-                                }
-                            }
+                        if (movies.movies.isEmpty()) {
+                            movieScreenState.update { UiState.Loading }
                         } else {
                             movieScreenState.update { mapSuccess(movies) }
                         }
@@ -86,14 +88,12 @@ class MovieViewModel(
         }
     }
 
-    private fun checkAndRefreshIfStale() {
-        scope.launch {
-            if (interactor.shouldRefreshMovies()) {
-                interactor.fetchMovies(language)
-                    .onFailure { error ->
-                        movieScreenState.update { mapError(error) }
-                    }
-            }
+    private suspend fun checkAndRefreshIfStale() {
+        if (catalogOrchestrator.shouldRefreshMovies()) {
+            catalogOrchestrator.fetchMovies(language)
+                .onFailure { error ->
+                    movieScreenState.update { mapError(error) }
+                }
         }
     }
 
@@ -104,7 +104,8 @@ class MovieViewModel(
         scope.launch {
             paginationState.update { it.copy(isLoadingMore = true) }
 
-            when (val result = interactor.loadMoreMovies(language, current.currentPage + 1)) {
+            when (val result =
+                catalogOrchestrator.loadMoreMovies(language, current.currentPage + 1)) {
                 is AppResult.Success -> {
                     paginationState.update {
                         it.copy(
@@ -127,15 +128,16 @@ class MovieViewModel(
         }
     }
 
-    fun onCardEvent(event: CardEventModel) {
+    fun onEvent(event: MovieEventModel) {
         when (event) {
-            is CardEventModel.OnDoubleTap -> scope.launch { toggleFavorite(event.movie.id) }
-            is CardEventModel.OnSingleTap -> scope.launch { handleSingleTap(event.movieId) }
+            is MovieEventModel.OnCardDoubleTap -> scope.launch { toggleFavorite(event.movie.id) }
+            is MovieEventModel.OnCardSingleTap -> scope.launch { handleSingleTap(event.movieId) }
+            is MovieEventModel.RetryMovies -> observeMovies()
         }
     }
 
-    internal suspend fun handleSingleTap(movieId: Long) {
-        val canAccess = interactor.canAccessMovieDetail(movieId)
+    private suspend fun handleSingleTap(movieId: Long) {
+        val canAccess = userActionOrchestrator.canAccessMovieDetail(movieId)
 
         if (canAccess) {
             eventHandler.sendEvent(UiEvent.Navigate(NavigationDestination.MovieDetail(movieId)))
@@ -153,16 +155,18 @@ class MovieViewModel(
         val movie = currentState.data.firstOrNull { it.id == movieId } ?: return
         val newFavoriteState = !movie.isFavorite
 
-        val uid = interactor.getAuthenticatedUid()
+        userActionOrchestrator.toggleFavoriteAndGetUid(movieId, newFavoriteState)
+            .onSuccess { uid ->
+                scope.launch {
+                    userActionOrchestrator.syncFavoriteToCircle(
+                        uid,
+                        movieId,
+                        newFavoriteState
+                    )
+                }
 
-        interactor.toggleFavorite(movieId, newFavoriteState)
-            .onSuccess {
-                if (uid != null) {
-                    scope.launch { interactor.syncFavoriteToCircle(uid, movieId, newFavoriteState) }
-
-                    if (newFavoriteState) {
-                        checkAndNotifyMatch(uid, movieId)
-                    }
+                if (newFavoriteState) {
+                    checkAndNotifyMatch(uid, movieId)
                 }
             }
             .onFailure { error ->
@@ -173,10 +177,10 @@ class MovieViewModel(
     }
 
     private suspend fun checkAndNotifyMatch(uid: String, movieId: Long) {
-        interactor.checkForMovieMatch(uid, movieId)
+        userActionOrchestrator.checkForMovieMatch(uid, movieId)
             .onSuccess { result ->
                 if (result is MovieMatchResult.Match) {
-                    val ownerAvatarUrl = interactor.getOwnerAvatarUrl(uid)
+                    val ownerAvatarUrl = userActionOrchestrator.getOwnerAvatarUrl(uid)
                     val matchingMembers = result.matchingMemberDomainModels.map { member ->
                         MatchingMemberInfo(member.displayName, member.avatarUrl)
                     }.toImmutableList()

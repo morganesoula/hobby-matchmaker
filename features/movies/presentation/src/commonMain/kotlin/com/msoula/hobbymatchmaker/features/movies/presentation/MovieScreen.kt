@@ -39,7 +39,7 @@ import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
 import com.msoula.hobbymatchmaker.core.design.util.UIText
 import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.features.movies.presentation.mappers.toCarouselItems
-import com.msoula.hobbymatchmaker.features.movies.presentation.models.CardEventModel
+import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieEventModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.MovieUiModel
 import com.msoula.hobbymatchmaker.features.movies.presentation.models.PaginationStateModel
 import kotlinx.collections.immutable.ImmutableList
@@ -54,8 +54,7 @@ fun MovieContent(
     showMatchAnimation: Boolean,
     matchingAnimationData: MatchAnimationData,
     onNavigate: (NavigationDestination) -> Unit,
-    observeMovies: () -> Unit,
-    onEvent: (CardEventModel) -> Unit,
+    onEvent: (MovieEventModel) -> Unit,
     onLoadMore: () -> Unit,
     resetAnimation: () -> Unit
 ) {
@@ -107,7 +106,7 @@ fun MovieContent(
                     ErrorStateScreen(
                         error = error,
                         hint = hint,
-                        onRetry = { observeMovies() }
+                        onRetry = { onEvent(MovieEventModel.RetryMovies) }
                     )
                 },
                 onSuccess = { movies ->
@@ -118,11 +117,11 @@ fun MovieContent(
                         hasMorePages = paginationState.hasMorePages,
                         onLoadMore = onLoadMore,
                         onMovieSingleTap = { id, overview ->
-                            onEvent(CardEventModel.OnSingleTap(id, overview))
+                            onEvent(MovieEventModel.OnCardSingleTap(id, overview))
                         },
                         onMovieDoubleTap = { id ->
                             val selectedMovie = movies.first { it.id == id }
-                            onEvent(CardEventModel.OnDoubleTap(selectedMovie))
+                            onEvent(MovieEventModel.OnCardDoubleTap(selectedMovie))
                         }
                     )
                 }

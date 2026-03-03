@@ -4,12 +4,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.AuthState
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfoUseCase
+import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Logger
+import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ClearCurrentUserProfileUuidUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveIsConnectedUseCase
 import com.msoula.hobbymatchmaker.core.splashscreen.presentation.model.SplashUiState
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.SyncLocalFavoritesToCloudUseCase
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,7 +25,8 @@ class SplashViewModel(
     private val observeIsConnectedUseCase: ObserveIsConnectedUseCase,
     private val fetchFirebaseUserInfo: FetchFirebaseUserInfoUseCase,
     private val clearCurrentUserProfileUuidUseCase: ClearCurrentUserProfileUuidUseCase,
-    syncLocalFavoritesToCloudUseCase: Lazy<SyncLocalFavoritesToCloudUseCase>
+    syncLocalFavoritesToCloudUseCase: Lazy<SyncLocalFavoritesToCloudUseCase>,
+    private val defaultErrorMessageMapper: ErrorMessageMapper
 ) : ViewModel() {
     private val syncLocalFavoritesToCloudUseCase by syncLocalFavoritesToCloudUseCase
 
@@ -33,28 +37,29 @@ class SplashViewModel(
         viewModelScope.launch {
             try {
                 val isLocallyConnected = withTimeout(3_000) { observeIsConnectedUseCase().first() }
-
-                delay(1_000)
-
-                if (isLocallyConnected) {
+                val navigationTarget = if (isLocallyConnected) {
                     val isFirebaseSessionValid = validateFirebaseSession()
-
                     if (isFirebaseSessionValid) {
-                        state.update { SplashUiState.GoToMovies }
-
                         launch {
                             runCatching { syncLocalFavoritesToCloudUseCase() }
-                                .onFailure { Logger.w("Splash sync failed - ${it.message}") }
+                                .onFailure { Logger.w("Splash sync failed: ${it.message}") }
                         }
+                        SplashUiState.GoToMovies
                     } else {
                         clearCurrentUserProfileUuidUseCase()
-                        state.update { SplashUiState.GoToAuth }
+                        SplashUiState.GoToAuth
                     }
                 } else {
-                    state.update { SplashUiState.GoToAuth }
+                    SplashUiState.GoToAuth
                 }
-            } catch (t: Throwable) {
-                state.update { SplashUiState.Error(t.message ?: "Unknown error") }
+
+                delay(1_000)
+                state.update { navigationTarget }
+            } catch (e: TimeoutCancellationException) {
+                state.update { SplashUiState.GoToAuth }
+            } catch (e: Exception) {
+                Logger.e("Splash screen error: $e")
+                state.update { SplashUiState.Error(defaultErrorMessageMapper.toUIText(AppError.Authentication.Unknown)) }
             }
         }
     }

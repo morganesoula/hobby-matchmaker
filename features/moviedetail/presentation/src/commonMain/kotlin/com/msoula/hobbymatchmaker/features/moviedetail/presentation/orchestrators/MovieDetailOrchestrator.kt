@@ -1,4 +1,4 @@
-package com.msoula.hobbymatchmaker.features.moviedetail.presentation.interactors
+package com.msoula.hobbymatchmaker.features.moviedetail.presentation.orchestrators
 
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.AuthState
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfoUseCase
@@ -8,28 +8,22 @@ import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.FetchMovieTrailerUseCase
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieDetailUseCase
 import com.msoula.hobbymatchmaker.features.moviedetail.domain.useCases.ObserveMovieSuccess
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MatchingMemberUiModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.toMovieDetailUiModel
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.SetMovieFavoriteUseCase
-import com.msoula.hobbymatchmaker.features.social.domain.models.MovieMatchResult
-import com.msoula.hobbymatchmaker.features.social.domain.useCases.CheckMovieMatchUseCase
-import com.msoula.hobbymatchmaker.features.social.domain.useCases.SyncFavoriteToCircleUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class MovieDetailInteractor(
+class MovieDetailOrchestrator(
     private val observeMovieDetailUseCase: ObserveMovieDetailUseCase,
     private val fetchMovieTrailerUseCase: FetchMovieTrailerUseCase,
     private val setMovieFavoriteUseCase: SetMovieFavoriteUseCase,
-    private val fetchFirebaseUserInfo: FetchFirebaseUserInfoUseCase,
-    private val checkMovieMatchUseCase: CheckMovieMatchUseCase,
-    private val syncFavoriteToCircleUseCase: SyncFavoriteToCircleUseCase
+    private val fetchFirebaseUserInfo: FetchFirebaseUserInfoUseCase
 ) {
     fun observeMovieDetail(
         movieId: Long,
         language: String
-    ): Flow<AppResult<MovieSuccess, AppError>> =
+    ): Flow<AppResult<MovieSuccess, AppError>?> =
         observeMovieDetailUseCase(movieId, language).map { result ->
             when (result) {
                 is AppResult.Success -> {
@@ -38,7 +32,7 @@ class MovieDetailInteractor(
                             MovieSuccess.Success(data.data.toMovieDetailUiModel())
                         )
 
-                        is ObserveMovieSuccess.DataLoadedInDB -> AppResult.Success(MovieSuccess.Loaded)
+                        is ObserveMovieSuccess.DataLoadedInDB -> null
                     }
                 }
 
@@ -51,7 +45,7 @@ class MovieDetailInteractor(
         language: String
     ) = fetchMovieTrailerUseCase(movieId, language).mapSuccess { it.videoURI }
 
-    suspend fun toggleFavorite(movieId: Long, isFavorite: Boolean): AppResult<Unit, AppError> {
+    suspend fun toggleFavorite(movieId: Long, isFavorite: Boolean): AppResult<String, AppError> {
         return when (val authResult = fetchFirebaseUserInfo()) {
             is AppResult.Failure -> AppResult.Failure(authResult.error)
             is AppResult.Success -> {
@@ -62,8 +56,10 @@ class MovieDetailInteractor(
                     )
                 }
 
-                syncFavoriteToCircleUseCase(uid, movieId, isFavorite)
-                setMovieFavoriteUseCase(uid, movieId, isFavorite)
+                when (val favoriteResult = setMovieFavoriteUseCase(uid, movieId, isFavorite)) {
+                    is AppResult.Failure -> AppResult.Failure(favoriteResult.error)
+                    is AppResult.Success -> AppResult.Success(uid)
+                }
             }
         }
     }
@@ -79,24 +75,9 @@ class MovieDetailInteractor(
             }
         }
     }
-
-    suspend fun checkForMovieMatch(uid: String, movieId: Long) =
-        checkMovieMatchUseCase(uid, movieId).mapSuccess { result ->
-            when (result) {
-                is MovieMatchResult.Match -> MovieMatchUiSuccess(result.matchingMemberDomainModels.map {
-                    MatchingMemberUiModel(
-                        name = it.displayName, avatarUrl = it.avatarUrl
-                    )
-                })
-
-                else -> Unit
-            }
-        }
 }
 
 sealed interface MovieSuccess {
     data class Success(val data: MovieDetailUiModel) : MovieSuccess
-    data object Loaded : MovieSuccess
 }
 
-class MovieMatchUiSuccess(val matchingMembers: List<MatchingMemberUiModel>)

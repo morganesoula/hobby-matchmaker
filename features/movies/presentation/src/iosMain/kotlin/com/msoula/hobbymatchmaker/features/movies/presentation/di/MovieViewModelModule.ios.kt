@@ -7,8 +7,9 @@ import org.koin.dsl.module
 actual val featuresModuleMovieViewModelPresentationPlatformSpecific = module {
     viewModel {
         MovieViewModel(
-            interactor = get(),
-            defaultMessageMapper = get()
+            userActionOrchestrator = get(),
+            defaultMessageMapper = get(),
+            catalogOrchestrator = get()
         )
     }
 }

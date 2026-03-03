@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
-import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.getDeviceLocale
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
@@ -17,15 +16,21 @@ import com.msoula.hobbymatchmaker.core.design.util.UIErrorHint
 import com.msoula.hobbymatchmaker.core.design.util.UIText
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.design.util.UiState
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.interactors.MovieDetailInteractor
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.interactors.MovieMatchUiSuccess
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.interactors.MovieSuccess
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.mappers.toMatchingMemberUiModel
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MatchingMemberUiModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiEventModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.orchestrators.MovieDetailOrchestrator
+import com.msoula.hobbymatchmaker.features.moviedetail.presentation.orchestrators.MovieSuccess
+import com.msoula.hobbymatchmaker.features.social.domain.models.MovieMatchResult
+import com.msoula.hobbymatchmaker.features.social.domain.useCases.CheckMovieMatchUseCase
+import com.msoula.hobbymatchmaker.features.social.domain.useCases.SyncFavoriteToCircleUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -34,7 +39,9 @@ import kotlinx.coroutines.launch
 
 class MovieDetailViewModel(
     private val movieId: Long,
-    private val interactor: MovieDetailInteractor,
+    private val interactor: MovieDetailOrchestrator,
+    private val syncFavoriteToCircleUseCase: SyncFavoriteToCircleUseCase,
+    private val checkMovieMatchUseCase: CheckMovieMatchUseCase,
     private val defaultMessageMapper: ErrorMessageMapper,
     externalScope: CoroutineScope? = null
 ) : ViewModel() {
@@ -57,12 +64,20 @@ class MovieDetailViewModel(
     private fun observeData() {
         retryTrigger
             .flatMapLatest { interactor.observeMovieDetail(movieId, language) }
+            .filterNotNull()
+            .distinctUntilChanged()
             .onEach { result ->
-                movieDetailState.update {
-                    when (result) {
-                        is AppResult.Success -> mapDetailSuccess(result.data)
-                        is AppResult.Failure -> mapError(result.error)
+                when (result) {
+                    is AppResult.Success -> {
+                        when (val data = result.data) {
+                            is MovieSuccess.Success -> {
+                                movieDetailState.update { UiState.Success(data.data) }
+                                updateSharedMembers()
+                            }
+                        }
                     }
+
+                    is AppResult.Failure -> movieDetailState.update { mapError(result.error) }
                 }
             }
             .launchIn(scope)
@@ -110,14 +125,21 @@ class MovieDetailViewModel(
         val movie = currentState.data
         val newFavoriteState = !movie.isFavorite
 
-        val uid = interactor.getAuthenticatedUid()
-
         interactor.toggleFavorite(movieId, newFavoriteState)
-            .onSuccess {
-                if (newFavoriteState && uid != null) {
-                    checkMatchAndNotify(uid, movieId)
+            .onSuccess { uid ->
+                scope.launch {
+                    syncFavoriteToCircleUseCase(uid, movieId, newFavoriteState)
                 }
-                fetchSharedMembers(movie)
+
+                if (newFavoriteState) {
+                    checkMovieMatchUseCase(uid, movieId)
+                        .onSuccess { result ->
+                            notifyMatchIfNeeded(result)
+                            applySharedMembers(result)
+                        }
+                } else {
+                    applySharedMembers(MovieMatchResult.NoMatch)
+                }
             }
             .onFailure { error ->
                 eventHandler.sendEvent(
@@ -126,35 +148,18 @@ class MovieDetailViewModel(
             }
     }
 
-    private suspend fun checkMatchAndNotify(uid: String, movieId: Long) {
-        interactor.checkForMovieMatch(uid, movieId)
-            .onSuccess { result ->
-                if (result is MovieMatchUiSuccess) {
-                    eventHandler.sendEvent(
-                        UiEvent.ShowSnackBar(
-                            UIText.Resource(
-                                Res.string.social_movie_match_notification,
-                                listOf(result.matchingMembers)
-                            )
-                        )
+    private suspend fun notifyMatchIfNeeded(result: MovieMatchResult) {
+        if (result is MovieMatchResult.Match) {
+            eventHandler.sendEvent(
+                UiEvent.ShowSnackBar(
+                    UIText.Resource(
+                        Res.string.social_movie_match_notification,
+                        listOf(result.matchingMemberDomainModels)
                     )
-                }
-            }
-            .onFailure { error ->
-                Logger.e("Failed to check movie match: $error")
-            }
-    }
-
-    private fun mapDetailSuccess(success: MovieSuccess): UiState<MovieDetailUiModel> =
-        when (success) {
-            is MovieSuccess.Success -> {
-                val uiModel = success.data
-                fetchSharedMembers(uiModel)
-                UiState.Success(uiModel)
-            }
-
-            is MovieSuccess.Loaded -> UiState.Loading
+                )
+            )
         }
+    }
 
     private fun mapError(error: AppError) =
         UiState.Error(
@@ -162,24 +167,28 @@ class MovieDetailViewModel(
             hint = UIErrorHint(retry = RetryPolicy.Manual)
         )
 
-    private fun fetchSharedMembers(movie: MovieDetailUiModel) {
+    private fun updateSharedMembers() {
         scope.launch {
             val uid = interactor.getAuthenticatedUid() ?: return@launch
-            interactor.checkForMovieMatch(uid, movie.id)
-                .onSuccess { result ->
-                    if (result is MovieMatchUiSuccess) {
-                        movieDetailState.update { currentState ->
-                            if (currentState is UiState.Success) {
-                                UiState.Success(
-                                    currentState.data.copy(
-                                        sharedMembers = result.matchingMembers,
-                                        isShared = result.matchingMembers.isNotEmpty()
-                                    )
-                                )
-                            } else currentState
-                        }
-                    }
-                }
+            checkMovieMatchUseCase(uid, movieId)
+                .onSuccess { result -> applySharedMembers(result) }
+        }
+    }
+
+    private fun applySharedMembers(result: MovieMatchResult) {
+        movieDetailState.update { currentState ->
+            if (currentState !is UiState.Success) return@update currentState
+            val (members, isShared) = when (result) {
+                is MovieMatchResult.Match -> result.matchingMemberDomainModels.map {
+                    it.toMatchingMemberUiModel()
+                } to result.matchingMemberDomainModels.isNotEmpty()
+
+                else -> emptyList<MatchingMemberUiModel>() to false
+            }
+
+            UiState.Success(
+                currentState.data.copy(sharedMembers = members, isShared = isShared)
+            )
         }
     }
 
