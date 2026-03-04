@@ -30,9 +30,11 @@ fun PrimaryTextField(
     text: String,
     singleLine: Boolean,
     onValueChanged: (String) -> Unit,
+    readOnly: Boolean = false,
     label: String? = null,
     keyboardOptions: KeyboardOptions? = null,
     keyboardActions: KeyboardActions? = null,
+    trailingIcon: (@Composable () -> Unit)? = null,
     showSupportingText: Boolean = false
 ) {
     val maxChar = 120
@@ -45,6 +47,7 @@ fun PrimaryTextField(
                 onValueChanged(it)
             }
         },
+        readOnly = readOnly,
         label = { label?.let { Text(text = it) } },
         singleLine = singleLine,
         colors = HMMTextFieldColors(),
@@ -59,7 +62,8 @@ fun PrimaryTextField(
                     color = MaterialTheme.colorScheme.primary
                 )
             }
-        }
+        },
+        trailingIcon = trailingIcon,
     )
 }
 

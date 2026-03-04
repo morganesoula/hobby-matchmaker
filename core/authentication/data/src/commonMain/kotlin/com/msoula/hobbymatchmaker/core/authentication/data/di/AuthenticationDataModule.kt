@@ -7,6 +7,7 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.repositories.Authen
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.firestore
+import dev.gitlive.firebase.storage.storage
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -16,6 +17,7 @@ val coreModuleAuthenticationData = module {
     includes(coreModuleAuthenticationPlatformSpecificData)
     single { Firebase.auth }
     single { Firebase.firestore }
+    single { Firebase.storage("gs://hobby-matchmaker.firebasestorage.app") }
 
     singleOf(::AuthenticationRemoteDataSourceImpl) bind AuthenticationRemoteDataSource::class
     singleOf(::AuthenticationRepositoryImpl) bind AuthenticationRepository::class

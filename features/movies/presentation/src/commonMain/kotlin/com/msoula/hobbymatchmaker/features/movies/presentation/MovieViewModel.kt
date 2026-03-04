@@ -137,15 +137,7 @@ class MovieViewModel(
     }
 
     private suspend fun handleSingleTap(movieId: Long) {
-        val canAccess = userActionOrchestrator.canAccessMovieDetail(movieId)
-
-        if (canAccess) {
-            eventHandler.sendEvent(UiEvent.Navigate(NavigationDestination.MovieDetail(movieId)))
-        } else {
-            eventHandler.sendEvent(
-                UiEvent.ShowSnackBar(UIText.Resource(Res.string.connection_issue))
-            )
-        }
+        eventHandler.sendEvent(UiEvent.Navigate(NavigationDestination.MovieDetail(movieId)))
     }
 
     private suspend fun toggleFavorite(movieId: Long) {

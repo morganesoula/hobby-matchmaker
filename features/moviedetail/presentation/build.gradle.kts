@@ -11,7 +11,7 @@ multiplatformConfig {
 }
 
 kotlin {
-    androidLibrary {
+    android {
         namespace = "com.msoula.hobbymatchmaker.features.moviedetail.presentation"
     }
 

@@ -1,5 +1,6 @@
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryExtension
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.gradle.kotlin.dsl.configure
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -15,11 +16,10 @@ multiplatformConfig {
 }
 
 kotlin {
-    androidLibrary {
+    extensions.configure<KotlinMultiplatformAndroidLibraryExtension> {
         namespace = "com.msoula.hobbymatchmaker.core.login.presentation"
 
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
             freeCompilerArgs.addAll(
                 "-P",
                 "plugin:org.jetbrains.kotlin.parcelize:additionalAnnotation=com.msoula.hobbymatchmaker.core.login.presentation.models.HMMParcelize"

@@ -1,5 +1,5 @@
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryExtension
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 import java.io.FileInputStream
 import java.net.URI
@@ -19,14 +19,10 @@ multiplatformConfig {
 }
 
 kotlin {
-    androidLibrary {
+    extensions.configure<KotlinMultiplatformAndroidLibraryExtension> {
         namespace = "com.msoula.hobbymatchmaker.composeapp"
         compileSdk = ProjectConfig.PROJECT_CONFIG_SDK_VERSION
         minSdk = ProjectConfig.PROJECT_CONFIG_MIN_SDK_VERSION
-
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
-        }
     }
 
     val xcf = XCFramework()

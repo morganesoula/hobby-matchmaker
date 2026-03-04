@@ -8,7 +8,7 @@ multiplatformConfig {
 }
 
 kotlin {
-    androidLibrary {
+    android {
         namespace = "com.msoula.hobbymatchmaker.core.session.data"
     }
 

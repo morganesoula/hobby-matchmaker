@@ -92,7 +92,13 @@ class UserProfileViewModel(
                         return@collect
                     }
 
-                    screenState.update { UserProfileUiStateModel.Success(profile) }
+                    screenState.update {
+                        UserProfileUiStateModel.Success(
+                            profile.copy(
+                                isPseudoEditable = profile.pseudo.isBlank()
+                            )
+                        )
+                    }
                     if (!isEditMode.value) {
                         editableProfile.update { profile }
                     }

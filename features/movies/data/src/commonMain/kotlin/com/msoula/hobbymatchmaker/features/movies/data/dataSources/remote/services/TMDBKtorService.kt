@@ -2,7 +2,6 @@ package com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.servi
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
-import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.safeCall
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.MovieResponseRemoteModel
 import io.ktor.client.HttpClient
@@ -33,8 +32,5 @@ class TMDBKtorServiceImpl(private val client: HttpClient) : TMDBKtorService {
             parameter(PARAMS_LANGUAGE, language)
             parameter(PARAMS_PAGE, page)
         }.body<MovieResponseRemoteModel>()
-            .also {
-                Logger.d("GetMovies: page=$page")
-            }
     }
 }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -14,7 +15,6 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.GenericCard
 import com.msoula.hobbymatchmaker.core.design.atoms.PrimaryTextField
@@ -27,6 +27,7 @@ import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_pse
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_pseudo_not_available
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_pseudo_title
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_title
+import com.msoula.hobbymatchmaker.core.design.icons.LucideLock
 import com.msoula.hobbymatchmaker.core.design.icons.VscodeCodiconsLightbulb
 import com.msoula.hobbymatchmaker.core.design.molecules.TipTextField
 import com.msoula.hobbymatchmaker.core.design.molecules.ValidationRequirement
@@ -42,6 +43,7 @@ fun ProfileEditInformationForm(
     modifier: Modifier = Modifier,
     name: String,
     pseudo: String,
+    isPseudoEditable: Boolean = true,
     onNameChanged: (String) -> Unit,
     onPseudoChanged: (String) -> Unit,
     onPseudoFocusLost: () -> Unit,
@@ -118,11 +120,17 @@ fun ProfileEditInformationForm(
                     },
                 text = pseudo,
                 singleLine = true,
+                readOnly = !isPseudoEditable,
                 onValueChanged = onPseudoChanged,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Next
-                )
+                ),
+                trailingIcon = {
+                    if (!isPseudoEditable) {
+                        Icon(imageVector = LucideLock, contentDescription = null)
+                    }
+                }
             )
 
             if (!pseudoFieldFocused.value && pseudo.isNotBlank()) {
@@ -163,19 +171,4 @@ fun ProfileEditInformationForm(
             )
         }
     }
-}
-
-@Preview
-@Composable
-fun EditInformationPreview() {
-    ProfileEditInformationForm(
-        name = "Test nom",
-        pseudo = "Test pseudo",
-        onNameChanged = {},
-        onPseudoChanged = {},
-        onPseudoFocusLost = {},
-        isPseudoAvailable = true,
-        bio = "Test bio sur une seule ligne ou peut-être plusieurs, qui sait",
-        onBioChanged = {}
-    )
 }

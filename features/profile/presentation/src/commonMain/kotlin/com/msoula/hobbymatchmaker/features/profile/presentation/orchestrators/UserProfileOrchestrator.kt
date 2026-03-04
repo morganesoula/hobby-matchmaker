@@ -3,9 +3,11 @@ package com.msoula.hobbymatchmaker.features.profile.presentation.orchestrators
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.ImageFileManager
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveLikedMoviesCountUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveLikedMoviesIdsUseCase
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.ObserveCurrentUserProfileStateUseCase
+import com.msoula.hobbymatchmaker.features.profile.domain.useCases.UploadAvatarUseCase
 import com.msoula.hobbymatchmaker.features.profile.presentation.mappers.toSocialMemberUiModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.mappers.toUserProfileUiModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiModel
@@ -23,6 +25,7 @@ class UserProfileOrchestrator(
     private val observeLikedMoviesCount: ObserveLikedMoviesCountUseCase,
     private val observeLikedMoviesIds: ObserveLikedMoviesIdsUseCase,
     private val computeCommonMoviesUseCase: ComputeCommonMoviesUseCase,
+    private val uploadAvatarUseCase: UploadAvatarUseCase,
     private val imageManager: ImageFileManager
 ) {
     fun observeCurrentUser(uid: String): Flow<UserProfileUiModel?> =
@@ -54,18 +57,21 @@ class UserProfileOrchestrator(
         newPath: String
     ): AppResult<String, AppError> {
         val fileName = "avatar_${uid}_${Clock.System.now()}.jpg"
+        val localPath = imageManager.copyImageToInternalStorage(newPath, fileName)
+            ?: return AppResult.Failure(AppError.Storage.WriteFailed)
 
-        val internalPath =
-            imageManager.copyImageToInternalStorage(newPath, fileName)
-                ?: return AppResult.Failure(AppError.Storage.WriteFailed)
+        return when (val result = uploadAvatarUseCase(uid, localPath)) {
+            is AppResult.Failure -> {
+                Logger.e("Error in savingAvatar: ${result.error}")
+                result
+            }
 
-        if (oldPath != null &&
-            (oldPath.startsWith("/data/") ||
-                oldPath.contains("/files/avatars"))
-        ) {
-            imageManager.deleteImageFromInternalStorage(oldPath)
+            is AppResult.Success -> {
+                if (oldPath != null && (oldPath.startsWith("/data") || oldPath.contains("/files/avatars"))) {
+                    imageManager.deleteImageFromInternalStorage(oldPath)
+                }
+                AppResult.Success(result.data)
+            }
         }
-
-        return AppResult.Success(internalPath)
     }
 }

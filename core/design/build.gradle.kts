@@ -11,7 +11,7 @@ multiplatformConfig {
 }
 
 kotlin {
-    androidLibrary {
+    android {
         namespace = "com.msoula.hobbymatchmaker.core.design"
         @Suppress("OPT_IN_USAGE")
         experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true

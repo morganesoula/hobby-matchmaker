@@ -22,13 +22,19 @@ open class MultiplatformConfigExtension(
             sourceSets.getByName("commonMain").dependencies {
                 implementation(libs.findLibrary("firebase-kmp-auth").get())
                 implementation(libs.findLibrary("firebase-kmp-firestore").get())
+                implementation(libs.findLibrary("firebase-kmp-storage").get())
             }
 
             sourceSets.getByName("androidMain").dependencies {
-                implementation(project.dependencies.platform(libs.findLibrary("firebase-bom").get()))
+                implementation(
+                    project.dependencies.platform(
+                        libs.findLibrary("firebase-bom").get()
+                    )
+                )
                 implementation(libs.findLibrary("firebase-auth").get())
                 implementation(libs.findLibrary("firebase-common").get())
                 implementation(libs.findLibrary("firebase-firestore").get())
+                implementation(libs.findLibrary("firebase-storage").get())
             }
         }
     }

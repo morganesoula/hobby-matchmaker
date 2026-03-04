@@ -3,7 +3,7 @@ plugins {
 }
 
 kotlin {
-    androidLibrary {
+    android {
         namespace = "com.msoula.hobbymatchmaker.core.splashscreen.presentation"
         @Suppress("OPT_IN_USAGE")
         experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true

@@ -4,7 +4,9 @@ import com.msoula.hobbymatchmaker.features.profile.data.dataSources.local.UserPr
 import com.msoula.hobbymatchmaker.features.profile.data.dataSources.local.UserProfileLocalDataSourceImpl
 import com.msoula.hobbymatchmaker.features.profile.data.dataSources.remote.UserProfileRemoteDataSource
 import com.msoula.hobbymatchmaker.features.profile.data.dataSources.remote.UserProfileRemoteDataSourceImpl
+import com.msoula.hobbymatchmaker.features.profile.data.repositories.AvatarStorageRepositoryImpl
 import com.msoula.hobbymatchmaker.features.profile.data.repositories.UserProfileRepositoryImpl
+import com.msoula.hobbymatchmaker.features.profile.domain.repositories.AvatarStorageRepository
 import com.msoula.hobbymatchmaker.features.profile.domain.repositories.UserProfileRepository
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -19,4 +21,5 @@ val featuresModuleUserProfileData = module {
             get()
         )
     }
+    singleOf(::AvatarStorageRepositoryImpl) bind AvatarStorageRepository::class
 }

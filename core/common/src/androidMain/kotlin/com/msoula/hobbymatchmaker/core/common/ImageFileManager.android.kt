@@ -1,18 +1,20 @@
 package com.msoula.hobbymatchmaker.core.common
 
 import android.content.Context
-import android.net.Uri
+import dev.gitlive.firebase.storage.Data
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import androidx.core.net.toUri
 
-actual class ImageFileManager(private val context: Context, private val dispatcherProvider: DispatcherProvider) {
+actual class ImageFileManager(
+    private val context: Context,
+    private val dispatcherProvider: DispatcherProvider
+) {
     actual suspend fun copyImageToInternalStorage(sourceUri: String, fileName: String): String? =
         withContext(dispatcherProvider.io) {
             try {
-                val uri = Uri.parse(sourceUri)
-
                 val avatarsDir = File(context.filesDir, "avatars")
                 if (!avatarsDir.exists()) {
                     avatarsDir.mkdirs()
@@ -20,7 +22,7 @@ actual class ImageFileManager(private val context: Context, private val dispatch
 
                 val destinationFile = File(avatarsDir, fileName)
 
-                context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                context.contentResolver.openInputStream(sourceUri.toUri())?.use { inputStream ->
                     FileOutputStream(destinationFile).use { outputStream ->
                         inputStream.copyTo(outputStream)
                     }
@@ -49,4 +51,7 @@ actual class ImageFileManager(private val context: Context, private val dispatch
             false
         }
     }
+
+    actual fun readFileData(filePath: String): Data? =
+        runCatching { Data(File(filePath).readBytes()) }.getOrNull()
 }

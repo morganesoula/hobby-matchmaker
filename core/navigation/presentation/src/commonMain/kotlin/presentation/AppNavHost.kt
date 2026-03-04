@@ -527,7 +527,6 @@ fun MainScaffold(
                 val selectedMatchMoviesState by hubViewModel.selectedMatchMoviesState.collectAsState()
 
                 HubContent(
-                    paddingValues = padding,
                     hubFavoriteMovies = hubFavoriteMoviesState,
                     hubRecentMatches = hubRecentMatchesState,
                     showRecentMatchDetail = showRecentMatchDetail,

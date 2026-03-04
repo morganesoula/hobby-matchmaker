@@ -171,7 +171,7 @@ fun UserProfileContent(
                                                 )
                                             )
                                         },
-                                        pseudo = currentEditableProfile.pseudo,
+                                        pseudo = if (profile.isPseudoEditable) currentEditableProfile.pseudo else profile.pseudo,
                                         onPseudoChanged = { pseudo ->
                                             userProfileActions.onEvent(
                                                 UserProfileUiEventModel.OnPseudoChanged(
@@ -179,6 +179,7 @@ fun UserProfileContent(
                                                 )
                                             )
                                         },
+                                        isPseudoEditable = profile.isPseudoEditable,
                                         onPseudoFocusLost = {
                                             userProfileActions.onEvent(UserProfileUiEventModel.OnPseudoDefined)
                                         },

@@ -6,6 +6,7 @@ import androidx.compose.runtime.Immutable
 data class UserProfileUiModel(
     val name: String = "",
     val pseudo: String = "",
+    val isPseudoEditable: Boolean = false,
     val avatarUrl: String? = null,
     val bio: String? = null,
     val interests: List<String>? = null,

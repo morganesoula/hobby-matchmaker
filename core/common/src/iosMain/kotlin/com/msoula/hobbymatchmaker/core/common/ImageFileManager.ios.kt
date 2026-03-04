@@ -1,12 +1,15 @@
 package com.msoula.hobbymatchmaker.core.common
 
+import dev.gitlive.firebase.storage.Data
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.withContext
 import platform.Foundation.NSData
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSURL
+import platform.Foundation.dataWithContentsOfFile
 import platform.Foundation.dataWithContentsOfURL
 import platform.Foundation.writeToURL
+import kotlin.let
 
 @OptIn(ExperimentalForeignApi::class)
 actual class ImageFileManager(
@@ -59,4 +62,7 @@ actual class ImageFileManager(
             false
         }
     }
+
+    actual fun readFileData(filePath: String): Data? =
+        NSData.dataWithContentsOfFile(filePath)?.let { Data(it) }
 }

@@ -1,4 +1,6 @@
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryExtension
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
+import org.gradle.kotlin.dsl.configure
 import java.util.Properties
 
 plugins {
@@ -12,7 +14,7 @@ multiplatformConfig {
 }
 
 kotlin {
-    androidLibrary {
+    extensions.configure<KotlinMultiplatformAndroidLibraryExtension> {
         namespace = "com.msoula.hobbymatchmaker.core.network"
     }
 
