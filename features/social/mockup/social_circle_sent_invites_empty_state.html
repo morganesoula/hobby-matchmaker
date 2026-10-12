@@ -1,0 +1,175 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Social Circle - Sent Invites</title>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "error": "#ffb4ab",
+            "surface-container": "#241e1d",
+            "background": "#181211",
+            "primary": "#ffc082",
+            "on-error-container": "#ffdad6",
+            "surface-container-lowest": "#120d0c",
+            "surface": "#181211",
+            "primary-container": "#ff9900",
+            "outline": "#a38d7a",
+            "secondary-fixed-dim": "#f6bb81",
+            "inverse-on-surface": "#362f2e",
+            "on-background": "#ece0de",
+            "on-tertiary-fixed": "#001e2c",
+            "error-container": "#93000a",
+            "on-surface": "#ece0de",
+            "surface-tint": "#ffb86f",
+            "surface-container-highest": "#3a3332",
+            "secondary-fixed": "#ffdcbe",
+            "tertiary-container": "#04beff",
+            "on-primary": "#4a2800",
+            "surface-dim": "#181211",
+            "surface-container-low": "#201a19",
+            "text-muted": "#94a3b8",
+            "inverse-primary": "#8a5100",
+            "background-dark": "#201a19",
+            "surface-bright": "#3f3836",
+            "outline-variant": "#554434",
+            "on-primary-fixed-variant": "#693c00",
+            "inverse-surface": "#ece0de",
+            "on-tertiary-fixed-variant": "#004c69",
+            "surface-card": "#271e15",
+            "on-secondary-fixed": "#2c1600",
+            "on-tertiary-container": "#004965",
+            "on-primary-container": "#653a00",
+            "tertiary": "#8ed5ff",
+            "secondary-container": "#663e0e",
+            "on-secondary": "#4a2800",
+            "surface-variant": "#3a3332",
+            "on-surface-variant": "#dbc2ad",
+            "surface-container-high": "#2f2827",
+            "on-tertiary": "#00344a",
+            "tertiary-fixed-dim": "#7cd0ff",
+            "on-secondary-container": "#e3aa71",
+            "primary-fixed": "#ffdcbd",
+            "on-error": "#690005",
+            "background-light": "#f8f7f5",
+            "primary-fixed-dim": "#ffb86f",
+            "tertiary-fixed": "#c4e7ff",
+            "on-secondary-fixed-variant": "#663e0e",
+            "secondary": "#f6bb81",
+            "surface-border": "rgba(255, 153, 0, 0.2)",
+            "on-primary-fixed": "#2c1600"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "fontFamily": {
+            "headline-md": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"],
+            "label-xs": ["Plus Jakarta Sans"]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-['Plus_Jakarta_Sans',sans-serif] min-h-screen flex flex-col justify-between selection:bg-primary-container selection:text-on-primary">
+<!-- Mobile Frame Container -->
+<div class="relative mx-auto w-full max-w-md min-h-screen flex flex-col bg-background shadow-2xl overflow-hidden border-x border-outline-variant/30">
+<!-- Top Header -->
+<header class="flex items-center justify-between px-4 py-3 bg-surface-container-lowest border-b border-outline-variant/20 sticky top-0 z-20">
+<button aria-label="Go back" class="flex h-10 w-10 items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-2xl">arrow_back</span>
+</button>
+<h1 class="text-base font-bold tracking-tight text-on-surface">Social Circle</h1>
+<button aria-label="Filter invitations" class="flex h-10 w-10 items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-2xl">tune</span>
+</button>
+</header>
+<!-- Navigation Tabs -->
+<nav class="flex border-b border-outline-variant/30 bg-surface-container-low px-2 sticky top-[57px] z-20">
+<!-- Received Tab -->
+<a class="flex flex-1 items-center justify-center gap-2 py-3.5 border-b-2 border-transparent text-on-surface-variant hover:text-on-surface transition-colors" href="#">
+<span class="text-sm font-semibold tracking-wide">Received</span>
+<span class="px-2 py-0.5 rounded-full text-xs font-bold bg-surface-container-highest text-secondary">2</span>
+</a>
+<!-- Sent Tab (Active) -->
+<a class="flex flex-1 items-center justify-center gap-2 py-3.5 border-b-2 border-primary-container text-on-surface font-bold transition-colors" href="#">
+<span class="text-sm font-bold tracking-wide">Sent</span>
+<span class="px-2 py-0.5 rounded-full text-xs font-bold bg-primary-container/20 text-primary">0</span>
+</a>
+</nav>
+<!-- Main Content Area: Focused Clean Empty State -->
+<main class="flex-1 flex flex-col items-center justify-center px-6 py-10 relative z-10">
+<div class="w-full max-w-sm flex flex-col items-center text-center p-8 rounded-2xl bg-surface-container-low/60 border border-outline-variant/30 shadow-lg backdrop-blur-sm relative overflow-hidden">
+<!-- Subtle Glow Layer -->
+<div class="absolute -top-16 -right-16 w-36 h-36 bg-primary-container/10 rounded-full blur-2xl pointer-events-none"></div>
+<div class="absolute -bottom-16 -left-16 w-36 h-36 bg-secondary/10 rounded-full blur-2xl pointer-events-none"></div>
+<!-- Stylized Sent Illustration Icon -->
+<div class="relative mb-6">
+<div class="absolute inset-0 bg-primary-container/20 rounded-full blur-xl scale-125 animate-pulse"></div>
+<div class="relative flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-tr from-surface-card to-surface-container-high border border-primary-container/40 shadow-inner">
+<span class="material-symbols-outlined text-primary-container text-5xl transform -rotate-12 translate-x-0.5 translate-y-0.5" style="font-variation-settings: &quot;FILL&quot; 1;">send</span>
+</div>
+</div>
+<!-- Typography Content -->
+<h2 class="text-xl font-bold tracking-tight text-on-surface mb-3">No Sent Invites</h2>
+<p class="text-sm text-on-surface-variant leading-relaxed mb-6 font-normal">
+          Your sent invitations list is empty. Connect with fellow movie lovers to compare favorites and unlock mutual movie matches!
+        </p>
+<!-- Prompt Callout for the Floating Action Button -->
+<div class="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-surface-container-high/80 border border-outline-variant/40 text-xs font-medium text-secondary">
+<span class="material-symbols-outlined text-primary-container text-base">touch_app</span>
+<span class="">Tap the floating <strong>+</strong> button below to send your first invite</span>
+</div>
+</div>
+</main>
+<!-- Floating Action Button (FAB) -->
+<div class="fixed bottom-20 right-6 md:absolute md:bottom-20 md:right-6 z-30">
+<button aria-label="Send new invite" class="group flex h-14 w-14 items-center justify-center rounded-full bg-primary-container text-on-primary-container shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-primary-container/30">
+<span class="material-symbols-outlined text-3xl font-bold transition-transform group-hover:rotate-90">add</span>
+</button>
+</div>
+<!-- Bottom Navigation Bar (Shared Component Contract) -->
+<div class="relative flex h-auto w-full flex-col bg-[#241c0f] dark group/design-root overflow-x-hidden z-20" style="font-family: &quot;Plus Jakarta Sans&quot;, &quot;Noto Sans&quot;, sans-serif;">
+
+</div>
+</div>
+
+
+</body></html>

@@ -74,10 +74,13 @@ fun NoDataCard(
                 textAlign = TextAlign.Center
             )
             SpacerHeight16()
-            EngagingButton(
-                text = noDataBtnText,
-                onClick = { onNoDataButtonClicked() }
-            )
+
+            if (noDataBtnText.isNotBlank()) {
+                EngagingButton(
+                    text = noDataBtnText,
+                    onClick = { onNoDataButtonClicked() }
+                )
+            }
         }
     }
 }

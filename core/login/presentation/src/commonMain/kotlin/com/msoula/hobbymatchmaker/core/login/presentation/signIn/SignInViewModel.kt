@@ -121,8 +121,13 @@ class SignInViewModel(
                 return@launch
             }
 
-            doSignIn {
-                signInInteractor.signInSocial(provider) { client.getCredential() }
+            when (val credentialResult = client.getCredential()) {
+                is AppResult.Failure -> eventHandler.sendEvent(
+                    UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(credentialResult.error))
+                )
+                is AppResult.Success -> doSignIn {
+                    signInInteractor.signInSocial(provider) { credentialResult.data }
+                }
             }
         }
     }
@@ -166,11 +171,13 @@ class SignInViewModel(
 
         action()
             .onSuccess {
-                signInState.update { UiState.Success(Unit) }
                 eventHandler.sendEvent(UiEvent.Navigate(NavigationDestination.Movies))
             }
             .onFailure { error ->
-                signInState.update { UiState.Error(defaultErrorMessageMapper.toUIText(error)) }
+                signInState.update { UiState.Success(Unit) }
+                eventHandler.sendEvent(
+                    UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(error))
+                )
             }
     }
 

@@ -106,10 +106,11 @@ class SocialViewModel(
             currentUserProfile
                 .flatMapLatest { profile ->
                     val pseudo = profile?.pseudo
-                    if (pseudo.isNullOrEmpty()) {
+                    val uid = currentUserUid
+                    if (pseudo.isNullOrEmpty() || uid == null) {
                         flowOf(AppResult.Success(ObserveIncomingInvitesSuccess.Empty))
                     } else {
-                        socialUseCases.observeIncomingInvitesUseCase(pseudo)
+                        socialUseCases.observeIncomingInvitesUseCase(uid,pseudo)
                     }
                 }
                 .collect { result ->
@@ -215,14 +216,18 @@ class SocialViewModel(
     private suspend fun inviteToSocialCircle(pseudo: String, name: String?) {
         val uid = currentUserUid
         if (uid == null) {
+            Logger.e("inviteToSocialCircle: currentUserUid is null, aborting")
             eventHandler.sendEvent(
                 UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(AppError.Domain.Unauthorized))
             )
             return
         }
 
+        Logger.d("inviteToSocialCircle: sending invite to pseudo=$pseudo, uid=$uid, ownerPseudo=$currentUserPseudo")
+
         socialUseCases.sendInvitesUseCase(uid, currentUserPseudo, pseudo, name)
             .onSuccess {
+                Logger.d("inviteToSocialCircle: invite sent successfully to $pseudo")
                 socialUseCases.refreshSentInvitesUseCase(uid)
                     .onFailure {
                         Logger.e("Failed to refresh sent invites after send: $it")
@@ -230,6 +235,7 @@ class SocialViewModel(
                 eventHandler.sendEvent(UiEvent.OnDataReady("invitation_sent"))
             }
             .onFailure { error ->
+                Logger.e("inviteToSocialCircle: failed to send invite to $pseudo — $error")
                 eventHandler.sendEvent(
                     UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
                 )

@@ -23,14 +23,14 @@ import UIKit
 import FirebaseCore
 import composeApp
 
-class AppDelegate: UIResponder, UIApplicationDelegate {
-    var window: UIWindow?
-
+class AppDelegate: NSObject, UIApplicationDelegate {
+    
     func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         FirebaseApp.configure()
+        KoinHelperKt.doInitKoin()
         return true
     }
 }

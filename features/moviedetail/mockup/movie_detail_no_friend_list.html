@@ -1,0 +1,178 @@
+<!DOCTYPE html><html class="dark" lang="fr" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>The Rip - Details</title>
+<!-- Tailwind CSS CDN with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              orange: '#f59e0b',
+              accent: '#ff9900',
+              dark: '#141110',
+              card: '#1e1816',
+              surface: '#26201e'
+            }
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+<!-- Typography & Global Layout Styles -->
+<style data-purpose="custom-scrollbars-and-reset">
+    /* Hide scrollbars for native app-like appearance */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    body {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+  </style>
+</head>
+<body class="bg-[#141110] text-neutral-100 flex justify-center min-h-screen antialiased">
+<!-- Mobile Container Wrapper -->
+<main class="w-full max-w-md bg-[#141110] min-h-screen flex flex-col relative pb-10 shadow-2xl overflow-x-hidden">
+<!-- BEGIN: TopStatusBar -->
+<header class="sticky top-0 z-50 flex items-center justify-between px-7 pt-3 pb-2 text-white bg-gradient-to-b from-black/80 via-black/40 to-transparent backdrop-blur-[2px]">
+<!-- Time Display -->
+<span class="text-[15px] font-semibold tracking-tight">9:41</span>
+<!-- iOS Status Icons -->
+<div class="flex items-center space-x-2 text-white">
+<!-- Cellular Signal -->
+<svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+<path d="M2 17h2.5v4H2v-4zm5-4h2.5v8H7v-8zm5-4h2.5v12H12V9zm5-5h2.5v17H17V4z"></path>
+</svg>
+<!-- Wi-Fi Icon -->
+<svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+<path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98A16.88 16.88 0 0 0 12 4zm0 2.9c3.78 0 7.22 1.43 9.8 3.79L12 18.52 2.2 10.69C4.78 8.33 8.22 6.9 12 6.9z"></path>
+</svg>
+<!-- Battery Icon -->
+<div class="flex items-center">
+<div class="w-6 h-3 rounded-[3px] border border-white p-[1px] flex items-center">
+<div class="w-full h-full bg-white rounded-[1.5px]"></div>
+</div>
+<div class="w-[1.5px] h-1.5 bg-white rounded-r-sm -ml-[0.5px]"></div>
+</div>
+</div>
+</header>
+<!-- END: TopStatusBar -->
+<!-- BEGIN: HeroMovieBanner -->
+<section class="relative -mt-12 w-full h-[400px] flex flex-col justify-end overflow-hidden" data-purpose="movie-hero">
+<!-- Immersive Movie Key Art (The Rip) -->
+
+<!-- Dark Gradient Masking to blend seamlessly into background -->
+<div class="absolute inset-0 bg-gradient-to-t from-[#141110] via-[#141110]/50 to-transparent"></div>
+<div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent"></div>
+<!-- Title and Key Movie Metadata -->
+<div class="relative z-10 px-6 text-center mb-2">
+<h1 class="text-4xl font-extrabold tracking-normal text-white drop-shadow-md"><br></h1>
+<p class="mt-2 text-[14px] font-normal tracking-wide text-neutral-300">
+          2026 &nbsp;·&nbsp; Action &nbsp;·&nbsp; Thriller &nbsp;·&nbsp; Crime &nbsp;·&nbsp; 1h 53m
+        </p>
+</div>
+</section>
+<!-- END: HeroMovieBanner -->
+<!-- BEGIN: ContentBody -->
+<div class="px-5 space-y-6 pt-1 flex-1">
+<!-- BEGIN: TrailerActionButton -->
+<div data-purpose="trailer-cta">
+<button class="w-full py-3.5 px-6 rounded-2xl bg-[#ff9900] active:scale-[0.98] transition-transform shadow-lg shadow-[#ff9900]/20 flex items-center justify-center space-x-2 text-neutral-950 font-bold text-[17px]" type="button">
+<!-- Play Icon Triangle -->
+<svg class="w-5 h-5 fill-current text-neutral-950 ml-0.5" viewBox="0 0 24 24">
+<path d="M8 5v14l11-7z"></path>
+</svg>
+<span class="">Play Trailer</span>
+</button>
+</div>
+<!-- END: TrailerActionButton -->
+<!-- BEGIN: SynopsisSection -->
+<section class="pt-1" data-purpose="movie-synopsis">
+<h2 class="text-[#ff9900] font-bold text-xl mb-2 tracking-tight">
+          Synopsis
+        </h2>
+<p class="text-neutral-300 text-[15px] leading-relaxed font-normal antialiased">
+          La méfiance s'installe quand une équipe de flics de Miami découvre des millions en cash dans une planque délabrée. Plus personne ne sait quoi penser... ni à qui se fier.
+        </p>
+</section>
+<!-- END: SynopsisSection -->
+<!-- BEGIN: MainCastSection -->
+<section class="pt-1" data-purpose="movie-cast">
+<h2 class="text-[#ff9900] font-bold text-xl mb-4 tracking-tight">
+          Main Cast
+        </h2>
+<!-- Cast Horizontal Scroll / Flex Row -->
+<div class="flex space-x-4 overflow-x-auto no-scrollbar pb-1">
+<!-- Actor 1: Ben Affleck -->
+<div class="flex flex-col items-center flex-shrink-0 w-24 text-center">
+<div class="w-[84px] h-[84px] rounded-full overflow-hidden border border-neutral-700/60 shadow-md bg-neutral-800">
+<img alt="Ben Affleck" class="w-full h-full object-cover object-center" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRjK0T2hDTHg-vcKh4plGQfXHCLIq325XQgTm2xuBuUhvdcSp4IJwwB9V1EqOgIjO6sq9XFh6cGt2EUrxG-AghyJQ6NES_Wec9tqphw481YHuvFhAwhLNY01jBW_WyoyZY9vSAwXPYUcg8z-79E3rEEw8cmwnGlwRKqAk3b2MLjUh8aQyVdTLBY6paouJ1Kx41FT5iMS4fwegFs4C2SbpnzSQ_9Ipfmw31748kOT0YZxxlU2EwMo9ayQ">
+</div>
+<span class="mt-2.5 text-[14px] font-semibold text-white truncate w-full block">Ben Affleck</span>
+<span class="text-[11px] text-neutral-400 font-normal truncate w-full block mt-0.5">Detective Sergeant</span>
+</div>
+<!-- Actor 2: Matt Damon -->
+<div class="flex flex-col items-center flex-shrink-0 w-24 text-center">
+<div class="w-[84px] h-[84px] rounded-full overflow-hidden border border-neutral-700/60 shadow-md bg-neutral-800">
+<img alt="Matt Damon" class="w-full h-full object-cover object-center" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCijmEJxuG42SagJhbqawEcbxabhOd1uJZoP3FNeWR8Xlofd2IuQxirtY3WoIFrsNciI_GPlnu9RwS1gMjDjzqCD-_7t1zwbKs2ZNvB3lR0r64cjT45U3Uu1ZlH4dice2nsjIzGWB_9GnZZvmJMXSxT1yCW6g3equpC-qn-jUCxVeBHglTjNjlSJqdT0Gup7RImZ1f5bW6XLbuWADVlWDqQDxIybuRS5OYpXCYe4BDsWI1uTQ7jJznWsg">
+</div>
+<span class="mt-2.5 text-[14px] font-semibold text-white truncate w-full block">Matt Damon</span>
+<span class="text-[11px] text-neutral-400 font-normal truncate w-full block mt-0.5">Lieutenant Dan...</span>
+</div>
+<!-- Actor 3: Kyle Chandler -->
+<div class="flex flex-col items-center flex-shrink-0 w-24 text-center">
+<div class="w-[84px] h-[84px] rounded-full overflow-hidden border border-neutral-700/60 shadow-md bg-neutral-800">
+<img alt="Kyle Chandler" class="w-full h-full object-cover object-center" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2R8QxDcJA6_B4L-JbAectx2QLVTSTgmpLgFTgSI1pTAyAgREBis-xIge_NqgAmNlczhZfxl-kKxjieI8XAOshPMfDwuIFZUP-PSvyq98JUcg2ifZ4gss1e1NoN6N_o9p2TvS6qfyA2gTnZNzAZc_tMTcMgqNeDCnnYbe_6ddEtK2hIQlA05K0G2kR4Wg9MX72A_5dW1-jwP6MGer8zMiqgT1miaVnovB4R3KJ44jj2MAWSJw4vn9fag">
+</div>
+<span class="mt-2.5 text-[14px] font-semibold text-white truncate w-full block">Kyle Chandler</span>
+<span class="text-[11px] text-neutral-400 font-normal truncate w-full block mt-0.5">DEA Agent Mat...</span>
+</div>
+<!-- Actor 4: Extra Cast Member -->
+<div class="flex flex-col items-center flex-shrink-0 w-24 text-center">
+<div class="w-[84px] h-[84px] rounded-full overflow-hidden border border-neutral-700/60 shadow-md bg-neutral-800">
+<img alt="Catalina Sandino" class="w-full h-full object-cover object-center" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIEVuEE1IHejuare5EWSkicBgOWj9myos_hh5R48gKKrLVBj2URvj4SRWDEcQf5hh-dcBoqLcSrqzD4uyPXfT_3gE0cipNYJ6lyo07sJNAWjUO29fSrbVYX319p_ATrXvMx5oT4N06EVrM7wlS7ZU5FyTEbVI6mAblQ2JXcIWemY-llXknzoasgfssJuJceaYZHpG6vix8XP_yDQfV35Sbmo00o14Sm0qD--e1-Od0ZavYgfIgEE4hOw">
+</div>
+<span class="mt-2.5 text-[14px] font-semibold text-white truncate w-full block">Catalina S.</span>
+<span class="text-[11px] text-neutral-400 font-normal truncate w-full block mt-0.5">Federal Agent</span>
+</div>
+</div>
+</section>
+<!-- END: MainCastSection -->
+<!-- BEGIN: FriendsMatchSection -->
+<section class="pt-2" data-purpose="friends-social-connector">
+<div class="flex items-center justify-between mb-3.5">
+
+<!-- Match Indicator Badge -->
+
+</div>
+<!-- Friends List Stack -->
+<div class="space-y-3">
+
+</div>
+</section>
+<!-- END: FriendsMatchSection -->
+</div>
+<!-- END: ContentBody -->
+<!-- BEGIN: NativeHomeIndicator -->
+<footer class="pt-8 pb-3 flex justify-center w-full" data-purpose="home-indicator">
+<div class="w-36 h-1 bg-white/40 rounded-full"></div>
+</footer>
+<!-- END: NativeHomeIndicator -->
+</main>
+
+
+
+
+</body></html>

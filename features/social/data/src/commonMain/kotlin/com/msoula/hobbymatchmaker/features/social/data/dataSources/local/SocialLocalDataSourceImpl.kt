@@ -5,35 +5,30 @@ import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.safeCallStorage
 import com.msoula.hobbymatchmaker.core.database.services.SocialInvitationDAO
 import com.msoula.hobbymatchmaker.core.database.services.SocialMemberDAO
-import com.msoula.hobbymatchmaker.core.session.data.dataSources.local.SessionLocalDataSource
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.mappers.toSocialCircleMemberDataEntity
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.mappers.toSocialCircleMemberDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.mappers.toSocialInvitation
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.mappers.toSocialInvitationDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.models.SocialCircleMemberLocalDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.models.SocialInvitationDataModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
 class SocialLocalDataSourceImpl(
-    private val sessionLocalDataSource: SessionLocalDataSource,
     private val socialInvitationDAO: SocialInvitationDAO,
     private val socialMemberDAO: SocialMemberDAO
 ) : SocialLocalDataSource {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override fun observeSocialCircle(): Flow<List<SocialCircleMemberLocalDataModel>> =
-        sessionLocalDataSource.observeCurrentUid()
-            .filter { it.isNotEmpty() }
-            .flatMapLatest { uid ->
-                socialMemberDAO.observeUserProfileMembers(uid).map { members ->
+    override fun observeSocialCircle(uid: String?): Flow<List<SocialCircleMemberLocalDataModel>> =
+        flow {
+            uid?.let { safeUid ->
+                socialMemberDAO.observeUserProfileMembers(safeUid).map { members ->
                     members.map { it.toSocialCircleMemberDataModel() }
                 }
-            }
+            } ?: emptyFlow<SocialCircleMemberLocalDataModel>()
+        }
 
     /* override suspend fun addToCircle(member: SocialCircleMemberDataEntity): AppResult<Unit, AppError> {
         val ownerUid = sessionLocalDataSource.observeCurrentUid().first()
@@ -60,32 +55,28 @@ class SocialLocalDataSourceImpl(
         }
     } */
 
-    override suspend fun removeFromCircle(memberUid: String): AppResult<Unit, AppError> {
-        val ownerUid = sessionLocalDataSource.observeCurrentUid().first()
-
-        if (ownerUid.isEmpty()) return AppResult.Failure(
+    override suspend fun removeFromCircle(memberUid: String, ownerUid: String?): AppResult<Unit, AppError> {
+        return ownerUid?.let {
+            try {
+                socialMemberDAO.deleteSocialMember(ownerUid, memberUid)
+                AppResult.Success(Unit)
+            } catch (t: Throwable) {
+                AppResult.Failure(AppError.Network.Unknown(t))
+            }
+        } ?: AppResult.Failure(
             AppError.Network.Unknown(
                 Throwable("No session UID")
             )
         )
-
-        return try {
-            socialMemberDAO.deleteSocialMember(ownerUid, memberUid)
-            AppResult.Success(Unit)
-        } catch (t: Throwable) {
-            AppResult.Failure(AppError.Network.Unknown(t))
-        }
     }
 
-    override suspend fun syncCircle(members: List<SocialCircleMemberLocalDataModel>) {
-        val ownerUId = sessionLocalDataSource.observeCurrentUid().first()
-
-        if (ownerUId.isEmpty()) return
-
-        socialMemberDAO.replaceAll(
-            ownerUid = ownerUId,
-            members.map { it.toSocialCircleMemberDataEntity() }
-        )
+    override suspend fun syncCircle(members: List<SocialCircleMemberLocalDataModel>, ownerUid: String?) {
+        ownerUid?.let {
+            socialMemberDAO.replaceAll(
+                ownerUid = it,
+                members.map { it.toSocialCircleMemberDataEntity() }
+            )
+        } ?: return
     }
 
     override fun observeIncomingInvites(toPseudo: String): Flow<List<SocialInvitationDataModel>> =

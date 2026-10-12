@@ -32,7 +32,7 @@ Each feature or core module typically follows the three-layer pattern:
 
 
 - 🧠 **MVVM** for clear separation of concerns
-- 🧩 **Compose Navigation (in progress)** for multiplatform navigation
+- 🧩 **Compose Navigation** for multiplatform navigation
 - 🧪 **Koin** for dependency injection
 - 🌐 **Ktor** for network calls
 

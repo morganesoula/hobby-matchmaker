@@ -112,7 +112,7 @@ class SignUpViewModel(
                 eventHandler.sendEvent(UiEvent.Navigate(NavigationDestination.Movies))
             }
             .onFailure { error ->
-                signUpState.update { UiState.Error(defaultErrorMessageMapper.toUIText(error)) }
+                signUpState.update { UiState.Success(Unit) }
                 eventHandler.sendEvent(
                     UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(error))
                 )

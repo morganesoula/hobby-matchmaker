@@ -12,8 +12,6 @@
 	<string>$(FIREBASE_API_KEY)</string>
 	<key>FIREBASE_APPLICATION_ID</key>
 	<string>$(FIREBASE_APPLICATION_ID)</string>
-	<key>TMDB_KEY</key>
-	<string>$(TMDB_KEY)</string>
 	<key>WEB_CLIENT_ID</key>
 	<string>$(WEB_CLIENT_ID)</string>
 </dict>

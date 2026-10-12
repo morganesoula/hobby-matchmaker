@@ -1,0 +1,220 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>HobbyMatchMaker - Movies</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#FD9800",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#201a19",
+                        "surface": "#2B2322",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-white min-h-screen flex flex-col">
+<!-- Top Navigation / Header -->
+<header class="sticky top-0 z-10 bg-background-dark/80 backdrop-blur-md px-6 pt-6 pb-2">
+<div class="flex items-center justify-between">
+<h1 class="text-2xl font-bold tracking-tight text-white">HobbyMatchMaker</h1>
+<div class="flex gap-4">
+<button class="p-2 rounded-full bg-surface text-white">
+<span class="material-symbols-outlined text-[24px]">notifications</span>
+</button>
+</div>
+</div>
+</header>
+<main class="flex-1 pb-24">
+<!-- Recent Matches Section -->
+<section class="mt-6">
+<div class="px-6 mb-4 flex justify-between items-end">
+<h2 class="text-lg font-bold text-white">Recent Matches</h2>
+<button class="text-primary text-sm font-medium">View All</button>
+</div>
+<div class="flex overflow-x-auto hide-scrollbar gap-5 px-6 pb-2">
+<!-- Match Item -->
+<div class="flex flex-col items-center gap-2 shrink-0 text-center">
+<div class="relative cursor-pointer">
+<div class="w-16 h-16 rounded-full border-2 border-primary/30 p-0.5">
+<img alt="" class="w-full h-auto aspect-square object-cover rounded-full active:scale-95 transition-transform" data-alt="Close up portrait of a smiling man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-lZnaItioN6OojmmEPlKPpKztECfTq2BFV7AgI8D4RFIou8R-NSxN2OCeJheGn9BYNCmKdft4U-th6Gu9d9BgUVMc2i6d_iXPyAaRWRGf6qGoA5vSD44WV_r5tuu1ih9nJQqZl8zsMKSKcSdH3k_-AT8vtSbfZQxe3aAY17H-rMxHJf1eauW0gaHSyNugfuGMN2e7FIf6NsdEDDhjdVz27A8YHAOJqDsdxmbxw2Vuvv6iCswiZxTksWHzyvzh_sDu4I0xMnp0URM4">
+</div>
+<div class="absolute bottom-0 right-0 bg-primary text-background-dark rounded-full p-1 border-2 border-background-dark flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px] font-bold">movie</span>
+</div>
+</div>
+<span class="text-xs font-medium text-white/90">Alex<br><span class="text-[10px] text-white/50 font-normal">5 shared movies</span></span>
+</div>
+<div class="flex flex-col items-center gap-2 shrink-0 text-center">
+<div class="relative cursor-pointer">
+<div class="w-16 h-16 rounded-full border-2 border-primary/30 p-0.5">
+<img alt="" class="w-full h-auto aspect-square object-cover rounded-full active:scale-95 transition-transform" data-alt="Portrait of a woman with curly hair" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCO5EzqiTGTdr53oHHNmdi9SKLlCueeqG1NA1UFgyqiYB-yuOBztQ72qEqPxQxwSFIxOR2HZyLPxyyPHwoIZfqRQAkz9Xfa3FnNsXn95UeU_nHnWGYhEEDky0Mm6_jZ8O62WrGBk7HehkreL8iFa8APqAugNvEW50ATxqq0f09O01Lql07m_qylljejy1-SOeqo_1rkhG4Wsiww1OcSRx7ez5N5VIMAvBNNve1NGQ4AAmRsaoAujDMY7SI2V6lFZWt7I-HJ90vhTXYX">
+</div>
+<div class="absolute bottom-0 right-0 bg-primary text-background-dark rounded-full p-1 border-2 border-background-dark flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px] font-bold">movie</span>
+</div>
+</div>
+<span class="text-xs font-medium text-white/90">Jordan<br><span class="text-[10px] text-white/50 font-normal">3 shared movies</span></span>
+</div>
+<div class="flex flex-col items-center gap-2 shrink-0 text-center">
+<div class="relative cursor-pointer">
+<div class="w-16 h-16 rounded-full border-2 border-primary/30 p-0.5">
+<img alt="" class="w-full h-auto aspect-square object-cover rounded-full active:scale-95 transition-transform" data-alt="Portrait of a man wearing glasses" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdXxu8NFqWVLrwfrHrBBJk5YSP4k2NZ4iB037eO_l20dxlCYjDsUNDgc-CZSXtBc2iB_n4GJt8hwdYnZF4JHS0Y-Abbf-yTPK5nt354Y5mUtxaHvsF2XThTCbQqCPnp-MFDMKLoZ1JcBgM9e4TFtIaygQyOrJ1TLYDKojJx0lunld6VG3yme8g5yqLcLmu3yevr-TSVmpYSYsZqiXiIWsEi6_i4MsKEpYgwqFbj18TlyNybH3SBqXrrpDE-ufMutVIajfgcq5XuCdD">
+</div>
+<div class="absolute bottom-0 right-0 bg-primary text-background-dark rounded-full p-1 border-2 border-background-dark flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px] font-bold">movie</span>
+</div>
+</div>
+<span class="text-xs font-medium text-white/90">Taylor<br><span class="text-[10px] text-white/50 font-normal">8 shared movies</span></span>
+</div>
+<div class="flex flex-col items-center gap-2 shrink-0 text-center">
+<div class="relative cursor-pointer">
+<div class="w-16 h-16 rounded-full border-2 border-primary/30 p-0.5">
+<img alt="" class="w-full h-auto aspect-square object-cover rounded-full active:scale-95 transition-transform" data-alt="Young woman looking at camera" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcPkhfI2lBYRzhK_gYMDbXekjR26KtkhlFOud0XJX0HBEKtWeMFMGxvW-mUoearw_Hfp86vudiyMKw1gjYbwiQjdiJgyu5BbskQ1jKlNnxAafsUQmdbgwkn7Naqj_KKXDih2PBpwQ-iNjAjnYeypOEN1s9Src6MkATgsk3Z9M6Na22fxgyOVAaKqVmLErZh5gdB5Wrys97ZtvQ9JBC1-ykKMOBuPnTLYeMDyQwAvIvLZuSrBeYN2kLxwGR7VIGh7Ai335JgukPFNff">
+</div>
+<div class="absolute bottom-0 right-0 bg-primary text-background-dark rounded-full p-1 border-2 border-background-dark flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px] font-bold">movie</span>
+</div>
+</div>
+<span class="text-xs font-medium text-white/90">Morgan<br><span class="text-[10px] text-white/50 font-normal">2 shared movies</span></span>
+</div>
+<div class="flex flex-col items-center gap-2 shrink-0 text-center">
+<div class="relative cursor-pointer">
+<div class="w-16 h-16 rounded-full border-2 border-primary/30 p-0.5">
+<img alt="" class="w-full h-auto aspect-square object-cover rounded-full active:scale-95 transition-transform" data-alt="Professional portrait of a man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDH8XrCSattdvt_ygHm0czqiUkfPJLY83FjaaBDq1HeB7BKtMckvA5SY5tMh5BBAPger0wbDoPiH1m7oiJDR9FmVzbHZhrVENO5IS1l66d3jDFkm5GbaSaQZlRX1hOhkUlhdCqboFcjoG-aLWGEF07MYPa3MZPwmPsMpr6iZxAKHHFVTzpGYpyUcm_pGhqnWWurQ1MOdzWTiVz8e3asGGgecc97ETPs-NyL7eFlIv4O3G-dlQ1-YWB3ZTFyktQuaxAx4CcBTF5hAweO">
+</div>
+<div class="absolute bottom-0 right-0 bg-primary text-background-dark rounded-full p-1 border-2 border-background-dark flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px] font-bold">movie</span>
+</div>
+</div>
+<span class="text-xs font-medium text-white/90">Casey<br><span class="text-[10px] text-white/50 font-normal">4 shared movies</span></span>
+</div>
+</div><div class="hidden px-6 py-8 flex flex-col items-center text-center bg-surface/30 rounded-xl mx-6 mt-2">
+<span class="material-symbols-outlined text-4xl text-white/20 mb-3">group_add</span>
+<p class="text-sm text-white/70 mb-4">Find common interests to see matches here!</p>
+<button class="px-6 py-2 bg-primary text-background-dark font-bold rounded-full text-sm">Explore Movies</button>
+</div>
+</section>
+<!-- My Favorite Movies Section -->
+<section class="mt-10 px-6">
+<div class="mb-5">
+<h2 class="text-lg font-bold text-white">My Favorite Movies</h2>
+<p class="text-white/50 text-xs">Tap a movie to see who else likes it</p>
+</div>
+<!-- Movie Grid -->
+<div class="grid grid-cols-2 gap-4">
+<!-- Movie Card 1 -->
+<div class="group cursor-pointer">
+<div class="relative aspect-[2/3] overflow-hidden rounded-lg bg-surface">
+<img alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Cinematic movie poster with blue lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHqnLbnSL76GBQBScocB6vI5WgCQECPQuaOkx-cGIo1kpqWTaniXfR5w87nTFP8oIV8e0F96Js3iRce0HJDPOG9EY-5xQp06Uhlf2sUcRzmtJT6k_IDbrk4oY3bz3meWKZeDx6TjYdo2XcxejDiXJ05NWm2sQS8TbJvCRAfV32jcYQrGEuLUFGYMGkBdy2ZdpdviN8thPYkFkKP7wUygW9Y6xJHucjLdD34qYEyaQITKSnHAWI1326X72JJBkiqyaq7ctEaCqeZMhO">
+<!-- Shared Badge -->
+<div class="absolute top-2 right-2 bg-primary px-2 py-1 rounded-md flex items-center gap-1 shadow-lg group-hover:ring-2 ring-white/20 transition-all">
+<span class="material-symbols-outlined text-[12px] font-bold text-background-dark">handshake</span>
+<span class="text-[10px] font-bold text-background-dark uppercase tracking-wider">Shared</span>
+</div>
+</div>
+<div class="mt-2">
+<h3 class="text-sm font-semibold text-white/90 truncate">Interstellar</h3>
+<p class="text-[10px] text-white/40">Sci-Fi • 2014</p>
+</div>
+</div>
+<!-- Movie Card 2 -->
+<div class="group cursor-pointer">
+<div class="relative aspect-[2/3] overflow-hidden rounded-lg bg-surface">
+<img alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Action movie poster with dark theme" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAHVEBAUqZ3TOd0d818u52R7C7IyQtijaDYG4UxYpz8Isrn_FxPEH1hFVY1wLOKv_ozGw6OO2-L3MIsESKQ6iVuTo6tmZKlzGkT7LUuft_oHQ0BBj7cxcgAWIXgwz6a-DQ3awOQfZGx_zOIwyCi7-azCdQv-HEGMLbqZO7dRGBDmDYUFFN_iPV5F9HDVfc646ggBu2T3i58VEV_tT8yFwDrHRoGM1VdZKiBM7vGrBsPvHnkMRH3ak-H0L6RoVNTAO3gh9UKkVKbzba">
+</div>
+<div class="mt-2">
+<h3 class="text-sm font-semibold text-white/90 truncate">The Dark Knight</h3>
+<p class="text-[10px] text-white/40">Action • 2008</p>
+</div>
+</div>
+<!-- Movie Card 3 -->
+<div class="group cursor-pointer">
+<div class="relative aspect-[2/3] overflow-hidden rounded-lg bg-surface">
+<img alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Drama movie poster with golden light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZmSAa2WCMLTCir9TI5N1PX3ES65rqcBzo6RK3vBu-J2SCM8sRVBIy0rBgdP2GxgjHjH0WhfSl1heBc-EtuLLBpTde-NfL5qM6SmSYFIYlPQ4zCr8SPcR3crWbBv0fkI1B72JApBsZbj99QPLt2WzSQi3g5LGJO2Endc714g-lwhKp-_dnyTHH-ttSCI77aUHtg5F_3vtJinl9J_-_VA0oO7tdTGFZYmiIkxBruaKXDj2WNJuRzoGI6d_5XDIf_E12Ma4t6qGwNPdk">
+<!-- Shared Badge -->
+<div class="absolute top-2 right-2 bg-primary px-2 py-1 rounded-md flex items-center gap-1 shadow-lg group-hover:ring-2 ring-white/20 transition-all">
+<span class="material-symbols-outlined text-[12px] font-bold text-background-dark">handshake</span>
+<span class="text-[10px] font-bold text-background-dark uppercase tracking-wider">Shared</span>
+</div>
+</div>
+<div class="mt-2">
+<h3 class="text-sm font-semibold text-white/90 truncate">Dune: Part Two</h3>
+<p class="text-[10px] text-white/40">Sci-Fi • 2024</p>
+</div>
+</div>
+<!-- Movie Card 4 -->
+<div class="group cursor-pointer">
+<div class="relative aspect-[2/3] overflow-hidden rounded-lg bg-surface">
+<img alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Classic movie reel on a desk" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9Rq8MvOHB2sU4UNz6dtj8yPNYoJx5uuB22AHMqbFlUI9_T4cntKP9EoQqW4QgcmLMifyf3-G6pqW6njq-ppON1rU5U7b1aIt0i-A4jBBKmVo1oCAdJsEgXeNQ35MkvZ6tRbr28tVtHNBgQkHWx2eF3S_Jb7fAsOOn9OxoVuCpXPvxhUhzmE8KWEeJ3Qmcy8pvxwMhoXzbW2rqUy36hZhCedYnx8RE920sY6IktkPjRtY8un_2tlQ_2sT_cn2NKEHiZ31MqhwPoAVl">
+</div>
+<div class="mt-2">
+<h3 class="text-sm font-semibold text-white/90 truncate">Inception</h3>
+<p class="text-[10px] text-white/40">Sci-Fi • 2010</p>
+</div>
+</div>
+</div><div class="hidden py-12 flex flex-col items-center text-center bg-surface/30 rounded-xl mt-2">
+<span class="material-symbols-outlined text-4xl text-white/20 mb-3">movie_filter</span>
+<p class="text-sm text-white/70 mb-4">Your favorite movies will appear here</p>
+<button class="px-6 py-2 border border-primary text-primary font-bold rounded-full text-sm hover:bg-primary/10">Start Browsing</button>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-surface/90 backdrop-blur-xl border-t border-white/5 px-6 pb-6 pt-3">
+<div class="flex justify-between items-center max-w-md mx-auto">
+<a class="flex flex-col items-center gap-1 text-white/40 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-[26px]">home</span>
+<span class="text-[10px] font-medium">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-white/40 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-[26px]">search</span>
+<span class="text-[10px] font-medium">Search</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined text-[26px] fill-current" style="font-variation-settings: 'FILL' 1">favorite</span>
+<span class="text-[10px] font-bold">Matches</span>
+<div class="w-1 h-1 bg-primary rounded-full mt-0.5"></div>
+</a>
+<a class="flex flex-col items-center gap-1 text-white/40 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-[26px]">person</span>
+<span class="text-[10px] font-medium">Profile</span>
+</a>
+</div>
+</nav>
+</body></html>

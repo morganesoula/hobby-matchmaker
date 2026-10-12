@@ -12,10 +12,6 @@ import composeApp
 struct iOSApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
-    init() {
-        KoinHelperKt.doInitKoin()
-    }
-    
     var body: some Scene {
         WindowGroup {
             ComposeView()

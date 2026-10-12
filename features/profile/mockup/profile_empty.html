@@ -1,0 +1,219 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>User Profile - Getting Started</title>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-surface": "#ece0de",
+            "surface-container-high": "#2f2827",
+            "background": "#181211",
+            "background-dark": "#201a19",
+            "on-error": "#690005",
+            "tertiary-fixed-dim": "#7cd0ff",
+            "surface-dim": "#181211",
+            "on-primary": "#4a2800",
+            "inverse-on-surface": "#362f2e",
+            "inverse-primary": "#8a5100",
+            "secondary-container": "#663e0e",
+            "text-muted": "#94a3b8",
+            "surface-tint": "#ffb86f",
+            "on-background": "#ece0de",
+            "on-tertiary-container": "#004965",
+            "outline-variant": "#554434",
+            "surface-bright": "#3f3836",
+            "surface-container-lowest": "#120d0c",
+            "error-container": "#93000a",
+            "on-error-container": "#ffdad6",
+            "on-surface-variant": "#dbc2ad",
+            "on-secondary": "#4a2800",
+            "tertiary": "#8ed5ff",
+            "primary-container": "#ff9900",
+            "error": "#ffb4ab",
+            "on-secondary-container": "#e3aa71",
+            "secondary": "#f6bb81",
+            "on-primary-fixed-variant": "#693c00",
+            "on-primary-fixed": "#2c1600",
+            "on-secondary-fixed": "#2c1600",
+            "primary-fixed-dim": "#ffb86f",
+            "surface": "#181211",
+            "secondary-fixed-dim": "#f6bb81",
+            "primary-fixed": "#ffdcbd",
+            "tertiary-fixed": "#c4e7ff",
+            "surface-container-highest": "#3a3332",
+            "on-primary-container": "#653a00",
+            "surface-container": "#241e1d",
+            "surface-container-low": "#201a19",
+            "surface-variant": "#3a3332",
+            "on-tertiary": "#00344a",
+            "on-tertiary-fixed": "#001e2c",
+            "outline": "#a38d7a",
+            "on-secondary-fixed-variant": "#663e0e",
+            "surface-border": "rgba(255, 153, 0, 0.2)",
+            "tertiary-container": "#04beff",
+            "inverse-surface": "#ece0de",
+            "secondary-fixed": "#ffdcbe",
+            "surface-card": "#271e15",
+            "on-tertiary-fixed-variant": "#004c69",
+            "background-light": "#f8f7f5",
+            "primary": "#ffc082"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "gutter": "1rem",
+            "margin": "1.5rem",
+            "space-xs": "0.25rem",
+            "space-sm": "0.5rem",
+            "space-xl": "2rem",
+            "space-lg": "1.5rem",
+            "space-md": "1rem"
+          },
+          "fontFamily": {
+            "headline-sm": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "label-xs": ["Plus Jakarta Sans"]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface antialiased flex justify-center min-h-screen">
+<!-- Mobile/Responsive Wrapper -->
+<main class="w-full max-w-md min-h-screen flex flex-col bg-surface border-x border-surface-container-highest shadow-2xl relative pb-20">
+<!-- Top App Bar / Profile Header -->
+
+<!-- Content Container -->
+<div class="flex-1 px-4 py-4 space-y-6">
+<!-- 1. User Identity & Placeholder Avatar -->
+<section class="flex flex-col items-center text-center pt-2">
+<div class="relative group cursor-pointer mb-3">
+<!-- Neutral placeholder avatar with dashed warm glow -->
+<div class="w-28 h-28 rounded-full border-2 border-dashed border-primary/50 bg-surface-container flex flex-col items-center justify-center p-1 relative overflow-hidden transition-all duration-300 group-hover:border-primary group-hover:bg-surface-container-high">
+<span class="material-symbols-outlined text-4xl text-outline mb-1">person</span>
+<span class="text-[11px] font-semibold text-primary flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[13px]">add_a_photo</span>ePhoto
+            </span>
+</div>
+<!-- Quick add badge -->
+
+</div>
+<div class="space-y-1">
+<h2 class="text-on-surface text-xl font-bold tracking-tight">New Cinephile</h2>
+<p class="text-on-surface-variant text-sm font-normal">@newcinephile</p>
+</div>
+<!-- Onboarding Progress Hint -->
+
+<!-- Edit / Complete Profile CTA -->
+<div class="mt-4 w-full flex items-center justify-center gap-2">
+<button class="w-full max-w-xs flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border-2 border-primary text-primary hover:bg-primary/10 transition-all font-semibold text-sm active:scale-[0.98]">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+<span class="">Complete Profile</span>
+</button>
+</div>
+</section>
+<!-- 2. Stats Counters (Empty State Cards side-by-side) -->
+<section class="grid grid-cols-2 gap-3">
+<!-- Liked Movies Card -->
+<div class="flex flex-col justify-between p-4 rounded-xl bg-surface-card border border-surface-border relative overflow-hidden">
+<div class="flex items-center justify-between">
+<span class="text-xs font-medium text-on-surface-variant">Liked Movies</span>
+<span class="material-symbols-outlined text-primary/70 text-[18px]">movie</span>
+</div>
+<div class="mt-2">
+<span class="text-3xl font-extrabold text-on-surface">0</span>
+</div>
+
+</div>
+<!-- Connections Card -->
+<div class="flex flex-col justify-between p-4 rounded-xl bg-surface-card border border-surface-border relative overflow-hidden">
+<div class="flex items-center justify-between">
+<span class="text-xs font-medium text-on-surface-variant">Connections</span>
+<span class="material-symbols-outlined text-secondary/70 text-[18px]">group</span>
+</div>
+<div class="mt-2 flex items-baseline gap-1">
+<span class="text-3xl font-extrabold text-on-surface">0</span>
+<span class="text-sm font-semibold text-text-muted">/ 5</span>
+</div>
+
+</div>
+</section>
+<!-- 3. Favorite Genres / Interests Empty State -->
+
+<!-- 4. "My Social Circle" Section with Empty State Block -->
+<section class="space-y-3">
+<div class="flex items-center justify-between">
+<div>
+<h3 class="text-on-surface font-bold text-base tracking-tight">My Social Circle</h3>
+
+</div>
+
+</div>
+<!-- Dedicated Empty State Card -->
+<div class="p-6 rounded-2xl bg-surface-card border border-surface-border flex flex-col items-center text-center relative overflow-hidden">
+<!-- Subtle decorative radial halo -->
+<div class="absolute -top-12 -right-12 w-28 h-28 bg-primary/10 rounded-full blur-2xl pointer-events-none"></div>
+<div class="w-14 h-14 rounded-full bg-secondary-container/40 border border-secondary/30 flex items-center justify-center text-secondary mb-3">
+<span class="material-symbols-outlined text-2xl">group_add</span>
+</div>
+<h4 class="text-on-surface font-bold text-base">Your circle is empty</h4>
+<p class="text-on-surface-variant text-xs mt-1 max-w-[260px] leading-relaxed">
+            Invite your movie buddies to compare tastes and get matched on cinema nights!
+          </p>
+<button class="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary hover:bg-secondary text-on-primary font-bold text-xs tracking-wide transition-all shadow-md active:scale-95">
+<span class="material-symbols-outlined text-[16px]">send</span>
+<span class="">Invite Friends</span>
+</button>
+</div>
+</section>
+<!-- 5. Account Settings & Logout -->
+<section class="pt-2 pb-6 border-t border-surface-container-high space-y-2">
+
+
+<!-- Discreet Logout Button -->
+<button class="w-full mt-3 flex items-center justify-center gap-2 px-4 py-2 text-xs font-medium hover:text-error transition-colors text-primary">
+<span class="material-symbols-outlined text-[16px]">logout</span>
+<span class="">Log out</span>
+</button>
+</section>
+</div>
+<!-- Immutable Shared Component: BottomNavBar -->
+<nav class="fixed bottom-0 left-0 right-0 z-30 flex justify-center pointer-events-none">
+<div class="w-full max-w-md pointer-events-auto">
+
+</div>
+</nav>
+</main>
+
+
+</body></html>

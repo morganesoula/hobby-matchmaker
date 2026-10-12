@@ -26,14 +26,3 @@ internal fun KotlinMultiplatformExtension.configureIOSApplication() {
         }
     }
 }
-
-fun KotlinMultiplatformExtension.configureCInterops(project: Project) {
-    if (project.name != "network") return
-
-    listOf(
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { target ->
-        target.compilations.getByName("main").cinterops.create("network")
-    }
-}

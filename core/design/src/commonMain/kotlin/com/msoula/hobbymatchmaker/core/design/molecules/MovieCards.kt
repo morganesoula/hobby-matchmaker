@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -132,7 +133,7 @@ fun MovieCard(
                 modifier = Modifier
                     .fillMaxSize()
                     .clip(RoundedCornerShape(5)),
-                contentScale = ContentScale.Crop,
+                contentScale = ContentScale.Fit,
                 loading = {
                     HMMShimmerEffect()
                     LoadingPosterPlaceholder()

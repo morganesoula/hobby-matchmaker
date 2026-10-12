@@ -127,3 +127,14 @@ inline fun <Out : Any, Error> AppResult<Out?, Error>.requireNonNull(onNull: () -
         is AppResult.Success -> data?.let { AppResult.Success(it) } ?: AppResult.Failure(onNull())
         is AppResult.Failure -> this
     }
+
+suspend inline fun <Entry> safeNetworkCall(
+    connectivityChecker: NetworkConnectivityChecker,
+    crossinline block: suspend () -> Entry
+): AppResult<Entry, AppError> {
+    if (!connectivityChecker.hasActiveConnection()) {
+        return AppResult.Failure(AppError.Network.Unreachable)
+    }
+
+    return safeFirebaseCall { block() }
+}

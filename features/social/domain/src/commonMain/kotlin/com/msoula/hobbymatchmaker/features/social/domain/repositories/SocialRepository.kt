@@ -24,7 +24,7 @@ interface SocialRepository {
     ): AppResult<Unit, AppError>
 
     suspend fun refreshSocialCircle(uid: String): AppResult<Unit, AppError>
-    fun observeIncomingInvites(toPseudo: String): Flow<List<SocialInviteDomainModel>>
+    fun observeIncomingInvites(ownerUid: String, toPseudo: String): Flow<List<SocialInviteDomainModel>>
     suspend fun refreshIncomingInvites(ownerUid: String): AppResult<Unit, AppError>
     fun observeSentInvites(uid: String): Flow<List<SocialInviteDomainModel>>
     suspend fun refreshSentInvites(uid: String): AppResult<Unit, AppError>

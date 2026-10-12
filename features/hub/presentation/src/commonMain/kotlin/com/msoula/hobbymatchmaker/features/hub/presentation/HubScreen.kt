@@ -100,8 +100,6 @@ fun HubContent(
                     ),
                     onDismiss = onModalDismissed
                 )
-
-                else -> {}
             }
         }
     }

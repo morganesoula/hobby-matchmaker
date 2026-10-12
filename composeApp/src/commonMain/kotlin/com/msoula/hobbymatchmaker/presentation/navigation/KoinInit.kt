@@ -27,7 +27,7 @@ import com.msoula.hobbymatchmaker.features.profile.domain.di.featuresModuleUserP
 import com.msoula.hobbymatchmaker.features.profile.presentation.di.featuresModuleUserProfilePresentation
 import com.msoula.hobbymatchmaker.features.social.data.di.featuresModuleSocialData
 import com.msoula.hobbymatchmaker.features.social.domain.di.featuresModuleSocialDomain
-import com.msoula.hobbymatchmaker.features.social.presentation.featuresModuleSocialPresentation
+import com.msoula.hobbymatchmaker.features.social.presentation.di.featuresModuleSocialPresentation
 
 fun appModule() = listOf(
     coreModuleNetwork,

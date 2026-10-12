@@ -1,4 +1,7 @@
-import java.net.URI
+@file:OptIn(ExperimentalSpmForKmpFeature::class)
+
+import io.github.frankois944.spmForKmp.swiftPackageConfig
+import io.github.frankois944.spmForKmp.utils.ExperimentalSpmForKmpFeature
 
 plugins {
     alias(libs.plugins.hobbymatchmaker.buildlogic.multiplatform.compose)
@@ -11,12 +14,26 @@ multiplatformConfig {
 }
 
 kotlin {
-    android {
-        namespace = "com.msoula.hobbymatchmaker.features.moviedetail.presentation"
+    listOf(
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { target ->
+        target.swiftPackageConfig("nativeIosPlayerShared") {
+            minIos = "15.0"
+            dependency {
+                remotePackageVersion(
+                    url = uri("https://github.com/youtube/youtube-ios-player-helper.git"),
+                    products = {
+                        add("YouTubeiOSPlayerHelper")
+                    },
+                    version = "1.0.4"
+                )
+            }
+        }
     }
 
-    iosArm64().apply {
-        compilations["main"].cinterops.create("nativeIosPlayerShared")
+    android {
+        namespace = "com.msoula.hobbymatchmaker.features.moviedetail.presentation"
     }
 
     sourceSets {
@@ -37,7 +54,6 @@ kotlin {
             implementation(project(Modules.DESIGN))
             implementation(project(Modules.MOVIE_DOMAIN))
             implementation(project(Modules.MOVIE_DETAIL_DOMAIN))
-            implementation(project(Modules.NETWORK))
             implementation(project(Modules.SOCIAL_DOMAIN))
 
         }
@@ -53,22 +69,6 @@ kotlin {
         iosMain.dependencies {
             // Network for Coil
             implementation(libs.findLibrary("ktor-client-darwin").get())
-        }
-    }
-}
-
-swiftPackageConfig {
-    create("nativeIosPlayerShared") {
-        minIos = "18.0"
-
-        dependency {
-            remotePackageVersion(
-                url = URI("https://github.com/youtube/youtube-ios-player-helper.git"),
-                products = {
-                    add("YouTubeiOSPlayerHelper", exportToKotlin = true)
-                },
-                version = "1.0.4"
-            )
         }
     }
 }

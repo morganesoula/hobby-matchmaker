@@ -10,6 +10,8 @@
 		A107BB8E2DBC08CA00ABD150 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A107BB8D2DBC08CA00ABD150 /* libsqlite3.tbd */; };
 		A18419902DCFD1930033E797 /* YouTubeiOSPlayerHelper in Frameworks */ = {isa = PBXBuildFile; productRef = A184198F2DCFD1930033E797 /* YouTubeiOSPlayerHelper */; };
 		A18E733E2EAD1F6500B1816D /* nativeIosShared in Frameworks */ = {isa = PBXBuildFile; productRef = A18E733D2EAD1F6500B1816D /* nativeIosShared */; };
+		A1DF575F2F60919E00BF7B9C /* composeApp.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1DF575E2F60919D00BF7B9C /* composeApp.xcframework */; };
+		A1DF57602F60919E00BF7B9C /* composeApp.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A1DF575E2F60919D00BF7B9C /* composeApp.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,6 +38,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				A1DF57602F60919E00BF7B9C /* composeApp.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -47,10 +50,11 @@
 		A1654D952D5BB95100F7F8E6 /* HobbyMatchMaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HobbyMatchMaker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1654DA52D5BB95200F7F8E6 /* iosAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iosAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1654DAF2D5BB95200F7F8E6 /* iosAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iosAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1DF575E2F60919D00BF7B9C /* composeApp.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = composeApp.xcframework; path = ../composeApp/build/XCFrameworks/debug/composeApp.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		A18DEC7B2EA7E3390065D9B8 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		A18DEC7B2EA7E3390065D9B8 /* Exceptions for "iosApp" folder in "iosApp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -63,7 +67,7 @@
 		A1654D972D5BB95100F7F8E6 /* iosApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				A18DEC7B2EA7E3390065D9B8 /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
+				A18DEC7B2EA7E3390065D9B8 /* Exceptions for "iosApp" folder in "iosApp" target */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -85,6 +89,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1DF575F2F60919E00BF7B9C /* composeApp.xcframework in Frameworks */,
 				A18E733E2EAD1F6500B1816D /* nativeIosShared in Frameworks */,
 				A107BB8E2DBC08CA00ABD150 /* libsqlite3.tbd in Frameworks */,
 				A18419902DCFD1930033E797 /* YouTubeiOSPlayerHelper in Frameworks */,
@@ -111,6 +116,7 @@
 		7DEDD20BC06CE39FE6B82CDD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A1DF575E2F60919D00BF7B9C /* composeApp.xcframework */,
 				A107BB8D2DBC08CA00ABD150 /* libsqlite3.tbd */,
 			);
 			name = Frameworks;
@@ -148,7 +154,9 @@
 				A1654D922D5BB95100F7F8E6 /* Frameworks */,
 				A1654D932D5BB95100F7F8E6 /* Resources */,
 				A1F3BA402DCA4DE6005104EF /* Embed Frameworks */,
-			);
+				A1BFCOPY2EAD000000B18161 /* Copy Compose Resources */,
+			
+				71D8402E316D49F48A47ECF9 /* Kotzilla Dsym */,);
 			buildRules = (
 			);
 			dependencies = (
@@ -321,6 +329,42 @@
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
+		};
+		A1BFCOPY2EAD000000B18161 /* Copy Compose Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Compose Resources";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/bash\nset -e\n\nif [[ \"$PLATFORM_NAME\" == \"iphonesimulator\" ]]; then\n    ARCH=\"iosSimulatorArm64\"\nelse\n    ARCH=\"iosArm64\"\nfi\n\nRESOURCE_SRC=\"$SRCROOT/../composeApp/build/kotlin-multiplatform-resources/aggregated-resources/$ARCH/composeResources\"\nRESOURCE_DST=\"$BUILT_PRODUCTS_DIR/$PRODUCT_NAME.app/compose-resources\"\n\nif [ -d \"$RESOURCE_SRC\" ]; then\n    mkdir -p \"$RESOURCE_DST\"\n    cp -R \"$RESOURCE_SRC\" \"$RESOURCE_DST/\"\nfi\n";
+		};
+		71D8402E316D49F48A47ECF9 /* Kotzilla Dsym */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Kotzilla Dsym";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+			shellPath = /bin/sh;
+			shellScript = "# KOTZILLA_SCRIPT_VERSION=9\nset -e\nM=$BUILT_PRODUCTS_DIR/$PRODUCT_NAME.app/kotzilla-debug\n[ \"$CONFIGURATION\" = Release ] && rm -f \"$M\" 2>/dev/null || touch \"$M\" 2>/dev/null\n[ -z \"$DWARF_DSYM_FOLDER_PATH\" ] && exit 0\ncd \"$SRCROOT/..\"\n./gradlew ':composeApp:uploadDsymFile' --dsymPath=\"$DWARF_DSYM_FOLDER_PATH\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

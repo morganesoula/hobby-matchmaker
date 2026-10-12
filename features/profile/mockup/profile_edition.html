@@ -1,0 +1,276 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Edit Profile - HobbyMatchMaker</title>
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-background": "#ece0de",
+            "on-error": "#690005",
+            "tertiary-fixed": "#c4e7ff",
+            "background": "#181211",
+            "on-error-container": "#ffdad6",
+            "surface": "#181211",
+            "outline-variant": "#554434",
+            "error-container": "#93000a",
+            "inverse-surface": "#ece0de",
+            "surface-container-highest": "#3a3332",
+            "text-muted": "#94a3b8",
+            "on-surface": "#ece0de",
+            "tertiary-container": "#04beff",
+            "on-tertiary": "#00344a",
+            "outline": "#a38d7a",
+            "surface-bright": "#3f3836",
+            "on-primary": "#4a2800",
+            "background-light": "#f8f7f5",
+            "surface-container-low": "#201a19",
+            "surface-card": "#271e15",
+            "surface-dim": "#181211",
+            "on-primary-fixed-variant": "#693c00",
+            "surface-container": "#241e1d",
+            "secondary-fixed-dim": "#f6bb81",
+            "on-tertiary-fixed-variant": "#004c69",
+            "surface-tint": "#ffb86f",
+            "on-secondary-fixed": "#2c1600",
+            "primary-fixed": "#ffdcbd",
+            "secondary-fixed": "#ffdcbe",
+            "on-secondary-fixed-variant": "#663e0e",
+            "on-primary-container": "#653a00",
+            "surface-variant": "#3a3332",
+            "background-dark": "#201a19",
+            "tertiary-fixed-dim": "#7cd0ff",
+            "on-primary-fixed": "#2c1600",
+            "inverse-on-surface": "#362f2e",
+            "inverse-primary": "#8a5100",
+            "surface-container-high": "#2f2827",
+            "primary-container": "#ff9900",
+            "on-secondary": "#4a2800",
+            "secondary": "#f6bb81",
+            "surface-container-lowest": "#120d0c",
+            "error": "#ffb4ab",
+            "on-secondary-container": "#e3aa71",
+            "on-surface-variant": "#dbc2ad",
+            "primary-fixed-dim": "#ffb86f",
+            "secondary-container": "#663e0e",
+            "on-tertiary-container": "#004965",
+            "on-tertiary-fixed": "#001e2c",
+            "tertiary": "#8ed5ff",
+            "primary": "#ffc082",
+            "surface-border": "rgba(255, 153, 0, 0.2)"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-md": "1rem",
+            "space-lg": "1.5rem",
+            "space-xs": "0.25rem",
+            "space-xl": "2rem",
+            "margin": "1.5rem",
+            "space-sm": "0.5rem",
+            "gutter": "1rem"
+          },
+          "fontFamily": {
+            "label-xs": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "label-xs": ["10px", { "lineHeight": "12px", "letterSpacing": "-0.025em", "fontWeight": "700" }],
+            "body-md": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "400" }],
+            "headline-sm": ["1.125rem", { "lineHeight": "1.5rem", "fontWeight": "700" }],
+            "headline-md": ["1.25rem", { "lineHeight": "1.75rem", "fontWeight": "700" }],
+            "headline-lg": ["1.875rem", { "lineHeight": "2.25rem", "fontWeight": "700" }],
+            "label-md": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.05em", "fontWeight": "600" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-smoothing: antialiased;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-body-md text-body-md min-h-screen flex flex-col items-center selection:bg-primary-container selection:text-background-dark">
+<!-- Main Device Viewport Wrapper -->
+<div class="w-full max-w-2xl bg-surface min-h-screen flex flex-col shadow-2xl relative pb-28">
+<!-- Top App Bar (Task-focused contextual screen with Back & Quick Save action) -->
+<header class="sticky top-0 z-40 bg-surface/80 backdrop-blur-md border-b border-primary/10 shadow-sm shadow-primary/5">
+<div class="flex justify-between items-center w-full px-6 py-3.5 max-w-2xl mx-auto">
+<button aria-label="Go back" class="p-2 -ml-2 rounded-full text-on-surface-variant hover:bg-primary/10 hover:text-primary transition-colors duration-150 active:scale-95 flex items-center justify-center" type="button">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="text-headline-sm font-headline-sm text-on-surface tracking-tight font-bold">
+          Edit Profile
+        </h1>
+<button class="text-label-md font-label-md px-3.5 py-1.5 rounded-lg bg-primary-container text-background-dark font-bold hover:brightness-110 active:scale-95 transition-all duration-150 shadow-sm shadow-primary-container/30 flex items-center gap-1" type="button">
+<span>Save</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="check">check</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 px-6 pt-6 pb-8 space-y-6">
+<!-- Profile Avatar Section with Ambient Warm Glow -->
+<section class="flex flex-col items-center justify-center pt-2 pb-4">
+<div class="relative group">
+<!-- Ambient Radial Warmth Glow Behind Avatar -->
+<div class="absolute -inset-2 bg-gradient-to-tr from-primary-container/20 to-primary/30 rounded-full blur-lg opacity-70 group-hover:opacity-100 transition-opacity duration-300"></div>
+<!-- Circular Avatar Frame -->
+<div class="relative w-28 h-28 rounded-full ring-2 ring-primary/40 p-1 bg-surface-container-low shadow-xl">
+<img class="w-full h-full rounded-full object-cover" data-alt="Close-up portrait of Alex Chen with modern warm rim lighting against a moody dark cinema backdrop. The subject wears dark stylish casual attire with subtle amber refractions illuminating the face, conveying an approachable, movie enthusiast aesthetic with rich cinematic film tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbpFjUljGu92yc6wF49RFBJEAsmhqmspCy255EwXsQ91snjj-NQijDF3FbMy3M_dhQ4Ytx7KbyQhpeCJfR4R5o3OPhyjyv0XiaCaR6uM_6mysJCX46nS2Y7Ea6_R7YVtvQoriruyciV9RKuDC_ytAfwEOmb9U6H_N9xNg5WSnHHR7S93DfsBgXUVcIUI3ERgDQRvjOyRYTd1D5-fi3CmeCxY3Vq0lqCZnBTgWqVjO09QYcphOBgJB1Hg">
+</div>
+<!-- Edit Avatar Camera Overlay Button -->
+<button aria-label="Change profile photo" class="absolute bottom-0 right-0 bg-primary-container text-background-dark p-2.5 rounded-full shadow-lg shadow-primary-container/40 hover:scale-105 active:scale-95 transition-transform duration-150 ring-4 ring-surface" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="photo_camera">photo_camera</span>
+</button>
+</div>
+<button class="mt-3.5 text-primary text-label-md font-label-md hover:underline tracking-wide flex items-center gap-1.5 transition-colors" type="button">
+<span>Change profile picture</span>
+</button>
+</section>
+<!-- Form Inputs Container -->
+<form class="space-y-6" onsubmit="event.preventDefault()">
+<!-- Field 1: Full Name -->
+<div class="space-y-2">
+<label class="block text-label-md font-label-md text-on-surface-variant uppercase tracking-wider" for="full-name">
+            Full Name
+          </label>
+<div class="relative rounded-xl bg-surface-container-low border border-primary/20 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all duration-150">
+<div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-on-surface-variant/70">
+<span class="material-symbols-outlined text-[20px]" data-icon="badge">badge</span>
+</div>
+<input class="w-full pl-11 pr-4 py-3 bg-transparent text-on-surface font-body-md text-body-md rounded-xl border-0 focus:ring-0 focus:outline-none placeholder:text-text-muted" id="full-name" name="fullName" placeholder="Enter your full name" type="text" value="Alex Chen">
+</div>
+</div>
+<!-- Field 2: Username (With Helper Hint above and Inline Error State below) -->
+<div class="space-y-2">
+<div class="flex flex-col gap-1">
+<label class="block text-label-md font-label-md text-on-surface-variant uppercase tracking-wider" for="username">
+              Username
+            </label>
+<!-- Helper / Hint Text DIRECTLY ABOVE input -->
+<p class="text-label-md font-label-md text-primary/80 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="info">info</span>
+<span>Your username must be unique across the platform</span>
+</p>
+</div>
+<!-- Input field with @ prefix & active Error Border state -->
+<div class="relative rounded-xl bg-surface-container-low border-2 border-error/70 focus-within:border-error focus-within:ring-1 focus-within:ring-error transition-all duration-150 shadow-sm shadow-error/10">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-primary font-bold">
+<span class="text-body-md font-body-md font-bold">@</span>
+</div>
+<input aria-describedby="username-error" aria-invalid="true" class="w-full pl-9 pr-10 py-3 bg-transparent text-on-surface font-body-md text-body-md rounded-xl border-0 focus:ring-0 focus:outline-none text-error" id="username" name="username" placeholder="username" type="text" value="alex_c">
+<div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-error">
+<span class="material-symbols-outlined text-[20px]" data-icon="error">error</span>
+</div>
+</div>
+<!-- Inline Validation Error Message -->
+<p class="text-label-md font-label-md text-error flex items-center gap-1.5 pt-0.5" id="username-error">
+<span class="material-symbols-outlined text-[15px]" data-icon="warning">warning</span>
+<span>This username is already taken. Please choose another.</span>
+</p>
+</div>
+<!-- Field 3: Biography / Bio -->
+<div class="space-y-2">
+<div class="flex items-center justify-between">
+<label class="block text-label-md font-label-md text-on-surface-variant uppercase tracking-wider" for="bio">
+              Biography
+            </label>
+<span class="text-label-md font-label-md text-text-muted">Optional</span>
+</div>
+<div class="relative rounded-xl bg-surface-container-low border border-primary/20 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all duration-150 p-1">
+<textarea class="w-full px-3 py-2 bg-transparent text-on-surface font-body-md text-body-md border-0 focus:ring-0 focus:outline-none resize-none placeholder:text-text-muted/60" id="bio" maxlength="120" name="bio" placeholder="Tell other film and hobby fans about yourself..." rows="3">Movie enthusiast, sci-fi fanatic and cinema lover who enjoys discussing plots and easter eggs...</textarea>
+</div>
+<!-- Character counter indicator -->
+<div class="flex justify-end pr-1">
+<span class="text-label-xs font-label-xs text-text-muted">
+<span class="text-primary font-bold">84</span> / 120 max characters
+            </span>
+</div>
+</div>
+<!-- Field 4: Interests & Tags -->
+<div class="space-y-3">
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between"><div class="flex items-center gap-2"><label class="block text-label-md font-label-md text-on-surface-variant uppercase tracking-wider" for="interests-input">Interests</label><span class="text-label-md font-label-md text-text-muted">Optional</span></div><span class="text-label-xs font-label-xs text-primary font-bold bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">3/5 selected</span></div>
+<!-- Helper text DIRECTLY ABOVE input -->
+<p class="text-label-md font-label-md text-on-surface-variant/80 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]" data-icon="sell">sell</span><span class="">Type one or more interests separated by commas and tap Add (max 5 interests)</span></p>
+</div>
+<!-- Comma Tag Input Field -->
+<div class="relative rounded-xl bg-surface-container-low border border-primary/20 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all duration-150"><div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-on-surface-variant/70"><span class="material-symbols-outlined text-[20px]" data-icon="sell">sell</span></div><input class="w-full pl-11 pr-20 py-3 bg-transparent text-on-surface font-body-md text-body-md rounded-xl border-0 focus:ring-0 focus:outline-none placeholder:text-text-muted/50" id="interests-input" placeholder="e.g. Noir, Comedy (tap Add)" type="text"><div class="absolute inset-y-0 right-0 pr-2 flex items-center"><button class="px-3 py-1.5 rounded-lg bg-primary/10 hover:bg-primary-container text-primary hover:text-background-dark text-label-md font-label-md font-bold transition-all duration-150 flex items-center gap-1 active:scale-95 border border-primary/20" type="button"><span class="material-symbols-outlined text-[16px]" data-icon="add">add</span><span class="">Add</span></button></div></div>
+<!-- Chip / Tag Preview Container -->
+<div class="flex flex-wrap items-center gap-2 pt-1">
+<!-- Chip 1: Action -->
+<div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-high border border-primary/30 text-on-surface text-label-md font-label-md shadow-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+<span>Action</span>
+<button aria-label="Remove Action tag" class="ml-1 text-on-surface-variant hover:text-error hover:bg-error/10 rounded p-0.5 transition-colors" type="button">
+<span class="material-symbols-outlined text-[14px]" data-icon="close">close</span>
+</button>
+</div>
+<!-- Chip 2: Sci-Fi -->
+<div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-high border border-primary/30 text-on-surface text-label-md font-label-md shadow-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+<span>Sci-Fi</span>
+<button aria-label="Remove Sci-Fi tag" class="ml-1 text-on-surface-variant hover:text-error hover:bg-error/10 rounded p-0.5 transition-colors" type="button">
+<span class="material-symbols-outlined text-[14px]" data-icon="close">close</span>
+</button>
+</div>
+<!-- Chip 3: Thriller -->
+<div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-high border border-primary/30 text-on-surface text-label-md font-label-md shadow-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+<span>Thriller</span>
+<button aria-label="Remove Thriller tag" class="ml-1 text-on-surface-variant hover:text-error hover:bg-error/10 rounded p-0.5 transition-colors" type="button">
+<span class="material-symbols-outlined text-[14px]" data-icon="close">close</span>
+</button>
+</div>
+<!-- Add suggestion badge -->
+<button class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-dashed border-primary/30 text-primary hover:bg-primary/10 text-label-md font-label-md transition-colors" type="button">
+
+
+</button>
+</div>
+</div>
+</form>
+</main>
+<!-- Bottom Sticky Actions Dock (No Logout button as requested) -->
+<div class="fixed bottom-0 left-0 w-full z-30 bg-surface/90 backdrop-blur-xl border-t border-primary/10 py-3.5 px-6">
+<div class="max-w-2xl mx-auto flex items-center justify-between gap-4">
+
+</div>
+</div>
+</div>
+
+
+</body></html>

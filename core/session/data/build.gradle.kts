@@ -18,7 +18,6 @@ kotlin {
             implementation(libs.findLibrary("datastore-preferences").get())
 
             implementation(project(Modules.COMMON))
-            implementation(project(Modules.NETWORK))
             implementation(project(Modules.SESSION_DOMAIN))
         }
 

@@ -1,8 +1,11 @@
+@file:OptIn(ExperimentalSpmForKmpFeature::class)
+
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryExtension
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
+import io.github.frankois944.spmForKmp.swiftPackageConfig
+import io.github.frankois944.spmForKmp.utils.ExperimentalSpmForKmpFeature
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 import java.io.FileInputStream
-import java.net.URI
 import java.util.Properties
 
 plugins {
@@ -26,12 +29,43 @@ kotlin {
     }
 
     val xcf = XCFramework()
-    iosArm64().apply {
-        compilations["main"].cinterops.create("nativeIosShared")
-        binaries.framework {
+    listOf(
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach {
+        it.binaries.framework {
             baseName = "composeApp"
             isStatic = true
             xcf.add(this)
+        }
+    }
+
+    listOf(
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { target ->
+        target.swiftPackageConfig("nativeIosShared") {
+            minIos = "15.0"
+
+            dependency {
+                remotePackageVersion(
+                    url = uri("https://github.com/firebase/firebase-ios-sdk.git"),
+                    products = {
+                        add("FirebaseCore")
+                        add("FirebaseAuth")
+                        add("FirebaseFirestore")
+                        add("FirebaseStorage")
+                    },
+                    version = "12.10.0"
+                )
+                remotePackageVersion(
+                    url = uri("https://github.com/google/GoogleSignIn-iOS.git"),
+                    products = {
+                        add("GoogleSignIn")
+                    },
+                    version = "9.1.0"
+                )
+            }
         }
     }
 
@@ -61,7 +95,6 @@ kotlin {
             implementation(project(Modules.MOVIE_DETAIL_DOMAIN))
             implementation(project(Modules.MOVIE_DETAIL_PRESENTATION))
             implementation(project(Modules.NAVIGATION_PRESENTATION))
-            implementation(project(Modules.NETWORK))
             implementation(project(Modules.PROFILE_DATA))
             implementation(project(Modules.PROFILE_DOMAIN))
             implementation(project(Modules.PROFILE_PRESENTATION))
@@ -111,31 +144,4 @@ compose.resources {
     publicResClass = true
     packageOfResClass = "com.msoula.hobbymatchmaker"
     generateResClass = always
-}
-
-swiftPackageConfig {
-    create("nativeIosShared") {
-        minIos = "18.0"
-
-        dependency {
-            remotePackageVersion(
-                url = URI("https://github.com/firebase/firebase-ios-sdk.git"),
-                products = {
-                    // Don't export Firebase to Kotlin - using gitlive bindings instead
-                    add("FirebaseCore", exportToKotlin = false)
-                    add("FirebaseAuth", exportToKotlin = false)
-                    add("FirebaseFirestore", exportToKotlin = false)
-                },
-                version = "11.14.0"
-            )
-            remotePackageVersion(
-                url = URI("https://github.com/google/GoogleSignIn-iOS"),
-                products = {
-                    // Don't export GoogleSignIn to Kotlin - Swift code returns simple types
-                    add("GoogleSignIn", exportToKotlin = false)
-                },
-                version = "8.0.0"
-            )
-        }
-    }
 }

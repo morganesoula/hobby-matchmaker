@@ -35,3 +35,8 @@ DerivedData/
 .swiftpm/
 
 iosApp/iosApp/secrets.xcconfig
+.hotswan/
+
+# Build outputs and Kotlin compiler cache
+**/build/
+.kotlin/

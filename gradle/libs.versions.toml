@@ -1,48 +1,48 @@
 [versions]
-activityCompose = "1.12.4"
+activityCompose = "1.13.0"
 appcompat = "1.7.1"
-buildKonfig = "0.17.1"
-coil = "3.3.0"
-composeMultiplatform = "1.10.1"
+buildKonfig = "0.20.0"
+coil = "3.4.0"
+composeMultiplatform = "1.10.3"
 composeNavigation = "2.9.2"
-credentials = "1.5.0"
-datastore = "1.2.0"
+credentials = "1.6.0"
+datastore = "1.2.1"
 datetime = "0.7.1"
 detekt = "1.23.8"
-facebookAndroidSdk = "18.1.3"
-fileKit = "0.12.0"
-firebaseBOM = "34.9.0"
+facebookAndroidSdk = "18.2.3"
+fileKit = "0.14.1"
+firebaseBOM = "34.12.0"
 firebaseKMP = "2.4.0"
 googleIdentity = "1.2.0"
 googleServices = "4.4.4"
-gradle = "9.1.0"
-koin = "4.1.1"
-kotest = "6.1.3"
-kotlinGradlePlugin = "2.3.0"
+gradle = "9.4.1"
+hotswan = "1.3.0"
+koin = "4.2.1"
+kotest = "6.1.11"
+kotlinGradlePlugin = "2.3.21"
 kotlinxCollectionsImmutable = "0.4.0"
 kotlinxCoroutinesTest = "1.10.2"
-kotlinxIo = "0.8.2"
-kotlinxSerialization = "1.10.0"
+kotlinxIo = "0.9.0"
+kotlinxSerialization = "1.11.0"
 kotlinxCoroutineKMP = "1.10.2"
-kotzilla = "1.4.0"
-kover = "0.9.7"
-ktor = "3.4.0"
+kotzilla = "2.1.3"
+kover = "0.9.8"
+ktor = "3.4.3"
 material3 = "1.9.0"
 mediaPlayer = "2.1.0"
 mockk = "1.14.9"
-playServicesAuth = "21.5.0"
+playServicesAuth = "21.5.1"
 savedState = "1.4.0"
-spm = "1.1.1"
-sqldelight = "2.2.1"
+spm = "1.9.1"
+sqldelight = "2.3.2"
 timber = "5.0.1"
 turbine = "1.2.1"
 youtube = "13.0.0"
-jetbrainsKotlinJvm = "2.2.21"
 uuid = "0.8.4"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
-jetbrainsKotlinJvmVersion = "2.3.0"
+jetbrainsKotlinJvmVersion = "2.3.21"
 
 [libraries]
 activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
@@ -121,17 +121,18 @@ ktor = ["ktor-client-core", "ktor-client-logging", "ktor-client-negotiation", "k
 android-application = { id = "com.android.application", version.ref = "gradle" }
 android-library = { id = "com.android.library", version.ref = "gradle" }
 android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "gradle" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinGradlePlugin" }
 build-konfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildKonfig" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlinGradlePlugin" }
-google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinGradlePlugin" }
-detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
-sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+hotswan-compiler = { id = "com.github.skydoves.compose.hotswan.compiler", version.ref = "hotswan" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinGradlePlugin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlinGradlePlugin" }
-spm-kmp = { id = "io.github.frankois944.spmForKmp", version.ref = "spm" }
 kotzilla = { id = "io.kotzilla.kotzilla-plugin", version.ref = "kotzilla" }
+serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinGradlePlugin" }
+spm-kmp = { id = "io.github.frankois944.spmForKmp", version.ref = "spm" }
+sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 
 hobbymatchmaker-buildlogic-multiplatform = { id = "hobbymatchmaker.buildlogic.multiplatform", version = "unspecified" }
 hobbymatchmaker-buildlogic-multiplatform-compose = { id = "hobbymatchmaker.buildlogic.multiplatformCompose", version = "unspecified" }

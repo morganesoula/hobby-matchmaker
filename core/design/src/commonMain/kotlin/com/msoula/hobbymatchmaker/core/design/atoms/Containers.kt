@@ -1,13 +1,13 @@
 package com.msoula.hobbymatchmaker.core.design.atoms
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,6 +18,7 @@ import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.error_issue_retry
 import com.msoula.hobbymatchmaker.core.design.icons.MaterialIconsError_outline
 import com.msoula.hobbymatchmaker.core.design.models.EmptyStateConfig
+import com.msoula.hobbymatchmaker.core.design.molecules.NoDataCard
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.util.RetryPolicy
 import com.msoula.hobbymatchmaker.core.design.util.UIErrorHint
@@ -76,33 +77,21 @@ fun ErrorStateScreen(
 }
 
 @Composable
-fun EmptyStateScreen(config: EmptyStateConfig) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(CustomSize.TwentyFour)
+fun EmptyStateScreen(
+    modifier: Modifier = Modifier,
+    config: EmptyStateConfig
+) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
-        Icon(
-            imageVector = config.icon,
-            contentDescription = null,
-            modifier = Modifier.size(96.dp)
+        NoDataCard(
+            noDataTitle = config.title.asString(),
+            noDataText = config.description?.asString() ?: "",
+            noDataBtnText = config.ctaText?.asString() ?: "",
+            icon = config.icon,
+            onNoDataButtonClicked = { config.ctaAction }
         )
-        SpacerHeight16()
-        Text(config.title.asString(), style = MaterialTheme.typography.titleMedium)
-
-        config.description?.let {
-            SpacerHeight8()
-            Text(it.asString(), textAlign = TextAlign.Center)
-        }
-
-        config.ctaAction?.let {
-            SpacerHeight16()
-            Button(onClick = it) {
-                Text(config.ctaText?.asString() ?: "Action")
-            }
-        }
     }
 }
 

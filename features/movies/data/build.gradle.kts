@@ -22,7 +22,6 @@ kotlin {
                 implementation(libs.findBundle("ktor").get())
 
                 // Modules
-                implementation(project(Modules.NETWORK))
                 implementation(project(Modules.DATABASE))
                 implementation(project(Modules.MOVIE_DOMAIN))
                 implementation(project(Modules.COMMON))

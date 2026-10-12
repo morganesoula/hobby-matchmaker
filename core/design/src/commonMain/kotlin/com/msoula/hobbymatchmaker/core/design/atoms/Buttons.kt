@@ -1,8 +1,11 @@
 package com.msoula.hobbymatchmaker.core.design.atoms
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -15,10 +18,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.theme.CustomFontSize
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
@@ -46,6 +50,7 @@ fun PrimaryButton(
         modifier =
             modifier
                 .fillMaxWidth()
+                .imePadding()
                 .padding(horizontal = CustomSize.TwentyFour),
     ) {
         if (loading) {
@@ -162,8 +167,39 @@ fun SocialMediaButton(
     }
 }
 
-@Preview
 @Composable
-fun SecondButtonPreview() {
-    SecondaryButton(text = "Sign up", onClick = {})
+fun ButtonWithStartIcon(
+    icon: ImageVector,
+    textButton: String,
+    onButtonClick: () -> Unit,
+    containerColor: Color,
+    contentColor: Color
+) {
+    Button(
+        onClick = { onButtonClick() },
+        shape = RoundedCornerShape(CustomSize.Sixteen),
+        border = BorderStroke(CustomSize.Two, MaterialTheme.colorScheme.primary),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = containerColor,
+            contentColor = contentColor
+        )
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(vertical = CustomSize.Four),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null
+            )
+
+            SpacerWidth8()
+
+            Text(
+                text = textButton,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
 }

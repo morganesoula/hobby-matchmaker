@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.google.services)
-    alias(libs.plugins.kotzilla)
+    alias(libs.plugins.hotswan.compiler)
 }
 
 android {
@@ -99,9 +99,6 @@ dependencies {
 
     // Koin
     implementation(libs.koin.android)
-
-    // Kotzilla
-    implementation(libs.kotzilla.sdk)
 
     // Modules
     implementation(project(":core:authentication:domain"))

@@ -29,7 +29,7 @@ fun MovieDomainModel.toMovieUiModel(): MovieUiModel {
         releaseDate = this.releaseDate,
         isFavorite = this.isFavorite,
         title = this.title,
-        overview = this.overview ?: "",
+        overview = this.overview,
         note = this.note
     )
 }

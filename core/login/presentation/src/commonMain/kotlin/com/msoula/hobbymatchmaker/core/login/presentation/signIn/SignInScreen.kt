@@ -61,7 +61,7 @@ fun SignInScreenContent(
     dontAskCheckbox: Boolean,
     onNavigate: (NavigationDestination) -> Unit,
     snackBarHostState: SnackbarHostState,
-    facebookUIClient: FacebookUIClient
+    facebookUIClient: FacebookUIClient?
 ) {
     var displayResetPasswordDialog by rememberSaveable { mutableStateOf(false) }
     var displayGuestDialog by rememberSaveable { mutableStateOf(false) }
@@ -135,21 +135,23 @@ fun SignInScreenContent(
                                     onEvent(AuthenticationUIEvent.OnAppleButtonClicked)
                                 },
                                 onFacebookClick = {
-                                    if (facebookUIClient.hasValidToken()) {
-                                        return@SignInSocialMedia
-                                    }
+                                    facebookUIClient?.let {
+                                        if (it.hasValidToken()) {
+                                            return@SignInSocialMedia
+                                        }
 
-                                    facebookUIClient.registerCallback(
-                                        onSuccess = { credential, _ ->
-                                            onEvent(
-                                                AuthenticationUIEvent.OnFacebookButtonClicked(
-                                                    credential
+                                        it.registerCallback(
+                                            onSuccess = { credential, _ ->
+                                                onEvent(
+                                                    AuthenticationUIEvent.OnFacebookButtonClicked(
+                                                        credential
+                                                    )
                                                 )
-                                            )
-                                        },
-                                        onError = { Logger.d("Error fetching Facebook credentials") }
-                                    )
-                                    facebookUIClient.logIn()
+                                            },
+                                            onError = { Logger.d("Error fetching Facebook credentials") }
+                                        )
+                                        it.logIn()
+                                    }
                                 }
                             )
                         },

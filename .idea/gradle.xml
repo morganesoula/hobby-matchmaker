@@ -18,7 +18,7 @@
         </compositeConfiguration>
         <option name="testRunner" value="CHOOSE_PER_TEST" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleJvm" value="#GRADLE_LOCAL_JAVA_HOME" />
+        <option name="gradleJvm" value="azul-21" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
@@ -38,7 +38,6 @@
             <option value="$PROJECT_DIR$/core/login/presentation" />
             <option value="$PROJECT_DIR$/core/navigation" />
             <option value="$PROJECT_DIR$/core/navigation/presentation" />
-            <option value="$PROJECT_DIR$/core/network" />
             <option value="$PROJECT_DIR$/core/session" />
             <option value="$PROJECT_DIR$/core/session/data" />
             <option value="$PROJECT_DIR$/core/session/domain" />

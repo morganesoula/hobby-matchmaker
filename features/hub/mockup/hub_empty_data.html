@@ -1,0 +1,133 @@
+<!DOCTYPE html><html class="dark" lang="fr"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>HobbyMatchMaker - Matchs &amp; Favoris</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ff9900",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#201a19",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-tab .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen flex flex-col">
+<!-- Top Navigation / Header -->
+<header class="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-primary/10">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-3xl">hub</span>
+<h1 class="text-xl font-bold tracking-tight">Hub Matchs</h1>
+</div>
+<button class="flex items-center justify-center p-2 rounded-full hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col max-w-2xl mx-auto w-full px-6 py-8 gap-12 overflow-y-auto pb-32">
+<!-- Section: Recent Matches -->
+<section class="flex flex-col items-center text-center animate-fade-in">
+<div class="flex items-center justify-between w-full mb-6">
+<h2 class="text-lg font-bold">Matchs récents</h2>
+<span class="text-xs font-medium text-primary/60 uppercase tracking-widest">Aperçu</span>
+</div>
+<div class="relative w-full aspect-[16/9] bg-primary/5 dark:bg-white/5 rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-primary/20 p-8">
+<!-- Overlapping Circles Illustration -->
+<div class="relative flex items-center justify-center mb-6">
+<div class="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center border-2 border-primary/40 -mr-4 z-0">
+<span class="material-symbols-outlined text-primary opacity-40 text-4xl">person</span>
+</div>
+<div class="w-16 h-16 rounded-full bg-primary flex items-center justify-center border-2 border-background-dark z-10">
+<span class="material-symbols-outlined text-background-dark text-4xl">person_add</span>
+</div>
+</div>
+<h3 class="text-xl font-bold mb-2">Pas encore de matchs ?</h3>
+<p class="text-slate-500 dark:text-slate-400 text-sm max-w-xs mb-6">
+                    Invitez des amis pour voir vos points communs ici.
+                </p>
+<button class="flex items-center gap-2 px-6 py-2.5 bg-primary/10 hover:bg-primary/20 text-primary font-bold rounded-xl transition-all border border-primary/20">
+<span class="material-symbols-outlined text-lg">share</span>
+                    Inviter des amis
+                </button>
+</div>
+</section>
+<!-- Section: Favorite Movies -->
+<section class="flex flex-col items-center text-center">
+<div class="flex items-center justify-between w-full mb-6">
+<h2 class="text-lg font-bold">Films favoris</h2>
+<span class="material-symbols-outlined text-primary/40">movie_edit</span>
+</div>
+<div class="w-full py-12 px-8 flex flex-col items-center justify-center bg-gradient-to-b from-primary/5 to-transparent rounded-2xl">
+<!-- Movie/Popcorn Illustration -->
+<div class="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-6 ring-8 ring-primary/5">
+<span class="material-symbols-outlined text-primary text-5xl">theater_comedy</span>
+</div>
+<h3 class="text-xl font-bold mb-2">Votre liste de favoris est vide</h3>
+<p class="text-slate-500 dark:text-slate-400 text-sm max-w-md mb-8">
+                    Parcourez les films et cliquez sur le coeur pour commencer à construire votre bibliothèque de goûts.
+                </p>
+<button class="w-full max-w-sm flex items-center justify-center gap-3 px-8 py-4 bg-primary text-background-dark font-bold text-lg rounded-xl hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">explore</span>
+                    Découvrir des films
+                </button>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-background-dark/95 backdrop-blur-xl border-t border-white/10 px-4 pb-8 pt-3 z-50">
+<div class="max-w-md mx-auto flex items-center justify-around">
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Accueil</span>
+</a>
+<!-- Active Tab: Matchs -->
+<a class="active-tab flex flex-col items-center gap-1 text-primary relative" href="#">
+<div class="absolute -top-3 w-10 h-1 bg-primary rounded-full"></div>
+<span class="material-symbols-outlined text-2xl">handshake</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Matchs</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">movie</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Films</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Profil</span>
+</a>
+</div>
+</nav>
+</body></html>

@@ -8,9 +8,11 @@ import com.msoula.hobbymatchmaker.features.social.domain.repositories.SocialRepo
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.launch
 
 sealed class ObserveIncomingInvitesSuccess {
     data class Success(val invites: List<SocialInviteDomainModel>) : ObserveIncomingInvitesSuccess()
@@ -22,8 +24,8 @@ class ObserveIncomingInvitesUseCase(
     private val socialRepository: SocialRepository,
     private val dispatcher: CoroutineDispatcher
 ) {
-    operator fun invoke(toPseudo: String) =
-        socialRepository.observeIncomingInvites(toPseudo)
+    operator fun invoke(ownerUid: String, toPseudo: String) =
+        socialRepository.observeIncomingInvites(ownerUid, toPseudo)
             .distinctUntilChanged()
             .mapLatest<List<SocialInviteDomainModel>, AppResult<ObserveIncomingInvitesSuccess, AppError>> { list ->
                 if (list.isEmpty()) {

@@ -17,8 +17,6 @@ kotlin {
             implementation(project(Modules.COMMON))
             implementation(project(Modules.DATABASE))
             implementation(project(Modules.MOVIE_DETAIL_DOMAIN))
-            implementation(project(Modules.MOVIE_DATA))
-            implementation(project(Modules.NETWORK))
         }
     }
 }

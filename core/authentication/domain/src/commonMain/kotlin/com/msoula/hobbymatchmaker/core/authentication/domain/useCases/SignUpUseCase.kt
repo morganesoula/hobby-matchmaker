@@ -8,6 +8,7 @@ import com.msoula.hobbymatchmaker.core.common.flatMapSuspend
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.session.domain.models.SessionUserDomainModel
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.CreateUserUseCase
+import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetCurrentUserProfileUuidUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetIsConnectedUseCase
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.CreateDefaultUserProfileUseCase
 
@@ -16,7 +17,8 @@ class SignUpUseCase(
     private val authenticationRepository: AuthenticationRepository,
     private val createDefaultUserProfileUseCase: CreateDefaultUserProfileUseCase,
     private val createUserUseCase: CreateUserUseCase,
-    private val setIsConnectedUseCase: SetIsConnectedUseCase
+    private val setIsConnectedUseCase: SetIsConnectedUseCase,
+    private val setCurrentUserProfileUuidUseCase: SetCurrentUserProfileUuidUseCase
 ) {
     suspend operator fun invoke(p: Parameters.DoubleStringParam): AppResult<SignUpSuccess, AppError> =
         authenticationRepository.signUp(p.firstValue, p.secondValue)
@@ -26,7 +28,10 @@ class SignUpUseCase(
                         createDefaultUserProfileUseCase(uid = uid, name = "")
                     }
                     .flatMapSuspend {
-                        setIsConnectedUseCase(true).mapSuccess {
+                        setIsConnectedUseCase(true)
+                    }
+                    .flatMapSuspend {
+                        setCurrentUserProfileUuidUseCase(uid).mapSuccess {
                             SignUpSuccess
                         }
                     }

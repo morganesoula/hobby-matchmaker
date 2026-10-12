@@ -18,8 +18,5 @@
     <mapping directory="$PROJECT_DIR$/composeApp/build/spmKmpPlugin/nativeIosShared/scratch/checkouts/leveldb" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/composeApp/build/spmKmpPlugin/nativeIosShared/scratch/checkouts/nanopb" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/composeApp/build/spmKmpPlugin/nativeIosShared/scratch/checkouts/promises" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/composeApp/build/spmKmpPlugin/nativeIosShared/scratch/checkouts/swift-protobuf" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/composeApp/build/spmKmpPlugin/nativeIosShared/scratch/checkouts/swift-protobuf/Sources/protobuf/abseil" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/composeApp/build/spmKmpPlugin/nativeIosShared/scratch/checkouts/swift-protobuf/Sources/protobuf/protobuf" vcs="Git" />
   </component>
 </project>

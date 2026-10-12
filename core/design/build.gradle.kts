@@ -1,3 +1,4 @@
+import io.github.frankois944.spmForKmp.swiftPackageConfig
 import java.net.URI
 
 plugins {
@@ -18,7 +19,19 @@ kotlin {
     }
 
     listOf(iosArm64(), iosSimulatorArm64()).forEach { target ->
-        target.compilations["main"].cinterops.create("nativeIosPlayerShared")
+        target.swiftPackageConfig(cinteropName = "nativeIosPlayerShared") {
+            minIos = "15.0"
+
+            dependency {
+                remotePackageVersion(
+                    url = uri("https://github.com/youtube/youtube-ios-player-helper.git"),
+                    products = {
+                        add("YouTubeiOSPlayerHelper")
+                    },
+                    version = "1.0.4"
+                )
+            }
+        }
     }
 
     sourceSets {
@@ -44,20 +57,4 @@ compose.resources {
     publicResClass = true
     packageOfResClass = "com.msoula.hobbymatchmaker.core.design"
     generateResClass = always
-}
-
-swiftPackageConfig {
-    create("nativeIosPlayerShared") {
-        minIos = "18.0"
-
-        dependency {
-            remotePackageVersion(
-                url = URI("https://github.com/youtube/youtube-ios-player-helper.git"),
-                products = {
-                    add("YouTubeiOSPlayerHelper", exportToKotlin = true)
-                },
-                version = "1.0.4"
-            )
-        }
-    }
 }

@@ -34,6 +34,7 @@ import com.msoula.hobbymatchmaker.core.design.icons.BootstrapPerson
 import com.msoula.hobbymatchmaker.core.design.icons.HeroiconsSparkles
 import com.msoula.hobbymatchmaker.core.design.icons.LucideFilm
 import com.msoula.hobbymatchmaker.core.design.log_out
+import com.msoula.hobbymatchmaker.core.design.models.ProfileHeaderUiModel
 import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMember
 import com.msoula.hobbymatchmaker.core.design.molecules.BackNavigationTopBar
 import com.msoula.hobbymatchmaker.core.design.molecules.EditProfileTopBar
@@ -224,11 +225,22 @@ fun UserProfileContent(
                         CompleteProfileLayout(
                             headerSection = {
                                 AuthentifiedProfileHeader(
-                                    fullName = profile.name,
-                                    biography = profile.bio ?: "",
-                                    avatarPath = profile.avatarUrl,
+                                    user = ProfileHeaderUiModel(
+                                        name = "Morgane",
+                                        pseudo = profile.pseudo,
+                                        biography = profile.bio ?: "",
+                                        avatarUrl = profile.avatarUrl,
+                                        circleSize = profile.socialMembersCount
+                                    ),
                                     onEditProfileClicked = {
                                         userProfileActions.onEvent(UserProfileUiEventModel.OnEditModeClicked)
+                                    },
+                                    onSearchPeople = {
+                                        userProfileActions.onSearchPeople(it)
+                                    },
+                                    searchResult = searchedPseudos,
+                                    onInviteToSocialCircle = { pseudo, name ->
+                                        userProfileActions.onInviteToSocialCircle(pseudo, name)
                                     }
                                 )
                             },
@@ -239,21 +251,18 @@ fun UserProfileContent(
                                 )
                             },
                             interestsSection = {
-                                ProfileInterestsSection(
-                                    interests = profile.interests?.toImmutableList()
-                                )
+                                profile.interests?.let {
+                                    if (it.isNotEmpty()) {
+                                        ProfileInterestsSection(
+                                            interests = it.toImmutableList()
+                                        )
+                                    }
+                                }
                             },
                             socialSection = {
                                 ProfileSocialSection(
                                     socialMembers = profile.socialMembers.map { it.toProfileSocialMembers() }
-                                        .toImmutableList(),
-                                    onSearchPeople = {
-                                        userProfileActions.onSearchPeople(it)
-                                    },
-                                    searchResult = searchedPseudos,
-                                    onInviteToSocialCircle = { pseudo, name ->
-                                        userProfileActions.onInviteToSocialCircle(pseudo, name)
-                                    }
+                                        .toImmutableList()
                                 )
                             },
                             logOut = {

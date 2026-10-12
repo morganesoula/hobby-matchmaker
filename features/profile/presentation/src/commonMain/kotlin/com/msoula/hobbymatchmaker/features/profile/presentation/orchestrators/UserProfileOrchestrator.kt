@@ -37,6 +37,7 @@ class UserProfileOrchestrator(
                 .onStart { emit(emptyList()) }
         ) { profile, count, ids, members ->
             val userMoviesSet = ids.toSet()
+            Logger.d("User movies set: $userMoviesSet with profile: $profile")
             profile.toUserProfileUiModel(
                 likedMoviesCount = count.toInt(),
                 socialCircle = members.map { member ->

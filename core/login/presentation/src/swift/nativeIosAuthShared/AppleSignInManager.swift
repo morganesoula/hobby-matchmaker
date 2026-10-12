@@ -1,7 +1,7 @@
-import UIKit
 import AuthenticationServices
-import Foundation
 import CryptoKit
+import Foundation
+import UIKit
 
 @objcMembers public class AppleSignInManager: NSObject {
     @objc public static let shared = AppleSignInManager()
@@ -67,12 +67,13 @@ extension AppleSignInManager: ASAuthorizationControllerDelegate {
             let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential,
             let identityTokenData = appleIDCredential.identityToken,
             let tokenString = String(data: identityTokenData, encoding: .utf8),
-            let nonce = currentNonce else {
-                callback?(nil, nil, "Unable to parse Apple ID credentials.")
-                return
-            }
+            let nonce = currentNonce
+        else {
+            callback?(nil, nil, "Unable to parse Apple ID credentials.")
+            return
+        }
 
-            callback?(tokenString, nonce, nil)
+        callback?(tokenString, nonce, nil)
     }
 
     public func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: any Error) {
@@ -82,6 +83,9 @@ extension AppleSignInManager: ASAuthorizationControllerDelegate {
 
 extension AppleSignInManager: ASAuthorizationControllerPresentationContextProviding {
     public func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-        return UIApplication.shared.windows.first { $0.isKeyWindow }!
+        return UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .first { $0.isKeyWindow }!
     }
 }

@@ -23,7 +23,6 @@ kotlin {
             // Modules
             implementation(project(Modules.AUTHENTICATION_DOMAIN))
             implementation(project(Modules.COMMON))
-            implementation(project(Modules.NETWORK))
         }
     }
 }

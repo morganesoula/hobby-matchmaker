@@ -9,35 +9,47 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import nativeIosShared.IosNativeSocialCredential
 import platform.UIKit.UIApplication
-import kotlin.coroutines.resumeWithException
+import platform.UIKit.UIViewController
+import platform.UIKit.UIWindow
+import platform.UIKit.UIWindowScene
+import kotlin.coroutines.resume
 
 class IosGoogleUIClient : GoogleUIClient {
 
     @OptIn(ExperimentalForeignApi::class)
     override suspend fun getGoogleCredentials(): AppResult<AuthCredential?, AppError> {
         return suspendCancellableCoroutine { continuation ->
-            val viewController =
-                UIApplication.sharedApplication.keyWindow?.rootViewController as? objcnames.classes.UIViewController
-                    ?: run {
-                        continuation.resumeWithException(IllegalStateException("no rootViewController found"))
-                        return@suspendCancellableCoroutine
-                    }
+            val viewController = getRootViewController()
+                ?: run {
+                    continuation.resume(AppResult.Failure(AppError.Authentication.Unknown))
+                    return@suspendCancellableCoroutine
+                }
 
-            IosNativeSocialCredential.shared()
-                .getGoogleCredentialsFrom(viewController) { idToken, accessToken, error ->
+                IosNativeSocialCredential.shared().getGoogleCredentialsFrom(viewController) { idToken, accessToken, error ->
                     if (error != null) {
-                        continuation.resumeWithException(Exception(error.localizedDescription))
+                        continuation.resume(AppResult.Failure(AppError.Authentication.InvalidCredentials))
                     } else if (idToken != null && accessToken != null) {
                         val credential = GoogleAuthProvider.credential(idToken, accessToken)
-
-                        continuation.resume(AppResult.Success(credential)) { cause, _, _ ->
-                            continuation.resumeWithException(Exception("XXX IDTOKEN is $idToken" + cause.message))
-                        }
+                        continuation.resume(AppResult.Success(credential))
                     } else {
-                        continuation.resumeWithException(Exception("Unknown error occurred during Google Sign-In"))
+                        continuation.resume(AppResult.Failure(AppError.Authentication.Unknown))
                     }
                 }
         }
+    }
+
+    fun getRootViewController() = run {
+        val scene = UIApplication.sharedApplication.connectedScenes.firstOrNull() as? UIWindowScene
+            ?: return null
+
+        for (window in scene.windows) {
+            val uiWindow = window as UIWindow
+            if (uiWindow.isKeyWindow()) {
+                return@run uiWindow.rootViewController
+            }
+        }
+
+        null
     }
 }
 

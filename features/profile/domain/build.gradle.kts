@@ -11,7 +11,6 @@ kotlin {
         commonMain.dependencies {
             // Modules
             implementation(project(Modules.COMMON))
-            implementation(project(Modules.SESSION_DOMAIN))
         }
     }
 }

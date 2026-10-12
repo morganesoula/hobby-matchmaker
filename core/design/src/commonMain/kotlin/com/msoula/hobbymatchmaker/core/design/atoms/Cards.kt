@@ -8,10 +8,11 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -40,6 +41,7 @@ fun MovieGenericCard(
     index: Int,
     content: @Composable () -> Unit
 ) {
+    val aspectRatio = 2f / 3f
     val scale by remember {
         derivedStateOf {
             val currentItem =
@@ -57,8 +59,8 @@ fun MovieGenericCard(
 
     Card(
         modifier = modifier
-            .width(CardSize.Width300)
-            .height(CardSize.Height440)
+            .aspectRatio(aspectRatio)
+            .widthIn(max = CardSize.Width300)
             .padding(CustomSize.Eight)
             .scale(scale)
             .zIndex(scale * 10),

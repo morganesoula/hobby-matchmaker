@@ -1,5 +1,7 @@
 package com.msoula.hobbymatchmaker.core.design.organisms
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
@@ -64,118 +66,121 @@ fun SignUpForm(
     val emailFieldFocused = rememberSaveable { mutableStateOf(false) }
     val nameFieldFocused = rememberSaveable { mutableStateOf(false) }
 
-    // Name
-    PrimaryTextFieldWithIcon(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = CustomSize.Sixteen)
-            .onFocusChanged {
-                nameFieldFocused.value = it.isFocused
-            },
-        text = name,
-        label = stringResource(Res.string.firstname),
-        contentDescription = stringResource(Res.string.firstname),
-        singleLine = true,
-        onValueChanged = onNameChanged,
-        icon = BootstrapPerson,
-        keyboardOptions = KeyboardOptions(
-            capitalization = KeyboardCapitalization.Sentences,
-            imeAction = ImeAction.Next
-        ),
-        keyboardActions = null
-    )
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(CustomSize.Eight)
+    ) {
+        // Name
+        PrimaryTextFieldWithIcon(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = CustomSize.Sixteen)
+                .onFocusChanged {
+                    nameFieldFocused.value = it.isFocused
+                },
+            text = name,
+            label = stringResource(Res.string.firstname),
+            contentDescription = stringResource(Res.string.firstname),
+            singleLine = true,
+            onValueChanged = onNameChanged,
+            icon = BootstrapPerson,
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Sentences,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = null
+        )
 
-    if (nameRequirement.isNotEmpty() && nameFieldFocused.value) {
-        if (nameRequirement.any { !it.isValid }) {
-            ValidationRequirementsList(
-                requirements = nameRequirement
-            )
+        if (nameRequirement.isNotEmpty() && nameFieldFocused.value) {
+            if (nameRequirement.any { !it.isValid }) {
+                ValidationRequirementsList(requirements = nameRequirement)
+            }
         }
-    }
 
-    SpacerHeight8()
+        SpacerHeight8()
 
-    // Email
-    PrimaryTextFieldWithIcon(
-        text = email,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = CustomSize.Sixteen)
-            .onFocusChanged {
-                emailFieldFocused.value = it.isFocused
-            },
-        label = stringResource(Res.string.email),
-        contentDescription = stringResource(Res.string.email),
-        singleLine = true,
-        onValueChanged = onEmailChanged,
-        icon = MaterialSymbolsAlternate_email,
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Email,
-            imeAction = ImeAction.Next,
-            autoCorrectEnabled = false
-        ),
-        keyboardActions = null
-    )
+        // Email
+        PrimaryTextFieldWithIcon(
+            text = email,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = CustomSize.Sixteen)
+                .onFocusChanged {
+                    emailFieldFocused.value = it.isFocused
+                },
+            label = stringResource(Res.string.email),
+            contentDescription = stringResource(Res.string.email),
+            singleLine = true,
+            onValueChanged = onEmailChanged,
+            icon = MaterialSymbolsAlternate_email,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next,
+                autoCorrectEnabled = false
+            ),
+            keyboardActions = null
+        )
 
-    if (emailRequirement.isNotEmpty() && emailFieldFocused.value) {
-        if (emailRequirement.any { !it.isValid }) {
-            ValidationRequirementsList(
-                requirements = emailRequirement
-            )
-        }
-    }
-
-    SpacerHeight8()
-
-    // Password
-    PasswordTextField(
-        modifier = modifier
-            .onFocusChanged {
-                passwordFieldFocused.value = it.isFocused
-            },
-        text = password,
-        label = stringResource(Res.string.password),
-        contentDescription = stringResource(Res.string.password),
-        onEvent = onPasswordChanged,
-        visualTransformation = if (hiddenPassword) PasswordVisualTransformation() else
-            VisualTransformation.None,
-        keyboardActions = rememberSubmitKeyBoardActions {
-            onFinish()
-        },
-        trailingIcon = {
-            IconButton(onClick = { hiddenPassword = !hiddenPassword }) {
-                val description =
-                    if (hiddenPassword) {
-                        stringResource(Res.string.show_password)
-                    } else {
-                        stringResource(Res.string.hide_password)
-                    }
-                Icon(
-                    imageVector = if (hiddenPassword) MaterialSymbolsVisibility else MaterialSymbolsVisibility_off,
-                    contentDescription = description
+        if (emailRequirement.isNotEmpty() && emailFieldFocused.value) {
+            if (emailRequirement.any { !it.isValid }) {
+                ValidationRequirementsList(
+                    requirements = emailRequirement
                 )
             }
         }
-    )
 
-    if (passwordRequirement.isNotEmpty() && passwordFieldFocused.value) {
-        if (passwordRequirement.any { !it.isValid }) {
-            ValidationRequirementsList(
-                requirements = passwordRequirement
-            )
+        SpacerHeight8()
 
-            SpacerHeight8()
+        // Password
+        PasswordTextField(
+            modifier = modifier
+                .onFocusChanged {
+                    passwordFieldFocused.value = it.isFocused
+                },
+            text = password,
+            label = stringResource(Res.string.password),
+            contentDescription = stringResource(Res.string.password),
+            onEvent = onPasswordChanged,
+            visualTransformation = if (hiddenPassword) PasswordVisualTransformation() else
+                VisualTransformation.None,
+            keyboardActions = rememberSubmitKeyBoardActions {
+                onFinish()
+            },
+            trailingIcon = {
+                IconButton(onClick = { hiddenPassword = !hiddenPassword }) {
+                    val description =
+                        if (hiddenPassword) {
+                            stringResource(Res.string.show_password)
+                        } else {
+                            stringResource(Res.string.hide_password)
+                        }
+                    Icon(
+                        imageVector = if (hiddenPassword) MaterialSymbolsVisibility else MaterialSymbolsVisibility_off,
+                        contentDescription = description
+                    )
+                }
+            }
+        )
+
+        if (passwordRequirement.isNotEmpty() && passwordFieldFocused.value) {
+            if (passwordRequirement.any { !it.isValid }) {
+                ValidationRequirementsList(
+                    requirements = passwordRequirement
+                )
+
+                SpacerHeight8()
+            }
         }
+
+        SpacerHeight16()
+
+        PrimaryButton(
+            text = stringResource(Res.string.sign_up),
+            onClick = onFinish,
+            loading = loading,
+            enabled = enabled
+        )
     }
-
-    SpacerHeight16()
-
-    PrimaryButton(
-        text = stringResource(Res.string.sign_up),
-        onClick = onFinish,
-        loading = loading,
-        enabled = enabled
-    )
 }
 
 

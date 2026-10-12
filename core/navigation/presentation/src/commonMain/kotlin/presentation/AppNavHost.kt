@@ -16,7 +16,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -86,7 +85,6 @@ private val VideoPlayerStateSaver = Saver<VideoPlayerState, List<Any>>(
     }
 )
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun AppNavHost(
     socialClients: SocialClients
@@ -164,13 +162,9 @@ fun AppNavHost(
                     dontAskCheckbox = dontAskCheckbox,
                     onEvent = signInViewModel::onEvent,
                     snackBarHostState = snackbarHostState,
-                    facebookUIClient = requireNotNull(
-                        (socialClients
-                            .clients[ProviderType.FACEBOOK] as? FacebookUIClientImpl)
-                            ?.facebookUIClient
-                    ) {
-                        "Facebook UI client is not configured in SocialClients"
-                    }
+                    facebookUIClient = (socialClients
+                        .clients[ProviderType.FACEBOOK] as? FacebookUIClientImpl)
+                        ?.facebookUIClient
                 )
             }
 
@@ -307,6 +301,17 @@ fun AppNavHost(
                                 "profile_updated" -> userProfileViewModel.closeEdition()
                             }
                         }
+
+                        else -> Unit
+                    }
+                }
+            }
+
+            LaunchedEffect(Unit) {
+                socialViewModel.events.collect { event ->
+                    when (event) {
+                        is UiEvent.ShowSnackBar ->
+                            snackBarHostState.showSnackbar(event.message.asStringSuspend())
 
                         else -> Unit
                     }

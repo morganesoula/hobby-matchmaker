@@ -1,0 +1,168 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Social Circle - Movie Matches</title>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "background-dark": "#201a19",
+            "on-tertiary-container": "#004965",
+            "on-primary": "#4a2800",
+            "on-secondary": "#4a2800",
+            "on-surface-variant": "#dbc2ad",
+            "inverse-primary": "#8a5100",
+            "on-surface": "#ece0de",
+            "surface-container-lowest": "#120d0c",
+            "primary-fixed": "#ffdcbd",
+            "tertiary-fixed-dim": "#7cd0ff",
+            "surface-container": "#241e1d",
+            "surface": "#181211",
+            "inverse-on-surface": "#362f2e",
+            "on-secondary-container": "#e3aa71",
+            "outline-variant": "#554434",
+            "surface-container-highest": "#3a3332",
+            "on-secondary-fixed-variant": "#663e0e",
+            "outline": "#a38d7a",
+            "on-primary-container": "#653a00",
+            "surface-border": "rgba(255, 153, 0, 0.2)",
+            "secondary-container": "#663e0e",
+            "on-error-container": "#ffdad6",
+            "surface-container-low": "#201a19",
+            "inverse-surface": "#ece0de",
+            "text-muted": "#94a3b8",
+            "primary-fixed-dim": "#ffb86f",
+            "tertiary-fixed": "#c4e7ff",
+            "surface-container-high": "#2f2827",
+            "on-secondary-fixed": "#2c1600",
+            "on-error": "#690005",
+            "secondary": "#f6bb81",
+            "on-primary-fixed-variant": "#693c00",
+            "tertiary": "#8ed5ff",
+            "tertiary-container": "#04beff",
+            "background-light": "#f8f7f5",
+            "primary": "#ffc082",
+            "surface-tint": "#ffb86f",
+            "on-background": "#ece0de",
+            "surface-card": "#271e15",
+            "background": "#181211",
+            "on-tertiary": "#00344a",
+            "on-tertiary-fixed-variant": "#004c69",
+            "on-tertiary-fixed": "#001e2c",
+            "surface-variant": "#3a3332",
+            "error-container": "#93000a",
+            "surface-bright": "#3f3836",
+            "on-primary-fixed": "#2c1600",
+            "secondary-fixed-dim": "#f6bb81",
+            "error": "#ffb4ab",
+            "primary-container": "#ff9900",
+            "surface-dim": "#181211",
+            "secondary-fixed": "#ffdcbe"
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          fontFamily: {
+            sans: ["Plus Jakarta Sans", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .fill-icon {
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface antialiased min-h-screen flex flex-col justify-between selection:bg-primary-container selection:text-on-primary">
+<!-- Container max-w mobile shell simulation / responsive container -->
+<div class="w-full max-w-md mx-auto flex flex-col min-h-screen bg-background border-x border-outline-variant/30 shadow-2xl relative">
+<!-- Top Bar -->
+<header class="sticky top-0 z-20 flex items-center justify-between px-4 py-3 bg-surface/95 backdrop-blur-md border-b border-outline-variant/20">
+<button aria-label="Go back" class="flex size-10 items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high transition-colors" type="button">
+<span class="material-symbols-outlined text-2xl">arrow_back</span>
+</button>
+<h1 class="text-on-surface text-lg font-bold tracking-tight text-center flex-1">Social Circle</h1>
+<button aria-label="Filter and Settings" class="flex size-10 items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high transition-colors" type="button">
+<span class="material-symbols-outlined text-2xl">tune</span>
+</button>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col px-4 pt-4 pb-6 space-y-6">
+<!-- Segmented Tabs -->
+<section aria-label="Invitations view filter" class="w-full">
+<div class="flex h-11 w-full items-center justify-center rounded-xl bg-surface-container p-1 border border-outline-variant/30">
+<!-- Received (Active) -->
+<button class="flex-1 h-full flex items-center justify-center rounded-lg bg-surface-container-highest text-primary font-semibold text-sm shadow-sm transition-all duration-200" type="button">
+<span class="">Received</span>
+<span class="ml-1.5 px-1.5 py-0.5 rounded-full text-xs font-bold bg-primary-container/20 text-primary">0</span>
+</button>
+<!-- Sent (Inactive) -->
+<button class="flex-1 h-full flex items-center justify-center rounded-lg text-on-surface-variant font-medium text-sm hover:text-on-surface transition-all duration-200" type="button">
+<span class="">Sent</span>
+<span class="ml-1.5 px-1.5 py-0.5 rounded-full text-xs font-medium bg-surface-container-highest/60 text-on-surface-variant">2</span>
+</button>
+</div>
+</section>
+<!-- Central Empty State Card -->
+<section class="flex-1 flex flex-col items-center justify-center py-2 space-y-6">
+<!-- Glowing Circular Badge Illustration -->
+<div class="relative flex items-center justify-center">
+<div class="absolute -inset-3 rounded-full bg-primary-container/20 blur-xl animate-pulse"></div>
+<div class="relative flex size-24 items-center justify-center rounded-full bg-gradient-to-b from-surface-container-high to-surface-card border border-primary-container/40 shadow-inner">
+<span class="material-symbols-outlined text-4xl text-primary">mark_email_unread</span>
+</div>
+</div>
+<!-- Empty State Typography -->
+<div class="text-center space-y-2 max-w-xs px-2">
+<h2 class="text-on-surface text-xl font-bold tracking-tight">No Pending Invites</h2>
+<p class="text-on-surface-variant text-sm leading-relaxed">
+            No one has sent you an invite yet. Share your handle so your friends can connect with you and discover mutual movie matches!
+          </p>
+</div>
+<!-- QR Code / Profile ID Card Container -->
+<div class="w-full rounded-2xl bg-surface-container border border-outline-variant/40 p-5 shadow-lg flex flex-col items-center space-y-4">
+<!-- User Tag / Pseudo Header -->
+<div class="flex flex-col items-center">
+<span class="text-xs font-semibold tracking-wider uppercase text-secondary">Pseudo</span>
+<span class="text-lg font-bold text-on-surface mt-0.5 tracking-tight">@alex_c</span>
+</div>
+<!-- Stylized QR Code Graphic Container with Corner Brackets -->
+
+<!-- QR Caption -->
+
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+
+</div>
+
+
+</body></html>

@@ -7,31 +7,48 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
+import com.msoula.hobbymatchmaker.core.design.atoms.ButtonWithStartIcon
 import com.msoula.hobbymatchmaker.core.design.atoms.CircleWithCustomPhoto
 import com.msoula.hobbymatchmaker.core.design.atoms.CircleWithDefaultIcon
+import com.msoula.hobbymatchmaker.core.design.atoms.GenericCard
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight4
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWidth8
 import com.msoula.hobbymatchmaker.core.design.authentified_edit_button_title
+import com.msoula.hobbymatchmaker.core.design.cancel
 import com.msoula.hobbymatchmaker.core.design.icons.LucidePencil
+import com.msoula.hobbymatchmaker.core.design.icons.MaterialSymbolsPerson_add
+import com.msoula.hobbymatchmaker.core.design.models.ProfileHeaderUiModel
+import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMember
+import com.msoula.hobbymatchmaker.core.design.molecules.PseudoSearchBar
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
+import com.msoula.hobbymatchmaker.core.design.theme.IconSize
+import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_main_add_people_form_title
+import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_main_add_people_text_button
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -83,11 +100,24 @@ fun GuestProfileHeader(
 @Composable
 fun AuthentifiedProfileHeader(
     modifier: Modifier = Modifier,
-    fullName: String,
-    biography: String,
-    avatarPath: String? = null,
-    onEditProfileClicked: () -> Unit
+    user: ProfileHeaderUiModel,
+    onEditProfileClicked: () -> Unit,
+    onSearchPeople: (pseudo: String) -> Unit,
+    searchResult: ImmutableList<ProfileSocialMember> = persistentListOf(),
+    onInviteToSocialCircle: (pseudo: String, name: String?) -> Unit
 ) {
+    val identityDisplayText = when {
+        user.name.isNotBlank() && user.pseudo.isNotBlank() -> "${user.name} (@${user.pseudo})"
+        user.name.isNotBlank() -> user.name
+        user.pseudo.isNotBlank() -> "@${user.pseudo}"
+        else -> ""
+    }
+
+    val textFieldState = rememberTextFieldState()
+    var displayAddPeopleForm by rememberSaveable { mutableStateOf(false) }
+    var pseudoSelectedTmp by remember { mutableStateOf("") }
+    var associatedNameTmp by remember { mutableStateOf("") }
+
     Box(
         modifier = modifier.fillMaxWidth()
             .padding(top = CustomSize.Sixteen)
@@ -101,24 +131,24 @@ fun AuthentifiedProfileHeader(
             verticalArrangement = Arrangement.Center
         ) {
             CircleWithCustomPhoto(
-                customAvatarPath = avatarPath,
+                customAvatarPath = user.avatarUrl,
                 borderColor = MaterialTheme.colorScheme.primary.copy(alpha = .4f)
             )
-            SpacerHeight16()
+            SpacerHeight8()
 
-            if (fullName.isNotBlank()) {
+            if (identityDisplayText.isNotBlank()) {
                 Text(
-                    text = fullName,
+                    text = user.name,
                     color = MaterialTheme.colorScheme.onPrimary,
                     style = MaterialTheme.typography.titleLarge,
                     textAlign = TextAlign.Center
                 )
-                SpacerHeight4()
+                SpacerHeight16()
             }
 
-            if (biography.isNotBlank()) {
+            if (user.biography.isNotBlank()) {
                 Text(
-                    text = biography,
+                    text = user.biography,
                     color = MaterialTheme.colorScheme.onPrimary,
                     style = MaterialTheme.typography.titleMedium,
                     textAlign = TextAlign.Center
@@ -127,47 +157,100 @@ fun AuthentifiedProfileHeader(
                 SpacerHeight16()
             }
 
-            Button(
-                onClick = { onEditProfileClicked() },
-                modifier = Modifier.border(
-                    2.dp, MaterialTheme.colorScheme.primary,
-                    RoundedCornerShape(CustomSize.Sixteen)
-                ),
-                colors = ButtonDefaults.buttonColors(
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                ButtonWithStartIcon(
+                    icon = LucidePencil,
+                    textButton = stringResource(Res.string.authentified_edit_button_title),
+                    onButtonClick = onEditProfileClicked,
                     containerColor = Color.Transparent,
                     contentColor = MaterialTheme.colorScheme.onSurface
                 )
-            ) {
-                Row(
-                    modifier = modifier
-                        .wrapContentSize()
-                        .padding(CustomSize.Four),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = LucidePencil,
-                        contentDescription = null
-                    )
 
-                    SpacerWidth8()
+                if (!displayAddPeopleForm && (user.circleSize) < 5) {
+                    SpacerHeight8()
 
-                    Text(
-                        text = stringResource(Res.string.authentified_edit_button_title),
-                        textAlign = TextAlign.Center
+                    ButtonWithStartIcon(
+                        icon = MaterialSymbolsPerson_add,
+                        textButton = stringResource(
+                            Res.string.user_profile_social_circle_main_add_people_text_button
+                        ),
+                        onButtonClick = { displayAddPeopleForm = true },
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
                     )
+                }
+
+                if (displayAddPeopleForm) {
+                    SpacerHeight16()
+                    GenericCard(
+                        Modifier
+                            .border(
+                                1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(
+                                    CustomSize.Sixteen
+                                )
+                            ),
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    ) {
+                        Column {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = MaterialSymbolsPerson_add,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(IconSize.TwentyFour)
+                                )
+                                SpacerWidth8()
+                                Text(
+                                    text = stringResource(Res.string.user_profile_social_circle_main_add_people_form_title),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onBackground
+                                )
+                            }
+
+                            PseudoSearchBar(
+                                textFieldState = textFieldState,
+                                onSearch = onSearchPeople,
+                                searchResults = searchResult,
+                                onPseudoSelected = { pseudo, name ->
+                                    pseudoSelectedTmp = pseudo
+                                    associatedNameTmp = name ?: ""
+                                }
+                            )
+
+                            if (pseudoSelectedTmp.isNotEmpty()) {
+                                SpacerHeight8()
+
+                                Button(
+                                    onClick = {
+                                        displayAddPeopleForm = false
+                                        onInviteToSocialCircle(pseudoSelectedTmp, associatedNameTmp)
+                                    },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    shape = RoundedCornerShape(CustomSize.Sixteen)
+                                ) {
+                                    Text(text = stringResource(Res.string.user_profile_social_circle_main_add_people_text_button))
+                                }
+                            }
+
+                            SpacerHeight8()
+
+                            Button(
+                                onClick = { displayAddPeopleForm = false },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(CustomSize.Sixteen)
+                            ) {
+                                Text(text = stringResource(Res.string.cancel))
+                            }
+                        }
+                    }
+                    SpacerHeight16()
                 }
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun AuthentifiedProfileHeaderPreview() {
-    AuthentifiedProfileHeader(
-        fullName = "Kit Kat",
-        biography = "Random biography to make it real",
-        onEditProfileClicked = { }
-    )
 }

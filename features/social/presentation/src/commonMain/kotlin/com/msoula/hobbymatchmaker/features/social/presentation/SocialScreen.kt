@@ -6,14 +6,14 @@ import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.EmptyStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.StateContainer
-import com.msoula.hobbymatchmaker.core.design.icons.MaterialIconsMovie_filter
-import com.msoula.hobbymatchmaker.core.design.icons.MaterialSymbolsRoundedSad_tab
+import com.msoula.hobbymatchmaker.core.design.icons.BootstrapSendCheck
+import com.msoula.hobbymatchmaker.core.design.icons.FeatherInbox
 import com.msoula.hobbymatchmaker.core.design.models.EmptyStateConfig
 import com.msoula.hobbymatchmaker.core.design.models.TabItem
-import com.msoula.hobbymatchmaker.core.design.no_data
-import com.msoula.hobbymatchmaker.core.design.not_found
 import com.msoula.hobbymatchmaker.core.design.organisms.ReceivedInvitationSection
 import com.msoula.hobbymatchmaker.core.design.organisms.SentInvitationSection
+import com.msoula.hobbymatchmaker.core.design.social_received_requests_no_data_description
+import com.msoula.hobbymatchmaker.core.design.social_received_requests_no_data_title
 import com.msoula.hobbymatchmaker.core.design.social_sent_requests_no_data_description
 import com.msoula.hobbymatchmaker.core.design.social_sent_requests_no_data_title
 import com.msoula.hobbymatchmaker.core.design.templates.SocialLayout
@@ -42,10 +42,10 @@ fun SocialContent(
                     onLoading = {},
                     onEmpty = {
                         EmptyStateScreen(
-                            EmptyStateConfig(
-                                icon = MaterialIconsMovie_filter,
-                                title = UIText.Resource(Res.string.no_data),
-                                description = UIText.Resource(Res.string.not_found)
+                            config = EmptyStateConfig(
+                                icon = FeatherInbox,
+                                title = UIText.Resource(Res.string.social_received_requests_no_data_title),
+                                description = UIText.Resource(Res.string.social_received_requests_no_data_description)
                             )
                         )
                     },
@@ -83,8 +83,8 @@ fun SocialContent(
                     onLoading = {},
                     onEmpty = {
                         EmptyStateScreen(
-                            EmptyStateConfig(
-                                icon = MaterialSymbolsRoundedSad_tab,
+                            config = EmptyStateConfig(
+                                icon = BootstrapSendCheck,
                                 title = UIText.Resource(Res.string.social_sent_requests_no_data_title),
                                 description = UIText.Resource(Res.string.social_sent_requests_no_data_description)
                             )

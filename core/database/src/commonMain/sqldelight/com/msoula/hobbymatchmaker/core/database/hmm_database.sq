@@ -57,8 +57,7 @@ CREATE TABLE social_circle_member (
     member_pseudo TEXT,
     member_avatar_url TEXT,
     added_at INTEGER NOT NULL,
-    PRIMARY KEY (uid, member_uid),
-    FOREIGN KEY (uid) REFERENCES user_profile(uid) ON DELETE CASCADE
+    PRIMARY KEY (uid, member_uid)
 );
 
 CREATE TABLE IF NOT EXISTS user_cache (

@@ -34,7 +34,7 @@ actual class ImageFileManager(
                     )
                 }
 
-                val sourceURL = NSURL(string = sourceUri)
+                val sourceURL = NSURL.fileURLWithPath(sourceUri)
                 val imageData = NSData.dataWithContentsOfURL(sourceURL) ?: return@withContext null
                 val destinationURL = avatarsDirectory?.URLByAppendingPathComponent(fileName)
                     ?: return@withContext null

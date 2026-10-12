@@ -8,63 +8,36 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.GenericCard
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
-import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
-import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWidth4
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWidth8
 import com.msoula.hobbymatchmaker.core.design.authentified_no_social_members_description
-import com.msoula.hobbymatchmaker.core.design.cancel
-import com.msoula.hobbymatchmaker.core.design.icons.MaterialSymbolsPerson_add
 import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMember
-import com.msoula.hobbymatchmaker.core.design.molecules.PseudoSearchBar
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.theme.IconSize
 import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_common_movies_count_plural
 import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_common_movies_count_singular
-import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_main_add_people_form_title
-import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_main_add_people_text_button
 import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_main_title
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ProfileSocialSection(
-    socialMembers: ImmutableList<ProfileSocialMember>?,
-    onSearchPeople: (pseudo: String) -> Unit,
-    searchResult: ImmutableList<ProfileSocialMember> = persistentListOf(),
-    onInviteToSocialCircle: (pseudo: String, name: String?) -> Unit
+    socialMembers: ImmutableList<ProfileSocialMember>?
 ) {
-    val textFieldState = rememberTextFieldState()
-    var displayAddPeopleForm by rememberSaveable { mutableStateOf(false) }
-    var pseudoSelectedTmp by remember { mutableStateOf("") }
-    var associatedNameTmp by remember { mutableStateOf("") }
-
     GenericCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -83,98 +56,6 @@ fun ProfileSocialSection(
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onBackground,
                 )
-
-                if (!displayAddPeopleForm && (socialMembers?.size ?: 0) < 5) {
-                    Button(
-                        onClick = { displayAddPeopleForm = true },
-                        modifier = Modifier.wrapContentWidth(),
-                        shape = RoundedCornerShape(CustomSize.Sixteen)
-                    ) {
-                        Icon(
-                            imageVector = MaterialSymbolsPerson_add,
-                            contentDescription = stringResource(
-                                Res.string.user_profile_social_circle_main_add_people_text_button
-                            ),
-                            modifier = Modifier.size(IconSize.Sixteen)
-                        )
-
-                        SpacerWidth4()
-
-                        Text(
-                            text = stringResource(
-                                Res.string.user_profile_social_circle_main_add_people_text_button
-                            )
-                        )
-                    }
-                }
-            }
-
-            if (displayAddPeopleForm) {
-                SpacerHeight16()
-                GenericCard(
-                    Modifier
-                        .border(
-                            1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(
-                                CustomSize.Sixteen
-                            )
-                        ),
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer
-                ) {
-                    Column {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = MaterialSymbolsPerson_add,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(IconSize.TwentyFour)
-                            )
-                            SpacerWidth8()
-                            Text(
-                                text = stringResource(Res.string.user_profile_social_circle_main_add_people_form_title),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onBackground
-                            )
-                        }
-
-                        PseudoSearchBar(
-                            textFieldState = textFieldState,
-                            onSearch = onSearchPeople,
-                            searchResults = searchResult,
-                            onPseudoSelected = { pseudo, name ->
-                                pseudoSelectedTmp = pseudo
-                                associatedNameTmp = name ?: ""
-                            }
-                        )
-
-                        if (pseudoSelectedTmp.isNotEmpty()) {
-                            SpacerHeight8()
-
-                            Button(
-                                onClick = {
-                                    displayAddPeopleForm = false
-                                    onInviteToSocialCircle(pseudoSelectedTmp, associatedNameTmp)
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(CustomSize.Sixteen)
-                            ) {
-                                Text(text = stringResource(Res.string.user_profile_social_circle_main_add_people_text_button))
-                            }
-                        }
-
-                        SpacerHeight8()
-
-                        Button(
-                            onClick = { displayAddPeopleForm = false },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(CustomSize.Sixteen)
-                        ) {
-                            Text(text = stringResource(Res.string.cancel))
-                        }
-                    }
-                }
-                SpacerHeight16()
             }
 
             SpacerHeight16()
@@ -243,14 +124,4 @@ fun ProfileSocialSection(
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun ProfileSocialSectionPreview() {
-    ProfileSocialSection(
-        socialMembers = persistentListOf(),
-        onSearchPeople = {},
-        onInviteToSocialCircle = { _, _ -> }
-    )
 }

@@ -1,5 +1,6 @@
 package com.msoula.hobbymatchmaker.core.design.molecules
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
@@ -17,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWidth4
 import com.msoula.hobbymatchmaker.core.design.cancel
@@ -35,7 +37,7 @@ fun NavigationTopBar(
 ) {
     TopAppBar(
         title = {},
-        modifier = modifier,
+        windowInsets = WindowInsets(0),
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.Transparent, scrolledContainerColor = Color.Transparent
         ),

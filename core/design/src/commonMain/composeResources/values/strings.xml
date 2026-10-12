@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    // GENERAL
+    <!-- GENERAL -->
     <string name="welcome_title">Bienvenue !</string>
     <string name="welcome_subtitle">Créez votre compte HobbyMatchMaker</string>
     <string name="welcome_back_title">Heureux de vous revoir !</string>
     <string name="welcome_back_subtitle">Connectez-vous à HobbyMatchMaker</string>
     <string name="default_web_client_id" translatable="false">402985273077-ijpv11p99mv6vgii80etm1ee9j1ll9ui.apps.googleusercontent.com</string>
 
-    // ACCESSIBILITY
+    <!-- ACCESSIBILITY -->
     <string name="facebook_alt">Logo Facebook</string>
     <string name="google_alt">Logo Google</string>
     <string name="apple_alt">Logo Apple</string>
     <string name="actor_name_content_description">Nom d'acteur</string>
 
-    // ERROR
+    <!-- ERROR -->
     <string name="login_error">Identifiant ou mot de passe incorrect</string>
     <string name="signup_error">Cet email est déjà associé à un compte existant</string>
     <string name="email_already_exists_error">Cet e-mail est déjà associé à un compte existant</string>
@@ -26,7 +26,7 @@
     <string name="connection_issue">Problème de connexion. Veuillez vérifier votre réseau</string>
     <string name="error_issue_retry">Ressayer</string>
 
-    // FORM
+    <!-- FORM -->
     <string name="firstname">Pr\u00E9nom</string>
     <string name="lastname">Nom de famille</string>
     <string name="example">Exemple:&#160;</string>
@@ -59,7 +59,7 @@
     <string name="sign_in_with_google">Se connecter avec Google</string>
     <string name="sign_in_with_apple">Se connecter avec Apple</string>
 
-    // HUB
+    <!-- HUB -->
     <string name="hub_recent_matches_title">Matchs Récents</string>
     <string name="hub_recent_matches_shared_movies_single_txt">1 film commun</string>
     <string name="hub_recent_matches_shared_movies_plural_txt">%1$d films communs</string>
@@ -75,11 +75,11 @@
     <string name="hub_recent_matches_common_movies_title">Films en commun</string>
     <string name="hub_recent_matches_common_movies_no_data_txt">Vous n'avez pas encore de films en commun.</string>
 
-    // MOVIE DETAIL
+    <!-- MOVIE DETAIL -->
     <string name="movie_detail_friend_section_main_title">Amis qui ont aimé ce film</string>
     <string name="movie_detail_friend_section_no_data_title">Aucun ami n'a encore aimé ce film</string>
 
-    // OTHER
+    <!-- OTHER -->
     <string name="continue_as_guest_button_title">Continuer en tant qu'invité</string>
     <string name="continue_as_guest_dialog_title">Essayer en tant qu'invité</string>
     <string name="continue_as_guest_dialog_text">Commencez sans compte: certaines fonctions sont restreintes (synchro, récupération).Vous pourrez créer un compte plus tard pour garder vos données.</string>
@@ -131,7 +131,7 @@
     <string name="authentication_unknown">Echec de la connexion. Ressayez !</string>
     <string name="authentication_invalid_credentials">Identifiants incorrects.</string>
 
-    // PROFILE
+    <!-- PROFILE -->
     <string name="log_out">Déconnexion</string>
 
     <string name="movies_liked_count_title_singular">Film aimé</string>
@@ -153,12 +153,12 @@
     <string name="guest_build_circle_feature_title">Définissez Votre Cercle</string>
     <string name="guest_build_circle_feature_description">Ajoutez jusqu'à 5 personnes à votre cercle social et restez connectés</string>
     <string name="guest_share_interests_feature_title">Partagez Vos Passions</string>
-    <string name="guest_share_interests_feature_description">Indiquez vos passions et connectez vous à des gens qui vous ressemblent</string>
+    <string name="guest_share_interests_feature_description">Indiquez vos passions et connectez-vous à des gens qui vous ressemblent</string>
     <string name="guest_redirect_title">Prêt à commencer ?</string>
     <string name="guest_redirect_description">Rejoignez HobbyMatchMaker et lancez vous dans l'aventure</string>
     <string name="guest_redirect_sign_up_button_text">Inscrivez-vous dès maintenant !</string>
 
-    <string name="authentified_edit_button_title">Editez mon profil</string>
+    <string name="authentified_edit_button_title">Editer mon profil</string>
     <string name="authentified_no_social_members_description">Pas de membres ajoutés</string>
 
     <string name="edit_profile_save_button_title">Enregistrer</string>
@@ -175,20 +175,22 @@
     <string name="edit_profile_add_interests_description">Astuce: Séparez vos intérêts par des virgules pour en ajouter plusieurs à la fois</string>
     <string name="edit_profile_add_interests_hint">Ex: Randonnée, Jeux vidéos...</string>
 
-    // SOCIAL
+    <!-- SOCIAL -->
     <string name="social_received_requests_description">Retrouvez ici les personnes qui souhaitent vous ajouter à leur cercle social. En acceptant leur requête, vous serez notifiés lorsque vous aimez tous les deux le même film.</string>
     <string name="social_received_requests_title">Demandes reçues</string>
     <string name="social_received_requests_time">Il y a</string>
     <string name="social_received_requests_common_movie">en commun</string>
     <string name="social_received_requests_accept_button_text">Accepter</string>
     <string name="social_received_requests_decline_button_text">Refuser</string>
+    <string name="social_received_requests_no_data_title">Aucune invitation reçue</string>
+    <string name="social_received_requests_no_data_description">Vous n'avez pas encore reçu d'invitation. Explorez et connectez-vous avec d'autres joueurs !</string>
     <string name="social_sent_requests_title">Demandes envoyées</string>
     <string name="social_sent_requests_cancel_invitation_text">Annuler l'invitation</string>
     <string name="social_sent_requests_status_pending">En attente</string>
     <string name="social_sent_requests_status_accepted">Acceptée</string>
     <string name="social_sent_requests_status_declined">Refusée</string>
-    <string name="social_sent_requests_no_data_title">Oh non, vous n'avez encore invité personne...</string>
-    <string name="social_sent_requests_no_data_description">Bonne nouvelle: ajoutez des personnes via votre profil pour profiter de l'expérience au maximum !</string>
+    <string name="social_sent_requests_no_data_title">Aucune invitation envoyée</string>
+    <string name="social_sent_requests_no_data_description">Ajoutez des personnes via votre écran profil pour profiter de l'expérience au maximum !</string>
     <string name="social_capacity_reached">Il semblerait que vous ou votre invité ait atteint la limite maximale (5) de personnes autorisées à rejoindre le cercle d'amis !</string>
 
     <string name="social_movie_match_notification">Match avec %1$s !</string>

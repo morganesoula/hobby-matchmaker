@@ -1,5 +1,9 @@
+@file:OptIn(ExperimentalSpmForKmpFeature::class)
+
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryExtension
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
+import io.github.frankois944.spmForKmp.swiftPackageConfig
+import io.github.frankois944.spmForKmp.utils.ExperimentalSpmForKmpFeature
 import org.gradle.kotlin.dsl.configure
 import java.io.FileInputStream
 import java.util.Properties
@@ -27,8 +31,13 @@ kotlin {
         }
     }
 
-    iosArm64().apply {
-        compilations["main"].cinterops.create("nativeIosAuthShared")
+    listOf(
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { target ->
+        target.swiftPackageConfig("nativeIosAuthShared") {
+            minIos = "15.0"
+        }
     }
 
     sourceSets {
@@ -83,11 +92,5 @@ buildkonfig {
             "WEB_CLIENT_ID",
             secretProperties["web_client_id"]?.toString() ?: ""
         )
-    }
-}
-
-swiftPackageConfig {
-    create("nativeIosAuthShared") {
-        minIos = "18.0"
     }
 }

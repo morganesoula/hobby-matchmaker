@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -21,26 +23,23 @@ fun SignUpLayout(
     form: @Composable () -> Unit,
     bottomSection: @Composable () -> Unit
 ) {
-        Box(
-            modifier.fillMaxSize()
-                .padding(
-                    top = CustomSize.Sixteen,
-                    start = CustomSize.Sixteen,
-                    end = CustomSize.Sixteen
-                )
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .verticalScroll(rememberScrollState())
-                    .keyboardDismissOnTap()
-            ) {
-                topBar()
-                SpacerWeight1()
-                form()
-                SpacerWeight1()
-                bottomSection()
-            }
-        }
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+            .verticalScroll(rememberScrollState())
+            .imePadding()
+            .padding(
+                top = CustomSize.Sixteen,
+                start = CustomSize.Sixteen,
+                end = CustomSize.Sixteen
+            )
+            .navigationBarsPadding()
+    ) {
+        topBar()
+        SpacerWeight1()
+        form()
+        SpacerWeight1()
+        bottomSection()
+    }
 }

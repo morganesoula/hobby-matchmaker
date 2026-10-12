@@ -17,7 +17,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.common.isIosPlatform
 import com.msoula.hobbymatchmaker.core.design.atoms.LoadMoreDataIndicator
 import com.msoula.hobbymatchmaker.core.design.models.MovieCarouselItem
@@ -37,6 +36,7 @@ fun MovieCarousel(
     onMovieDoubleTap: (id: Long) -> Unit
 ) {
     val listState = rememberLazyListState()
+    val topPadding = if (isIosPlatform()) CustomSize.Eight else padding.calculateTopPadding()
 
     val shouldLoadMore by remember {
         derivedStateOf {
@@ -56,7 +56,7 @@ fun MovieCarousel(
         modifier = modifier
             .fillMaxSize()
             .padding(
-                top = if (isIosPlatform()) padding.calculateTopPadding() - 8.dp else padding.calculateTopPadding(),
+                top = topPadding,
                 bottom = padding.calculateBottomPadding(),
                 start = padding.calculateStartPadding(LocalLayoutDirection.current),
                 end = padding.calculateEndPadding(LocalLayoutDirection.current)
@@ -64,7 +64,7 @@ fun MovieCarousel(
         contentAlignment = Alignment.Center
     ) {
         LazyRow(
-            contentPadding = PaddingValues(start = CustomSize.SixtyFour),
+            contentPadding = PaddingValues(start = CustomSize.Eight),
             verticalAlignment = Alignment.CenterVertically,
             state = listState
         ) {

@@ -75,14 +75,17 @@ class UserProfileViewModel(
         .stateIn(scope, SharingStarted.Eagerly, null)
 
     init {
+        Logger.d("UserProfileViewModel created")
         observeProfile()
         refreshProfileData()
     }
 
     private fun observeProfile() {
+        Logger.d("Observing profile")
         scope.launch {
             currentUserUid
                 .flatMapLatest { uid ->
+                    Logger.d("UID of currentUserUid is: $uid")
                     if (uid != null) userProfileInteractor.observeCurrentUser(uid)
                     else flowOf(null)
                 }

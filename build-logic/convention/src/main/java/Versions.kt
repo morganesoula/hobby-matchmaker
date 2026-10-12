@@ -30,7 +30,6 @@ object Modules {
     const val MOVIE_DETAIL_DOMAIN = ":features:moviedetail:domain"
     const val MOVIE_DETAIL_PRESENTATION = ":features:moviedetail:presentation"
     const val NAVIGATION_PRESENTATION = ":core:navigation:presentation"
-    const val NETWORK = ":core:network"
     const val PROFILE_DATA = ":features:profile:data"
     const val PROFILE_DOMAIN = ":features:profile:domain"
     const val PROFILE_PRESENTATION = ":features:profile:presentation"

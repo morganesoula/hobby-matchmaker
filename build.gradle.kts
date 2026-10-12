@@ -7,14 +7,15 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.google.services) apply false
     alias(libs.plugins.serialization) apply false
-    alias(libs.plugins.detekt) apply false
+    alias(libs.plugins.detekt)
     alias(libs.plugins.spm.kmp) apply false
-    alias(libs.plugins.kotzilla) apply false
     alias(libs.plugins.jetbrains.kotlin.jvm) apply false
+    alias(libs.plugins.hotswan.compiler) apply false
 }
 
 val projectStructure = file(projectDir)
-val configFile = files("$rootProject/../config/detekt/detekt.yml")
+val configFile = files(rootDir.resolve("config/detekt/detekt.yml"))
+val detektFiles = providers.gradleProperty("detektFiles")
 val kotlinFiles = "**/*.kt"
 val resourcesFiles = "**/resources/**"
 val buildFiles = "**/build/**"
@@ -27,7 +28,8 @@ tasks.register<io.gitlab.arturbosch.detekt.Detekt>("detektAll") {
     ignoreFailures = false
     autoCorrect = autoFix
     buildUponDefaultConfig = true
-    setSource(projectStructure)
+    val only = detektFiles.orNull?.split(",")?.filter { it.isNotBlank() }
+    if (only.isNullOrEmpty()) setSource(projectStructure) else setSource(files(only))
     config.setFrom(configFile)
     include(kotlinFiles)
     exclude(resourcesFiles, buildFiles)
