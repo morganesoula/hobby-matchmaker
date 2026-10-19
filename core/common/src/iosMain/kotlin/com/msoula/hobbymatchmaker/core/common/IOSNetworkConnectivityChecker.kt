@@ -1,5 +1,6 @@
 package com.msoula.hobbymatchmaker.core.common
 
+import common.NetworkReachability
 import kotlinx.cinterop.ExperimentalForeignApi
 
 class IOSNetworkConnectivityChecker : NetworkConnectivityChecker {

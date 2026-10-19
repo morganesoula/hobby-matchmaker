@@ -1,0 +1,85 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:AppErrorMapper.kt$fun Throwable.toFirebaseError(): AppError</ID>
+    <ID>CyclomaticComplexMethod:AppNavHost.kt$@Composable fun AppNavHost( socialClients: SocialClients )</ID>
+    <ID>EmptyDefaultConstructor:InviteStatusData.kt$InviteStatusData$( )</ID>
+    <ID>EmptyFunctionBlock:SplashScreen.kt${ }</ID>
+    <ID>InvalidPackageDeclaration:AppNavHost.kt$package com.msoula.hobbymatchmaker.core.navigation.presentation</ID>
+    <ID>InvalidPackageDeclaration:NavigationCallbacks.kt$package com.msoula.hobbymatchmaker.core.navigation.presentation.utils</ID>
+    <ID>InvalidPackageDeclaration:Route.kt$package com.msoula.hobbymatchmaker.core.navigation.presentation</ID>
+    <ID>InvalidPackageDeclaration:SocialClients.kt$package com.msoula.hobbymatchmaker.core.navigation.presentation.models</ID>
+    <ID>LongParameterList:AlertDialogs.kt$( modifier: Modifier = Modifier, paddingValues: PaddingValues, title: String, confirmButtonText: String, cancelButtonText: String, isEnabled: Boolean, isLoading: Boolean, onCancel: () -&gt; Unit, onDismiss: () -&gt; Unit, onConfirm: () -&gt; Unit, content: @Composable () -&gt; Unit )</ID>
+    <ID>LongParameterList:Buttons.kt$( modifier: Modifier = Modifier, text: String, contentDescription: String, iconRes: DrawableResource, containerColor: Color, contentColor: Color, borderStroke: BorderStroke?, onClick: () -&gt; Unit, loading: Boolean )</ID>
+    <ID>LongParameterList:HubScreen.kt$( hubFavoriteMovies: UiState&lt;ImmutableList&lt;MovieCarouselItem&gt;&gt;, hubRecentMatches: UiState&lt;ImmutableList&lt;ProfileSocialMember&gt;&gt;, showRecentMatchDetail: Boolean, observeFavoriteMovies: () -&gt; Unit, getRecentMatches: () -&gt; Unit, onModalDismissed: () -&gt; Unit, onMemberClicked: (member: ProfileSocialMember) -&gt; Unit, navigateToMoviesScreen: () -&gt; Unit, navigateToMovieDetail: (movieId: Long) -&gt; Unit, navigateToProfileScreen: () -&gt; Unit, selectedMatch: ProfileSocialMember?, selectedMatchMoviesState: UiState&lt;ImmutableList&lt;MovieCarouselItem&gt;&gt; )</ID>
+    <ID>LongParameterList:MovieCards.kt$( modifier: Modifier = Modifier, movieId: Long, title: String, overview: String, posterFilePath: String, voteAverage: Double, isFavorite: Boolean, onDoubleTap: (movieId: Long) -&gt; Unit, onSingleTap: (id: Long, overview: String) -&gt; Unit, state: LazyListState, index: Int )</ID>
+    <ID>LongParameterList:MovieDetailInformation.kt$( modifier: Modifier = Modifier, padding: PaddingValues, posterPath: String?, status: String, title: String, isFavorite: Boolean, releaseDate: String, genres: ImmutableList&lt;String&gt;, duration: Int, videoId: String, movieId: Long, isVideoUriKnown: Boolean, overview: String, filteredCast: Casting, isLoading: Boolean, videoPlayerVisible: Boolean, onVideoPlayerDismissed: () -&gt; Unit, onPlayTrailerClicked: (Long, Boolean) -&gt; Unit, onMovieDoubleTap: (movieId: Long) -&gt; Unit, actorSection: @Composable () -&gt; Unit, friendSection: @Composable () -&gt; Unit )</ID>
+    <ID>LongParameterList:MovieScreen.kt$( modifier: Modifier = Modifier, movieState: UiState&lt;ImmutableList&lt;MovieUiModel&gt;&gt;, paginationState: PaginationStateModel, snackBarHostState: SnackbarHostState, showMatchAnimation: Boolean, matchingAnimationData: MatchAnimationData, onNavigate: (NavigationDestination) -&gt; Unit, onEvent: (MovieEventModel) -&gt; Unit, onLoadMore: () -&gt; Unit, resetAnimation: () -&gt; Unit )</ID>
+    <ID>LongParameterList:SignInForm.kt$( modifier: Modifier = Modifier, email: String, password: String, loading: Boolean, enabled: Boolean, onEmailChanged: (String) -&gt; Unit, onPasswordChanged: (String) -&gt; Unit, onForgotPasswordClicked: () -&gt; Unit, onFinish: () -&gt; Unit )</ID>
+    <ID>LongParameterList:SignUpForm.kt$( modifier: Modifier = Modifier, name: String, email: String, password: String, loading: Boolean, enabled: Boolean, nameRequirement: ImmutableList&lt;ValidationRequirement&gt; = persistentListOf(), emailRequirement: ImmutableList&lt;ValidationRequirement&gt; = persistentListOf(), passwordRequirement: ImmutableList&lt;ValidationRequirement&gt; = persistentListOf(), onNameChanged: (String) -&gt; Unit, onEmailChanged: (String) -&gt; Unit, onPasswordChanged: (String) -&gt; Unit, onFinish: () -&gt; Unit )</ID>
+    <ID>LongParameterList:UserProfileOrchestrator.kt$UserProfileOrchestrator$( private val observeCurrentUserProfileState: ObserveCurrentUserProfileStateUseCase, private val observeSocialCircle: ObserveSocialCircleUseCase, private val observeLikedMoviesCount: ObserveLikedMoviesCountUseCase, private val observeLikedMoviesIds: ObserveLikedMoviesIdsUseCase, private val computeCommonMoviesUseCase: ComputeCommonMoviesUseCase, private val uploadAvatarUseCase: UploadAvatarUseCase, private val imageManager: ImageFileManager )</ID>
+    <ID>LongParameterList:UserProfileViewModel.kt$UserProfileViewModel$( private val userProfileInteractor: UserProfileOrchestrator, private val defaultMessageMapper: ErrorMessageMapper, private val checkPseudoUseCase: IsPseudoAvailableUseCase, private val logOutUseCase: LogOutUseCase, private val upsertUserUseCase: UpsertUserProfileUseCase, private val syncUserUseCase: SyncUserProfileUseCase, private val refreshSocialCircleUseCase: RefreshSocialCircleUseCase, private val observeSessionStateUseCase: ObserveSessionStateUseCase, externalScope: CoroutineScope? = null )</ID>
+    <ID>MatchingDeclarationName:AppErrorHelper.kt$AppResult&lt;out S, out E&gt;</ID>
+    <ID>MatchingDeclarationName:DatabaseDriver.android.kt$AndroidDriverFactory : DriverFactory</ID>
+    <ID>MatchingDeclarationName:DatabaseDriver.ios.kt$IosDriverFactory : DriverFactory</ID>
+    <ID>MatchingDeclarationName:SearchUserByPseudo.kt$SearchUsersByPseudoUseCase</ID>
+    <ID>MatchingDeclarationName:UseCaseParameters.kt$Parameters</ID>
+    <ID>MaxLineLength:AppNavHost.kt$is NavigationDestination.MovieDetail</ID>
+    <ID>MaxLineLength:HubOrchestrator.kt$HubOrchestrator$else</ID>
+    <ID>MaxLineLength:HubScreen.kt$if</ID>
+    <ID>MaxLineLength:Ios.kt$project.logger.lifecycle("⏩ Skipping iOS targets for ${project.name} (disabled via kmp.buildTargets.ios.enabled)")</ID>
+    <ID>MaxLineLength:IosGoogleUIClient.kt$IosGoogleUIClient$IosNativeSocialCredential.shared()</ID>
+    <ID>MaxLineLength:ProfileEditInformationForm.kt$warningText = stringResource(Res.string.edit_profile_basic_information_pseudo_not_available)</ID>
+    <ID>MaxLineLength:ProfileEditInterestsForm.kt$!interests.contains(tag.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() })</ID>
+    <ID>MaxLineLength:ProfileHeader.kt$Text(text = stringResource(Res.string.user_profile_social_circle_main_add_people_text_button))</ID>
+    <ID>MaxLineLength:ProfileHeader.kt$text = stringResource(Res.string.user_profile_social_circle_main_add_people_form_title)</ID>
+    <ID>MaxLineLength:ProfileSocialSection.kt$1 -&gt; stringResource(Res.string.user_profile_social_circle_common_movies_count_singular)</ID>
+    <ID>MaxLineLength:ProfileSocialSection.kt$else -&gt; "$count " + stringResource(Res.string.user_profile_social_circle_common_movies_count_plural)</ID>
+    <ID>MaxLineLength:RefreshSentInvitesUseCase.kt$RefreshSentInvitesUseCase$suspend operator fun invoke(ownerUid: String): AppResult&lt;Unit, AppError&gt;</ID>
+    <ID>MaxLineLength:SocialRemoteDataSource.kt$SocialRemoteDataSource$suspend fun addToSocialCircle(socialCircleMemberDataModel: SocialCircleMemberRemoteDataModel): AppResult&lt;Unit, AppError&gt;</ID>
+    <ID>MaxLineLength:SocialRemoteDataSourceImpl.kt$SocialRemoteDataSourceImpl$override suspend</ID>
+    <ID>MaxLineLength:SplashViewModel.kt$SplashViewModel$state.update { SplashUiState.Error(defaultErrorMessageMapper.toUIText(AppError.Authentication.Unknown)) }</ID>
+    <ID>MaxLineLength:UserProfileScreen.kt$descriptionFeature = stringResource(Res.string.guest_share_interests_feature_description)</ID>
+    <ID>MaxLineLength:UserProfileScreen.kt$pseudo = if (profile.isPseudoEditable) currentEditableProfile.pseudo else profile.pseudo</ID>
+    <ID>NestedBlockDepth:ImageRepositoryImpl.android.kt$ImageRepositoryImpl$override suspend fun downloadImage(remotePosterPath: String): String?</ID>
+    <ID>NestedBlockDepth:ImageRepositoryImpl.ios.kt$ImageRepositoryImpl$@OptIn(ExperimentalForeignApi::class) private fun saveImageToLocal( imageData: NSData, imageName: String ): String?</ID>
+    <ID>NewLineAtEndOfFile:Multiplatform.kt$com.msoula.convention.Multiplatform.kt</ID>
+    <ID>NewLineAtEndOfFile:ObserveCurrentUserProfileStateUseCase.kt$com.msoula.hobbymatchmaker.features.profile.domain.useCases.ObserveCurrentUserProfileStateUseCase.kt</ID>
+    <ID>NewLineAtEndOfFile:UserProfileActions.kt$com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileActions.kt</ID>
+    <ID>ReturnCount:AndroidNetworkConnectivityChecker.kt$AndroidNetworkConnectivityChecker$@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE) override fun hasActiveConnection(): Boolean</ID>
+    <ID>ReturnCount:ImageRepositoryImpl.android.kt$ImageRepositoryImpl$override suspend fun downloadImage(remotePosterPath: String): String?</ID>
+    <ID>ReturnCount:ImageRepositoryImpl.ios.kt$ImageRepositoryImpl$override suspend fun downloadImage(remotePosterPath: String): String?</ID>
+    <ID>ReturnCount:SetCurrentUserProfileUuidUseCase.kt$SetCurrentUserProfileUuidUseCase$@OptIn(ExperimentalUuidApi::class) suspend operator fun invoke(authenticatedUid: String? = null): AppResult&lt;String, AppError&gt;</ID>
+    <ID>ReturnCount:UserDataRepositoryImpl.kt$UserDataRepositoryImpl$override suspend fun getUser(uid: String): AppResult&lt;UserSummaryDomainModel, AppError&gt;</ID>
+    <ID>ReturnCount:UserDataRepositoryImpl.kt$UserDataRepositoryImpl$override suspend fun getUsers(uids: List&lt;String&gt;): AppResult&lt;Map&lt;String, UserSummaryDomainModel&gt;, AppError&gt;</ID>
+    <ID>SpreadOperator:KoinHelper.kt$( module { single&lt;PlatformContext&gt; { PlatformContext.INSTANCE } }, *appModule().toTypedArray() )</ID>
+    <ID>SpreadOperator:Texts.kt$(res, *args.toTypedArray())</ID>
+    <ID>SwallowedException:SplashViewModel.kt$SplashViewModel$e: TimeoutCancellationException</ID>
+    <ID>TooGenericExceptionCaught:AppErrorMapper.kt$t: Throwable</ID>
+    <ID>TooGenericExceptionCaught:DataStoreHelper.kt$t: Throwable</ID>
+    <ID>TooGenericExceptionCaught:SocialLocalDataSourceImpl.kt$SocialLocalDataSourceImpl$t: Throwable</ID>
+    <ID>TooManyFunctions:MovieDAO.kt$MovieDAO</ID>
+    <ID>TooManyFunctions:MovieDAOImpl.kt$MovieDAOImpl : MovieDAO</ID>
+    <ID>TooManyFunctions:MovieRepositoryImpl.kt$MovieRepositoryImpl : MovieRepository</ID>
+    <ID>TooManyFunctions:SocialRemoteDataSource.kt$SocialRemoteDataSource</ID>
+    <ID>TooManyFunctions:SocialRemoteDataSourceImpl.kt$SocialRemoteDataSourceImpl : SocialRemoteDataSource</ID>
+    <ID>TooManyFunctions:SocialRepository.kt$SocialRepository</ID>
+    <ID>TooManyFunctions:SocialRepositoryImpl.kt$SocialRepositoryImpl : SocialRepository</ID>
+    <ID>TopLevelPropertyNaming:CreateDataStore.kt$internal const val dataStoreFileName = "app.preferences_pb"</ID>
+    <ID>TopLevelPropertyNaming:FirestoreVariables.kt$const val FirestoreCircleCollection = "circle"</ID>
+    <ID>TopLevelPropertyNaming:FirestoreVariables.kt$const val FirestoreUsersCollection = "users"</ID>
+    <ID>UnusedParameter:InvitationCard.kt$guestAvatarUrl: String</ID>
+    <ID>UnusedParameter:Logger.kt$Logger$throwable: Throwable? = null</ID>
+    <ID>UnusedParameter:SplashScreen.kt$modifier: Modifier = Modifier</ID>
+    <ID>UnusedParameter:Texts.kt$modifier: Modifier = Modifier</ID>
+    <ID>UnusedParameter:TopBars.kt$modifier: Modifier = Modifier</ID>
+    <ID>UnusedPrivateProperty:MovieDetailInformation.kt$val bigHeartScale by animateFloatAsState( targetValue = if (showBigHeart) 2f else 0f, animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing), label = "" )</ID>
+    <ID>UseCheckOrError:AuthenticationRemoteDataSourceImpl.kt$AuthenticationRemoteDataSourceImpl$throw IllegalStateException("UID missing after sign-in")</ID>
+    <ID>UseCheckOrError:AuthenticationRemoteDataSourceImpl.kt$AuthenticationRemoteDataSourceImpl$throw IllegalStateException("UID missing after sign-up")</ID>
+    <ID>UseCheckOrError:MovieDAOImpl.kt$MovieDAOImpl$throw IllegalStateException("Movie not found")</ID>
+    <ID>UseRequire:SocialRemoteDataSourceImpl.kt$SocialRemoteDataSourceImpl$throw IllegalArgumentException("User not found with uid: $invitingMemberUid")</ID>
+    <ID>UseRequire:SocialRemoteDataSourceImpl.kt$SocialRemoteDataSourceImpl$throw IllegalArgumentException("User not found with uid: $ownerUid")</ID>
+    <ID>VariableNaming:SocialRemoteDataSourceImpl.kt$SocialRemoteDataSourceImpl$private val MAX_CIRCLE_SIZE = 5</ID>
+  </CurrentIssues>
+</SmellBaseline>

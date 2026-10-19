@@ -4,7 +4,7 @@ import com.msoula.hobbymatchmaker.core.common.AndroidNetworkConnectivityChecker
 import com.msoula.hobbymatchmaker.core.common.ImageFileManager
 import com.msoula.hobbymatchmaker.core.common.NetworkConnectivityChecker
 import com.msoula.hobbymatchmaker.core.common.createDataStore
-import com.msoula.hobbymatchmaker.core.network.BuildKonfig.APP_SECRET
+import com.msoula.hobbymatchmaker.core.common.BuildKonfig.APP_SECRET
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.HttpRequestRetry

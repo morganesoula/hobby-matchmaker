@@ -1,5 +1,6 @@
 package com.msoula.hobbymatchmaker.core.common.di
 
+import com.msoula.hobbymatchmaker.core.common.BuildKonfig.APP_SECRET
 import com.msoula.hobbymatchmaker.core.common.IOSNetworkConnectivityChecker
 import com.msoula.hobbymatchmaker.core.common.ImageFileManager
 import com.msoula.hobbymatchmaker.core.common.NetworkConnectivityChecker

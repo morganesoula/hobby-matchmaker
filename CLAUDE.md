@@ -41,5 +41,6 @@ hobby implemented; TV shows, activities, and others will follow.
 
 ## Git
 
+**DO NOT** add the Claude co-author line in any commit messages.
 Commit format: feat (scope): message --in-progress/--finished.
 Use keywords such as `add, clean, fix, migrate, ui improvements` in your git messages.

@@ -15,6 +15,7 @@ plugins {
 
 val projectStructure = file(projectDir)
 val configFile = files(rootDir.resolve("config/detekt/detekt.yml"))
+val baselineFile = rootDir.resolve("config/detekt/baseline.xml")
 val detektFiles = providers.gradleProperty("detektFiles")
 val kotlinFiles = "**/*.kt"
 val resourcesFiles = "**/resources/**"
@@ -31,11 +32,25 @@ tasks.register<io.gitlab.arturbosch.detekt.Detekt>("detektAll") {
     val only = detektFiles.orNull?.split(",")?.filter { it.isNotBlank() }
     if (only.isNullOrEmpty()) setSource(projectStructure) else setSource(files(only))
     config.setFrom(configFile)
+    if (baselineFile.exists()) baseline.set(baselineFile)
     include(kotlinFiles)
     exclude(resourcesFiles, buildFiles)
     reports {
         html.required.set(true)
+        sarif.required.set(true)
         xml.required.set(false)
         txt.required.set(false)
     }
+}
+
+// Records current issues in config/detekt/baseline.xml so detektAll only fails on new ones
+tasks.register<io.gitlab.arturbosch.detekt.DetektCreateBaselineTask>("detektAllBaseline") {
+    description = "Creates the DETEKT baseline for all modules"
+    parallel = true
+    buildUponDefaultConfig = true
+    setSource(projectStructure)
+    config.setFrom(configFile)
+    baseline.set(baselineFile)
+    include(kotlinFiles)
+    exclude(resourcesFiles, buildFiles)
 }

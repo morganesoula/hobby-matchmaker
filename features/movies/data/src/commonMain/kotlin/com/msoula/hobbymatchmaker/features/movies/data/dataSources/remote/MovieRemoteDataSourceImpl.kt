@@ -4,8 +4,8 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.data.FirestoreUsersCollection
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
-import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
-import com.msoula.hobbymatchmaker.core.network.safeNetworkCall
+import com.msoula.hobbymatchmaker.core.common.NetworkConnectivityChecker
+import com.msoula.hobbymatchmaker.core.common.safeNetworkCall
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.MovieRemoteDataModel
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.models.PaginatedMovieResult
 import com.msoula.hobbymatchmaker.features.movies.data.dataSources.remote.services.TMDBKtorService

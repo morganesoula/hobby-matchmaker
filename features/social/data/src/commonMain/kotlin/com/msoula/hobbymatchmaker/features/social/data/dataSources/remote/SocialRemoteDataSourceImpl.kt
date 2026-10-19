@@ -6,8 +6,8 @@ import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.data.FirestoreCircleCollection
 import com.msoula.hobbymatchmaker.core.common.data.FirestoreUsersCollection
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
-import com.msoula.hobbymatchmaker.core.network.NetworkConnectivityChecker
-import com.msoula.hobbymatchmaker.core.network.safeNetworkCall
+import com.msoula.hobbymatchmaker.core.common.NetworkConnectivityChecker
+import com.msoula.hobbymatchmaker.core.common.safeNetworkCall
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toInviteStatusData
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.InviteDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.InviteStatusData

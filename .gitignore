@@ -12,7 +12,10 @@
 /captures
 .externalNativeBuild
 .cxx
-*.properties
+# Local secrets and machine-specific config
+secrets.properties
+local.properties.bak
+gradle/config.properties
 iosApp/tmdb.plist
 **/google-services.json
 kotzilla.json
@@ -40,3 +43,8 @@ iosApp/iosApp/secrets.xcconfig
 # Build outputs and Kotlin compiler cache
 **/build/
 .kotlin/
+
+# Built binaries
+*.apk
+*.aab
+/composeApp/release/
