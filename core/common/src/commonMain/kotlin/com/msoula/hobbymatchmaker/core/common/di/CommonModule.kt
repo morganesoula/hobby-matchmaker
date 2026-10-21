@@ -16,7 +16,7 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val coreModuleCommon = module {
-    includes(platformModule)
+    includes(coreModuleCommonPlatformSpecific)
 
     single<CoroutineDispatcher> { Dispatchers.IO }
     singleOf(::DefaultDispatcherProvider) bind DispatcherProvider::class
@@ -34,4 +34,4 @@ val coreModuleCommon = module {
     }
 }
 
-expect val platformModule: org.koin.core.module.Module
+expect val coreModuleCommonPlatformSpecific: org.koin.core.module.Module

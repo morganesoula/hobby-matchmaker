@@ -7,12 +7,11 @@ plugins {
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.google.services)
-    alias(libs.plugins.hotswan.compiler)
 }
 
 android {
     namespace = "com.msoula.hobbymatchmaker"
-    compileSdk = 36
+    compileSdk = 37
     buildFeatures.buildConfig = true
 
     val secretsPropertiesFile = rootProject.file("secrets.properties")
@@ -79,10 +78,6 @@ dependencies {
     implementation(project(":composeApp"))
     implementation(libs.appcompat)
     implementation(libs.activity.compose)
-    implementation(libs.facebook.android.sdk)
-    implementation(libs.play.services.auth)
-    implementation(libs.koin.android)
-    implementation(libs.timber.android)
 
     // Facebook
     implementation(libs.facebook.android.sdk)

@@ -10,7 +10,6 @@ plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.spm.kmp) apply false
     alias(libs.plugins.jetbrains.kotlin.jvm) apply false
-    alias(libs.plugins.hotswan.compiler) apply false
 }
 
 val projectStructure = file(projectDir)

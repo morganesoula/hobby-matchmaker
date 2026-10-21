@@ -48,3 +48,6 @@ iosApp/iosApp/secrets.xcconfig
 *.apk
 *.aab
 /composeApp/release/
+
+# JVM heap dumps
+*.hprof

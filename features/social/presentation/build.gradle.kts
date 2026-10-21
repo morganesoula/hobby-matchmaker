@@ -8,10 +8,6 @@ kotlin {
     }
 
     sourceSets {
-        all {
-            languageSettings.enableLanguageFeature("ExplicitBackingFields")
-        }
-
         commonMain.dependencies {
             implementation(project(Modules.COMMON))
             implementation(project(Modules.DESIGN))

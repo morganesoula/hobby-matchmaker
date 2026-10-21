@@ -12,10 +12,6 @@ kotlin {
     }
 
     sourceSets {
-        all {
-            languageSettings.enableLanguageFeature("ExplicitBackingFields")
-        }
-
         commonMain.dependencies {
             // Images
             implementation(libs.findLibrary("file-kit-core").get())

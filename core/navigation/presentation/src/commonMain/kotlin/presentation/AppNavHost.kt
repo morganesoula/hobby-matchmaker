@@ -9,7 +9,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,6 +16,7 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -33,7 +33,6 @@ import com.msoula.hobbymatchmaker.core.design.models.TabItem
 import com.msoula.hobbymatchmaker.core.design.reset_password
 import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
-import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClientImpl
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SignInScreenContent
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SignInViewModel
@@ -50,7 +49,6 @@ import com.msoula.hobbymatchmaker.features.hub.presentation.models.HubEvent
 import com.msoula.hobbymatchmaker.features.hub.presentation.models.HubSection
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailContent
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailViewModel
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.VideoPlayerState
 import com.msoula.hobbymatchmaker.features.movies.presentation.MovieContent
 import com.msoula.hobbymatchmaker.features.movies.presentation.MovieViewModel
@@ -99,7 +97,7 @@ fun AppNavHost(
     ) {
         composable<Splash> {
             val splashViewModel = koinViewModel<SplashViewModel>()
-            val state by splashViewModel.state.collectAsState()
+            val state by splashViewModel.state.collectAsStateWithLifecycle()
 
             SplashScreenContent(
                 state = state,
@@ -114,9 +112,9 @@ fun AppNavHost(
                     parametersOf(SocialClientsVM(socialClients.clients))
                 }
 
-                val signInState by signInViewModel.signInState.collectAsState()
-                val formState by signInViewModel.formDataFlow.collectAsState()
-                val dontAskCheckbox by signInViewModel.dontAskCheckboxValue.collectAsState()
+                val signInState by signInViewModel.signInState.collectAsStateWithLifecycle()
+                val formState by signInViewModel.formDataFlow.collectAsStateWithLifecycle()
+                val dontAskCheckbox by signInViewModel.dontAskCheckboxValue.collectAsStateWithLifecycle()
                 val snackbarHostState = remember { SnackbarHostState() }
 
                 LaunchedEffect(Unit) {
@@ -171,8 +169,8 @@ fun AppNavHost(
             composable<SignUp> {
                 val signUpViewModel = koinViewModel<SignUpViewModel>()
 
-                val registrationState by signUpViewModel.formDataFlow.collectAsState()
-                val signUpState by signUpViewModel.signUpState.collectAsState()
+                val registrationState by signUpViewModel.formDataFlow.collectAsStateWithLifecycle()
+                val signUpState by signUpViewModel.signUpState.collectAsStateWithLifecycle()
 
                 val snackBarHostState = remember { SnackbarHostState() }
 
@@ -218,7 +216,7 @@ fun AppNavHost(
                 parameters = { parametersOf(movieId) }
             )
 
-            val movieDetailState by movieDetailViewModel.movieDetailState.collectAsState()
+            val movieDetailState by movieDetailViewModel.movieDetailState.collectAsStateWithLifecycle()
             val snackBarHostState = remember { SnackbarHostState() }
             var videoPlayerState by rememberSaveable(stateSaver = VideoPlayerStateSaver) {
                 mutableStateOf(VideoPlayerState.Initial)
@@ -239,17 +237,6 @@ fun AppNavHost(
 
                         else -> {}
                     }
-                }
-            }
-
-            LaunchedEffect(Unit) {
-                val currentState = movieDetailState
-                if (currentState is UiState.Success<MovieDetailUiModel>) {
-                    videoPlayerState = VideoPlayerState(
-                        videoId = currentState.data.videoKey,
-                        isVisible = false,
-                        isLoading = false
-                    )
                 }
             }
 
@@ -275,12 +262,12 @@ fun AppNavHost(
             val userProfileViewModel = koinViewModel<UserProfileViewModel>()
             val snackBarHostState = remember { SnackbarHostState() }
 
-            val profileState by userProfileViewModel.screenState.collectAsState()
-            val isEditMode by userProfileViewModel.isEditMode.collectAsState()
-            val editableProfile by userProfileViewModel.editableProfile.collectAsState()
-            val isPseudoAvailable by userProfileViewModel.isPseudoAvailable.collectAsState()
+            val profileState by userProfileViewModel.screenState.collectAsStateWithLifecycle()
+            val isEditMode by userProfileViewModel.isEditMode.collectAsStateWithLifecycle()
+            val editableProfile by userProfileViewModel.editableProfile.collectAsStateWithLifecycle()
+            val isPseudoAvailable by userProfileViewModel.isPseudoAvailable.collectAsStateWithLifecycle()
 
-            val searchedPseudos by socialViewModel.searchResults.collectAsState()
+            val searchedPseudos by socialViewModel.searchResults.collectAsStateWithLifecycle()
             val profile = (profileState as? UserProfileUiStateModel.Success)?.userProfile
 
             LaunchedEffect(Unit) {
@@ -390,8 +377,8 @@ fun AppNavHost(
                 }.toImmutableList()
             }
 
-            val sentInvites by socialViewModel.sentInvites.collectAsState()
-            val incomingInvites by socialViewModel.incomingInvites.collectAsState()
+            val sentInvites by socialViewModel.sentInvites.collectAsStateWithLifecycle()
+            val incomingInvites by socialViewModel.incomingInvites.collectAsStateWithLifecycle()
             var showCapacityDialog by remember { mutableStateOf(false) }
 
             LaunchedEffect(Unit) {
@@ -463,15 +450,12 @@ fun MainScaffold(
             composable<Movies> {
                 val movieViewModel: MovieViewModel = koinViewModel()
 
-                val movieState by movieViewModel.movieScreenState.collectAsState()
-                val paginationState by movieViewModel.paginationState.collectAsState()
+                val movieState by movieViewModel.movieScreenState.collectAsStateWithLifecycle()
+                val paginationState by movieViewModel.paginationState.collectAsStateWithLifecycle()
 
                 val snackBarHostState = remember { SnackbarHostState() }
 
                 var matchingAnimationData by remember { mutableStateOf(MatchAnimationData.Empty) }
-
-                LaunchedEffect(Unit) {
-                }
 
                 var matchAnimVisibility by remember {
                     mutableStateOf(false)
@@ -525,11 +509,11 @@ fun MainScaffold(
 
             composable<Hub> {
                 val hubViewModel: HubViewModel = koinViewModel()
-                val hubFavoriteMoviesState by hubViewModel.hubFavoriteMoviesState.collectAsState()
-                val hubRecentMatchesState by hubViewModel.hubRecentMatchesState.collectAsState()
-                val showRecentMatchDetail by hubViewModel.showRecentMatchDetail.collectAsState()
-                val selectedMatch by hubViewModel.selectedMatch.collectAsState()
-                val selectedMatchMoviesState by hubViewModel.selectedMatchMoviesState.collectAsState()
+                val hubFavoriteMoviesState by hubViewModel.hubFavoriteMoviesState.collectAsStateWithLifecycle()
+                val hubRecentMatchesState by hubViewModel.hubRecentMatchesState.collectAsStateWithLifecycle()
+                val showRecentMatchDetail by hubViewModel.showRecentMatchDetail.collectAsStateWithLifecycle()
+                val selectedMatch by hubViewModel.selectedMatch.collectAsStateWithLifecycle()
+                val selectedMatchMoviesState by hubViewModel.selectedMatchMoviesState.collectAsStateWithLifecycle()
 
                 HubContent(
                     hubFavoriteMovies = hubFavoriteMoviesState,

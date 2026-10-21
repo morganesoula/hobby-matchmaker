@@ -110,7 +110,7 @@ class SocialViewModel(
                     if (pseudo.isNullOrEmpty() || uid == null) {
                         flowOf(AppResult.Success(ObserveIncomingInvitesSuccess.Empty))
                     } else {
-                        socialUseCases.observeIncomingInvitesUseCase(uid,pseudo)
+                        socialUseCases.observeIncomingInvitesUseCase(uid, pseudo)
                     }
                 }
                 .collect { result ->
@@ -153,7 +153,8 @@ class SocialViewModel(
                 )
 
                 else -> {
-                    Logger.e("Unhandled invite result type: ${data::class.simpleName}")
+                    val message = data?.let { it::class.simpleName } ?: "Uncoded message"
+                    Logger.e("Unhandled invite result type: $message")
                     UiState.Empty
                 }
             }

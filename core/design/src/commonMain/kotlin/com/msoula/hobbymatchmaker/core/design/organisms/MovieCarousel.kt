@@ -14,6 +14,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -38,7 +39,7 @@ fun MovieCarousel(
     val listState = rememberLazyListState()
     val topPadding = if (isIosPlatform()) CustomSize.Eight else padding.calculateTopPadding()
 
-    val shouldLoadMore by remember {
+    val shouldLoadMore by remember(hasMorePages, isLoadingMore) {
         derivedStateOf {
             val lastVisibleIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
             val totalItems = listState.layoutInfo.totalItemsCount
@@ -48,8 +49,9 @@ fun MovieCarousel(
         }
     }
 
+    val currentOnLoadMore by rememberUpdatedState(onLoadMore)
     LaunchedEffect(shouldLoadMore) {
-        if (shouldLoadMore == true) onLoadMore()
+        if (shouldLoadMore == true) currentOnLoadMore()
     }
 
     Box(

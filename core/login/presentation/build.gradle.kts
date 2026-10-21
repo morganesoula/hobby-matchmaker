@@ -4,7 +4,6 @@ import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryExtension
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 import io.github.frankois944.spmForKmp.swiftPackageConfig
 import io.github.frankois944.spmForKmp.utils.ExperimentalSpmForKmpFeature
-import org.gradle.kotlin.dsl.configure
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -41,10 +40,6 @@ kotlin {
     }
 
     sourceSets {
-        all {
-            languageSettings.enableLanguageFeature("ExplicitBackingFields")
-        }
-
         commonMain.dependencies {
             // Modules
             implementation(project(Modules.AUTHENTICATION_DOMAIN))

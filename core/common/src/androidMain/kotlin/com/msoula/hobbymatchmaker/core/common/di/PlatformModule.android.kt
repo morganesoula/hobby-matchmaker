@@ -1,10 +1,10 @@
 package com.msoula.hobbymatchmaker.core.common.di
 
 import com.msoula.hobbymatchmaker.core.common.AndroidNetworkConnectivityChecker
+import com.msoula.hobbymatchmaker.core.common.BuildKonfig.APP_SECRET
 import com.msoula.hobbymatchmaker.core.common.ImageFileManager
 import com.msoula.hobbymatchmaker.core.common.NetworkConnectivityChecker
 import com.msoula.hobbymatchmaker.core.common.createDataStore
-import com.msoula.hobbymatchmaker.core.common.BuildKonfig.APP_SECRET
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.HttpRequestRetry
@@ -25,7 +25,7 @@ import kotlinx.io.IOException
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
-actual val platformModule = module {
+actual val coreModuleCommonPlatformSpecific = module {
     single { createDataStore(androidContext()) }
     single { ImageFileManager(get(), get()) }
 
