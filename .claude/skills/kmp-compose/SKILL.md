@@ -1,7 +1,7 @@
 ---
 name: kmp-compose
 description: |
-  Compose UI patterns, design system, and component library for this KMP project. Use this skill whenever writing composables, choosing a UI component, handling UiState/FormState, wiring ViewModel events in a screen, using the theme or typography, or adding a new screen. Trigger on phrases like "composable", "UI component", "design system", "UiState", "FormState", "UiEvent", "UIText", "atom", "molecule", "organism", "template", "EmptyStateConfig", "StateContainer", "LaunchedEffect", "theme", "typography", or "ErrorMessageMapper".
+  Compose UI patterns, design system, and component library for this KMP project. Use this skill whenever writing composables, choosing a UI component, handling UiState/FormState, wiring ViewModel events in a screen, using the theme or typography, or adding a new screen. Trigger on phrases like "composable", "UI component", "design system", "UiState", "FormState", "UiEvent", "UIText", "atom", "molecule", "organism", "template", "EmptyStateConfig", "StateContainer", "LaunchedEffect", "theme", "typography", or "ErrorMessageMapper". Also covers Compose performance/correctness: collectAsStateWithLifecycle, snapshotFlow, Flow parameters, DisposableEffect, rememberUpdatedState, SideEffect, Modifier order (padding/clickable/clip/background/graphicsLayer), BoxWithConstraints, SubcomposeLayout, nested Scaffold, recomposition, and jank.
 ---
 
 # Compose UI & Design System — HobbyMatchmaker KMP
@@ -179,6 +179,8 @@ LaunchedEffect(Unit) {
     }
 }
 ```
+
+`events` is a one-shot stream, not state, so `LaunchedEffect` + `collect` is correct here; never use it for `StateFlow`s. If the handler calls a callback parameter that can change (e.g. `onNavigate`), read it through `rememberUpdatedState`. Otherwise the long-lived effect keeps the first lambda (see `references/side-effects.md`).
 
 Use `event.message.asStringSuspend()` (suspend extension) inside `LaunchedEffect` / coroutine contexts.
 Use `event.message.asString()` (composable extension) inside `@Composable` functions.
@@ -385,10 +387,13 @@ fun MyComponent(
 
 **Stability:** Annotate data classes passed to composables with `@Immutable` when they contain `List`, `Map`, or other unstable types.
 
-**State collection:** Always use `collectAsState()`:
+**State collection:** Use `collectAsStateWithLifecycle()`, which pauses collection while the screen is in the background. It comes from `org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose` and works in `commonMain`. Existing `collectAsState()` calls are legacy: migrate them when you touch a screen.
 ```kotlin
-val state by viewModel.screenState.collectAsState()
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+
+val state by viewModel.screenState.collectAsStateWithLifecycle()
 ```
+Collect at the call site (`AppNavHost` / `*Screen`) and pass the resolved value down. **Never** give a composable a `Flow<T>` parameter.
 
 **Remember:** Only for Compose-internal state (`LazyListState`, `SnackbarHostState`, `PagerState`, animation state). Never for application state — that belongs in the ViewModel.
 
@@ -411,13 +416,58 @@ For decorative icons: `contentDescription = null`. For interactive/informational
 
 ---
 
+## Performance & Correctness Rules (summary)
+
+These are the rules from `references/` that matter most for this codebase. Apply them by default. Open a reference file only when the routing table below says you need its detail.
+
+**Flows**
+- `collectAsStateWithLifecycle()` for every flow coming from outside composition. No `Flow<T>` composable params.
+- High-frequency sources (more than one emission per ~100 ms): add `.conflate().distinctUntilChanged()` inside `remember(key) { }`.
+- To go from Compose state to a side effect (analytics, pagination triggers off `LazyListState`), use `LaunchedEffect(listState) { snapshotFlow { … }.distinctUntilChanged().collect { … } }`.
+
+**Effects**
+- Suspending work → `LaunchedEffect(keys)`. Key the effect on every value that should restart it.
+- Listener/observer with teardown → `DisposableEffect(key) { …; onDispose { … } }`, not `LaunchedEffect { try/finally }`.
+- A callback used inside a long-lived effect → `val latest by rememberUpdatedState(callback)`.
+- `SideEffect` only for thin writes to non-Compose objects. Never run side effects inside `remember { }`.
+- One-shot screen work (initial load) belongs in the ViewModel, not in a composable effect.
+
+**Modifiers** (read the chain top to bottom: each modifier wraps everything below it)
+- `background(color, shape)` rather than the `clip(shape).background(color)` pair. If you do need `clip`, put it before `background`.
+- `padding(…).clickable { }` = only the visible area is tappable. `clickable { }.padding(…)` = the padding is tappable too (use this for 48dp touch targets).
+- `graphicsLayer { alpha / transforms }` near the top of the chain when it must affect the whole unit.
+- Don't wrap a `Modifier` chain in `remember` "for perf".
+
+**Layout / subcomposition**
+- No `BoxWithConstraints` just to read a size → use `Modifier.onSizeChanged` / `Modifier.layout`.
+- No `BoxWithConstraints` inside lazy list or grid items. Read the size once above the list and pass the result down.
+- `Scaffold`s are subcomposing layouts. Only nest them on purpose; the current pattern is `MainScaffold` (bottom bar) → tab screen `Scaffold` (top bar). Don't add a third level, and don't nest them inside list items.
+
+## References — load on demand
+
+| Read this file | When |
+|---|---|
+| `references/collecting-flows.md` | Migrating `collectAsState` calls, sensor/location/high-frequency flows, `minActiveState`, `snapshotFlow` vs `derivedStateOf`, a battery drain or background-work report |
+| `references/side-effects.md` | Choosing between `LaunchedEffect`, `DisposableEffect`, `SideEffect`, `RememberedEffect`; an effect that restarts unexpectedly, a stale callback, a leaked listener, a ViewModel per list row |
+| `references/modifier.md` | Click or ripple area wrong, background/clip painted in the wrong place, fade/alpha applied to the wrong part, `size` vs `padding` order, reviewing a diff that reorders modifiers |
+| `references/subcomposition.md` | `BoxWithConstraints`, `SubcomposeLayout`, `Scaffold` cost, a slow first frame, extra measure passes, scroll jank after wrapping items, `SubcomposeSlotReusePolicy` / `precompose` |
+
+Notes on these files: they are adapted from skydoves' Compose-performance skills and written Android-first. In this KMP project:
+- DI is Koin (`koinViewModel`).
+- `compose-effects` (`RememberedEffect`, `ViewModelStoreScope`) is not a dependency.
+- Profiling tools (Perfetto, Layout Inspector, `@TraceRecomposition`, `FrameTimingMetric`) only work on the Android target.
+
+---
+
 ## Checklist: Adding a New Screen
 
 - [ ] Create `*Content` or `*Screen` composable in `:features:<name>:presentation`
 - [ ] Accept `state: UiState<T>` (or feature-specific state model), `onEvent`, `onNavigate` lambdas, `modifier: Modifier = Modifier`
 - [ ] Use `StateContainer` or `when (state)` to branch on `Loading / Empty / Error / Success`
 - [ ] Add `LaunchedEffect(Unit)` to collect `viewModel.events`, handle `UiEvent.Navigate`, `UiEvent.ShowSnackBar`, etc.
+- [ ] Collect ViewModel state with `collectAsStateWithLifecycle()` at the call site; no `Flow<T>` params
 - [ ] Use `remember { SnackbarHostState() }` inside the composable (Compose-internal state)
+- [ ] Check modifier order on clickable and clipped elements; no `BoxWithConstraints` in list items
 - [ ] Wrap lists in `.toImmutableList()` before passing to child composables
 - [ ] Annotate any data class holding unstable fields with `@Immutable`
 - [ ] Use `Res.string.*` for all user-visible strings

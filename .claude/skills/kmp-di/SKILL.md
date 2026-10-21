@@ -24,7 +24,6 @@ All modules are collected into a single `List<Module>` in `composeApp`:
 ```kotlin
 // composeApp/…/navigation/KoinInit.kt
 fun appModule() = listOf(
-    coreModuleNetwork,
     coreModuleSessionData,
     coreModuleSessionDomain,
     coreModuleAuthenticationData,
@@ -204,27 +203,47 @@ viewModel { (socialClients: SocialClientsVM) ->
 Use `expect val`/`actual val` when a binding differs between Android and iOS, then compose with `includes()` in the common module.
 
 ```kotlin
-// core/network/…/di/NetworkModule.kt  (commonMain)
-val coreModuleNetwork = module {
+// core/common/…/di/CommonModule.kt  (commonMain)
+val coreModuleCommon = module {
+    includes(coreModuleCommonPlatformSpecific)
+
     single<CoroutineDispatcher> { Dispatchers.IO }
+    singleOf(::DefaultDispatcherProvider) bind DispatcherProvider::class
+    single<FirebaseFirestore>(createdAtStart = true) {
+        Firebase.firestore
+    }
     single<FirebaseAuth> { Firebase.auth }
-    includes(coreModuleNetworkPlatformSpecific)   // ← composed here
-    single<Json> { Json { ignoreUnknownKeys = true; ... } }
+    single<Json> {
+        Json {
+            ignoreUnknownKeys = true
+            isLenient = true
+            prettyPrint = true
+            encodeDefaults = true
+        }
+    }
 }
-expect val coreModuleNetworkPlatformSpecific: Module
+
+expect val coreModuleCommonPlatformSpecific: Module
 ```
 
 ```kotlin
 // androidMain — CIO engine + Android connectivity
-actual val coreModuleNetworkPlatformSpecific = module {
+actual val coreModuleCommonPlatformSpecific = module {
+    single { createDataStore(androidContext()) }
+    single { ImageFileManager(get(), get()) }
+
     single<NetworkConnectivityChecker> { AndroidNetworkConnectivityChecker(get()) }
-    single<HttpClient>(createdAtStart = true) { HttpClient(CIO) { ... } }
+    single<HttpClient>(createdAtStart = true) { ... }
 }
 
 // iosMain — Darwin engine + iOS connectivity
-actual val coreModuleNetworkPlatformSpecific = module {
+actual val coreModuleCommonPlatformSpecific = module {
+    single { createDataStore() }
+    single { ImageFileManager(get()) }
+
     single<NetworkConnectivityChecker> { IOSNetworkConnectivityChecker() }
-    single<HttpClient>(createdAtStart = true) { HttpClient(Darwin) { ... } }
+
+    single<HttpClient>(createdAtStart = true) { ... }
 }
 ```
 
@@ -293,9 +312,9 @@ Use `*Of` constructor-reference forms when all constructor parameters are alread
 
 | Thing | Pattern | Examples |
 |---|---|---|
-| Core module val | `coreModule<Concern><Layer>` | `coreModuleNetwork`, `coreModuleSessionDomain`, `coreModuleAuthenticationData` |
+| Core module val | `coreModule<Concern><Layer>` | `coreModuleSessionDomain`, `coreModuleAuthenticationData` |
 | Feature module val | `featuresModule<Feature><Layer>` | `featuresModuleMovieDomain`, `featuresModuleSocialPresentation` |
-| Platform-specific val | `<parentModuleName>PlatformSpecific` | `coreModuleNetworkPlatformSpecific`, `featuresModuleMovieDataPlatformSpecific` |
+| Platform-specific val | `<parentModuleName>PlatformSpecific` | `coreModuleCommonPlatformSpecific`, `featuresModuleMovieDataPlatformSpecific` |
 | DI file location | `di/` subdirectory within each layer | `features/movies/domain/…/di/MovieDomainModule.kt` |
 
 ---
