@@ -1,24 +1,19 @@
 package com.msoula.hobbymatchmaker.core.design.organisms
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
-import com.msoula.hobbymatchmaker.core.design.atoms.MainTitle
-import com.msoula.hobbymatchmaker.core.design.atoms.MediumTitle
-import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight4
-import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
 import com.msoula.hobbymatchmaker.core.design.hub_favorite_movies_no_data_btn_txt
 import com.msoula.hobbymatchmaker.core.design.hub_favorite_movies_no_data_title
 import com.msoula.hobbymatchmaker.core.design.hub_favorite_movies_no_data_txt
@@ -35,32 +30,34 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun HubFavoriteMoviesSection(
     modifier: Modifier = Modifier,
+    content: @Composable BoxScope.() -> Unit
+) {
+    HubSection(
+        modifier = modifier,
+        title = stringResource(Res.string.hub_favorite_movies_title),
+        subtitle = stringResource(Res.string.hub_favorite_movies_subtitle),
+        content = content
+    )
+}
+
+@Composable
+fun HubFavoriteMovies(
+    modifier: Modifier = Modifier,
     likedMovies: ImmutableList<MovieCarouselItem>,
     navigateToMovieDetail: (movieId: Long) -> Unit
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = CustomSize.Sixteen),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(
+            start = CustomSize.Sixteen,
+            end = CustomSize.Sixteen,
+            bottom = CustomSize.Sixteen
+        ),
+        horizontalArrangement = Arrangement.spacedBy(CustomSize.Sixteen),
+        verticalArrangement = Arrangement.spacedBy(CustomSize.Sixteen)
     ) {
-        item(span = { GridItemSpan(maxLineSpan) }) {
-            Column {
-                MainTitle(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = stringResource(Res.string.hub_favorite_movies_title)
-                )
-                SpacerHeight4()
-                MediumTitle(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = stringResource(Res.string.hub_favorite_movies_subtitle)
-                )
-                SpacerHeight8()
-            }
-        }
-
-        items(likedMovies) { movie ->
+        items(likedMovies, key = { it.id }) { movie ->
             HubFavoriteMovie(movie = movie, onMovieCardTapped = navigateToMovieDetail)
         }
     }
@@ -72,16 +69,12 @@ fun HubNoFavoriteMoviesSection(
     navigateToMoviesScreen: () -> Unit
 ) {
     Column(
-        modifier = modifier.padding(horizontal = CustomSize.Sixteen)
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
     ) {
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = stringResource(Res.string.hub_favorite_movies_title),
-            style = MaterialTheme.typography.titleLarge
-        )
-        SpacerHeight8()
-
         NoDataCard(
+            modifier = Modifier.fillMaxWidth(),
             noDataTitle = stringResource(Res.string.hub_favorite_movies_no_data_title),
             noDataText = stringResource(Res.string.hub_favorite_movies_no_data_txt),
             noDataBtnText = stringResource(Res.string.hub_favorite_movies_no_data_btn_txt),

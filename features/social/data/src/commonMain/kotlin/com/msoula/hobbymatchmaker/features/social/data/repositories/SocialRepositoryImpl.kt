@@ -75,7 +75,8 @@ class SocialRepositoryImpl(
                             commonMoviesCount = remoteData?.commonMoviesCount
                                 ?: SocialMemberDomainModel.Initial.commonMoviesCount,
                             moviesLiked = remoteData?.moviesLiked
-                                ?: SocialMemberDomainModel.Initial.moviesLiked
+                                ?: SocialMemberDomainModel.Initial.moviesLiked,
+                            lastMatchAt = remoteData?.lastMatchAt
                         )
                     }
                 }

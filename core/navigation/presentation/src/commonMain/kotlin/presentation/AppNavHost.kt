@@ -416,6 +416,18 @@ fun MainScaffold(
     val currentBackStack by tabNavController.currentBackStackEntryAsState()
     val currentDestination = currentBackStack?.destination
 
+    val navigateToTab: (route: Any) -> Unit = remember(tabNavController) {
+        { route ->
+            tabNavController.navigate(route) {
+                launchSingleTop = true
+                restoreState = true
+                popUpTo(tabNavController.graph.startDestinationId) {
+                    saveState = true
+                }
+            }
+        }
+    }
+
     Scaffold(
         bottomBar = {
             NavigationBar {
@@ -426,15 +438,7 @@ fun MainScaffold(
 
                     NavigationBarItem(
                         selected = selected,
-                        onClick = {
-                            tabNavController.navigate(tab.route) {
-                                launchSingleTop = true
-                                restoreState = true
-                                popUpTo(tabNavController.graph.startDestinationId) {
-                                    saveState = true
-                                }
-                            }
-                        },
+                        onClick = { navigateToTab(tab.route) },
                         icon = { Icon(tab.icon, contentDescription = tab.label) },
                         label = { Text(tab.label) }
                     )
@@ -523,7 +527,7 @@ fun MainScaffold(
                     getRecentMatches = { hubViewModel.retryObservation(HubSection.RECENT_MATCHES) },
                     onModalDismissed = { hubViewModel.onEvent(HubEvent.OnModalDismissed) },
                     onMemberClicked = { hubViewModel.onEvent(HubEvent.OnRecentMatchClicked(it)) },
-                    navigateToMoviesScreen = { navCallbacks.navigateToMoviesFromHub() },
+                    navigateToMoviesScreen = { navigateToTab(Movies) },
                     navigateToMovieDetail = { navCallbacks.navigateToMovieDetailFromMoviesOrHub(it) },
                     navigateToProfileScreen = { navCallbacks.navigateToProfileFromHub() },
                     selectedMatch = selectedMatch,

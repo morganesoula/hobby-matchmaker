@@ -6,5 +6,6 @@ data class SocialCircleEntryRemoteDataModel(
     val memberPseudo: String = "",
     val memberName: String = "",
     val commonMoviesCount: Int = 0,
-    val moviesLiked: List<Long>? = null
+    val moviesLiked: List<Long>? = null,
+    val lastMatchAt: Long? = null
 )

@@ -61,6 +61,7 @@
 
     <!-- HUB -->
     <string name="hub_recent_matches_title">Matchs Récents</string>
+    <string name="hub_recent_matches_subtitle">Les amis avec qui vous partagez des films, du plus récent au plus ancien</string>
     <string name="hub_recent_matches_shared_movies_single_txt">1 film commun</string>
     <string name="hub_recent_matches_shared_movies_plural_txt">%1$d films communs</string>
     <string name="hub_recent_matches_no_data_title">Pas encore de matchs ?</string>

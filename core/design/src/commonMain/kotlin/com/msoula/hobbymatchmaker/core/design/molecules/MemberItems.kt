@@ -3,12 +3,16 @@ package com.msoula.hobbymatchmaker.core.design.molecules
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.CircleWithCustomPhoto
@@ -24,6 +28,8 @@ fun MemberItem(
     modifier: Modifier = Modifier,
     member: ProfileSocialMember,
     displayMoviesCount: Boolean = true,
+    avatarSize: Dp? = null,
+    avatarBorderColor: Color? = null,
     onMemberClicked: (member: ProfileSocialMember) -> Unit
 ) {
     Column(
@@ -35,6 +41,8 @@ fun MemberItem(
         }
     ) {
         CircleWithCustomPhoto(
+            modifier = avatarSize?.let { Modifier.size(it) } ?: Modifier,
+            borderColor = avatarBorderColor,
             customAvatarPath = member.avatarUrl
         )
         SpacerHeight8()
@@ -42,7 +50,9 @@ fun MemberItem(
             text = member.name ?: member.pseudo,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
         if (displayMoviesCount) {
             SpacerHeight4()

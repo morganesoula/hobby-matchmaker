@@ -44,3 +44,9 @@ hobby implemented; TV shows, activities, and others will follow.
 **DO NOT** add the Claude co-author line in any commit messages.
 Commit format: feat (scope): message --in-progress/--finished.
 Use keywords such as `add, clean, fix, migrate, ui improvements` in your git messages.
+
+---
+
+## Other
+
+**DO NOT** try to run the app on a device or emulator after implementing, updating or deleting code.

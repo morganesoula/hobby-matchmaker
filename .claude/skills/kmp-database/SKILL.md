@@ -58,7 +58,8 @@ CREATE TABLE movie (
     videoKey         TEXT,       -- YouTube/Vimeo trailer key
     duration         INTEGER,    -- in minutes
     note             REAL,       -- TMDB vote average
-    has_cast         INTEGER NOT NULL DEFAULT 0
+    has_cast         INTEGER NOT NULL DEFAULT 0,
+    favoritedAt      INTEGER     -- epoch millis set when liked, null otherwise (migration 1.sqm)
 );
 ```
 
@@ -171,7 +172,7 @@ CREATE TABLE social_invitation (
 |---|---|---|
 | `observeMovies` | `movie` | All movies ordered by `popularity DESC` |
 | `observeDetailMovie` | `movie` + `actor` | Full detail with LEFT JOIN cast |
-| `observeFavoriteMovies` | `movie` | Only `isFavorite = 1`, ordered by popularity |
+| `observeFavoriteMovies` | `movie` | Only `isFavorite = 1`, most recently liked first (`favoritedAt DESC`, then popularity) |
 | `observeFavoriteMoviesCount` | `movie` | `COUNT(*)` where `isFavorite = 1` |
 | `getFavoriteIds` | `movie` | Only `movieId` for all favorites |
 | `upsertMoviePreservingUserData` | `movie` | Updates catalogue fields without touching `isFavorite` / `isSeen` |
@@ -181,6 +182,16 @@ CREATE TABLE social_invitation (
 | `observeUsersByUids` | `user_cache` | Batch lookup by UID list |
 
 ---
+
+### Migrations
+
+Schema changes to an existing table need a numbered migration next to the `.sq` file
+(`1.sqm`, `2.sqm`, …) **and** the matching change in the `CREATE TABLE` of `hmm_database.sq`
+(used for fresh installs). Drivers apply pending migrations automatically from `HMMDatabase.Schema`.
+
+| Migration | Change |
+|---|---|
+| `1.sqm` | `ALTER TABLE movie ADD COLUMN favoritedAt INTEGER` |
 
 ### Adding a New Table or Query
 
@@ -247,6 +258,7 @@ firestore.collection(FirestoreUsersCollection)
 | `avatarUrl` | `String?` | Download URL |
 | `commonMoviesCount` | `Int` | Count of shared liked movies |
 | `moviesLiked` | `List<Long>?` | TMDB IDs the member has liked |
+| `lastMatchAt` | `Long?` | Epoch millis of the latest shared like; written on **both** circle entries by the device whose like creates the match (`updateMovieLikedInCircleEntries`). Drives Hub recent-matches ordering |
 
 **Accessed via:**
 

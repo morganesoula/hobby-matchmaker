@@ -56,6 +56,7 @@ import com.msoula.hobbymatchmaker.core.design.atoms.HMMShimmerEffect
 import com.msoula.hobbymatchmaker.core.design.atoms.LoadingPosterPlaceholder
 import com.msoula.hobbymatchmaker.core.design.atoms.MovieGenericCard
 import com.msoula.hobbymatchmaker.core.design.atoms.RatingChip
+import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
 import com.msoula.hobbymatchmaker.core.design.hub_favorite_movies_shared_tag
 import com.msoula.hobbymatchmaker.core.design.icons.LucideHeart
 import com.msoula.hobbymatchmaker.core.design.models.MovieCarouselItem
@@ -213,10 +214,11 @@ fun HubFavoriteMovie(
 ) {
     val imageLoader: ImageLoader = koinInject()
 
-    Column {
+    Column(modifier = modifier) {
         Box(
-            modifier = modifier
-                .fillMaxSize()
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(2f / 3f)
                 .pointerInput(movie.id) {
                     detectTapGestures(
                         onTap = {
@@ -271,9 +273,13 @@ fun HubFavoriteMovie(
             }
         }
 
+        SpacerHeight8()
         Text(
             text = movie.title,
-            color = MaterialTheme.colorScheme.onBackground
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.titleSmall,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }
