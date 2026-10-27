@@ -51,3 +51,8 @@ iosApp/iosApp/secrets.xcconfig
 
 # JVM heap dumps
 *.hprof
+
+# Release signing (never commit)
+keystore.properties
+*.jks
+*.keystore
