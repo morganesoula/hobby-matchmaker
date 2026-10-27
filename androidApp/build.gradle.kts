@@ -41,7 +41,7 @@ android {
         minSdk = 26
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
 
         manifestPlaceholders["facebookApplicationID"] = secretProperties["facebook_application_id"] ?: ""
         manifestPlaceholders["facebookClientToken"] = secretProperties["facebook_client_token"] ?: ""
