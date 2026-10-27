@@ -17,6 +17,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -94,6 +95,30 @@ fun SecondaryButton(
             modifier = modifier.padding(CustomSize.Eight),
             fontSize = CustomFontSize.Sixteen,
             textAlign = TextAlign.Center,
+        )
+    }
+}
+
+@Composable
+fun DestructiveTextButton(
+    modifier: Modifier = Modifier,
+    text: String,
+    onClick: () -> Unit
+) {
+    TextButton(
+        onClick = { onClick() },
+        colors = ButtonDefaults.textButtonColors(
+            contentColor = MaterialTheme.colorScheme.error
+        ),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = CustomSize.TwentyFour),
+    ) {
+        Text(
+            text = text,
+            fontSize = CustomFontSize.Sixteen,
+            textAlign = TextAlign.Center
         )
     }
 }

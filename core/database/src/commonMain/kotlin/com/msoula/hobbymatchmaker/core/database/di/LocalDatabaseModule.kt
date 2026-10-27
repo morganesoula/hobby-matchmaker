@@ -13,6 +13,8 @@ import com.msoula.hobbymatchmaker.core.database.services.SocialMemberDAO
 import com.msoula.hobbymatchmaker.core.database.services.SocialMemberDAOImpl
 import com.msoula.hobbymatchmaker.core.database.services.UserCacheDAO
 import com.msoula.hobbymatchmaker.core.database.services.UserCacheDAOImpl
+import com.msoula.hobbymatchmaker.core.database.services.UserDataDAO
+import com.msoula.hobbymatchmaker.core.database.services.UserDataDAOImpl
 import com.msoula.hobbymatchmaker.core.database.services.UserProfileDAO
 import com.msoula.hobbymatchmaker.core.database.services.UserProfileDAOImpl
 import org.koin.core.module.Module
@@ -40,6 +42,7 @@ val coreModuleDAO = module {
     singleOf(::SocialMemberDAOImpl) bind SocialMemberDAO::class
     singleOf(::UserCacheDAOImpl) bind UserCacheDAO::class
     singleOf(::SocialInvitationDAOImpl) bind SocialInvitationDAO::class
+    singleOf(::UserDataDAOImpl) bind UserDataDAO::class
 }
 
 expect val coreModuleDatabasePlatformSpecific: Module

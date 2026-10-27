@@ -131,9 +131,15 @@
     <string name="authentication_already_exists">Un compte existe déjà. Connectez-vous :)</string>
     <string name="authentication_unknown">Echec de la connexion. Ressayez !</string>
     <string name="authentication_invalid_credentials">Identifiants incorrects.</string>
+    <string name="authentication_recent_login_required">Pour votre sécurité, déconnectez-vous puis reconnectez-vous avant de supprimer votre compte.</string>
 
     <!-- PROFILE -->
     <string name="log_out">Déconnexion</string>
+    <string name="delete_account">Supprimer mon compte</string>
+    <string name="delete_account_dialog_title">Supprimer votre compte ?</string>
+    <string name="delete_account_dialog_message">Votre profil, votre avatar, vos films aimés, votre cercle social et vos invitations seront définitivement supprimés. Cette action est irréversible.</string>
+    <string name="delete_account_dialog_confirm">Supprimer</string>
+    <string name="delete_account_dialog_cancel">Annuler</string>
 
     <string name="movies_liked_count_title_singular">Film aimé</string>
     <string name="movies_liked_count_title_plural">Films aimés</string>

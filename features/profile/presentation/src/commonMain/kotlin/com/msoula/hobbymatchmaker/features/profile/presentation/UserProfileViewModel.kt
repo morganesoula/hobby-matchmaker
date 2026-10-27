@@ -67,6 +67,12 @@ class UserProfileViewModel(
     val isPseudoAvailable: StateFlow<Boolean?>
         field = MutableStateFlow<Boolean?>(null)
 
+    val isDeleteAccountDialogVisible: StateFlow<Boolean>
+        field = MutableStateFlow<Boolean>(false)
+
+    val isDeletingAccount: StateFlow<Boolean>
+        field = MutableStateFlow<Boolean>(false)
+
     val screenState: StateFlow<UserProfileUiStateModel>
         field = MutableStateFlow<UserProfileUiStateModel>(UserProfileUiStateModel.Loading)
 
@@ -162,6 +168,15 @@ class UserProfileViewModel(
             UserProfileUiEventModel.OnEditModeClicked -> toggleEditMode()
 
             UserProfileUiEventModel.OnSignUpButtonClicked -> logOut()
+
+            UserProfileUiEventModel.OnDeleteAccountClicked ->
+                isDeleteAccountDialogVisible.update { true }
+
+            UserProfileUiEventModel.OnDeleteAccountDismissed -> {
+                if (!isDeletingAccount.value) isDeleteAccountDialogVisible.update { false }
+            }
+
+            UserProfileUiEventModel.OnDeleteAccountConfirmed -> deleteAccount()
         }
     }
 
@@ -217,6 +232,30 @@ class UserProfileViewModel(
                         UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
                     )
                 }
+        }
+    }
+
+    private fun deleteAccount() {
+        if (isDeletingAccount.value) return
+
+        scope.launch {
+            isDeletingAccount.update { true }
+            userProfileInteractor.deleteAccount(localAvatarPath = editableProfile.value?.avatarUrl)
+                .onSuccess {
+                    isDeleteAccountDialogVisible.update { false }
+                    eventHandler.sendEvent(
+                        UiEvent.Navigate(NavigationDestination.SignIn)
+                    )
+                }
+                .onFailure { error ->
+                    Logger.e("Failed to delete account: $error")
+                    isDeleteAccountDialogVisible.update { false }
+                    eventHandler.sendEvent(
+                        UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
+                    )
+                }
+
+            isDeletingAccount.update { false }
         }
     }
 

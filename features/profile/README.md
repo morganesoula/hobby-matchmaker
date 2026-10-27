@@ -36,6 +36,18 @@ pseudo, biography, social circle, etc...
 - **Cross-feature logic (Log out):**
     - The UI provides a logout button, but the logic is delegated to the `Authentication` module
 
+- **Cross-feature logic (Delete account):**
+    - A "Delete my account" destructive text button sits at the very bottom of the profile (view
+      mode only), below Log out, and opens a confirmation dialog.
+    - The logic lives in the `Authentication` module (**DeleteAccountUseCase**), called through
+      **UserProfileOrchestrator**. It first checks the sign-in is recent (Firebase requires it): if
+      not, nothing is deleted and the user is asked to sign in again
+      (`AppError.Authentication.RecentLoginRequired`).
+    - Then it deletes, in one Firestore batch: the user's `users/{uid}` document, both sides of
+      every circle entry, and all invitations sent or received. Then the Storage avatar, the
+      Firebase Auth user, the provider sessions, and finally all local user data (SQLDelight wipe +
+      session flags + cached avatar file).
+
 - **Cross-feature logic (Removing a member):**
     - The UI allows interaction with the social circle (e.g. removing a member) which triggers logic
       from the `Social` module's domain.

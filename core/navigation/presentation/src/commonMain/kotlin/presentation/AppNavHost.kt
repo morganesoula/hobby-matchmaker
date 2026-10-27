@@ -266,6 +266,9 @@ fun AppNavHost(
             val isEditMode by userProfileViewModel.isEditMode.collectAsStateWithLifecycle()
             val editableProfile by userProfileViewModel.editableProfile.collectAsStateWithLifecycle()
             val isPseudoAvailable by userProfileViewModel.isPseudoAvailable.collectAsStateWithLifecycle()
+            val isDeleteAccountDialogVisible by userProfileViewModel.isDeleteAccountDialogVisible
+                .collectAsStateWithLifecycle()
+            val isDeletingAccount by userProfileViewModel.isDeletingAccount.collectAsStateWithLifecycle()
 
             val searchedPseudos by socialViewModel.searchResults.collectAsStateWithLifecycle()
             val profile = (profileState as? UserProfileUiStateModel.Success)?.userProfile
@@ -333,13 +336,20 @@ fun AppNavHost(
                 }
 
                 val userProfileState = remember(
-                    profileState, editableProfile, isEditMode, isPseudoAvailable
+                    profileState,
+                    editableProfile,
+                    isEditMode,
+                    isPseudoAvailable,
+                    isDeleteAccountDialogVisible,
+                    isDeletingAccount
                 ) {
                     UserProfileState(
                         profileState = profileState,
                         editableProfile = editableProfile,
                         isEditMode = isEditMode,
-                        isPseudoAvailable = isPseudoAvailable
+                        isPseudoAvailable = isPseudoAvailable,
+                        isDeleteAccountDialogVisible = isDeleteAccountDialogVisible,
+                        isDeletingAccount = isDeletingAccount
                     )
                 }
 

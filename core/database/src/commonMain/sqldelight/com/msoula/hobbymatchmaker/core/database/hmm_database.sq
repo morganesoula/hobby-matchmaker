@@ -335,6 +335,21 @@ deleteIncomingInvitations:
 DELETE FROM social_invitation
 WHERE to_pseudo = ?;
 
+deleteAllUserProfiles:
+DELETE FROM user_profile;
+
+deleteAllSocialMembers:
+DELETE FROM social_circle_member;
+
+deleteAllInvitations:
+DELETE FROM social_invitation;
+
+resetAllMovieUserData:
+UPDATE movie SET
+    isFavorite = 0,
+    isSeen = 0,
+    favoritedAt = NULL;
+
 
 CREATE INDEX IF NOT EXISTS movie_is_favorite ON movie(isFavorite);
 CREATE INDEX IF NOT EXISTS idx_user_profile_uid ON user_profile(uid);

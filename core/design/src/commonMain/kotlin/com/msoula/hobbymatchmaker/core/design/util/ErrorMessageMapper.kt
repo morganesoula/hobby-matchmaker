@@ -5,6 +5,7 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.authentication_already_exists
 import com.msoula.hobbymatchmaker.core.design.authentication_invalid_credentials
+import com.msoula.hobbymatchmaker.core.design.authentication_recent_login_required
 import com.msoula.hobbymatchmaker.core.design.authentication_unknown
 import com.msoula.hobbymatchmaker.core.design.external_service_error
 import com.msoula.hobbymatchmaker.core.design.forbidden
@@ -91,6 +92,10 @@ object DefaultErrorMessageMapper : ErrorMessageMapper {
 
         AppError.Authentication.InvalidCredentials -> UIText.Resource(
             Res.string.authentication_invalid_credentials
+        )
+
+        AppError.Authentication.RecentLoginRequired -> UIText.Resource(
+            Res.string.authentication_recent_login_required
         )
     }
 }

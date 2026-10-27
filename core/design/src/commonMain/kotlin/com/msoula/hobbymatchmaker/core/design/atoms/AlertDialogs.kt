@@ -82,6 +82,57 @@ fun PrimaryAlertDialog(
 }
 
 @Composable
+fun DestructiveConfirmationDialog(
+    title: String,
+    message: String,
+    confirmButtonText: String,
+    cancelButtonText: String,
+    isLoading: Boolean,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    AlertDialog(
+        title = {
+            Text(
+                text = title,
+                fontSize = CustomFontSize.Sixteen,
+                textAlign = TextAlign.Center
+            )
+        },
+        text = { Text(text = message) },
+        onDismissRequest = { onDismiss() },
+        confirmButton = {
+            if (isLoading) {
+                CircularProgressIndicator()
+            } else {
+                Button(
+                    onClick = { onConfirm() },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError
+                    )
+                ) {
+                    Text(text = confirmButtonText)
+                }
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = { onDismiss() },
+                enabled = !isLoading,
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        contentColor = MaterialTheme.colorScheme.onBackground
+                    )
+            ) {
+                Text(text = cancelButtonText)
+            }
+        }
+    )
+}
+
+@Composable
 fun MinimalDialog(
     noDataText: String,
     onDismissRequest: () -> Unit

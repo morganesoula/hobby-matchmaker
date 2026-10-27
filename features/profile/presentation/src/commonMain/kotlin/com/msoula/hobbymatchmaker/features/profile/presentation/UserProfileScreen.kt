@@ -15,9 +15,16 @@ import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.isIosPlatform
 import com.msoula.hobbymatchmaker.core.design.Res
+import com.msoula.hobbymatchmaker.core.design.atoms.DestructiveTextButton
+import com.msoula.hobbymatchmaker.core.design.atoms.DestructiveConfirmationDialog
 import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.ProfileLoadingScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.SecondaryButton
+import com.msoula.hobbymatchmaker.core.design.delete_account
+import com.msoula.hobbymatchmaker.core.design.delete_account_dialog_cancel
+import com.msoula.hobbymatchmaker.core.design.delete_account_dialog_confirm
+import com.msoula.hobbymatchmaker.core.design.delete_account_dialog_message
+import com.msoula.hobbymatchmaker.core.design.delete_account_dialog_title
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_requirements_no_number
 import com.msoula.hobbymatchmaker.core.design.guest_build_circle_feature_description
 import com.msoula.hobbymatchmaker.core.design.guest_build_circle_feature_title
@@ -270,6 +277,14 @@ fun UserProfileContent(
                                     text = stringResource(Res.string.log_out),
                                     onClick = { userProfileActions.logOut("sign_in") }
                                 )
+                            },
+                            deleteAccount = {
+                                DestructiveTextButton(
+                                    text = stringResource(Res.string.delete_account),
+                                    onClick = {
+                                        userProfileActions.onEvent(UserProfileUiEventModel.OnDeleteAccountClicked)
+                                    }
+                                )
                             }
                         )
                     }
@@ -320,6 +335,22 @@ fun UserProfileContent(
                     )
                 }
             }
+        }
+
+        if (userProfileState.isDeleteAccountDialogVisible) {
+            DestructiveConfirmationDialog(
+                title = stringResource(Res.string.delete_account_dialog_title),
+                message = stringResource(Res.string.delete_account_dialog_message),
+                confirmButtonText = stringResource(Res.string.delete_account_dialog_confirm),
+                cancelButtonText = stringResource(Res.string.delete_account_dialog_cancel),
+                isLoading = userProfileState.isDeletingAccount,
+                onDismiss = {
+                    userProfileActions.onEvent(UserProfileUiEventModel.OnDeleteAccountDismissed)
+                },
+                onConfirm = {
+                    userProfileActions.onEvent(UserProfileUiEventModel.OnDeleteAccountConfirmed)
+                }
+            )
         }
     }
 }

@@ -10,4 +10,7 @@ sealed interface UserProfileUiEventModel {
     data object OnSaveClicked : UserProfileUiEventModel
     data object OnEditModeClicked : UserProfileUiEventModel
     data object OnSignUpButtonClicked : UserProfileUiEventModel
+    data object OnDeleteAccountClicked : UserProfileUiEventModel
+    data object OnDeleteAccountConfirmed : UserProfileUiEventModel
+    data object OnDeleteAccountDismissed : UserProfileUiEventModel
 }

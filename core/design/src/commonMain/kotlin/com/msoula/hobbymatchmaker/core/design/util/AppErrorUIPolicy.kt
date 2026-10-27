@@ -46,6 +46,7 @@ fun AppError.hint(): UIErrorHint = when (this) {
     AppError.Authentication.AlreadyExists -> UIErrorHint(RetryPolicy.Never, true)
     AppError.Authentication.Unknown -> UIErrorHint(RetryPolicy.Never, true)
     AppError.Authentication.InvalidCredentials -> UIErrorHint(RetryPolicy.Never, true)
+    AppError.Authentication.RecentLoginRequired -> UIErrorHint(RetryPolicy.Never, true)
 }
 
 inline fun <Event> AppError.route(

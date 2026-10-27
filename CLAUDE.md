@@ -20,6 +20,7 @@ hobby implemented; TV shows, activities, and others will follow.
 | AppError, AppResult, safeCall wrappers, error mapping, UIErrorHint            | `/kmp-error-handling` |
 | Reviewing changed code for quality, reuse, and efficiency                     | `/simplify`           |
 | Modifying settings.json, hooks, permissions, env vars                         | `/update-config`      |
+| Pushing the Android app online / Google Play release, version bump, .aab      | `/play-store-release` |
 
 ---
 
