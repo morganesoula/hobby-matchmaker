@@ -135,6 +135,8 @@
 
     <!-- PROFILE -->
     <string name="log_out">Déconnexion</string>
+    <string name="report_concern">Signaler un problème</string>
+    <string name="report_concern_email_subject">HobbyMatchMaker - Signalement</string>
     <string name="delete_account">Supprimer mon compte</string>
     <string name="delete_account_dialog_title">Supprimer votre compte ?</string>
     <string name="delete_account_dialog_message">Votre profil, votre avatar, vos films aimés, votre cercle social et vos invitations seront définitivement supprimés. Cette action est irréversible.</string>

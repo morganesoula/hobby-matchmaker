@@ -136,6 +136,8 @@
 
     <!-- Profile -->
     <string name="log_out">Log out</string>
+    <string name="report_concern">Report a concern</string>
+    <string name="report_concern_email_subject">HobbyMatchMaker - Report</string>
     <string name="delete_account">Delete my account</string>
     <string name="delete_account_dialog_title">Delete your account?</string>
     <string name="delete_account_dialog_message">Your profile, avatar, liked movies, social circle and invitations will be permanently deleted. This cannot be undone.</string>

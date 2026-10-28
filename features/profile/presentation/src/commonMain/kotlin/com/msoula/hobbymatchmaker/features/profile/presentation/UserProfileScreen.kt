@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.isIosPlatform
@@ -41,9 +42,12 @@ import com.msoula.hobbymatchmaker.core.design.icons.BootstrapPerson
 import com.msoula.hobbymatchmaker.core.design.icons.HeroiconsSparkles
 import com.msoula.hobbymatchmaker.core.design.icons.LucideFilm
 import com.msoula.hobbymatchmaker.core.design.log_out
+import com.msoula.hobbymatchmaker.core.design.report_concern
+import com.msoula.hobbymatchmaker.core.design.report_concern_email_subject
 import com.msoula.hobbymatchmaker.core.design.models.ProfileHeaderUiModel
 import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMember
 import com.msoula.hobbymatchmaker.core.design.molecules.BackNavigationTopBar
+import com.msoula.hobbymatchmaker.core.design.molecules.ContactLink
 import com.msoula.hobbymatchmaker.core.design.molecules.EditProfileTopBar
 import com.msoula.hobbymatchmaker.core.design.molecules.FeatureProfileCard
 import com.msoula.hobbymatchmaker.core.design.molecules.FeatureProfileCardWithButton
@@ -62,6 +66,8 @@ import com.msoula.hobbymatchmaker.core.design.templates.EditableProfileLayout
 import com.msoula.hobbymatchmaker.core.design.templates.GuestProfileLayout
 import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
 import com.msoula.hobbymatchmaker.core.design.util.RetryPolicy
+import com.msoula.hobbymatchmaker.core.design.util.SUPPORT_EMAIL
+import com.msoula.hobbymatchmaker.core.design.util.supportMailtoUri
 import com.msoula.hobbymatchmaker.core.design.util.UIErrorHint
 import com.msoula.hobbymatchmaker.features.profile.presentation.mappers.toProfileSocialMembers
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileActions
@@ -103,6 +109,9 @@ fun UserProfileContent(
             userProfileState.editableProfile?.name?.all { !it.isDigit() } == true
         }
     }
+
+    val uriHandler = LocalUriHandler.current
+    val reportConcernSubject = stringResource(Res.string.report_concern_email_subject)
 
     val avatarLauncher = rememberFilePickerLauncher(
         type = FileKitType.Image,
@@ -276,6 +285,17 @@ fun UserProfileContent(
                                 SecondaryButton(
                                     text = stringResource(Res.string.log_out),
                                     onClick = { userProfileActions.logOut("sign_in") }
+                                )
+                            },
+                            reportConcern = {
+                                ContactLink(
+                                    text = stringResource(Res.string.report_concern),
+                                    contactInfo = SUPPORT_EMAIL,
+                                    onClick = {
+                                        // No email app: the address stays visible under the link
+                                        runCatching { uriHandler.openUri(supportMailtoUri(reportConcernSubject)) }
+                                            .onFailure { Logger.e("No app to open the report email: ${it.message}") }
+                                    }
                                 )
                             },
                             deleteAccount = {
