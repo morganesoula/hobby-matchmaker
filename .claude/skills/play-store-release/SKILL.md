@@ -69,7 +69,9 @@ grep -rhoE "KEY_STORE_PATH[^/]*[^\"]*|value=\"[^\"]*\.(jks|keystore)\"" \
   suggest `! keytool -list -v -keystore "<path>"` to confirm the alias and validity.
 - **None found / password lost** → ask before generating a new upload key:
   `keytool -genkeypair -v -keystore <outside-the-repo>/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload`
-  (user runs it with `!` so passwords stay out of the transcript). Remind them to back up the
+  (user runs it **in their own terminal**: keytool prompts interactively, and passwords must stay
+  out of the transcript). **`-validity 10000` is mandatory**: without it keytool defaults to
+  90 days, and Play rejects upload certificates expiring before Oct 22, 2033. Remind them to back up the
   keystore + passwords in a password manager. Since no app exists on Play yet, a new upload key
   is fine; after the first upload, a lost upload key can be reset via Play Console support.
 - The keystore must live **outside the repo**.
@@ -194,6 +196,8 @@ Run all checks, then report a pass/fail table. **Blocking** failures stop the re
 | 7 | Static analysis | `./gradlew detektAll` | yes |
 | 8 | Unit tests | `./gradlew testDebugUnitTest` (or `allTests` when iOS mode is on) | yes |
 | 9 | Release build type sane | `isMinifyEnabled = false`, `signingConfig` set, no `isDebuggable = true` | yes |
+| 10 | Upload certificate valid long enough | `KS_PASS=<storePassword read from keystore.properties> keytool -list -v -keystore <storeFile> -storepass:env KS_PASS \| grep -E "^(Valid from\|Valide du)"`: the expiry must be after **Oct 22, 2033**. Never print the password; validity dates are not secret | yes |
+| 11 | `keyAlias` matches the keystore | Compare the alias in `keystore.properties` with the keystore's single `PrivateKeyEntry` and print only "matches" or "differs". If it differs and there is exactly one entry, fix `keystore.properties` without printing the alias. Ask the user to close the file in their IDE first: a stale editor buffer can overwrite the fix | yes |
 
 Do not continue past a blocking failure; explain the fix and ask how to proceed.
 
