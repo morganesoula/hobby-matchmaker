@@ -6,6 +6,8 @@ import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.authentication_already_exists
 import com.msoula.hobbymatchmaker.core.design.authentication_invalid_credentials
 import com.msoula.hobbymatchmaker.core.design.authentication_recent_login_required
+import com.msoula.hobbymatchmaker.core.design.profile_pseudo_missing_error
+import com.msoula.hobbymatchmaker.core.design.profile_pseudo_taken_error
 import com.msoula.hobbymatchmaker.core.design.authentication_unknown
 import com.msoula.hobbymatchmaker.core.design.external_service_error
 import com.msoula.hobbymatchmaker.core.design.forbidden
@@ -97,5 +99,12 @@ object DefaultErrorMessageMapper : ErrorMessageMapper {
         AppError.Authentication.RecentLoginRequired -> UIText.Resource(
             Res.string.authentication_recent_login_required
         )
+
+        is AppError.Profile -> error.toProfileUIText()
+    }
+
+    private fun AppError.Profile.toProfileUIText(): UIText = when (this) {
+        AppError.Profile.PseudoTaken -> UIText.Resource(Res.string.profile_pseudo_taken_error)
+        AppError.Profile.PseudoMissing -> UIText.Resource(Res.string.profile_pseudo_missing_error)
     }
 }

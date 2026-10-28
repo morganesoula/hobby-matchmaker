@@ -17,6 +17,9 @@ invitations, and shared interests).
           triggered.
     - **Sent & Search tab**:
         - The user can track the status of the invitations they sent and cancel them if needed.
+        - Every signed-in user has a pseudo (mandatory PickPseudo onboarding step), so everyone can
+          be found and invited. Sending an invite without a pseudo fails with
+          `AppError.Profile.PseudoMissing` as a safeguard.
         - The user can search for someone using a pseudo. The search is optimized using a lowercase
           prefix matching system and limits the results to 10 pertinent profiles to save bandwidth.
         - The user can add up to 5 people to their social circle.

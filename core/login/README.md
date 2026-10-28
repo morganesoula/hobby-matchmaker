@@ -6,7 +6,8 @@ This module owns the sign-in and sign-up presentation layer: form state, validat
 
 - Display and validate sign-in and sign-up forms (email, password, name)
 - Orchestrate email/password and social provider sign-in flows (Google, Apple, Facebook)
-- Handle first-sign-in setup (default profile creation, session initialisation)
+- Handle post-sign-in setup (session initialisation, profile hydration via `HydrateUserProfileUseCase`)
+  and route to the PickPseudo screen when the user has no pseudo yet (always after sign-up)
 - Manage password reset flow
 - Persist "don't ask again" preference for guest-mode dialog
 

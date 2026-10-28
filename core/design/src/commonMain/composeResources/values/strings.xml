@@ -177,8 +177,6 @@
     <string name="edit_profile_basic_information_requirements_no_number">Pas de nombre autorisé</string>
     <string name="edit_profile_basic_information_name_title">Nom</string>
     <string name="edit_profile_basic_information_pseudo_title">Pseudo</string>
-    <string name="edit_profile_basic_information_pseudo_not_available">Ce pseudo n'est pas disponible. Merci d'en choisir un autre.</string>
-    <string name="edit_profile_basic_information_pseudo_hint">Astuce: Ce pseudo unique vous permettra d'être ajouté par les autres utilisateurs de HobbyMatchMaker !</string>
     <string name="edit_profile_basic_information_bio_title">Bio</string>
     <string name="edit_profile_add_interests_title">Ajoutez des intérêts</string>
     <string name="edit_profile_add_interests_description">Astuce: Séparez vos intérêts par des virgules pour en ajouter plusieurs à la fois</string>
@@ -203,4 +201,27 @@
     <string name="social_capacity_reached">Il semblerait que vous ou votre invité ait atteint la limite maximale (5) de personnes autorisées à rejoindre le cercle d'amis !</string>
 
     <string name="social_movie_match_notification">Match avec %1$s !</string>
+
+    <!-- Pick pseudo -->
+    <string name="profile_pseudo_taken_error">Ce pseudo est déjà pris. Merci d'en choisir un autre.</string>
+    <string name="profile_pseudo_missing_error">Choisissez un pseudo pour profiter des fonctionnalités sociales.</string>
+    <string name="pick_pseudo_title">Choisissez votre pseudo</string>
+    <string name="pick_pseudo_subtitle">Vos amis utiliseront ce pseudo pour vous trouver et vous ajouter à leur cercle de loisirs.</string>
+    <string name="pick_pseudo_first_name_label">Prénom</string>
+    <string name="pick_pseudo_pseudo_label">Nom d'utilisateur / Pseudo</string>
+    <string name="pick_pseudo_placeholder">pseudo</string>
+    <string name="pick_pseudo_counter">%1$d/%2$d</string>
+    <string name="pick_pseudo_checking">Vérification de la disponibilité…</string>
+    <string name="pick_pseudo_taken">@%1$s est déjà pris, essayez-en un autre</string>
+    <string name="pick_pseudo_note_lead">Note :</string>
+    <string name="pick_pseudo_note_body">Vous ne pourrez plus modifier votre pseudo. Choisissez-le bien pour que vos amis de loisirs vous reconnaissent !</string>
+    <string name="pick_pseudo_continue">Continuer</string>
+    <string name="pick_pseudo_logout">Se déconnecter</string>
+    <string name="pick_pseudo_exit_caption">Appuyer sur retour quitte l'application</string>
+    <string name="pick_pseudo_close">Fermer</string>
+    <string name="pseudo_rule_length">Entre 3 et 20 caractères</string>
+    <string name="pseudo_rule_chars">Lettres, chiffres, _ et . uniquement</string>
+    <string name="pseudo_rule_dot">Ne commence ni ne finit par un point</string>
+    <string name="profile_share_pseudo">Partager mon pseudo</string>
+    <string name="profile_pseudo_copied">Pseudo copié dans le presse-papiers</string>
 </resources>

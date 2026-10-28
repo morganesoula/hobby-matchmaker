@@ -8,7 +8,7 @@ import com.msoula.hobbymatchmaker.core.common.flatMapSuspend
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetIsConnectedUseCase
 
-data class SignInSuccess(val uid: String)
+data class SignInSuccess(val uid: String, val needsPseudo: Boolean = false)
 class SignInUseCase(
     private val authenticationRepository: AuthenticationRepository,
     private val setIsConnectedUseCase: SetIsConnectedUseCase

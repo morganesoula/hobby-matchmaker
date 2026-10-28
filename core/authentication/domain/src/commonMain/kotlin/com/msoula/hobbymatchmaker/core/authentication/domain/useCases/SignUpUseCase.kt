@@ -20,12 +20,15 @@ class SignUpUseCase(
     private val setIsConnectedUseCase: SetIsConnectedUseCase,
     private val setCurrentUserProfileUuidUseCase: SetCurrentUserProfileUuidUseCase
 ) {
-    suspend operator fun invoke(p: Parameters.DoubleStringParam): AppResult<SignUpSuccess, AppError> =
+    suspend operator fun invoke(
+        p: Parameters.DoubleStringParam,
+        firstName: String
+    ): AppResult<SignUpSuccess, AppError> =
         authenticationRepository.signUp(p.firstValue, p.secondValue)
             .flatMapSuspend { uid ->
                 createUserUseCase(SessionUserDomainModel(uid, p.firstValue))
                     .flatMapSuspend {
-                        createDefaultUserProfileUseCase(uid = uid, name = "")
+                        createDefaultUserProfileUseCase(uid = uid, name = firstName.trim())
                     }
                     .flatMapSuspend {
                         setIsConnectedUseCase(true)

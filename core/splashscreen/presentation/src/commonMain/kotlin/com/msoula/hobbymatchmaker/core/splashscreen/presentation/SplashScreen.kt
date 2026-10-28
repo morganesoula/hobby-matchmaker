@@ -17,12 +17,14 @@ fun SplashScreenContent(
     modifier: Modifier = Modifier,
     state: SplashUiState,
     redirectToAuth: () -> Unit,
-    redirectToMovies: () -> Unit
+    redirectToMovies: () -> Unit,
+    redirectToPickPseudo: () -> Unit
 ) {
     LaunchedEffect(state) {
         when (state) {
             is SplashUiState.GoToMovies -> redirectToMovies()
             is SplashUiState.GoToAuth -> redirectToAuth()
+            is SplashUiState.GoToPickPseudo -> redirectToPickPseudo()
             else -> Unit
         }
     }

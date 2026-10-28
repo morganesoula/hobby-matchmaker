@@ -30,6 +30,11 @@ sealed interface AppError {
         data object RecentLoginRequired : Authentication
     }
 
+    sealed interface Profile : AppError {
+        data object PseudoTaken : Profile
+        data object PseudoMissing : Profile
+    }
+
     sealed interface External : AppError {
         data class Service(val provider: String, val message: String? = null) : External
     }

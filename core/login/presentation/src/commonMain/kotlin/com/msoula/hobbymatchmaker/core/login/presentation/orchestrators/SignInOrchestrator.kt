@@ -26,23 +26,23 @@ class SignInOrchestrator(
     suspend fun resetPassword(email: String): AppResult<Unit, AppError> =
         resetPasswordUseCase(Parameters.StringParam(email))
 
-    suspend fun signInEmail(email: String, password: String): AppResult<Unit, AppError> =
+    suspend fun signInEmail(email: String, password: String): AppResult<Boolean, AppError> =
         authenticationManager(
             AuthenticationManager.Params.EmailPassword(email, password)
-        ).mapSuccess { Unit }
+        ).mapSuccess { it.needsPseudo }
 
     suspend fun signInSocial(
         provider: ProviderType,
         credentialProvider: suspend () -> Any?
-    ): AppResult<Unit, AppError> =
+    ): AppResult<Boolean, AppError> =
         authenticationManager(
             AuthenticationManager.Params.SocialProvider(
                 provider, credentialProvider
             )
-        ).mapSuccess { Unit }
+        ).mapSuccess { it.needsPseudo }
 
-    suspend fun signInAsGuest(): AppResult<Unit, AppError> =
-        sessionManager.setCurrentUserProfileUuid().mapSuccess { Unit }
+    suspend fun signInAsGuest(): AppResult<Boolean, AppError> =
+        sessionManager.setCurrentUserProfileUuid().mapSuccess { false }
 
     fun observeDontAsk(): Flow<Boolean> =
         sessionManager.observeDontAskCheckboxValue()

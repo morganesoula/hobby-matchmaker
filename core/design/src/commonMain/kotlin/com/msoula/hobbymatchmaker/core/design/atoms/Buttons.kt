@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.theme.CustomFontSize
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
+import com.msoula.hobbymatchmaker.core.design.theme.IconSize
 import com.msoula.hobbymatchmaker.core.design.theme.disabledContainerColor
 import com.msoula.hobbymatchmaker.core.design.theme.onDisabledColor
 import org.jetbrains.compose.resources.DrawableResource
@@ -38,7 +39,8 @@ fun PrimaryButton(
     text: String,
     onClick: () -> Unit,
     loading: Boolean,
-    enabled: Boolean
+    enabled: Boolean,
+    trailingIcon: ImageVector? = null
 ) {
     Button(
         onClick = { onClick() },
@@ -63,10 +65,17 @@ fun PrimaryButton(
         } else {
             Text(
                 text = text,
-                modifier = modifier.padding(CustomSize.Eight),
+                modifier = Modifier.padding(CustomSize.Eight),
                 fontSize = CustomFontSize.Sixteen,
                 textAlign = TextAlign.Center,
             )
+            trailingIcon?.let {
+                Icon(
+                    imageVector = it,
+                    contentDescription = null,
+                    modifier = Modifier.size(IconSize.Sixteen)
+                )
+            }
         }
     }
 }
@@ -120,6 +129,30 @@ fun DestructiveTextButton(
             fontSize = CustomFontSize.Sixteen,
             textAlign = TextAlign.Center
         )
+    }
+}
+
+@Composable
+fun TextButtonWithStartIcon(
+    modifier: Modifier = Modifier,
+    icon: ImageVector,
+    text: String,
+    onClick: () -> Unit
+) {
+    TextButton(
+        onClick = { onClick() },
+        colors = ButtonDefaults.textButtonColors(
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+        ),
+        modifier = modifier
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(IconSize.Sixteen)
+        )
+        Spacer(modifier = Modifier.width(CustomSize.Eight))
+        Text(text = text, style = MaterialTheme.typography.labelLarge)
     }
 }
 

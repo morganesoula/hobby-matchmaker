@@ -25,6 +25,10 @@ object SignIn
 object SignUp
 
 @Serializable
+@SerialName("pick_pseudo")
+object PickPseudo
+
+@Serializable
 @SerialName("main")
 object Main
 

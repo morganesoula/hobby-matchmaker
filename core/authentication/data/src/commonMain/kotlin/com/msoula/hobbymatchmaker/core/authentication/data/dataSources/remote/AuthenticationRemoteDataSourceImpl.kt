@@ -7,6 +7,7 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.data.FirestoreCircleCollection
+import com.msoula.hobbymatchmaker.core.common.data.FirestorePseudosCollection
 import com.msoula.hobbymatchmaker.core.common.data.FirestoreUsersCollection
 import com.msoula.hobbymatchmaker.core.common.flatMap
 import com.msoula.hobbymatchmaker.core.common.flatMapSuspend
@@ -105,6 +106,8 @@ class AuthenticationRemoteDataSourceImpl(
                 delete(memberEntry)
             }
             (sentInviteRefs + receivedInviteRefs).forEach { delete(it) }
+            // Free the pseudo so it can be picked again
+            pseudo?.let { delete(firestore.collection(FirestorePseudosCollection).document(it.lowercase())) }
             delete(userRef)
         }.commit()
 

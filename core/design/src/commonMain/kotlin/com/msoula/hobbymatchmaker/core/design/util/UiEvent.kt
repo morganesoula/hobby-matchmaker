@@ -17,6 +17,7 @@ sealed interface UiEvent {
 sealed class NavigationDestination {
     data class MovieDetail(val movieId: Long) : NavigationDestination()
     data object Movies : NavigationDestination()
+    data object PickPseudo : NavigationDestination()
     data object Profile : NavigationDestination()
     data object SignIn : NavigationDestination()
     data object SignUp : NavigationDestination()

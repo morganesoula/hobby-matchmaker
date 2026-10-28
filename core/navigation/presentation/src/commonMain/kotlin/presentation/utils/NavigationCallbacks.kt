@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.navigation.NavController
 import com.msoula.hobbymatchmaker.core.navigation.presentation.Auth
 import com.msoula.hobbymatchmaker.core.navigation.presentation.Main
+import com.msoula.hobbymatchmaker.core.navigation.presentation.PickPseudo
 import com.msoula.hobbymatchmaker.core.navigation.presentation.MovieDetail
 import com.msoula.hobbymatchmaker.core.navigation.presentation.Profile
 import com.msoula.hobbymatchmaker.core.navigation.presentation.Social
@@ -30,6 +31,27 @@ class NavigationCallbacks(
     val navigateToMoviesFromSplash: () -> Unit = {
         navController.navigate(Main) {
             popUpTo<Splash> { inclusive = true }
+            launchSingleTop = true
+        }
+    }
+
+    val navigateToPickPseudoFromSplash: () -> Unit = {
+        navController.navigate(PickPseudo) {
+            popUpTo<Splash> { inclusive = true }
+            launchSingleTop = true
+        }
+    }
+
+    val navigateToPickPseudoFromAuth: () -> Unit = {
+        navController.navigate(PickPseudo) {
+            popUpTo<Auth> { inclusive = true }
+            launchSingleTop = true
+        }
+    }
+
+    val navigateToMoviesFromPickPseudo: () -> Unit = {
+        navController.navigate(Main) {
+            popUpTo<PickPseudo> { inclusive = true }
             launchSingleTop = true
         }
     }

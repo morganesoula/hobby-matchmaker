@@ -165,13 +165,15 @@ class SignInViewModel(
     }
 
     private suspend fun doSignIn(
-        action: suspend () -> AppResult<Unit, AppError>
+        action: suspend () -> AppResult<Boolean, AppError>
     ) {
         signInState.update { UiState.Loading }
 
         action()
-            .onSuccess {
-                eventHandler.sendEvent(UiEvent.Navigate(NavigationDestination.Movies))
+            .onSuccess { needsPseudo ->
+                val destination =
+                    if (needsPseudo) NavigationDestination.PickPseudo else NavigationDestination.Movies
+                eventHandler.sendEvent(UiEvent.Navigate(destination))
             }
             .onFailure { error ->
                 signInState.update { UiState.Success(Unit) }

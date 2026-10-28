@@ -11,4 +11,7 @@ interface UserProfileRepository {
     suspend fun syncUserProfile(userProfileDomainModel: UserProfileDomainModel): AppResult<Unit, AppError>
     suspend fun upsertUserProfile(userProfileDomainModel: UserProfileDomainModel): AppResult<Unit, AppError>
     suspend fun checkIfPseudoIsAvailable(pseudo: String): AppResult<Boolean, AppError>
+    suspend fun fetchRemoteUserProfile(uid: String): AppResult<UserProfileDomainModel?, AppError>
+    suspend fun reservePseudo(uid: String, pseudo: String, name: String): AppResult<Unit, AppError>
+    suspend fun ensurePseudoReservation(uid: String, pseudo: String): AppResult<Unit, AppError>
 }

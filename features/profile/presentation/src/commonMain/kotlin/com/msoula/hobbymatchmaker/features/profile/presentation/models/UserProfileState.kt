@@ -7,7 +7,6 @@ data class UserProfileState(
     val profileState: UserProfileUiStateModel,
     val editableProfile: UserProfileUiModel?,
     val isEditMode: Boolean,
-    val isPseudoAvailable: Boolean?,
     val isDeleteAccountDialogVisible: Boolean,
     val isDeletingAccount: Boolean
 )

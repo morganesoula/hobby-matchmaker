@@ -11,11 +11,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.isIosPlatform
 import com.msoula.hobbymatchmaker.core.design.Res
+import com.msoula.hobbymatchmaker.core.design.profile_pseudo_copied
 import com.msoula.hobbymatchmaker.core.design.atoms.DestructiveTextButton
 import com.msoula.hobbymatchmaker.core.design.atoms.DestructiveConfirmationDialog
 import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
@@ -82,6 +86,7 @@ import io.github.vinceglb.filekit.path
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -111,6 +116,9 @@ fun UserProfileContent(
     }
 
     val uriHandler = LocalUriHandler.current
+    val clipboardManager = LocalClipboardManager.current
+    val coroutineScope = rememberCoroutineScope()
+    val pseudoCopiedMessage = stringResource(Res.string.profile_pseudo_copied)
     val reportConcernSubject = stringResource(Res.string.report_concern_email_subject)
 
     val avatarLauncher = rememberFilePickerLauncher(
@@ -188,19 +196,7 @@ fun UserProfileContent(
                                                 )
                                             )
                                         },
-                                        pseudo = if (profile.isPseudoEditable) currentEditableProfile.pseudo else profile.pseudo,
-                                        onPseudoChanged = { pseudo ->
-                                            userProfileActions.onEvent(
-                                                UserProfileUiEventModel.OnPseudoChanged(
-                                                    pseudo
-                                                )
-                                            )
-                                        },
-                                        isPseudoEditable = profile.isPseudoEditable,
-                                        onPseudoFocusLost = {
-                                            userProfileActions.onEvent(UserProfileUiEventModel.OnPseudoDefined)
-                                        },
-                                        isPseudoAvailable = userProfileState.isPseudoAvailable,
+                                        pseudo = profile.pseudo,
                                         bio = currentEditableProfile.bio,
                                         onBioChanged = { bio ->
                                             userProfileActions.onEvent(
@@ -242,7 +238,7 @@ fun UserProfileContent(
                             headerSection = {
                                 AuthentifiedProfileHeader(
                                     user = ProfileHeaderUiModel(
-                                        name = "Morgane",
+                                        name = profile.name,
                                         pseudo = profile.pseudo,
                                         biography = profile.bio ?: "",
                                         avatarUrl = profile.avatarUrl,
@@ -257,6 +253,10 @@ fun UserProfileContent(
                                     searchResult = searchedPseudos,
                                     onInviteToSocialCircle = { pseudo, name ->
                                         userProfileActions.onInviteToSocialCircle(pseudo, name)
+                                    },
+                                    onSharePseudoClicked = {
+                                        clipboardManager.setText(AnnotatedString("@${profile.pseudo}"))
+                                        coroutineScope.launch { snackBarHostState.showSnackbar(pseudoCopiedMessage) }
                                     }
                                 )
                             },

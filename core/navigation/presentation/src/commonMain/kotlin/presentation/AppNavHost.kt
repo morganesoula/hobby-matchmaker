@@ -43,6 +43,8 @@ import com.msoula.hobbymatchmaker.core.navigation.presentation.models.SocialClie
 import com.msoula.hobbymatchmaker.core.navigation.presentation.utils.NavigationCallbacks
 import com.msoula.hobbymatchmaker.core.splashscreen.presentation.SplashScreenContent
 import com.msoula.hobbymatchmaker.core.splashscreen.presentation.SplashViewModel
+import com.msoula.hobbymatchmaker.features.profile.presentation.PickPseudoScreen
+import com.msoula.hobbymatchmaker.features.profile.presentation.PickPseudoViewModel
 import com.msoula.hobbymatchmaker.features.hub.presentation.HubContent
 import com.msoula.hobbymatchmaker.features.hub.presentation.HubViewModel
 import com.msoula.hobbymatchmaker.features.hub.presentation.models.HubEvent
@@ -102,7 +104,8 @@ fun AppNavHost(
             SplashScreenContent(
                 state = state,
                 redirectToAuth = navCallbacks.navigateToAuthFromSplash,
-                redirectToMovies = navCallbacks.navigateToMoviesFromSplash
+                redirectToMovies = navCallbacks.navigateToMoviesFromSplash,
+                redirectToPickPseudo = navCallbacks.navigateToPickPseudoFromSplash
             )
         }
 
@@ -123,6 +126,7 @@ fun AppNavHost(
                             is UiEvent.Navigate -> {
                                 when (event.destination) {
                                     NavigationDestination.Movies -> navCallbacks.navigateToMoviesFromAuth()
+                                    NavigationDestination.PickPseudo -> navCallbacks.navigateToPickPseudoFromAuth()
                                     NavigationDestination.SignUp -> nav.navigate(SignUp)
                                     else -> Unit
                                 }
@@ -183,6 +187,7 @@ fun AppNavHost(
                             is UiEvent.Navigate -> {
                                 when (event.destination) {
                                     NavigationDestination.Movies -> navCallbacks.navigateToMoviesFromAuth()
+                                    NavigationDestination.PickPseudo -> navCallbacks.navigateToPickPseudoFromAuth()
                                     NavigationDestination.SignIn -> nav.popBackStack()
                                     else -> Unit
                                 }
@@ -201,6 +206,35 @@ fun AppNavHost(
                     onNavigateToSignIn = { nav.popBackStack() }
                 )
             }
+        }
+
+        composable<PickPseudo> {
+            val pickPseudoViewModel = koinViewModel<PickPseudoViewModel>()
+            val formState by pickPseudoViewModel.formState.collectAsStateWithLifecycle()
+            val snackBarHostState = remember { SnackbarHostState() }
+
+            LaunchedEffect(Unit) {
+                pickPseudoViewModel.events.collect { event ->
+                    when (event) {
+                        is UiEvent.Navigate -> when (event.destination) {
+                            NavigationDestination.Movies -> navCallbacks.navigateToMoviesFromPickPseudo()
+                            NavigationDestination.SignIn -> navCallbacks.navigateAndClearToAuth()
+                            else -> Unit
+                        }
+
+                        is UiEvent.ShowSnackBar ->
+                            snackBarHostState.showSnackbar(event.message.asStringSuspend())
+
+                        else -> Unit
+                    }
+                }
+            }
+
+            PickPseudoScreen(
+                formState = formState,
+                snackBarHostState = snackBarHostState,
+                onEvent = pickPseudoViewModel::onEvent
+            )
         }
 
         composable<Main> {
@@ -265,7 +299,6 @@ fun AppNavHost(
             val profileState by userProfileViewModel.screenState.collectAsStateWithLifecycle()
             val isEditMode by userProfileViewModel.isEditMode.collectAsStateWithLifecycle()
             val editableProfile by userProfileViewModel.editableProfile.collectAsStateWithLifecycle()
-            val isPseudoAvailable by userProfileViewModel.isPseudoAvailable.collectAsStateWithLifecycle()
             val isDeleteAccountDialogVisible by userProfileViewModel.isDeleteAccountDialogVisible
                 .collectAsStateWithLifecycle()
             val isDeletingAccount by userProfileViewModel.isDeletingAccount.collectAsStateWithLifecycle()
@@ -339,7 +372,6 @@ fun AppNavHost(
                     profileState,
                     editableProfile,
                     isEditMode,
-                    isPseudoAvailable,
                     isDeleteAccountDialogVisible,
                     isDeletingAccount
                 ) {
@@ -347,7 +379,6 @@ fun AppNavHost(
                         profileState = profileState,
                         editableProfile = editableProfile,
                         isEditMode = isEditMode,
-                        isPseudoAvailable = isPseudoAvailable,
                         isDeleteAccountDialogVisible = isDeleteAccountDialogVisible,
                         isDeletingAccount = isDeletingAccount
                     )

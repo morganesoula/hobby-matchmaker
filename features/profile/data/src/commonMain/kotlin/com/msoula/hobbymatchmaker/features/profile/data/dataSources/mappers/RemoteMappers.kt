@@ -13,3 +13,13 @@ fun UserProfileDomainModel.toUserProfileRemoteDataModel(): UserProfileRemoteData
         interests = this.interests
     )
 }
+
+fun UserProfileRemoteDataModel.toUserProfileDomainModel(): UserProfileDomainModel =
+    UserProfileDomainModel(
+        uid = this.uid,
+        name = this.name ?: UserProfileDomainModel.Initial.name,
+        pseudo = this.pseudo ?: UserProfileDomainModel.Initial.pseudo,
+        avatarUrl = this.avatarUrl,
+        bio = this.bio,
+        interests = this.interests ?: emptyList()
+    )

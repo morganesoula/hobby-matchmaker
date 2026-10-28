@@ -3,6 +3,7 @@ package com.msoula.hobbymatchmaker.core.splashscreen.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.AuthState
+import com.msoula.hobbymatchmaker.core.authentication.domain.models.AuthenticatedUser
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfoUseCase
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
@@ -12,6 +13,7 @@ import com.msoula.hobbymatchmaker.core.session.domain.useCases.ClearCurrentUserP
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveIsConnectedUseCase
 import com.msoula.hobbymatchmaker.core.splashscreen.presentation.model.SplashUiState
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.SyncLocalFavoritesToCloudUseCase
+import com.msoula.hobbymatchmaker.features.profile.domain.useCases.HydrateUserProfileUseCase
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +27,7 @@ class SplashViewModel(
     private val observeIsConnectedUseCase: ObserveIsConnectedUseCase,
     private val fetchFirebaseUserInfo: FetchFirebaseUserInfoUseCase,
     private val clearCurrentUserProfileUuidUseCase: ClearCurrentUserProfileUuidUseCase,
+    private val hydrateUserProfileUseCase: HydrateUserProfileUseCase,
     syncLocalFavoritesToCloudUseCase: Lazy<SyncLocalFavoritesToCloudUseCase>,
     private val defaultErrorMessageMapper: ErrorMessageMapper
 ) : ViewModel() {
@@ -38,13 +41,14 @@ class SplashViewModel(
             try {
                 val isLocallyConnected = withTimeout(3_000) { observeIsConnectedUseCase().first() }
                 val navigationTarget = if (isLocallyConnected) {
-                    val isFirebaseSessionValid = validateFirebaseSession()
-                    if (isFirebaseSessionValid) {
+                    val authenticatedUser = fetchAuthenticatedUser()
+                    if (authenticatedUser != null) {
                         launch {
                             runCatching { syncLocalFavoritesToCloudUseCase() }
                                 .onFailure { Logger.w("Splash sync failed: ${it.message}") }
                         }
-                        SplashUiState.GoToMovies
+                        if (needsPseudo(authenticatedUser)) SplashUiState.GoToPickPseudo
+                        else SplashUiState.GoToMovies
                     } else {
                         clearCurrentUserProfileUuidUseCase()
                         SplashUiState.GoToAuth
@@ -64,12 +68,19 @@ class SplashViewModel(
         }
     }
 
-    private suspend fun validateFirebaseSession(): Boolean {
+    // Only a confirmed missing pseudo gates the user; a failed lookup (e.g. offline) lets them in
+    private suspend fun needsPseudo(user: AuthenticatedUser): Boolean =
+        when (val result = hydrateUserProfileUseCase(user.uid, user.displayName.orEmpty().substringBefore(" "))) {
+            is AppResult.Success -> !result.data
+            is AppResult.Failure -> false
+        }
+
+    private suspend fun fetchAuthenticatedUser(): AuthenticatedUser? {
         return when (val result = fetchFirebaseUserInfo()) {
-            is AppResult.Success -> result.data is AuthState.Authenticated
+            is AppResult.Success -> (result.data as? AuthState.Authenticated)?.user
             is AppResult.Failure -> {
                 Logger.w("Firebase session validation failed: ${result.error}")
-                false
+                null
             }
         }
     }
