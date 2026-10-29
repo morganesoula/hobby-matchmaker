@@ -4,7 +4,7 @@ data class SocialCircleEntryRemoteDataModel(
     val memberUid: String = "",
     val avatarUrl: String = "",
     val memberPseudo: String = "",
-    val memberName: String = "",
+    val memberName: String? = null,
     val commonMoviesCount: Int = 0,
     val moviesLiked: List<Long>? = null,
     val lastMatchAt: Long? = null

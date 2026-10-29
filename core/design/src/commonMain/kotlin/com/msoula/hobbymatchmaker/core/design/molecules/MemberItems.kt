@@ -47,7 +47,7 @@ fun MemberItem(
         )
         SpacerHeight8()
         Text(
-            text = member.name ?: member.pseudo,
+            text = member.name?.takeIf { it.isNotBlank() } ?: member.pseudo,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyMedium,

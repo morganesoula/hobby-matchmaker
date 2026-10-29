@@ -102,7 +102,7 @@ class SocialRemoteDataSourceImpl(
                         commonMoviesCount = document.get<Int?>("commonMoviesCount") ?: 0,
                         avatarUrl = document.get<String?>("avatarUrl") ?: "",
                         memberPseudo = document.get<String>("memberPseudo"),
-                        memberName = document.get<String?>("username") ?: "",
+                        memberName = document.get<String?>("username"),
                         moviesLiked = document.get<List<Long>?>("moviesLiked") ?: emptyList(),
                         lastMatchAt = document.get<Long?>("lastMatchAt")
                     )

@@ -14,9 +14,10 @@ class AcceptInviteUseCase(
         ownerUid: String,
         guestUid: String
     ): AppResult<Unit, AppError> {
-        return socialRepository.findUserByUid(ownerUid)
+        // Fresh reads: the cached summary can predate the pseudo pick and would be denormalized into both circles
+        return socialRepository.fetchFreshUserByUid(ownerUid)
             .flatMap { owner ->
-                socialRepository.findUserByUid(guestUid)
+                socialRepository.fetchFreshUserByUid(guestUid)
                     .flatMap { member ->
                         val commonMoviesCount = SocialMatchingUtils.calculateCommonMoviesCount(
                             owner.moviesLiked, member.moviesLiked
