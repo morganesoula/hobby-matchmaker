@@ -1,7 +1,7 @@
 ---
 name: kmp-ui-pattern
 description: |
-  Hybrid MVI + MVVM presentation layer for HobbyMatchmaker KMP — multiple StateFlow per ViewModel, *EventModel sealed interfaces, onEvent() dispatch, Orchestrators as domain facades, externalScope testability, @Immutable UI models, and *Content/*Screen composable naming. Use this skill whenever creating or reviewing a ViewModel, defining screen state, event models, UI models, composable structure, or Orchestrators. Trigger on phrases like "add a ViewModel", "create a screen", "MVI", "state", "EventModel", "onEvent", "screen composable", "UiModel", "Orchestrator", or "externalScope".
+  Hybrid MVI + MVVM presentation layer for HobbyMatchmaker KMP — multiple StateFlow per ViewModel, *EventModel sealed interfaces, onEvent() dispatch, Orchestrators as domain facades, externalScope testability, flat stable UI models, and *Content/*Screen composable naming. Use this skill whenever creating or reviewing a ViewModel, defining screen state, event models, UI models, composable structure, or Orchestrators. Trigger on phrases like "add a ViewModel", "create a screen", "MVI", "state", "EventModel", "onEvent", "screen composable", "UiModel", "Orchestrator", or "externalScope".
 ---
 
 # Presentation Layer Architecture — HobbyMatchmaker KMP
@@ -17,7 +17,7 @@ This project combines MVI-style event dispatch with MVVM-style multiple state fl
 | Side effects | `EventHandler` (Channel-based) emitting `UiEvent` |
 | Coroutine scope | `externalScope: CoroutineScope? = null` → `private val scope = externalScope ?: viewModelScope` |
 | Domain facade | `*Orchestrator` aggregates multiple use cases |
-| UI models | `@Immutable data class *UiModel` with `companion object { val Initial }` |
+| UI models | `data class *UiModel` (flat, plain `List`) with `companion object { val Initial }` |
 | Composables | `*Content` or `*Screen` (no `*Root`/`*Screen` split) wired inside `AppNavHost` |
 
 ---
@@ -67,8 +67,8 @@ class MovieViewModel(
     private val scope = externalScope ?: viewModelScope
 
     // Separate flows per concern
-    private val _movieScreenState = MutableStateFlow<UiState<ImmutableList<MovieUiModel>>>(UiState.Loading)
-    val movieScreenState: StateFlow<UiState<ImmutableList<MovieUiModel>>> = _movieScreenState.asStateFlow()
+    private val _movieScreenState = MutableStateFlow<UiState<List<MovieUiModel>>>(UiState.Loading)
+    val movieScreenState: StateFlow<UiState<List<MovieUiModel>>> = _movieScreenState.asStateFlow()
 
     private val _paginationState = MutableStateFlow(PaginationStateModel())
     val paginationState: StateFlow<PaginationStateModel> = _paginationState.asStateFlow()
@@ -180,7 +180,6 @@ class MovieUserActionOrchestrator(
 UI models are presentation-layer data classes. They hold pre-formatted strings (dates, units) ready for display.
 
 ```kotlin
-@Immutable
 data class MovieUiModel(
     val id: Long = 0L,
     val title: String = "",
@@ -196,13 +195,12 @@ data class MovieUiModel(
     }
 }
 
-@Immutable
 data class UserProfileUiModel(
     val uid: String = "",
     val displayName: String = "",
     val pseudo: String = "",
     val avatarUrl: String? = null,
-    val interests: ImmutableList<String> = persistentListOf()
+    val interests: List<String> = emptyList()
 ) {
     companion object {
         val Initial = UserProfileUiModel()
@@ -211,12 +209,13 @@ data class UserProfileUiModel(
 ```
 
 **Rules:**
-- Always annotate with `@Immutable`.
+- Don't annotate with `@Immutable`. UI models live in presentation modules (Compose compiler applied), so flat `val` data classes are inferred stable, and Strong Skipping skips unchanged `List` instances by `===`. See `/kmp-compose` → "Collections & stability".
 - Suffix: `*UiModel` (not `*Ui`, `*ViewState`).
 - All fields have defaults.
 - Always include `companion object { val Initial = ... }`.
-- Use `ImmutableList<T>` (from `kotlinx.collections.immutable`) for list fields.
-- Never nullable collections — use `persistentListOf()` or `emptyList()`.
+- Use plain `List<T>` for list fields, not `ImmutableList<T>`.
+- Never nullable collections: default to `emptyList()`.
+- Existing UI models (movies, profile) still use `@Immutable` + `ImmutableList`. Leave them as they are unless they feed a large lazy list.
 
 ### Mappers
 
@@ -310,7 +309,7 @@ composable<Movies> {
 ```kotlin
 @Composable
 fun MovieContent(
-    movieScreenState: UiState<ImmutableList<MovieUiModel>>,
+    movieScreenState: UiState<List<MovieUiModel>>,
     paginationState: PaginationStateModel,
     onEvent: (MovieEventModel) -> Unit,
     onNavigate: (NavigationDestination) -> Unit,
@@ -375,7 +374,7 @@ init {
 private fun observeMovies() {
     scope.launch {
         movieCatalogOrchestrator.observeMovies()
-            .map { movies -> movies.map { it.toMovieUiModel() }.toImmutableList() }
+            .map { movies -> movies.map { it.toMovieUiModel() } }
             .collect { uiModels ->
                 _movieScreenState.update {
                     if (uiModels.isEmpty()) UiState.Empty
@@ -426,7 +425,7 @@ private fun refreshMovies() {
 - [ ] Define `*Orchestrator`(s) if multiple use cases need coordination
 - [ ] Start reactive observation in `init { observeX() }`
 - [ ] Expose `val events = orchestrator.eventHandler.events` (or own `EventHandler`)
-- [ ] Create `*UiModel` annotated `@Immutable`, with defaults and `companion object { val Initial }`
+- [ ] Create `*UiModel` (flat `data class`, plain `List`, no `@Immutable`), with defaults and `companion object { val Initial }`
 - [ ] Write `fun DomainModel.toUiModel()` mapper extension in presentation layer
 - [ ] Create `*Content` or `*Screen` composable (state + onEvent, no ViewModel reference)
 - [ ] Wire ViewModel in `AppNavHost` `composable<>` block with `koinViewModel()`

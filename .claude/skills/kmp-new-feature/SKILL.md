@@ -72,7 +72,7 @@ If either is missing, **ask the user** before writing code — do not invent the
 ## 6. Presentation — `/kmp-ui-pattern`, `/kmp-compose`
 
 - [ ] `*EventModel` sealed interface, `*ViewModel` (multiple `StateFlow`s, `externalScope`), `*Orchestrator` if several use cases
-- [ ] `@Immutable *UiModel` with `Initial`, `DomainModel.toUiModel()` mapper
+- [ ] `*UiModel` (flat `data class`, plain `List`, no `@Immutable`) with `Initial`, `DomainModel.toUiModel()` mapper
 - [ ] `*Screen` / `*Content` composable built from `core/design` components and tokens, matching the mockup (`.png` wins over `.html`)
 - [ ] User-visible strings as `Res.string.*` in `core/design/src/commonMain/composeResources/`
 

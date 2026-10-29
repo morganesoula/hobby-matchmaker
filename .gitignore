@@ -56,3 +56,7 @@ iosApp/iosApp/secrets.xcconfig
 keystore.properties
 *.jks
 *.keystore
+
+# Agent skill scratch output (play-policy-insights, r8-analyzer)
+.scratch/
+/tmp/

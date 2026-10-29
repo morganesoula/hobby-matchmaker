@@ -1,7 +1,7 @@
 ---
 name: play-store-release
 description: |
-  End-to-end release procedure for publishing the HobbyMatchMaker Android app to the Google Play Store — first-release setup (upload keystore, signingConfig, Play App Signing, privacy policy and account-deletion pages on Firebase Hosting, Firebase/Facebook SHA registration), pre-flight checks, version bump, signed .aab build, and a guided Play Console checklist (store listing, App content, Data safety, track, release notes). Run this skill every time the user wants to ship the Android app. Trigger on phrases like "push the app online", "release the app", "publish to the Play Store", "upload to Google Play", "ship a new version", "new release", "bump the version", "build the aab", or "Play Console".
+  End-to-end release procedure for publishing the HobbyMatchMaker Android app to the Google Play Store — first-release setup (upload keystore, signingConfig, Play App Signing, privacy policy and account-deletion pages on Firebase Hosting, Firebase/Facebook SHA registration), pre-flight checks (including a Play policy audit), version bump, signed .aab build, and a guided Play Console checklist (store listing, App content, Data safety, track, release notes). Run this skill every time the user wants to ship the Android app. Trigger on phrases like "push the app online", "release the app", "publish to the Play Store", "upload to Google Play", "ship a new version", "new release", "bump the version", "build the aab", "Play Console", or "enable R8".
 ---
 
 # Google Play Release — HobbyMatchMaker (Android)
@@ -127,7 +127,7 @@ android {
 }
 ```
 
-Keep `isMinifyEnabled = false` (user decision: no R8 for now). Commit after asking:
+Keep `isMinifyEnabled = false` (user decision: no R8 for now; to turn it on later, follow section 8). Commit after asking:
 `feat (release): add release signing config --in-progress`.
 
 ### 2.4 Privacy policy + account-deletion pages (Firebase Hosting)
@@ -195,11 +195,39 @@ Run all checks, then report a pass/fail table. **Blocking** failures stop the re
 | 6 | Privacy policy + deletion URLs reachable | `curl -sI <url> \| head -1` → 200 | yes |
 | 7 | Static analysis | `./gradlew detektAll` | yes |
 | 8 | Unit tests | `./gradlew testDebugUnitTest` (or `allTests` when iOS mode is on) | yes |
-| 9 | Release build type sane | `isMinifyEnabled = false`, `signingConfig` set, no `isDebuggable = true` | yes |
+| 9 | Release build type sane | `signingConfig` set, no `isDebuggable = true`. R8: either `isMinifyEnabled = false` (current decision) or enabled as in section 8 with the keep rules file actually wired | yes |
 | 10 | Upload certificate valid long enough | `KS_PASS=<storePassword read from keystore.properties> keytool -list -v -keystore <storeFile> -storepass:env KS_PASS \| grep -E "^(Valid from\|Valide du)"`: the expiry must be after **Oct 22, 2033**. Never print the password; validity dates are not secret | yes |
 | 11 | `keyAlias` matches the keystore | Compare the alias in `keystore.properties` with the keystore's single `PrivateKeyEntry` and print only "matches" or "differs". If it differs and there is exactly one entry, fix `keystore.properties` without printing the alias. Ask the user to close the file in their IDE first: a stale editor buffer can overwrite the fix | yes |
 
+| 12 | Play policy audit | Run `/play-policy-insights` with the project specifics below. Any 🔴 Critical finding is blocking; 🟡 Important → ask; 🔵 Suggestion → list in the release summary | 🔴 yes |
+
 Do not continue past a blocking failure; explain the fix and ask how to proceed.
+
+### 3.1 Running `/play-policy-insights` on this KMP project
+
+The skill is written for single-module Android apps. Here's how to apply it:
+
+- **`app_dir` = the project root**, not `androidApp/`. Most policy-relevant code lives in
+  `commonMain` of `core/*` and `features/*` (auth, Firestore profile, avatar upload, account
+  deletion). `androidApp/` alone only holds the manifest and sign-in wiring.
+- Its scanner patterns target the native Android/Flutter/RN Firebase SDKs. This app uses the
+  **GitLive** KMP SDK (`dev.gitlive.firebase.*`: `Firebase.auth`, `Firebase.firestore`,
+  `Firebase.storage`), so the static scan under-reports data collection. When working the
+  `data_safety_*` goals, also check `core/*/data/**/remote/` and `/kmp-database` for what is
+  written to Firestore/Storage. Facebook SDK, Google Identity/Credential Manager and Kotzilla
+  are declared in `androidApp/build.gradle.kts`.
+- Account deletion: the in-app path is the same one pre-flight check 5 verifies. Demo login
+  credentials = the reviewer test account from section 6 → *App access* (never in the repo).
+- The audit reads the merged permissions from `androidApp/src/main/AndroidManifest.xml` and
+  library manifests. AD_ID was removed on purpose (commit 804020eb); a finding that says it is
+  missing is expected.
+- Optional input: `play_store_assets/play_store_info.json` at the project root, holding the
+  Data safety and listing answers, so the audit can compare code against what the store
+  declares. Without it, the audit runs against code only.
+- Scratch output goes to `.scratch/play_policy_insights_<uuid>/` (gitignored). Present
+  `compliance_report.md` from there; don't commit it.
+- Use findings to update the Data safety table and privacy policy (sections 2.4 and 6) before
+  submitting.
 
 ---
 
@@ -297,3 +325,39 @@ First reviews can take several days; updates are usually faster.
    (review, fingerprints, graphics), and anything skipped.
 4. After approval: suggest a quick sanity check of Google/Facebook sign-in on the
    Play-installed build (done by the user — never run the app yourself).
+
+---
+
+## 8. Enabling R8 (only when the user decides to)
+
+R8 is **off** today (`isMinifyEnabled = false`). Don't enable it as part of a routine release.
+Ask first, and do it on its own commit/branch, ahead of a release.
+
+Project facts that the generic `/r8-analyzer` skill doesn't know:
+
+- App module is `:androidApp` (not `:app`); release variant `release`. AGP is 9.5 (`gradle`
+  in `libs.versions.toml`), so use the AGP ≥ 9.3 DSL instead of `isMinifyEnabled`/`isShrinkResources`:
+  ```kotlin
+  buildTypes {
+      release {
+          optimization { enable = true }
+          proguardFiles("proguard-rules.pro")
+          signingConfig = signingConfigs.getByName("release")
+      }
+  }
+  ```
+- **The existing rules file is not wired.** `composeApp/proguard-rules.pro` is a library module
+  file, and no module calls `proguardFiles`/`consumerProguardFiles`. Move the rules to
+  `androidApp/proguard-rules.pro` and clean them first:
+  - Remove the Room rule (the project uses SQLDelight, not Room).
+  - Remove `-keep class io.ktor.** { *; }`, `-keep class kotlinx.coroutines.** { *; }` and
+    `-keep public class kotlin.reflect.jvm.internal.impl.** { public *; }`. Ktor, coroutines,
+    kotlinx.serialization, GitLive Firebase, Koin and Coil ship their own consumer rules.
+    Add back narrow rules only if the release build crashes on a specific class.
+  - Keep the AGP-generated `-dontwarn` block only while R8 reports those missing classes.
+- Verify on a release build (user installs it, never run it yourself): Google + Facebook
+  sign-in, Firestore reads/writes of `@Serializable` models, avatar upload, navigation
+  (type-safe routes are `@Serializable`).
+- Then run `/r8-analyzer`: Path A → `./gradlew :androidApp:analyzeReleaseR8Config`. It needs
+  `pip install "protobuf>=6.33.4"` and writes to `tmp/` at the project root (gitignored).
+- Once R8 is on, update check 9 and the snippet in 2.3 to match.

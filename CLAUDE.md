@@ -21,6 +21,8 @@ hobby implemented; TV shows, activities, and others will follow.
 | Reviewing changed code for quality, reuse, and efficiency                     | `/simplify`           |
 | Modifying settings.json, hooks, permissions, env vars                         | `/update-config`      |
 | Pushing the Android app online / Google Play release, version bump, .aab      | `/play-store-release` |
+| Play policy / Data safety / permissions compliance audit (KMP notes in `/play-store-release` §3.1) | `/play-policy-insights` |
+| R8 keep rules, app size, enabling minification (project notes in `/play-store-release` §8) | `/r8-analyzer` |
 
 ---
 

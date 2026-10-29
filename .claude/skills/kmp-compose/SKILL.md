@@ -1,7 +1,7 @@
 ---
 name: kmp-compose
 description: |
-  Compose UI patterns, design system, and component library for this KMP project. Use this skill whenever writing composables, choosing a UI component, handling UiState/FormState, wiring ViewModel events in a screen, using the theme or typography, or adding a new screen. Trigger on phrases like "composable", "UI component", "design system", "UiState", "FormState", "UiEvent", "UIText", "atom", "molecule", "organism", "template", "EmptyStateConfig", "StateContainer", "LaunchedEffect", "theme", "typography", or "ErrorMessageMapper". Also covers Compose performance/correctness: collectAsStateWithLifecycle, snapshotFlow, Flow parameters, DisposableEffect, rememberUpdatedState, SideEffect, Modifier order (padding/clickable/clip/background/graphicsLayer), BoxWithConstraints, SubcomposeLayout, nested Scaffold, recomposition, and jank.
+  Compose UI patterns, design system, and component library for this KMP project. Use this skill whenever writing composables, choosing a UI component, handling UiState/FormState, wiring ViewModel events in a screen, using the theme or typography, or adding a new screen. Trigger on phrases like "composable", "UI component", "design system", "UiState", "FormState", "UiEvent", "UIText", "atom", "molecule", "organism", "template", "EmptyStateConfig", "StateContainer", "LaunchedEffect", "theme", "typography", or "ErrorMessageMapper". Also covers Compose performance/correctness: collectAsStateWithLifecycle, snapshotFlow, Flow parameters, DisposableEffect, rememberUpdatedState, SideEffect, Modifier order (padding/clickable/clip/background/graphicsLayer), BoxWithConstraints, SubcomposeLayout, nested Scaffold, recomposition, and jank. Covers the Google Compose-performance rules too: strong skipping, stability, @Immutable/@Stable, ImmutableList, phase deferral, backwards writes, derivedStateOf, remember keys, LazyColumn/LazyRow key and contentType, onGloballyPositioned/onVisibilityChanged, animation and graphicsLayer, drawWithCache, AsyncImage, Modifier.Node/Modifier.composed, and auditing existing code for performance.
 ---
 
 # Compose UI & Design System — HobbyMatchmaker KMP
@@ -372,7 +372,7 @@ Available templates: `SignInLayout`, `SignUpLayout`, `HubLayout`, `CompleteProfi
 fun MyComponent(
     // 1. Required data params first
     title: String,
-    items: ImmutableList<Item>,
+    items: List<Item>,
     // 2. State params
     state: UiState<Data>,
     // 3. Event callbacks (prefix with `on`)
@@ -383,9 +383,13 @@ fun MyComponent(
 )
 ```
 
-**Collections:** Use `ImmutableList<T>` (from `kotlinx.collections.immutable`) for list params to avoid unnecessary recompositions. Convert with `.toImmutableList()`.
-
-**Stability:** Annotate data classes passed to composables with `@Immutable` when they contain `List`, `Map`, or other unstable types.
+**Collections & stability (Strong Skipping is on: Kotlin 2.4, Compose compiler plugin):**
+- New code uses plain `List<T>` for list params and UI-model fields. Strong Skipping already skips a composable when the list instance is unchanged (`===`). `ImmutableList` / `@Immutable` force `.equals()` on every recomposition, which is O(N) for collections.
+- Never add `@Immutable` / `@Stable` to a model that holds a `List`/`Set`/`Map`, and never add `ImmutableList` for performance.
+- Flat `data class`es of `val` primitives/`String`s in a Compose module are already inferred stable. Don't annotate them.
+- Add `@Stable`/`@Immutable` only when the compiler can't infer stability (class from a non-Compose module such as `:domain`, or an interface), the class is small and flat with no collections, and an upstream source re-allocates equal instances on each emission.
+- Existing `ImmutableList` / `@Immutable` code stays as it is. Only remove it when the model feeds a lazy layout with a large or deeply nested dataset (e.g. `MovieCarousel`'s infinite list); see `references/state-and-stability.md` §4.
+- Keep list instances stable on the ViewModel side: `_state.update { it.copy(…) }` reuses untouched list references, so Strong Skipping works.
 
 **State collection:** Use `collectAsStateWithLifecycle()`, which pauses collection while the screen is in the background. It comes from `org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose` and works in `commonMain`. Existing `collectAsState()` calls are legacy: migrate them when you touch a screen.
 ```kotlin
@@ -442,6 +446,33 @@ These are the rules from `references/` that matter most for this codebase. Apply
 - No `BoxWithConstraints` just to read a size → use `Modifier.onSizeChanged` / `Modifier.layout`.
 - No `BoxWithConstraints` inside lazy list or grid items. Read the size once above the list and pass the result down.
 - `Scaffold`s are subcomposing layouts. Only nest them on purpose; the current pattern is `MainScaffold` (bottom bar) → tab screen `Scaffold` (top bar). Don't add a third level, and don't nest them inside list items.
+- Avoid `onGloballyPositioned`: use `Modifier.onVisibilityChanged` (viewport/impressions), `onPlaced` / `onLayoutRectChanged` (local bounds). Never store coordinates in `MutableState` to position other content; use a custom `Layout`.
+- No decorative wrapper `Box`/`Canvas`: attach the modifier or use `Modifier.drawBehind` / `drawWithCache`.
+
+**State & phases**
+- Read fast-changing state (scroll offset, animated alpha/scale/offset) inside lambdas: `Modifier.graphicsLayer { }`, `Modifier.offset { IntOffset(…) }`, `Modifier.layout { }`, or pass `() -> Float` providers to children. This skips composition entirely.
+- No backwards writes: never write a state after reading it in the same pass, or from layout/draw into state read in composition (`references/backwards-write.md`).
+- `remember(keys)` lists every input it reads. Only `remember` heavy allocations or identity-sensitive objects; don't `remember { mutableStateOf(x) }` just to overwrite it.
+- `remember { derivedStateOf { } }` for filtering fast-changing inputs (`listState.firstVisibleItemIndex > 0`). `computedStateOf` needs Compose 1.13; this project is on Compose 1.12, so use `derivedStateOf`. Plain getters for trivial expressions; read `list.size` directly.
+- Don't over-index on recomposition counts: make composables cheap first, then measure.
+
+**Lazy layouts**
+- Primitive `key` + `contentType` on every lazy `items`. `itemsIndexed` instead of `list.indexOf(item)`.
+- Resolve `CompositionLocal`s and collect flows once above the list, pass values down.
+- No `LaunchedEffect`/`DisposableEffect` inside items for impressions/analytics (items are pre-fetched): use `Modifier.onVisibilityChanged`.
+- Selection: `Set` in state (or `mutableStateSetOf`) and `isSelected: () -> Boolean` providers.
+
+**Effects (additions)**
+- Synchronous reactions → `SideEffect(keys) { }` (Compose 1.12+), not a `LaunchedEffect` without suspension or a `DisposableEffect` with an empty `onDispose`.
+- Combine several `LaunchedEffect(Unit)` into one with nested `launch { }`. Guard optional effects with `if (callback != null)`.
+- `Handler.postDelayed` / `TimerTask` → `LaunchedEffect` + `delay()`.
+
+**Graphics & images**
+- Network images: Coil 3 `AsyncImage` (already a dependency), not `Image` + manual loading.
+- Cache `Path`/`Brush`/`Paint` in `Modifier.drawWithCache`; `Path.rewind()` over `reset()` in hot loops.
+- New custom modifiers use `Modifier.Node` (`ModifierNodeElement`), never `Modifier.composed` (`references/custom-modifiers.md`). `atoms/Images.kt` still uses `composed`/`onGloballyPositioned`: migrate when you touch it.
+
+**Before profiling (Android only):** measure a release build with R8 enabled (see `/r8-analyzer`), never a debuggable build. Baseline Profiles are not set up yet.
 
 ## References — load on demand
 
@@ -451,11 +482,27 @@ These are the rules from `references/` that matter most for this codebase. Apply
 | `references/side-effects.md` | Choosing between `LaunchedEffect`, `DisposableEffect`, `SideEffect`, `RememberedEffect`; an effect that restarts unexpectedly, a stale callback, a leaked listener, a ViewModel per list row |
 | `references/modifier.md` | Click or ripple area wrong, background/clip painted in the wrong place, fade/alpha applied to the wrong part, `size` vs `padding` order, reviewing a diff that reorders modifiers |
 | `references/subcomposition.md` | `BoxWithConstraints`, `SubcomposeLayout`, `Scaffold` cost, a slow first frame, extra measure passes, scroll jank after wrapping items, `SubcomposeSlotReusePolicy` / `precompose` |
+| `references/state-and-stability.md` | Stability / `@Immutable` / `ImmutableList` questions, strong skipping, phase deferral, `derivedStateOf`, `remember` keys, `SnapshotStateList`, `neverEqualPolicy` |
+| `references/strong-skipping.md` | How Strong Skipping decides to skip, lambda memoization, opting a composable out |
+| `references/backwards-write.md` | Infinite recomposition, first-frame "pop", state written during layout/draw |
+| `references/lazy-layouts.md` | Any `LazyColumn`/`LazyRow`/grid/pager: keys, `contentType`, selection, CompositionLocals or flows inside items, impressions |
+| `references/layouts.md` | `onGloballyPositioned`, `onVisibilityChanged`, `onPlaced`, floating labels/tooltips, wrapper depth, intrinsics |
+| `references/animation.md` | Animating alpha/scale/offset/size, `animateBounds`, shared elements, `Animatable` in a `Modifier.Node` |
+| `references/effects-and-threading.md` | Heavy work or allocations in a composable body, `SideEffect(keys)`, combining effects, effect ordering, timers |
+| `references/graphics-performance.md` | `Canvas`/`drawWithCache`, shaders, `Path` reuse, primitive collections, `AsyncImage` vs `Image` |
+| `references/custom-modifiers.md` | Writing a custom modifier, migrating `Modifier.composed` to `Modifier.Node` |
 
-Notes on these files: they are adapted from skydoves' Compose-performance skills and written Android-first. In this KMP project:
-- DI is Koin (`koinViewModel`).
-- `compose-effects` (`RememberedEffect`, `ViewModelStoreScope`) is not a dependency.
-- Profiling tools (Perfetto, Layout Inspector, `@TraceRecomposition`, `FrameTimingMetric`) only work on the Android target.
+**Performance audit of existing code:** scan the target against every "Performance & Correctness" group above. Before flagging or editing anything in a group, read its reference file for the approved fix and its scope guards; don't fix from the summary bullets alone.
+
+Notes on these files:
+- `collecting-flows`, `side-effects`, `modifier`, `subcomposition` are adapted from skydoves' Compose-performance skills. The other files come from Google's `android/skills` `jetpack-compose-performance` skill (Apache 2.0, merged here on 2026-10-29). Two of its sections were replaced by pointers: lifecycle-aware collection (our rule is stricter) and stale captures (covered by `side-effects.md`).
+- They are written Android-first. In this KMP project:
+  - DI is Koin (`koinViewModel`).
+  - `compose-effects` (`RememberedEffect`, `ViewModelStoreScope`) is not a dependency.
+  - Compose is 1.12 (CMP 1.12.x): `SideEffect(keys)` is available, `computedStateOf` (1.13) is not.
+  - `Dispatchers.IO` in `commonMain` needs `import kotlinx.coroutines.IO`. Blocking I/O belongs in the data layer (`/kmp-data-layer`), not in a composable's `produceState`.
+  - Android-only: `LocalContext`, `BroadcastReceiver`, `Handler`, Perfetto, Layout Inspector, `@TraceRecomposition`, `FrameTimingMetric`, Baseline Profiles.
+  - Where these files contradict the rules in this SKILL.md, this SKILL.md wins.
 
 ---
 
@@ -468,8 +515,9 @@ Notes on these files: they are adapted from skydoves' Compose-performance skills
 - [ ] Collect ViewModel state with `collectAsStateWithLifecycle()` at the call site; no `Flow<T>` params
 - [ ] Use `remember { SnackbarHostState() }` inside the composable (Compose-internal state)
 - [ ] Check modifier order on clickable and clipped elements; no `BoxWithConstraints` in list items
-- [ ] Wrap lists in `.toImmutableList()` before passing to child composables
-- [ ] Annotate any data class holding unstable fields with `@Immutable`
+- [ ] Plain `List<T>` params; no new `@Immutable`/`ImmutableList` on models holding collections
+- [ ] Every `LazyColumn`/`LazyRow`/grid `items` call has a primitive `key` **and** a `contentType`; small bounded lists (≈ ≤ 10) use `Column`/`Row`
+- [ ] Fast-changing values (scroll, animation) are read in lambdas (`graphicsLayer { }`, `offset { }`), not in composition
 - [ ] Use `Res.string.*` for all user-visible strings
 - [ ] Use design system atoms/molecules — don't rebuild existing components
 - [ ] Reach for a template if a similar page layout already exists
