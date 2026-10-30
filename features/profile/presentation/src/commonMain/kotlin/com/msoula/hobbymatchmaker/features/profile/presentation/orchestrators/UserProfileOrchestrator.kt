@@ -1,9 +1,12 @@
 package com.msoula.hobbymatchmaker.features.profile.presentation.orchestrators
 
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.DeleteAccountSuccess
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.DeleteAccountUseCase
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.ImageFileManager
 import com.msoula.hobbymatchmaker.core.common.Logger
+import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveLikedMoviesCountUseCase
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveLikedMoviesIdsUseCase
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.ObserveCurrentUserProfileStateUseCase
@@ -26,6 +29,7 @@ class UserProfileOrchestrator(
     private val observeLikedMoviesIds: ObserveLikedMoviesIdsUseCase,
     private val computeCommonMoviesUseCase: ComputeCommonMoviesUseCase,
     private val uploadAvatarUseCase: UploadAvatarUseCase,
+    private val deleteAccountUseCase: DeleteAccountUseCase,
     private val imageManager: ImageFileManager
 ) {
     fun observeCurrentUser(uid: String): Flow<UserProfileUiModel?> =
@@ -68,11 +72,19 @@ class UserProfileOrchestrator(
             }
 
             is AppResult.Success -> {
-                if (oldPath != null && (oldPath.startsWith("/data") || oldPath.contains("/files/avatars"))) {
-                    imageManager.deleteImageFromInternalStorage(oldPath)
-                }
+                deleteLocalAvatar(oldPath)
                 AppResult.Success(result.data)
             }
+        }
+    }
+
+    suspend fun deleteAccount(localAvatarPath: String?): AppResult<DeleteAccountSuccess, AppError> =
+        deleteAccountUseCase()
+            .onSuccess { deleteLocalAvatar(localAvatarPath) }
+
+    private fun deleteLocalAvatar(path: String?) {
+        if (path != null && (path.startsWith("/data") || path.contains("/files/avatars"))) {
+            imageManager.deleteImageFromInternalStorage(path)
         }
     }
 }

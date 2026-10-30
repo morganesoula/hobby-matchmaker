@@ -27,6 +27,12 @@ sealed interface AppError {
         data object AlreadyExists : Authentication
         data object Unknown : Authentication
         data object InvalidCredentials : Authentication
+        data object RecentLoginRequired : Authentication
+    }
+
+    sealed interface Profile : AppError {
+        data object PseudoTaken : Profile
+        data object PseudoMissing : Profile
     }
 
     sealed interface External : AppError {

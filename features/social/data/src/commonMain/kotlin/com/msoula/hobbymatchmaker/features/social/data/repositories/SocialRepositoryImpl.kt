@@ -45,6 +45,11 @@ class SocialRepositoryImpl(
                 AppResult.Success(member.toSocialMemberDomainModel())
             }
 
+    override suspend fun fetchFreshUserByUid(uid: String): AppResult<SocialMemberDomainModel, AppError> {
+        userDataRepository.invalidateCache(uid)
+        return findUserByUid(uid)
+    }
+
     override fun observeSocialCircle(uid: String): Flow<List<SocialMemberDomainModel>> =
         channelFlow {
             val remoteDataByMemberUid = mutableMapOf<String, SocialCircleEntryRemoteDataModel>()
@@ -75,7 +80,8 @@ class SocialRepositoryImpl(
                             commonMoviesCount = remoteData?.commonMoviesCount
                                 ?: SocialMemberDomainModel.Initial.commonMoviesCount,
                             moviesLiked = remoteData?.moviesLiked
-                                ?: SocialMemberDomainModel.Initial.moviesLiked
+                                ?: SocialMemberDomainModel.Initial.moviesLiked,
+                            lastMatchAt = remoteData?.lastMatchAt
                         )
                     }
                 }

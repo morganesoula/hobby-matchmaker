@@ -1,5 +1,7 @@
 package com.msoula.hobbymatchmaker.core.authentication.data.di
 
+import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.local.AuthenticationLocalDataSource
+import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.local.AuthenticationLocalDataSourceImpl
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.AuthenticationRemoteDataSource
 import com.msoula.hobbymatchmaker.core.authentication.data.dataSources.remote.AuthenticationRemoteDataSourceImpl
 import com.msoula.hobbymatchmaker.core.authentication.data.repositories.AuthenticationRepositoryImpl
@@ -20,6 +22,7 @@ val coreModuleAuthenticationData = module {
     single { Firebase.storage("gs://hobby-matchmaker.firebasestorage.app") }
 
     singleOf(::AuthenticationRemoteDataSourceImpl) bind AuthenticationRemoteDataSource::class
+    singleOf(::AuthenticationLocalDataSourceImpl) bind AuthenticationLocalDataSource::class
     singleOf(::AuthenticationRepositoryImpl) bind AuthenticationRepository::class
 }
 

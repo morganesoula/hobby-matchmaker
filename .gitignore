@@ -48,3 +48,15 @@ iosApp/iosApp/secrets.xcconfig
 *.apk
 *.aab
 /composeApp/release/
+
+# JVM heap dumps
+*.hprof
+
+# Release signing (never commit)
+keystore.properties
+*.jks
+*.keystore
+
+# Agent skill scratch output (play-policy-insights, r8-analyzer)
+.scratch/
+/tmp/

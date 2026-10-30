@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -101,8 +102,9 @@ class SocialRemoteDataSourceImpl(
                         commonMoviesCount = document.get<Int?>("commonMoviesCount") ?: 0,
                         avatarUrl = document.get<String?>("avatarUrl") ?: "",
                         memberPseudo = document.get<String>("memberPseudo"),
-                        memberName = document.get<String?>("username") ?: "",
-                        moviesLiked = document.get<List<Long>?>("moviesLiked") ?: emptyList()
+                        memberName = document.get<String?>("username"),
+                        moviesLiked = document.get<List<Long>?>("moviesLiked") ?: emptyList(),
+                        lastMatchAt = document.get<Long?>("lastMatchAt")
                     )
                 }
             }
@@ -423,25 +425,42 @@ class SocialRemoteDataSourceImpl(
     override suspend fun getSocialCircleSnapshot(uid: String): AppResult<List<SocialCircleEntryRemoteDataModel>, AppError> =
         AppResult.Success(observeSocialCircle(uid).first())
 
+    @OptIn(ExperimentalTime::class)
     override suspend fun updateMovieLikedInCircleEntries(
         ownerUid: String,
         movieId: Long,
         isFavorite: Boolean
     ): AppResult<Unit, AppError> = safeNetworkCall(connectivityChecker) {
         getSocialCircleSnapshot(ownerUid).mapSuccess { list ->
+            val now = Clock.System.now().toEpochMilliseconds()
+
             list.forEach { entry ->
-                firestore
+                // Liking a movie the member already likes creates a match on both sides
+                val isNewMatch = isFavorite && entry.moviesLiked?.contains(movieId) == true
+                val ownerEntryInMemberCircle = firestore
                     .collection(FirestoreUsersCollection)
                     .document(entry.memberUid)
                     .collection(FirestoreCircleCollection)
                     .document(ownerUid)
-                    .set(
-                        mapOf(
-                            "moviesLiked" to if (isFavorite) FieldValue.arrayUnion(movieId) else FieldValue.arrayRemove(
-                                movieId
-                            )
-                        ), merge = true
-                    )
+
+                ownerEntryInMemberCircle.set(
+                    buildMap {
+                        put(
+                            "moviesLiked",
+                            if (isFavorite) FieldValue.arrayUnion(movieId) else FieldValue.arrayRemove(movieId)
+                        )
+                        if (isNewMatch) put("lastMatchAt", now)
+                    }, merge = true
+                )
+
+                if (isNewMatch) {
+                    firestore
+                        .collection(FirestoreUsersCollection)
+                        .document(ownerUid)
+                        .collection(FirestoreCircleCollection)
+                        .document(entry.memberUid)
+                        .set(mapOf("lastMatchAt" to now), merge = true)
+                }
             }
         }
     }

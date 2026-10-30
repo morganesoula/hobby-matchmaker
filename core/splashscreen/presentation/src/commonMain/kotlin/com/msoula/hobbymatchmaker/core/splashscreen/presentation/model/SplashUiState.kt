@@ -8,5 +8,6 @@ sealed interface SplashUiState {
     data object Loading: SplashUiState
     data object GoToMovies : SplashUiState
     data object GoToAuth : SplashUiState
+    data object GoToPickPseudo : SplashUiState
     data class Error(val message: UIText) : SplashUiState
 }

@@ -61,6 +61,7 @@
 
     <!-- HUB -->
     <string name="hub_recent_matches_title">Recent Matches</string>
+    <string name="hub_recent_matches_subtitle">Friends you share movies with, most recent first</string>
     <string name="hub_recent_matches_shared_movies_single_txt">1 shared movie</string>
     <string name="hub_recent_matches_shared_movies_plural_txt">%1$d shared movies</string>
     <string name="hub_recent_matches_no_data_title">No match yet?</string>
@@ -131,9 +132,17 @@
     <string name="authentication_already_exists">An account already exists. Please sign in :)</string>
     <string name="authentication_unknown">Sign-in failed. Try again!</string>
     <string name="authentication_invalid_credentials">Invalid credentials.</string>
+    <string name="authentication_recent_login_required">For your security, please log out and sign in again before deleting your account.</string>
 
     <!-- Profile -->
     <string name="log_out">Log out</string>
+    <string name="report_concern">Report a concern</string>
+    <string name="report_concern_email_subject">HobbyMatchMaker - Report</string>
+    <string name="delete_account">Delete my account</string>
+    <string name="delete_account_dialog_title">Delete your account?</string>
+    <string name="delete_account_dialog_message">Your profile, avatar, liked movies, social circle and invitations will be permanently deleted. This cannot be undone.</string>
+    <string name="delete_account_dialog_confirm">Delete</string>
+    <string name="delete_account_dialog_cancel">Cancel</string>
 
     <string name="movies_liked_count_title_singular">Movie Liked</string>
     <string name="movies_liked_count_title_plural">Movies Liked</string>
@@ -168,8 +177,6 @@
     <string name="edit_profile_basic_information_requirements_title">Requirements:</string>
     <string name="edit_profile_basic_information_requirements_no_number">No numbers allowed</string>
     <string name="edit_profile_basic_information_pseudo_title">Pseudo</string>
-    <string name="edit_profile_basic_information_pseudo_not_available">This username is not available. Please choose another.</string>
-    <string name="edit_profile_basic_information_pseudo_hint">Tip: This unique username will allow you to be added by other users of HobbyMatchMaker !</string>
     <string name="edit_profile_basic_information_bio_title">Bio</string>
     <string name="edit_profile_add_interests_title">Add Interest</string>
     <string name="edit_profile_add_interests_description">Tip: Separate your interests with commas to add multiple tags at once</string>
@@ -194,4 +201,27 @@
     <string name="social_capacity_reached">It seems like you or your invitee have reached the maximum number (5) of people allowed in your circle!</string>
 
     <string name="social_movie_match_notification">Match with %1$s !</string>
+
+    <!-- Pick pseudo -->
+    <string name="profile_pseudo_taken_error">This pseudo is already taken. Please choose another.</string>
+    <string name="profile_pseudo_missing_error">Pick a pseudo to enjoy social features.</string>
+    <string name="pick_pseudo_title">Choose your Pseudo</string>
+    <string name="pick_pseudo_subtitle">Your friends will use this pseudo to find you and add you to their hobby circle.</string>
+    <string name="pick_pseudo_first_name_label">First name</string>
+    <string name="pick_pseudo_pseudo_label">Username / Pseudo</string>
+    <string name="pick_pseudo_placeholder">username</string>
+    <string name="pick_pseudo_counter">%1$d/%2$d</string>
+    <string name="pick_pseudo_checking">Checking availability…</string>
+    <string name="pick_pseudo_taken">@%1$s is already taken, try another one</string>
+    <string name="pick_pseudo_note_lead">Note:</string>
+    <string name="pick_pseudo_note_body">You cannot change your pseudo later. Choose carefully to make sure your hobby friends recognize you!</string>
+    <string name="pick_pseudo_continue">Continue</string>
+    <string name="pick_pseudo_logout">Log out</string>
+    <string name="pick_pseudo_exit_caption">Pressing back exits the application</string>
+    <string name="pick_pseudo_close">Close</string>
+    <string name="pseudo_rule_length">Between 3 and 20 characters</string>
+    <string name="pseudo_rule_chars">Letters, digits, _ and . only</string>
+    <string name="pseudo_rule_dot">Doesn't start or end with a dot</string>
+    <string name="profile_share_pseudo">Share my pseudo</string>
+    <string name="profile_pseudo_copied">Pseudo copied to clipboard</string>
 </resources>

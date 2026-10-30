@@ -22,7 +22,8 @@ fun ObserveDetailMovie.toMovieDetailDataEntity(list: List<ObserveDetailMovie>): 
             videoKey = this.videoKey,
             duration = this.duration,
             note = null,
-            has_cast = this.has_cast
+            has_cast = this.has_cast,
+            favoritedAt = null
         ),
         actors = list
             .filter { it.actorId != null }

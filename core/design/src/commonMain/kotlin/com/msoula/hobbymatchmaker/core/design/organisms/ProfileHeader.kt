@@ -50,6 +50,10 @@ import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_main_ad
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.text.font.FontWeight
+import com.msoula.hobbymatchmaker.core.design.icons.LucideCopy
+import com.msoula.hobbymatchmaker.core.design.profile_share_pseudo
 
 @Composable
 fun GuestProfileHeader(
@@ -104,14 +108,9 @@ fun AuthentifiedProfileHeader(
     onEditProfileClicked: () -> Unit,
     onSearchPeople: (pseudo: String) -> Unit,
     searchResult: ImmutableList<ProfileSocialMember> = persistentListOf(),
-    onInviteToSocialCircle: (pseudo: String, name: String?) -> Unit
+    onInviteToSocialCircle: (pseudo: String, name: String?) -> Unit,
+    onSharePseudoClicked: () -> Unit = {}
 ) {
-    val identityDisplayText = when {
-        user.name.isNotBlank() && user.pseudo.isNotBlank() -> "${user.name} (@${user.pseudo})"
-        user.name.isNotBlank() -> user.name
-        user.pseudo.isNotBlank() -> "@${user.pseudo}"
-        else -> ""
-    }
 
     val textFieldState = rememberTextFieldState()
     var displayAddPeopleForm by rememberSaveable { mutableStateOf(false) }
@@ -136,15 +135,35 @@ fun AuthentifiedProfileHeader(
             )
             SpacerHeight8()
 
-            if (identityDisplayText.isNotBlank()) {
+            if (user.name.isNotBlank()) {
                 Text(
                     text = user.name,
                     color = MaterialTheme.colorScheme.onPrimary,
                     style = MaterialTheme.typography.titleLarge,
                     textAlign = TextAlign.Center
                 )
-                SpacerHeight16()
             }
+
+            if (user.pseudo.isNotBlank()) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "@${user.pseudo}",
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    IconButton(onClick = { onSharePseudoClicked() }) {
+                        Icon(
+                            imageVector = LucideCopy,
+                            contentDescription = stringResource(Res.string.profile_share_pseudo),
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(IconSize.Sixteen)
+                        )
+                    }
+                }
+            }
+
+            if (user.name.isNotBlank() || user.pseudo.isNotBlank()) SpacerHeight16()
 
             if (user.biography.isNotBlank()) {
                 Text(

@@ -7,12 +7,11 @@ plugins {
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.google.services)
-    alias(libs.plugins.hotswan.compiler)
 }
 
 android {
     namespace = "com.msoula.hobbymatchmaker"
-    compileSdk = 36
+    compileSdk = 37
     buildFeatures.buildConfig = true
 
     val secretsPropertiesFile = rootProject.file("secrets.properties")
@@ -20,12 +19,29 @@ android {
         if (secretsPropertiesFile.exists()) load(FileInputStream(secretsPropertiesFile))
     }
 
+    val keystorePropertiesFile = rootProject.file("keystore.properties")
+    val keystoreProperties = Properties().apply {
+        if (keystorePropertiesFile.exists()) load(FileInputStream(keystorePropertiesFile))
+    }
+
+    signingConfigs {
+        create("release") {
+            val storeFilePath = keystoreProperties.getProperty("storeFile").orEmpty()
+            if (storeFilePath.isNotBlank()) {
+                storeFile = file(storeFilePath)
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
+        }
+    }
+
     defaultConfig {
         applicationId = "com.msoula.hobbymatchmaker"
         minSdk = 26
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        targetSdk = 36
+        versionCode = 3
+        versionName = "1.1.0"
 
         manifestPlaceholders["facebookApplicationID"] = secretProperties["facebook_application_id"] ?: ""
         manifestPlaceholders["facebookClientToken"] = secretProperties["facebook_client_token"] ?: ""
@@ -55,6 +71,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
@@ -79,10 +96,6 @@ dependencies {
     implementation(project(":composeApp"))
     implementation(libs.appcompat)
     implementation(libs.activity.compose)
-    implementation(libs.facebook.android.sdk)
-    implementation(libs.play.services.auth)
-    implementation(libs.koin.android)
-    implementation(libs.timber.android)
 
     // Facebook
     implementation(libs.facebook.android.sdk)

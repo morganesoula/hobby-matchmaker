@@ -111,7 +111,7 @@ multiplatformConfig {
 ### Shared Configuration & Rules
 
 - **Android SDK & Toolchain**:
-  - `compileSdk = 36`, `minSdk = 26`, `targetSdk = 35`
+  - `compileSdk = 37`, `minSdk = 26`, `targetSdk = 35`
   - Java Version: `JavaVersion.VERSION_21` via `jvmToolchain(21)`
 - **Dynamic Namespaces**:
   - Pattern: `com.msoula.hobbymatchmaker.<module.path>` (e.g., `:features:movies:data` → `com.msoula.hobbymatchmaker.features.movies.data`).

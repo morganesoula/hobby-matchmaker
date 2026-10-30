@@ -3,6 +3,7 @@ package com.msoula.hobbymatchmaker.core.authentication.data.models
 data class AuthUserRemoteDataModel(
     val uid: String = "",
     val email: String? = null,
+    val displayName: String? = null,
     val providers: List<String>,
     val signInProvider: String? = null
 ) {

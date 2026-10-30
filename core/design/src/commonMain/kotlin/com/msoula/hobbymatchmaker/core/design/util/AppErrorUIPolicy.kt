@@ -43,9 +43,9 @@ fun AppError.hint(): UIErrorHint = when (this) {
     is AppError.Storage.WriteFailed -> UIErrorHint(RetryPolicy.WithBackoff, true)
     is AppError.Storage.Corrupted -> UIErrorHint(RetryPolicy.Never, false)
 
-    AppError.Authentication.AlreadyExists -> UIErrorHint(RetryPolicy.Never, true)
-    AppError.Authentication.Unknown -> UIErrorHint(RetryPolicy.Never, true)
-    AppError.Authentication.InvalidCredentials -> UIErrorHint(RetryPolicy.Never, true)
+    // Every authentication and profile error needs the user to act and is never retried
+    is AppError.Authentication,
+    is AppError.Profile -> UIErrorHint(RetryPolicy.Never, true)
 }
 
 inline fun <Event> AppError.route(

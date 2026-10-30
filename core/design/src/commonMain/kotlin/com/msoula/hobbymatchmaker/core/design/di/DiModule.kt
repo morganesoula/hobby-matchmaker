@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.core.design.di
 
 import coil3.ImageLoader
 import coil3.PlatformContext
+import coil3.annotation.ExperimentalCoilApi
 import coil3.disk.DiskCache
 import coil3.memory.MemoryCache
 import coil3.network.ktor3.KtorNetworkFetcherFactory
@@ -12,6 +13,7 @@ import okio.FileSystem
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
+@OptIn(ExperimentalCoilApi::class)
 val coreModuleDi = module {
     single(createdAtStart = true) { DefaultErrorMessageMapper } bind ErrorMessageMapper::class
 

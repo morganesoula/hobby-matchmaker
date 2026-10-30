@@ -9,7 +9,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,6 +16,7 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -33,7 +33,6 @@ import com.msoula.hobbymatchmaker.core.design.models.TabItem
 import com.msoula.hobbymatchmaker.core.design.reset_password
 import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
-import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.core.login.presentation.clients.FacebookUIClientImpl
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SignInScreenContent
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.SignInViewModel
@@ -44,13 +43,14 @@ import com.msoula.hobbymatchmaker.core.navigation.presentation.models.SocialClie
 import com.msoula.hobbymatchmaker.core.navigation.presentation.utils.NavigationCallbacks
 import com.msoula.hobbymatchmaker.core.splashscreen.presentation.SplashScreenContent
 import com.msoula.hobbymatchmaker.core.splashscreen.presentation.SplashViewModel
+import com.msoula.hobbymatchmaker.features.profile.presentation.PickPseudoScreen
+import com.msoula.hobbymatchmaker.features.profile.presentation.PickPseudoViewModel
 import com.msoula.hobbymatchmaker.features.hub.presentation.HubContent
 import com.msoula.hobbymatchmaker.features.hub.presentation.HubViewModel
 import com.msoula.hobbymatchmaker.features.hub.presentation.models.HubEvent
 import com.msoula.hobbymatchmaker.features.hub.presentation.models.HubSection
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailContent
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.MovieDetailViewModel
-import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.MovieDetailUiModel
 import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.VideoPlayerState
 import com.msoula.hobbymatchmaker.features.movies.presentation.MovieContent
 import com.msoula.hobbymatchmaker.features.movies.presentation.MovieViewModel
@@ -99,12 +99,13 @@ fun AppNavHost(
     ) {
         composable<Splash> {
             val splashViewModel = koinViewModel<SplashViewModel>()
-            val state by splashViewModel.state.collectAsState()
+            val state by splashViewModel.state.collectAsStateWithLifecycle()
 
             SplashScreenContent(
                 state = state,
                 redirectToAuth = navCallbacks.navigateToAuthFromSplash,
-                redirectToMovies = navCallbacks.navigateToMoviesFromSplash
+                redirectToMovies = navCallbacks.navigateToMoviesFromSplash,
+                redirectToPickPseudo = navCallbacks.navigateToPickPseudoFromSplash
             )
         }
 
@@ -114,9 +115,9 @@ fun AppNavHost(
                     parametersOf(SocialClientsVM(socialClients.clients))
                 }
 
-                val signInState by signInViewModel.signInState.collectAsState()
-                val formState by signInViewModel.formDataFlow.collectAsState()
-                val dontAskCheckbox by signInViewModel.dontAskCheckboxValue.collectAsState()
+                val signInState by signInViewModel.signInState.collectAsStateWithLifecycle()
+                val formState by signInViewModel.formDataFlow.collectAsStateWithLifecycle()
+                val dontAskCheckbox by signInViewModel.dontAskCheckboxValue.collectAsStateWithLifecycle()
                 val snackbarHostState = remember { SnackbarHostState() }
 
                 LaunchedEffect(Unit) {
@@ -125,6 +126,7 @@ fun AppNavHost(
                             is UiEvent.Navigate -> {
                                 when (event.destination) {
                                     NavigationDestination.Movies -> navCallbacks.navigateToMoviesFromAuth()
+                                    NavigationDestination.PickPseudo -> navCallbacks.navigateToPickPseudoFromAuth()
                                     NavigationDestination.SignUp -> nav.navigate(SignUp)
                                     else -> Unit
                                 }
@@ -171,8 +173,8 @@ fun AppNavHost(
             composable<SignUp> {
                 val signUpViewModel = koinViewModel<SignUpViewModel>()
 
-                val registrationState by signUpViewModel.formDataFlow.collectAsState()
-                val signUpState by signUpViewModel.signUpState.collectAsState()
+                val registrationState by signUpViewModel.formDataFlow.collectAsStateWithLifecycle()
+                val signUpState by signUpViewModel.signUpState.collectAsStateWithLifecycle()
 
                 val snackBarHostState = remember { SnackbarHostState() }
 
@@ -185,6 +187,7 @@ fun AppNavHost(
                             is UiEvent.Navigate -> {
                                 when (event.destination) {
                                     NavigationDestination.Movies -> navCallbacks.navigateToMoviesFromAuth()
+                                    NavigationDestination.PickPseudo -> navCallbacks.navigateToPickPseudoFromAuth()
                                     NavigationDestination.SignIn -> nav.popBackStack()
                                     else -> Unit
                                 }
@@ -205,6 +208,35 @@ fun AppNavHost(
             }
         }
 
+        composable<PickPseudo> {
+            val pickPseudoViewModel = koinViewModel<PickPseudoViewModel>()
+            val formState by pickPseudoViewModel.formState.collectAsStateWithLifecycle()
+            val snackBarHostState = remember { SnackbarHostState() }
+
+            LaunchedEffect(Unit) {
+                pickPseudoViewModel.events.collect { event ->
+                    when (event) {
+                        is UiEvent.Navigate -> when (event.destination) {
+                            NavigationDestination.Movies -> navCallbacks.navigateToMoviesFromPickPseudo()
+                            NavigationDestination.SignIn -> navCallbacks.navigateAndClearToAuth()
+                            else -> Unit
+                        }
+
+                        is UiEvent.ShowSnackBar ->
+                            snackBarHostState.showSnackbar(event.message.asStringSuspend())
+
+                        else -> Unit
+                    }
+                }
+            }
+
+            PickPseudoScreen(
+                formState = formState,
+                snackBarHostState = snackBarHostState,
+                onEvent = pickPseudoViewModel::onEvent
+            )
+        }
+
         composable<Main> {
             MainScaffold(
                 navCallbacks = navCallbacks
@@ -218,7 +250,7 @@ fun AppNavHost(
                 parameters = { parametersOf(movieId) }
             )
 
-            val movieDetailState by movieDetailViewModel.movieDetailState.collectAsState()
+            val movieDetailState by movieDetailViewModel.movieDetailState.collectAsStateWithLifecycle()
             val snackBarHostState = remember { SnackbarHostState() }
             var videoPlayerState by rememberSaveable(stateSaver = VideoPlayerStateSaver) {
                 mutableStateOf(VideoPlayerState.Initial)
@@ -239,17 +271,6 @@ fun AppNavHost(
 
                         else -> {}
                     }
-                }
-            }
-
-            LaunchedEffect(Unit) {
-                val currentState = movieDetailState
-                if (currentState is UiState.Success<MovieDetailUiModel>) {
-                    videoPlayerState = VideoPlayerState(
-                        videoId = currentState.data.videoKey,
-                        isVisible = false,
-                        isLoading = false
-                    )
                 }
             }
 
@@ -275,12 +296,14 @@ fun AppNavHost(
             val userProfileViewModel = koinViewModel<UserProfileViewModel>()
             val snackBarHostState = remember { SnackbarHostState() }
 
-            val profileState by userProfileViewModel.screenState.collectAsState()
-            val isEditMode by userProfileViewModel.isEditMode.collectAsState()
-            val editableProfile by userProfileViewModel.editableProfile.collectAsState()
-            val isPseudoAvailable by userProfileViewModel.isPseudoAvailable.collectAsState()
+            val profileState by userProfileViewModel.screenState.collectAsStateWithLifecycle()
+            val isEditMode by userProfileViewModel.isEditMode.collectAsStateWithLifecycle()
+            val editableProfile by userProfileViewModel.editableProfile.collectAsStateWithLifecycle()
+            val isDeleteAccountDialogVisible by userProfileViewModel.isDeleteAccountDialogVisible
+                .collectAsStateWithLifecycle()
+            val isDeletingAccount by userProfileViewModel.isDeletingAccount.collectAsStateWithLifecycle()
 
-            val searchedPseudos by socialViewModel.searchResults.collectAsState()
+            val searchedPseudos by socialViewModel.searchResults.collectAsStateWithLifecycle()
             val profile = (profileState as? UserProfileUiStateModel.Success)?.userProfile
 
             LaunchedEffect(Unit) {
@@ -346,13 +369,18 @@ fun AppNavHost(
                 }
 
                 val userProfileState = remember(
-                    profileState, editableProfile, isEditMode, isPseudoAvailable
+                    profileState,
+                    editableProfile,
+                    isEditMode,
+                    isDeleteAccountDialogVisible,
+                    isDeletingAccount
                 ) {
                     UserProfileState(
                         profileState = profileState,
                         editableProfile = editableProfile,
                         isEditMode = isEditMode,
-                        isPseudoAvailable = isPseudoAvailable
+                        isDeleteAccountDialogVisible = isDeleteAccountDialogVisible,
+                        isDeletingAccount = isDeletingAccount
                     )
                 }
 
@@ -390,8 +418,8 @@ fun AppNavHost(
                 }.toImmutableList()
             }
 
-            val sentInvites by socialViewModel.sentInvites.collectAsState()
-            val incomingInvites by socialViewModel.incomingInvites.collectAsState()
+            val sentInvites by socialViewModel.sentInvites.collectAsStateWithLifecycle()
+            val incomingInvites by socialViewModel.incomingInvites.collectAsStateWithLifecycle()
             var showCapacityDialog by remember { mutableStateOf(false) }
 
             LaunchedEffect(Unit) {
@@ -429,6 +457,18 @@ fun MainScaffold(
     val currentBackStack by tabNavController.currentBackStackEntryAsState()
     val currentDestination = currentBackStack?.destination
 
+    val navigateToTab: (route: Any) -> Unit = remember(tabNavController) {
+        { route ->
+            tabNavController.navigate(route) {
+                launchSingleTop = true
+                restoreState = true
+                popUpTo(tabNavController.graph.startDestinationId) {
+                    saveState = true
+                }
+            }
+        }
+    }
+
     Scaffold(
         bottomBar = {
             NavigationBar {
@@ -439,15 +479,7 @@ fun MainScaffold(
 
                     NavigationBarItem(
                         selected = selected,
-                        onClick = {
-                            tabNavController.navigate(tab.route) {
-                                launchSingleTop = true
-                                restoreState = true
-                                popUpTo(tabNavController.graph.startDestinationId) {
-                                    saveState = true
-                                }
-                            }
-                        },
+                        onClick = { navigateToTab(tab.route) },
                         icon = { Icon(tab.icon, contentDescription = tab.label) },
                         label = { Text(tab.label) }
                     )
@@ -463,15 +495,12 @@ fun MainScaffold(
             composable<Movies> {
                 val movieViewModel: MovieViewModel = koinViewModel()
 
-                val movieState by movieViewModel.movieScreenState.collectAsState()
-                val paginationState by movieViewModel.paginationState.collectAsState()
+                val movieState by movieViewModel.movieScreenState.collectAsStateWithLifecycle()
+                val paginationState by movieViewModel.paginationState.collectAsStateWithLifecycle()
 
                 val snackBarHostState = remember { SnackbarHostState() }
 
                 var matchingAnimationData by remember { mutableStateOf(MatchAnimationData.Empty) }
-
-                LaunchedEffect(Unit) {
-                }
 
                 var matchAnimVisibility by remember {
                     mutableStateOf(false)
@@ -525,11 +554,11 @@ fun MainScaffold(
 
             composable<Hub> {
                 val hubViewModel: HubViewModel = koinViewModel()
-                val hubFavoriteMoviesState by hubViewModel.hubFavoriteMoviesState.collectAsState()
-                val hubRecentMatchesState by hubViewModel.hubRecentMatchesState.collectAsState()
-                val showRecentMatchDetail by hubViewModel.showRecentMatchDetail.collectAsState()
-                val selectedMatch by hubViewModel.selectedMatch.collectAsState()
-                val selectedMatchMoviesState by hubViewModel.selectedMatchMoviesState.collectAsState()
+                val hubFavoriteMoviesState by hubViewModel.hubFavoriteMoviesState.collectAsStateWithLifecycle()
+                val hubRecentMatchesState by hubViewModel.hubRecentMatchesState.collectAsStateWithLifecycle()
+                val showRecentMatchDetail by hubViewModel.showRecentMatchDetail.collectAsStateWithLifecycle()
+                val selectedMatch by hubViewModel.selectedMatch.collectAsStateWithLifecycle()
+                val selectedMatchMoviesState by hubViewModel.selectedMatchMoviesState.collectAsStateWithLifecycle()
 
                 HubContent(
                     hubFavoriteMovies = hubFavoriteMoviesState,
@@ -539,7 +568,7 @@ fun MainScaffold(
                     getRecentMatches = { hubViewModel.retryObservation(HubSection.RECENT_MATCHES) },
                     onModalDismissed = { hubViewModel.onEvent(HubEvent.OnModalDismissed) },
                     onMemberClicked = { hubViewModel.onEvent(HubEvent.OnRecentMatchClicked(it)) },
-                    navigateToMoviesScreen = { navCallbacks.navigateToMoviesFromHub() },
+                    navigateToMoviesScreen = { navigateToTab(Movies) },
                     navigateToMovieDetail = { navCallbacks.navigateToMovieDetailFromMoviesOrHub(it) },
                     navigateToProfileScreen = { navCallbacks.navigateToProfileFromHub() },
                     selectedMatch = selectedMatch,

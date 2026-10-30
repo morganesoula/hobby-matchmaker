@@ -1,5 +1,6 @@
 package com.msoula.hobbymatchmaker.core.authentication.domain.di
 
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.DeleteAccountUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFirebaseUserInfoUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.IsFirstSignInUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LinkInWithCredentialUseCase
@@ -13,6 +14,7 @@ import org.koin.dsl.module
 
 val coreModuleAuthenticationDomain = module {
     factoryOf(::LogOutUseCase)
+    factoryOf(::DeleteAccountUseCase)
     factoryOf(::ResetPasswordUseCase)
     factoryOf(::SignInUseCase)
     factoryOf(::SignUpUseCase)

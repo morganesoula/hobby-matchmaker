@@ -4,14 +4,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -23,16 +19,12 @@ import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight4
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight8
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_bio_title
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_name_title
-import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_pseudo_hint
-import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_pseudo_not_available
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_pseudo_title
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_title
-import com.msoula.hobbymatchmaker.core.design.icons.LucideLock
-import com.msoula.hobbymatchmaker.core.design.icons.VscodeCodiconsLightbulb
-import com.msoula.hobbymatchmaker.core.design.molecules.TipTextField
+import com.msoula.hobbymatchmaker.core.design.models.PseudoStatusUiModel
+import com.msoula.hobbymatchmaker.core.design.molecules.PseudoTextField
 import com.msoula.hobbymatchmaker.core.design.molecules.ValidationRequirement
 import com.msoula.hobbymatchmaker.core.design.molecules.ValidationRequirementsList
-import com.msoula.hobbymatchmaker.core.design.molecules.WarningTextField
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -43,18 +35,11 @@ fun ProfileEditInformationForm(
     modifier: Modifier = Modifier,
     name: String,
     pseudo: String,
-    isPseudoEditable: Boolean = true,
     onNameChanged: (String) -> Unit,
-    onPseudoChanged: (String) -> Unit,
-    onPseudoFocusLost: () -> Unit,
-    isPseudoAvailable: Boolean?,
     onBioChanged: (String) -> Unit,
     bio: String? = null,
     nameRequirements: ImmutableList<ValidationRequirement> = persistentListOf(),
-    pseudoRequirements: ImmutableList<ValidationRequirement> = persistentListOf(),
 ) {
-    val pseudoFieldFocused = rememberSaveable { mutableStateOf(false) }
-
     GenericCard(
         modifier = modifier
             .fillMaxWidth()
@@ -96,63 +81,16 @@ fun ProfileEditInformationForm(
             }
 
             SpacerHeight8()
-            Text(
-                text = stringResource(Res.string.edit_profile_basic_information_pseudo_title),
-                color = MaterialTheme.colorScheme.onSurface
+            // The pseudo is chosen once during onboarding (PickPseudo) and never edited here
+            PseudoTextField(
+                label = stringResource(Res.string.edit_profile_basic_information_pseudo_title),
+                pseudo = pseudo,
+                maxLength = pseudo.length,
+                status = PseudoStatusUiModel.Idle,
+                onPseudoChanged = {},
+                readOnly = true
             )
-            SpacerHeight8()
-
-            TipTextField(
-                hintText = stringResource(Res.string.edit_profile_basic_information_pseudo_hint),
-                icon = VscodeCodiconsLightbulb
-            )
-
-            PrimaryTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .onFocusChanged { focusState ->
-                        val wasFocused = pseudoFieldFocused.value
-                        pseudoFieldFocused.value = focusState.isFocused
-
-                        if (wasFocused && !focusState.isFocused && pseudo.isNotBlank()) {
-                            onPseudoFocusLost()
-                        }
-                    },
-                text = pseudo,
-                singleLine = true,
-                readOnly = !isPseudoEditable,
-                onValueChanged = onPseudoChanged,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Next
-                ),
-                trailingIcon = {
-                    if (!isPseudoEditable) {
-                        Icon(imageVector = LucideLock, contentDescription = null)
-                    }
-                }
-            )
-
-            if (!pseudoFieldFocused.value && pseudo.isNotBlank()) {
-                isPseudoAvailable?.let { available ->
-                    if (!available) {
-                        WarningTextField(
-                            warningText = stringResource(Res.string.edit_profile_basic_information_pseudo_not_available),
-                        )
-                        SpacerHeight16()
-                    }
-                }
-            }
-
-            if (pseudoRequirements.isNotEmpty() && pseudoFieldFocused.value) {
-                if (pseudoRequirements.any { !it.isValid }) {
-                    ValidationRequirementsList(
-                        requirements = pseudoRequirements
-                    )
-
-                    SpacerHeight8()
-                }
-            }
+            SpacerHeight16()
 
             Text(
                 text = stringResource(Res.string.edit_profile_basic_information_bio_title),

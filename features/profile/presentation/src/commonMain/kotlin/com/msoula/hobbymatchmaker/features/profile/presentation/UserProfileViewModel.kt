@@ -13,7 +13,6 @@ import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.session.domain.models.SessionState
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveSessionStateUseCase
-import com.msoula.hobbymatchmaker.features.profile.domain.useCases.IsPseudoAvailableUseCase
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.SyncUserProfileUseCase
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.UpsertUserProfileUseCase
 import com.msoula.hobbymatchmaker.features.profile.presentation.mappers.toUserProfileDomainModel
@@ -41,7 +40,6 @@ import kotlin.time.ExperimentalTime
 class UserProfileViewModel(
     private val userProfileInteractor: UserProfileOrchestrator,
     private val defaultMessageMapper: ErrorMessageMapper,
-    private val checkPseudoUseCase: IsPseudoAvailableUseCase,
     private val logOutUseCase: LogOutUseCase,
     private val upsertUserUseCase: UpsertUserProfileUseCase,
     private val syncUserUseCase: SyncUserProfileUseCase,
@@ -64,8 +62,11 @@ class UserProfileViewModel(
     val originalProfile: StateFlow<UserProfileUiModel?>
         field = MutableStateFlow<UserProfileUiModel?>(null)
 
-    val isPseudoAvailable: StateFlow<Boolean?>
-        field = MutableStateFlow<Boolean?>(null)
+    val isDeleteAccountDialogVisible: StateFlow<Boolean>
+        field = MutableStateFlow<Boolean>(false)
+
+    val isDeletingAccount: StateFlow<Boolean>
+        field = MutableStateFlow<Boolean>(false)
 
     val screenState: StateFlow<UserProfileUiStateModel>
         field = MutableStateFlow<UserProfileUiStateModel>(UserProfileUiStateModel.Loading)
@@ -83,27 +84,23 @@ class UserProfileViewModel(
     private fun observeProfile() {
         Logger.d("Observing profile")
         scope.launch {
-            currentUserUid
-                .flatMapLatest { uid ->
-                    Logger.d("UID of currentUserUid is: $uid")
-                    if (uid != null) userProfileInteractor.observeCurrentUser(uid)
-                    else flowOf(null)
-                }
-                .collect { profile ->
-                    if (profile == null) {
-                        screenState.update { UserProfileUiStateModel.Loading }
-                        return@collect
-                    }
+            observeSessionStateUseCase()
+                .flatMapLatest { session ->
+                    when (session) {
+                        is SessionState.Guest -> flowOf(UserProfileUiStateModel.Guest)
+                        is SessionState.Authenticated -> userProfileInteractor.observeCurrentUser(session.uid)
+                            .map { profile ->
+                                profile?.let { UserProfileUiStateModel.Success(it) }
+                                    ?: UserProfileUiStateModel.Loading
+                            }
 
-                    screenState.update {
-                        UserProfileUiStateModel.Success(
-                            profile.copy(
-                                isPseudoEditable = profile.pseudo.isBlank()
-                            )
-                        )
+                        null -> flowOf(UserProfileUiStateModel.Loading)
                     }
-                    if (!isEditMode.value) {
-                        editableProfile.update { profile }
+                }
+                .collect { state ->
+                    screenState.update { state }
+                    if (state is UserProfileUiStateModel.Success && !isEditMode.value) {
+                        editableProfile.update { state.userProfile }
                     }
                 }
         }
@@ -135,33 +132,20 @@ class UserProfileViewModel(
                 onAvatarSelected(event.path)
             }
 
-            is UserProfileUiEventModel.OnPseudoChanged -> {
-                editableProfile.update { current -> current?.copy(pseudo = event.value) }
-                isPseudoAvailable.update { null }
-            }
-
-            UserProfileUiEventModel.OnPseudoDefined -> {
-                val profile = editableProfile.value ?: return
-                scope.launch {
-                    if (profile.pseudo != originalProfile.value?.pseudo)
-                        checkPseudoUseCase(profile.pseudo)
-                            .onSuccess { available ->
-                                isPseudoAvailable.update { available }
-                            }
-                            .onFailure { error ->
-                                isPseudoAvailable.update { null }
-                                eventHandler.sendEvent(
-                                    UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
-                                )
-                            }
-                }
-            }
-
             UserProfileUiEventModel.OnSaveClicked -> saveProfile()
 
             UserProfileUiEventModel.OnEditModeClicked -> toggleEditMode()
 
             UserProfileUiEventModel.OnSignUpButtonClicked -> logOut()
+
+            UserProfileUiEventModel.OnDeleteAccountClicked ->
+                isDeleteAccountDialogVisible.update { true }
+
+            UserProfileUiEventModel.OnDeleteAccountDismissed -> {
+                if (!isDeletingAccount.value) isDeleteAccountDialogVisible.update { false }
+            }
+
+            UserProfileUiEventModel.OnDeleteAccountConfirmed -> deleteAccount()
         }
     }
 
@@ -220,10 +204,33 @@ class UserProfileViewModel(
         }
     }
 
+    private fun deleteAccount() {
+        if (isDeletingAccount.value) return
+
+        scope.launch {
+            isDeletingAccount.update { true }
+            userProfileInteractor.deleteAccount(localAvatarPath = editableProfile.value?.avatarUrl)
+                .onSuccess {
+                    isDeleteAccountDialogVisible.update { false }
+                    eventHandler.sendEvent(
+                        UiEvent.Navigate(NavigationDestination.SignIn)
+                    )
+                }
+                .onFailure { error ->
+                    Logger.e("Failed to delete account: $error")
+                    isDeleteAccountDialogVisible.update { false }
+                    eventHandler.sendEvent(
+                        UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
+                    )
+                }
+
+            isDeletingAccount.update { false }
+        }
+    }
+
     fun closeEdition() {
         editableProfile.update { originalProfile.value }
         isEditMode.update { false }
-        isPseudoAvailable.update { null }
     }
 
     @OptIn(ExperimentalTime::class)

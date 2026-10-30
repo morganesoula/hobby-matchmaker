@@ -8,6 +8,7 @@ import com.msoula.hobbymatchmaker.core.common.AppResult
 
 interface AuthenticationRepository {
     suspend fun logOut(): AppResult<Unit, AppError>
+    suspend fun deleteAccount(): AppResult<Unit, AppError>
     suspend fun signUp(
         email: String,
         password: String,

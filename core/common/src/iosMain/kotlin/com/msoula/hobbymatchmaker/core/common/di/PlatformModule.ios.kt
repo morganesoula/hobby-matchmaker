@@ -24,7 +24,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.io.IOException
 import org.koin.dsl.module
 
-actual val platformModule = module {
+actual val coreModuleCommonPlatformSpecific = module {
     single { createDataStore() }
     single { ImageFileManager(get()) }
 

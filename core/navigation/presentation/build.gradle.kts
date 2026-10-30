@@ -8,10 +8,6 @@ kotlin {
     }
 
     sourceSets {
-        all {
-            languageSettings.enableLanguageFeature("ExplicitBackingFields")
-        }
-
         commonMain.dependencies {
             // Module
             implementation(project(Modules.AUTHENTICATION_DOMAIN))

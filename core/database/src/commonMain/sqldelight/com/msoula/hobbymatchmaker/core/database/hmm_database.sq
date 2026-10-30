@@ -16,7 +16,8 @@ CREATE TABLE movie (
     videoKey TEXT,
     duration INTEGER,
     note REAL,
-    has_cast INTEGER NOT NULL DEFAULT 0
+    has_cast INTEGER NOT NULL DEFAULT 0,
+    favoritedAt INTEGER -- epoch millis, null when not favorite or liked before tracking
 );
 
 CREATE TABLE genre (
@@ -131,7 +132,8 @@ WHERE movieId = :movieId;
 
 updateMovieWithFavoriteValue:
 UPDATE movie SET
-    isFavorite = :isFavorite
+    isFavorite = :isFavorite,
+    favoritedAt = :favoritedAt
 WHERE movieId = :movieId;
 
 updateMovieWithVideoKey:
@@ -172,7 +174,7 @@ observeFavoriteMovies:
 SELECT *
 FROM movie
 WHERE isFavorite = 1
-ORDER BY popularity DESC;
+ORDER BY favoritedAt DESC, popularity DESC;
 
 insertMovieActorCrossRef:
 INSERT OR IGNORE INTO movie_actor_cross_ref (movieId, actorId)
@@ -332,6 +334,21 @@ WHERE from_uid = ?;
 deleteIncomingInvitations:
 DELETE FROM social_invitation
 WHERE to_pseudo = ?;
+
+deleteAllUserProfiles:
+DELETE FROM user_profile;
+
+deleteAllSocialMembers:
+DELETE FROM social_circle_member;
+
+deleteAllInvitations:
+DELETE FROM social_invitation;
+
+resetAllMovieUserData:
+UPDATE movie SET
+    isFavorite = 0,
+    isSeen = 0,
+    favoritedAt = NULL;
 
 
 CREATE INDEX IF NOT EXISTS movie_is_favorite ON movie(isFavorite);

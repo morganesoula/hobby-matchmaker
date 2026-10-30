@@ -71,7 +71,8 @@ class SignUpViewModel(
                         Parameters.DoubleStringParam(
                             formDataFlow.value.email,
                             formDataFlow.value.password
-                        )
+                        ),
+                        firstName = formDataFlow.value.firstName
                     ).mapSuccess {}
                 }
             }
@@ -109,7 +110,7 @@ class SignUpViewModel(
         action()
             .onSuccess {
                 signUpState.update { UiState.Success(Unit) }
-                eventHandler.sendEvent(UiEvent.Navigate(NavigationDestination.Movies))
+                eventHandler.sendEvent(UiEvent.Navigate(NavigationDestination.PickPseudo))
             }
             .onFailure { error ->
                 signUpState.update { UiState.Success(Unit) }

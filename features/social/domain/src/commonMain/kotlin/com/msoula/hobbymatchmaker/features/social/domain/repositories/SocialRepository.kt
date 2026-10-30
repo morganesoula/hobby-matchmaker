@@ -16,6 +16,10 @@ interface SocialRepository {
         uid: String
     ): AppResult<SocialMemberDomainModel, AppError>
 
+    suspend fun fetchFreshUserByUid(
+        uid: String
+    ): AppResult<SocialMemberDomainModel, AppError>
+
     fun observeSocialCircle(uid: String): Flow<List<SocialMemberDomainModel>>
     suspend fun syncMovieLikedToCircle(
         uid: String,

@@ -37,10 +37,6 @@ kotlin {
     }
 
     sourceSets {
-        all {
-            languageSettings.enableLanguageFeature("ExplicitBackingFields")
-        }
-
         commonMain.dependencies {
             // Coil
             implementation(libs.findLibrary("coil-network").get())

@@ -5,9 +5,10 @@ sealed interface UserProfileUiEventModel {
     data class OnBioChanged(val value: String) : UserProfileUiEventModel
     data class OnInterestsChanged(val value: List<String>) : UserProfileUiEventModel
     data class OnAvatarSelected(val path: String) : UserProfileUiEventModel
-    data class OnPseudoChanged(val value: String) : UserProfileUiEventModel
-    data object OnPseudoDefined : UserProfileUiEventModel
     data object OnSaveClicked : UserProfileUiEventModel
     data object OnEditModeClicked : UserProfileUiEventModel
     data object OnSignUpButtonClicked : UserProfileUiEventModel
+    data object OnDeleteAccountClicked : UserProfileUiEventModel
+    data object OnDeleteAccountConfirmed : UserProfileUiEventModel
+    data object OnDeleteAccountDismissed : UserProfileUiEventModel
 }

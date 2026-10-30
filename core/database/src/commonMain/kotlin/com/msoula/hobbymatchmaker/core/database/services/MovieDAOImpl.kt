@@ -18,6 +18,8 @@ import com.msoula.hobbymatchmaker.core.database.models.MovieDetailDataEntity
 import com.msoula.hobbymatchmaker.core.database.models.MovieUpdatedDataEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 class MovieDAOImpl(
     private val database: HMMDatabase,
@@ -199,10 +201,12 @@ class MovieDAOImpl(
         )
     }
 
+    @OptIn(ExperimentalTime::class)
     override suspend fun updateMovieFavorite(movieId: Long, isFavorite: Long) {
         database.hmm_databaseQueries.updateMovieWithFavoriteValue(
-            isFavorite,
-            movieId
+            isFavorite = isFavorite,
+            favoritedAt = if (isFavorite == 1L) Clock.System.now().toEpochMilliseconds() else null,
+            movieId = movieId
         )
     }
 

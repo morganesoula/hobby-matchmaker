@@ -70,10 +70,6 @@ kotlin {
     }
 
     sourceSets {
-        all {
-            languageSettings.enableLanguageFeature("ExplicitBackingFields")
-        }
-
         commonMain.dependencies {
             // Compose Resources
             implementation(libs.findLibrary("compose-resources").get())

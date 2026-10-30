@@ -391,7 +391,7 @@ Used in ViewModels to convert a collected `AppResult` to `UiState` in one step:
 result.toUIState(defaultMessageMapper) { data ->
     when (data) {
         is SomeSuccess.Empty   -> UiState.Empty
-        is SomeSuccess.Success -> UiState.Success(data.items.map { it.toUiModel() }.toImmutableList())
+        is SomeSuccess.Success -> UiState.Success(data.items.map { it.toUiModel() })
     }
 }
 ```

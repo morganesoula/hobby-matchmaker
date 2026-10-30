@@ -8,7 +8,13 @@ pseudo, biography, social circle, etc...
 #### Logic
 
 - Reading
-    - A default user profile is created when the profile is not completed or the user is anonymous.
+    - At sign-in (and at each launch from the splash), the profile is hydrated from Firestore into
+      the local database (**HydrateUserProfileUseCase**), so a reinstall or new device restores the
+      pseudo. A default local profile is created when there is no remote profile yet.
+    - **Mandatory pseudo step**: a signed-in user without a pseudo is sent to the **PickPseudo**
+      screen (after sign-up, after a sign-in that finds no pseudo, or from the splash) and cannot
+      reach the app until one is reserved. Guests skip it. If the remote lookup fails (offline), the
+      user is let in and the splash checks again on the next launch.
     - The profile displays:
         - an avatar (or placeholder when empty)
         - user's name
@@ -26,15 +32,30 @@ pseudo, biography, social circle, etc...
       *SyncUserUseCase**).
     - User can pick a profile picture from their gallery. The app automatically caches the new image
       and _cleans up the old local avatar_ to save device storage (**ImageManager**).
-    - User can set a pseudo (required for social features). **Note**: A pseudo can only be defined
-      once (`isPseudoEditable = profile.pseudo.isBlank()`).
-    - Checks if pseudo is available by querying the online database. An error message is
-      displayed in case it is unavailable.
+    - The pseudo is chosen once on the PickPseudo screen and is read-only afterwards (invites are
+      keyed by pseudo). Rules (**PseudoValidator**): 3–20 characters, letters/digits/`_`/`.`, not
+      starting or ending with a dot.
+    - Availability is checked live (debounced) and case-insensitively (**IsPseudoAvailableUseCase**),
+      but uniqueness is enforced by a Firestore transaction on the `pseudos/{pseudoLowercase}`
+      reservation doc (**ReservePseudoUseCase**).
+    - The profile header shows `@pseudo` with a copy action so users can share it.
     - User can add a biography - up to 120 characters (optional)
     - User can add interests (optional) - up to 5.
 
 - **Cross-feature logic (Log out):**
     - The UI provides a logout button, but the logic is delegated to the `Authentication` module
+
+- **Cross-feature logic (Delete account):**
+    - A "Delete my account" destructive text button sits at the very bottom of the profile (view
+      mode only), below Log out, and opens a confirmation dialog.
+    - The logic lives in the `Authentication` module (**DeleteAccountUseCase**), called through
+      **UserProfileOrchestrator**. It first checks the sign-in is recent (Firebase requires it): if
+      not, nothing is deleted and the user is asked to sign in again
+      (`AppError.Authentication.RecentLoginRequired`).
+    - Then it deletes, in one Firestore batch: the user's `users/{uid}` document, both sides of
+      every circle entry, and all invitations sent or received. Then the Storage avatar, the
+      Firebase Auth user, the provider sessions, and finally all local user data (SQLDelight wipe +
+      session flags + cached avatar file).
 
 - **Cross-feature logic (Removing a member):**
     - The UI allows interaction with the social circle (e.g. removing a member) which triggers logic
@@ -90,9 +111,9 @@ This layer implements a Repository pattern with a single source of truth, coordi
 
 - LocalDataSource: for caching and offline support.
 - RemoteDataSource: for API calls.
-- Smart Remote Syncing: When syncing the profile to Firebase, the Data layer automatically stores a
-  `pseudoLowercase` field. This optimizes future backend queries (e.g., searching for users ignoring
-  case sensitivity).
+- Pseudo reservation: `reservePseudo` writes `pseudos/{pseudoLowercase}` and
+  `users/{uid}.information.{name, pseudo, pseudoLowercase}` in one transaction. Profile syncs never
+  touch the pseudo fields. `pseudoLowercase` is what search queries use.
 
 ## Technical Specifications
 

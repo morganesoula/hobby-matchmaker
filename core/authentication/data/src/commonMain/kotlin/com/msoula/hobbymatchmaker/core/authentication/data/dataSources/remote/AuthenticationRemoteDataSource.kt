@@ -8,6 +8,7 @@ import dev.gitlive.firebase.auth.AuthCredential
 
 interface AuthenticationRemoteDataSource {
     suspend fun authenticationSignOut(): AppResult<Unit, AppError>
+    suspend fun deleteAccount(): AppResult<Unit, AppError>
     suspend fun linkWithCredential(credential: AuthCredential): AppResult<AuthUserRemoteDataModel?, AppError>
     suspend fun createUserWithEmailAndPassword(
         email: String,

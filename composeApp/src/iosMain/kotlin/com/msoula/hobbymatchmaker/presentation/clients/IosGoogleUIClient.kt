@@ -38,7 +38,7 @@ class IosGoogleUIClient : GoogleUIClient {
         }
     }
 
-    fun getRootViewController() = run {
+    fun getRootViewController(): UIViewController? = run {
         val scene = UIApplication.sharedApplication.connectedScenes.firstOrNull() as? UIWindowScene
             ?: return null
 

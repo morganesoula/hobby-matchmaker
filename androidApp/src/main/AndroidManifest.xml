@@ -3,6 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Added by the Facebook SDK: the app shows no ads and never reads the advertising ID -->
+    <uses-permission
+        android:name="com.google.android.gms.permission.AD_ID"
+        tools:node="remove" />
 
     <application
         android:name="com.msoula.hobbymatchmaker.HobbyMatchMakerApplication"
@@ -34,6 +38,9 @@
             tools:replace="android:value" />
         <meta-data
             android:name="com.facebook.sdk.AdvertiserIDCollectionEnabled"
+            android:value="false" />
+        <meta-data
+            android:name="com.facebook.sdk.AutoLogAppEventsEnabled"
             android:value="false" />
 
         <provider

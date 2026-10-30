@@ -10,10 +10,10 @@ import com.msoula.hobbymatchmaker.core.common.Parameters
 import com.msoula.hobbymatchmaker.core.common.flatMapSuspend
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetIsConnectedUseCase
-import com.msoula.hobbymatchmaker.features.profile.domain.useCases.CreateDefaultUserProfileUseCase
+import com.msoula.hobbymatchmaker.features.profile.domain.useCases.HydrateUserProfileUseCase
 
 class AuthenticationManager(
-    private val createDefaultUserProfileUseCase: CreateDefaultUserProfileUseCase,
+    private val hydrateUserProfileUseCase: HydrateUserProfileUseCase,
     private val signInUseCase: SignInUseCase,
     private val signInWithSocialProviderUseCase: SignInWithSocialProviderUseCase,
     private val setIsConnectedUseCase: SetIsConnectedUseCase,
@@ -28,21 +28,21 @@ class AuthenticationManager(
     }
 
     suspend operator fun invoke(params: Params): AppResult<SignInSuccess, AppError> {
-        val resultUid: AppResult<String, AppError> = when (params) {
+        val resultUser: AppResult<Pair<String, String>, AppError> = when (params) {
             is Params.EmailPassword ->
                 signInUseCase(Parameters.DoubleStringParam(params.email, params.password))
-                    .mapSuccess { it.uid }
+                    .mapSuccess { it.uid to "" }
 
             is Params.SocialProvider ->
                 signInWithSocialProviderUseCase(
                     providerType = params.providerType,
                     credentialProvider = params.credentialProvider
-                ).mapSuccess { user -> user?.uid.orEmpty() }
+                ).mapSuccess { user -> user?.uid.orEmpty() to user?.displayName.orEmpty().substringBefore(" ") }
         }
 
-        val uid = when (resultUid) {
-            is AppResult.Success -> resultUid.data
-            is AppResult.Failure -> return AppResult.Failure(resultUid.error)
+        val (uid, displayName) = when (resultUser) {
+            is AppResult.Success -> resultUser.data
+            is AppResult.Failure -> return AppResult.Failure(resultUser.error)
         }
 
         return setIsConnectedUseCase(true)
@@ -50,8 +50,11 @@ class AuthenticationManager(
                 sessionManager.setCurrentUserProfileUuid(uid)
             }
             .flatMapSuspend {
-                createDefaultUserProfileUseCase(uid, "")
-                    .mapSuccess { SignInSuccess(uid = uid) }
+                // A failed remote lookup must not block sign-in: the splash re-checks on next launch
+                when (val hydration = hydrateUserProfileUseCase(uid, displayName)) {
+                    is AppResult.Success -> AppResult.Success(SignInSuccess(uid, needsPseudo = !hydration.data))
+                    is AppResult.Failure -> AppResult.Success(SignInSuccess(uid))
+                }
             }
     }
 }

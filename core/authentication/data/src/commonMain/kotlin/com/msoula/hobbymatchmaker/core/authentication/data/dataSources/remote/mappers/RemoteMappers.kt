@@ -10,6 +10,7 @@ fun FirebaseUser.toAuthFirebaseUser(): AuthUserRemoteDataModel =
     AuthUserRemoteDataModel(
         uid = this.uid,
         email = this.email,
+        displayName = this.displayName,
         providers = this.providerData.map { it.providerId }.filterNot { it == "firebase" }
     )
 
@@ -20,6 +21,7 @@ fun AuthUserRemoteDataModel.toAuthenticatedUser(): AuthenticatedUser =
     AuthenticatedUser(
         uid = this.uid,
         email = this.email,
+        displayName = this.displayName,
         providers = this.providers
     )
 

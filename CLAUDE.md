@@ -20,6 +20,9 @@ hobby implemented; TV shows, activities, and others will follow.
 | AppError, AppResult, safeCall wrappers, error mapping, UIErrorHint            | `/kmp-error-handling` |
 | Reviewing changed code for quality, reuse, and efficiency                     | `/simplify`           |
 | Modifying settings.json, hooks, permissions, env vars                         | `/update-config`      |
+| Pushing the Android app online / Google Play release, version bump, .aab      | `/play-store-release` |
+| Play policy / Data safety / permissions compliance audit (KMP notes in `/play-store-release` §3.1) | `/play-policy-insights` |
+| R8 keep rules, app size, enabling minification (project notes in `/play-store-release` §8) | `/r8-analyzer` |
 
 ---
 
@@ -44,3 +47,9 @@ hobby implemented; TV shows, activities, and others will follow.
 **DO NOT** add the Claude co-author line in any commit messages.
 Commit format: feat (scope): message --in-progress/--finished.
 Use keywords such as `add, clean, fix, migrate, ui improvements` in your git messages.
+
+---
+
+## Other
+
+**DO NOT** try to run the app on a device or emulator after implementing, updating or deleting code.

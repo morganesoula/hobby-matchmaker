@@ -15,6 +15,7 @@ Two storage backends, one source of truth rule: **SQLDelight is always the sourc
 | Entity | SQLDelight table | Firestore path | Storage |
 |---|---|---|---|
 | User profile | `user_profile` | `users/{uid}` (nested under `information`) | — |
+| Pseudo reservations | — | `pseudos/{pseudoLowercase}` | — |
 | Social circle members | `social_circle_member` | `users/{uid}/circle/{memberUid}` | — |
 | Social invitations | `social_invitation` | `socialInvites/{fromUid}_{toPseudo}` | — |
 | Cached friend profiles | `user_cache` | `users/{uid}` (batch read by UID) | — |
@@ -58,7 +59,8 @@ CREATE TABLE movie (
     videoKey         TEXT,       -- YouTube/Vimeo trailer key
     duration         INTEGER,    -- in minutes
     note             REAL,       -- TMDB vote average
-    has_cast         INTEGER NOT NULL DEFAULT 0
+    has_cast         INTEGER NOT NULL DEFAULT 0,
+    favoritedAt      INTEGER     -- epoch millis set when liked, null otherwise (migration 1.sqm)
 );
 ```
 
@@ -171,7 +173,7 @@ CREATE TABLE social_invitation (
 |---|---|---|
 | `observeMovies` | `movie` | All movies ordered by `popularity DESC` |
 | `observeDetailMovie` | `movie` + `actor` | Full detail with LEFT JOIN cast |
-| `observeFavoriteMovies` | `movie` | Only `isFavorite = 1`, ordered by popularity |
+| `observeFavoriteMovies` | `movie` | Only `isFavorite = 1`, most recently liked first (`favoritedAt DESC`, then popularity) |
 | `observeFavoriteMoviesCount` | `movie` | `COUNT(*)` where `isFavorite = 1` |
 | `getFavoriteIds` | `movie` | Only `movieId` for all favorites |
 | `upsertMoviePreservingUserData` | `movie` | Updates catalogue fields without touching `isFavorite` / `isSeen` |
@@ -181,6 +183,16 @@ CREATE TABLE social_invitation (
 | `observeUsersByUids` | `user_cache` | Batch lookup by UID list |
 
 ---
+
+### Migrations
+
+Schema changes to an existing table need a numbered migration next to the `.sq` file
+(`1.sqm`, `2.sqm`, …) **and** the matching change in the `CREATE TABLE` of `hmm_database.sq`
+(used for fresh installs). Drivers apply pending migrations automatically from `HMMDatabase.Schema`.
+
+| Migration | Change |
+|---|---|
+| `1.sqm` | `ALTER TABLE movie ADD COLUMN favoritedAt INTEGER` |
 
 ### Adding a New Table or Query
 
@@ -204,6 +216,7 @@ Always use the constants — never hardcode collection names:
 // core/common/src/commonMain/kotlin/.../core/common/data/FirestoreVariables.kt
 const val FirestoreUsersCollection = "users"
 const val FirestoreCircleCollection = "circle"
+const val FirestorePseudosCollection = "pseudos"
 ```
 
 ---
@@ -217,8 +230,8 @@ const val FirestoreCircleCollection = "circle"
 | `uid` | `String` | Mirrors the document ID |
 | `email` | `String` | Set on first sign-in only |
 | `information` | `Map` | Nested object — see sub-fields below |
-| `information.pseudo` | `String` | Display pseudo (original casing) |
-| `information.pseudoLowercase` | `String` | `.lowercase()` of pseudo — used for all search queries |
+| `information.pseudo` | `String` | Display pseudo (original casing) — written **only** by the pseudo reservation transaction |
+| `information.pseudoLowercase` | `String` | `.lowercase()` of pseudo — used for all search queries — same owner as `pseudo` |
 | `information.name` | `String?` | Full name |
 | `information.avatarUrl` | `String?` | Firebase Storage download URL |
 | `information.bio` | `String?` | User biography |
@@ -235,6 +248,24 @@ firestore.collection(FirestoreUsersCollection)
 
 ---
 
+### Collection: `pseudos`
+
+**Document ID:** the lowercase pseudo — this is what makes pseudos unique case-insensitively.
+
+| Field | Type | Notes |
+|---|---|---|
+| `uid` | `String` | Owner of the pseudo |
+| `pseudo` | `String` | Original casing |
+| `createdAt` | `Timestamp` | `FieldValue.serverTimestamp` |
+
+- Written in one transaction with `users/{uid}.information.{name, pseudo, pseudoLowercase}` (`UserProfileRemoteDataSourceImpl.reservePseudo`). The transaction fails with `AppError.Profile.PseudoTaken` when the doc exists for another uid.
+- Pseudos are set once (mandatory PickPseudo onboarding step) and never edited: invites are keyed by pseudo.
+- Users who set a pseudo before this collection existed get their reservation backfilled at sign-in/splash (`HydrateUserProfileUseCase` → `ensurePseudoReservation`). The availability check also falls back to `information.pseudoLowercase` for them.
+- Deleted with the account (`AuthenticationRemoteDataSourceImpl.deleteRemoteUserData`) so the pseudo becomes available again.
+- Regular profile syncs (`syncUserProfile`) never write pseudo fields.
+
+---
+
 ### Subcollection: `users/{uid}/circle`
 
 **Document ID:** UID of the circle member (`String`)
@@ -247,6 +278,7 @@ firestore.collection(FirestoreUsersCollection)
 | `avatarUrl` | `String?` | Download URL |
 | `commonMoviesCount` | `Int` | Count of shared liked movies |
 | `moviesLiked` | `List<Long>?` | TMDB IDs the member has liked |
+| `lastMatchAt` | `Long?` | Epoch millis of the latest shared like; written on **both** circle entries by the device whose like creates the match (`updateMovieLikedInCircleEntries`). Drives Hub recent-matches ordering |
 
 **Accessed via:**
 

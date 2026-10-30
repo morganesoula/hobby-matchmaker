@@ -9,6 +9,7 @@ import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMember
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.design.util.EventHandler
 import com.msoula.hobbymatchmaker.core.design.util.UiState
+import com.msoula.hobbymatchmaker.core.design.util.hint
 import com.msoula.hobbymatchmaker.features.hub.presentation.mappers.toMovieCarouselItem
 import com.msoula.hobbymatchmaker.features.hub.presentation.mappers.toProfileSocialMember
 import com.msoula.hobbymatchmaker.features.hub.presentation.models.FavoriteMoviesSuccess
@@ -89,9 +90,8 @@ class HubViewModel(
                         is AppResult.Failure -> {
                             Logger.e("Error observing favorite movies: ${result.error}")
                             UiState.Error(
-                                defaultMessageMapper.toUIText(
-                                    result.error
-                                )
+                                defaultMessageMapper.toUIText(result.error),
+                                result.error.hint()
                             )
                         }
                     }
@@ -120,9 +120,8 @@ class HubViewModel(
                         is AppResult.Failure -> {
                             Logger.e("Error observing recent matches: ${result.error}")
                             UiState.Error(
-                                defaultMessageMapper.toUIText(
-                                    result.error
-                                )
+                                defaultMessageMapper.toUIText(result.error),
+                                result.error.hint()
                             )
                         }
                     }

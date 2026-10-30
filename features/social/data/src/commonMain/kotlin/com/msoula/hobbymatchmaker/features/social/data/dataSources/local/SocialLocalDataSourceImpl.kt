@@ -12,8 +12,7 @@ import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.mappers
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.models.SocialCircleMemberLocalDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.models.SocialInvitationDataModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
 class SocialLocalDataSourceImpl(
@@ -22,13 +21,11 @@ class SocialLocalDataSourceImpl(
 ) : SocialLocalDataSource {
 
     override fun observeSocialCircle(uid: String?): Flow<List<SocialCircleMemberLocalDataModel>> =
-        flow {
-            uid?.let { safeUid ->
-                socialMemberDAO.observeUserProfileMembers(safeUid).map { members ->
-                    members.map { it.toSocialCircleMemberDataModel() }
-                }
-            } ?: emptyFlow<SocialCircleMemberLocalDataModel>()
-        }
+        uid?.let { safeUid ->
+            socialMemberDAO.observeUserProfileMembers(safeUid).map { members ->
+                members.map { it.toSocialCircleMemberDataModel() }
+            }
+        } ?: flowOf(emptyList())
 
     /* override suspend fun addToCircle(member: SocialCircleMemberDataEntity): AppResult<Unit, AppError> {
         val ownerUid = sessionLocalDataSource.observeCurrentUid().first()

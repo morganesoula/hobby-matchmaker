@@ -18,6 +18,16 @@ service cloud.firestore {
 
     // To deploy rules: firebase deploy --only firestore:rules
 
+    // Pseudo reservations - doc id is the lowercase pseudo, owned by one uid, never reassigned
+    match /pseudos/{pseudoLowercase} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+                    && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.pseudo.lower() == pseudoLowercase;
+      allow update: if false;
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+
     // Profils utilisateurs - accès uniquement au propriétaire
           // match /users/{userId} {
             // allow read, write: if request.auth != null

@@ -8,7 +8,9 @@ This module handles all Firebase-based credential operations: account creation, 
 - Sign in with social providers (Google, Apple, Facebook) via `AuthProvider` abstraction
 - Link a social credential to an existing account
 - Send password reset emails
-- Check whether the current sign-in is the user's first (used to trigger profile creation)
+- Check whether the current sign-in is the user's first (`IsFirstSignInUseCase`, currently unused:
+  first-sign-in setup is driven by `HydrateUserProfileUseCase` finding no pseudo)
+- Expose the provider display name on `AuthenticatedUser` (used to prefill the first name)
 - Fetch current Firebase auth state
 
 ## Architecture

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HobbyMatchMaker - Choose your Pseudo</title>
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-bright": "#3f3836",
+            "secondary-fixed": "#ffdcbe",
+            "tertiary-fixed-dim": "#7cd0ff",
+            "secondary": "#f6bb81",
+            "on-secondary": "#4a2800",
+            "surface": "#181211",
+            "on-primary-fixed-variant": "#693c00",
+            "primary-fixed-dim": "#ffb86f",
+            "on-secondary-fixed": "#2c1600",
+            "surface-container-high": "#2f2827",
+            "on-primary-container": "#653a00",
+            "on-primary-fixed": "#2c1600",
+            "outline-variant": "#554434",
+            "on-secondary-container": "#e3aa71",
+            "on-secondary-fixed-variant": "#663e0e",
+            "on-tertiary-fixed-variant": "#004c69",
+            "surface-variant": "#3a3332",
+            "inverse-surface": "#ece0de",
+            "secondary-container": "#663e0e",
+            "surface-container-highest": "#3a3332",
+            "on-background": "#ece0de",
+            "outline": "#a38d7a",
+            "error": "#ffb4ab",
+            "surface-container-low": "#201a19",
+            "background-dark": "#201a19",
+            "primary-container": "#ff9900",
+            "surface-tint": "#ffb86f",
+            "on-error-container": "#ffdad6",
+            "tertiary-container": "#04beff",
+            "primary": "#ffc082",
+            "on-surface": "#ece0de",
+            "error-container": "#93000a",
+            "primary-fixed": "#ffdcbd",
+            "tertiary": "#8ed5ff",
+            "on-tertiary-fixed": "#001e2c",
+            "surface-container": "#241e1d",
+            "on-primary": "#4a2800",
+            "inverse-primary": "#8a5100",
+            "tertiary-fixed": "#c4e7ff",
+            "surface-container-lowest": "#120d0c",
+            "surface-border": "rgba(255, 153, 0, 0.2)",
+            "on-tertiary": "#00344a",
+            "inverse-on-surface": "#362f2e",
+            "background-light": "#f8f7f5",
+            "surface-card": "#271e15",
+            "on-surface-variant": "#dbc2ad",
+            "text-muted": "#94a3b8",
+            "on-error": "#690005",
+            "secondary-fixed-dim": "#f6bb81",
+            "on-tertiary-container": "#004965",
+            "background": "#181211",
+            "surface-dim": "#181211"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-xl": "2rem",
+            "space-md": "1rem",
+            "space-xs": "0.25rem",
+            "space-sm": "0.5rem",
+            "gutter": "1rem",
+            "space-lg": "1.5rem",
+            "margin": "1.5rem"
+          },
+          "fontFamily": {
+            "label-md": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "label-xs": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "label-md": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.05em", "fontWeight": "600" }],
+            "headline-sm": ["1.125rem", { "lineHeight": "1.5rem", "fontWeight": "700" }],
+            "headline-lg": ["1.875rem", { "lineHeight": "2.25rem", "fontWeight": "700" }],
+            "headline-md": ["1.25rem", { "lineHeight": "1.75rem", "fontWeight": "700" }],
+            "label-xs": ["10px", { "lineHeight": "12px", "letterSpacing": "-0.025em", "fontWeight": "700" }],
+            "body-md": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "400" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-container-lowest text-on-surface font-body-md antialiased min-h-screen flex items-center justify-center p-0 sm:p-4 select-none">
+<!-- Mobile Frame Container (max-w-2xl shell) -->
+<div class="relative w-full max-w-md sm:max-w-lg md:max-w-xl min-h-screen sm:min-h-[860px] sm:h-auto sm:rounded-[40px] overflow-hidden bg-surface-dim shadow-2xl flex flex-col justify-between border border-surface-border">
+<!-- BACKGROUND: Movie Discovery Home Screen Canvas (Dimmed & Blurred Underlay) -->
+<div class="absolute inset-0 pointer-events-none select-none overflow-hidden z-0 filter blur-md brightness-[0.38] scale-105">
+<!-- Simulated Header in Background -->
+<header class="w-full px-6 py-4 flex items-center justify-between border-b border-surface-border bg-surface/80">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-2xl" data-icon="movie">movie</span>
+<span class="text-headline-sm font-headline-sm text-primary tracking-tight">HobbyMatchMaker</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant text-base" data-icon="person">person</span>
+</div>
+</header>
+<!-- Background Content Simulation: Film Posters and Circles -->
+<div class="p-6 space-y-6">
+<div class="flex items-center justify-between">
+<span class="text-label-md font-label-md text-on-surface-variant">TRENDING IN MOVIE CIRCLES</span>
+<span class="text-xs text-primary font-bold">See All</span>
+</div>
+<!-- Posters Row -->
+<div class="grid grid-cols-2 gap-4">
+<div class="h-44 rounded-xl bg-surface-container-high p-3 flex flex-col justify-end border border-primary/10">
+<span class="text-xs font-bold text-on-surface">Interstellar Resonance</span>
+<span class="text-[10px] text-on-surface-variant">Sci-Fi • 4.9 ★</span>
+</div>
+<div class="h-44 rounded-xl bg-surface-container-high p-3 flex flex-col justify-end border border-primary/10">
+<span class="text-xs font-bold text-on-surface">Midnight Cinephiles</span>
+<span class="text-[10px] text-on-surface-variant">Drama • 4.8 ★</span>
+</div>
+</div>
+<div class="p-4 rounded-xl bg-surface-container-low border border-primary/15 flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="groups">groups</span>
+</div>
+<div class="space-y-1">
+<div class="h-3 w-32 bg-surface-container-highest rounded"></div>
+<div class="h-2 w-20 bg-surface-container-high rounded"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- SEMANTIC SHELL: Shared Component TopAppBar (as mandated in JSON) -->
+<header class="docked full-width top-0 sticky z-50 bg-surface/80 dark:bg-surface/80 backdrop-blur-md backdrop-blur-md shadow-sm border-b border-surface-border">
+<div class="flex justify-between items-center w-full px-6 py-3 max-w-2xl mx-auto">
+<!-- Leading Icon -->
+<button aria-label="Back" class="p-2 rounded-full text-on-surface-variant hover:bg-primary/10 transition-colors active:scale-95 transition-transform duration-150 flex items-center justify-center" type="button">
+<span class="material-symbols-outlined text-headline-sm" data-icon="arrow_back">arrow_back</span>
+</button>
+<!-- Brand Title -->
+<div class="text-headline-sm font-headline-sm text-primary dark:text-primary tracking-tight select-none">
+          HobbyMatchMaker
+        </div>
+<!-- Trailing Icon -->
+<button aria-label="Close" class="p-2 rounded-full text-on-surface-variant hover:bg-primary/10 transition-colors active:scale-95 transition-transform duration-150 flex items-center justify-center" type="button">
+<span class="material-symbols-outlined text-headline-sm" data-icon="close">close</span>
+</button>
+</div>
+</header>
+<!-- MODAL OVERLAY WRAPPER -->
+<main class="relative z-10 flex-1 flex flex-col justify-end sm:justify-center px-4 sm:px-6 py-6 overflow-y-auto">
+<!-- Elevated Modal Dialog / Sheet -->
+<section aria-labelledby="modal-headline" aria-modal="true" class="w-full bg-surface-container-low/95 backdrop-blur-xl border border-primary/20 rounded-3xl p-6 sm:p-7 shadow-2xl shadow-primary/10 relative transition-all duration-300" role="dialog">
+<!-- Decorative Glow Ambient Accent behind modal top -->
+<div class="absolute -top-12 left-1/2 -translate-x-1/2 w-48 h-20 bg-primary-container/20 blur-3xl pointer-events-none rounded-full"></div>
+<!-- 1. HEADER & CONTEXT -->
+<div class="text-center space-y-3 mb-6 relative">
+<!-- Friendly Avatar / Sparkle Icon Ring -->
+<div class="inline-flex items-center justify-center p-3 rounded-2xl bg-gradient-to-b from-primary/15 to-primary/5 border border-primary/30 ring-8 ring-primary/5 shadow-inner">
+<span class="material-symbols-outlined text-primary-container text-3xl" data-icon="alternate_email" data-weight="fill">alternate_email</span>
+</div>
+<div class="space-y-1">
+<h1 class="text-headline-md font-headline-md text-on-surface tracking-tight" id="modal-headline">
+              Choose your Pseudo
+            </h1>
+<p class="text-body-md font-body-md text-on-surface-variant max-w-xs mx-auto leading-relaxed">
+              Your friends will use this pseudo to find you and add you to their movie circle.
+            </p>
+</div>
+</div>
+<!-- INTERACTIVE STATE SWITCHER BAR (For Demo/Inspection) -->
+<div class="mb-5 bg-surface-container p-1 rounded-xl flex items-center justify-between text-label-xs font-label-xs border border-primary/10">
+<span class="px-2 text-on-surface-variant">Live Preview State:</span>
+<div class="flex items-center gap-1">
+<button class="px-2.5 py-1 rounded-lg bg-primary-container text-on-primary font-bold shadow-sm transition-all text-label-xs" id="btn-state-available" type="button">Available</button>
+<button class="px-2.5 py-1 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-all text-label-xs" id="btn-state-loading" type="button">Checking</button>
+<button class="px-2.5 py-1 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-all text-label-xs" id="btn-state-taken" type="button">Taken</button>
+</div>
+</div>
+<!-- 2. FORM FIELDS -->
+<form class="space-y-4" onsubmit="event.preventDefault();">
+<!-- Field: First Name (Subtly disabled/pre-filled) -->
+<div class="space-y-1.5">
+<label class="block text-label-md font-label-md text-on-surface-variant" for="first-name">
+              First name
+            </label>
+<div class="relative flex items-center">
+<input class="w-full bg-surface-container-highest/60 border border-outline-variant/40 rounded-xl px-4 py-3 text-body-md font-body-md text-on-surface/80 cursor-not-allowed select-none focus:ring-0 focus:outline-none" disabled="" id="first-name" type="text" value="Alex"/>
+<div class="absolute right-3.5 flex items-center text-on-surface-variant/70">
+<span class="material-symbols-outlined text-lg" data-icon="lock">lock</span>
+</div>
+</div>
+</div>
+<!-- Field: Pseudo / Username -->
+<div class="space-y-1.5">
+<div class="flex items-center justify-between">
+<label class="block text-label-md font-label-md text-on-surface-variant" for="pseudo-input">
+                Username / Pseudo
+              </label>
+<span class="text-label-xs font-label-xs text-on-surface-variant/70" id="char-counter">14/20</span>
+</div>
+<!-- Input Container with states -->
+<div class="relative flex items-center bg-surface-container rounded-xl border border-primary/30 transition-all duration-200 focus-within:border-primary-container focus-within:ring-2 focus-within:ring-primary-container/20" id="input-container">
+<!-- Accent Orange @ Prefix -->
+<span class="pl-4 pr-1 text-primary-container font-headline-sm select-none">@</span>
+<!-- Core Live Input -->
+<input autocomplete="off" class="w-full bg-transparent border-none py-3 pr-10 text-body-md font-body-md font-semibold text-on-surface placeholder:text-outline focus:ring-0 focus:outline-none tracking-wide" id="pseudo-input" maxlength="20" placeholder="username" spellcheck="false" type="text" value="alex_cinephile"/>
+<!-- Dynamic Status Icon -->
+<div class="absolute right-3.5 flex items-center">
+<!-- Available Checkmark -->
+<div class="w-6 h-6 rounded-full bg-emerald-950/70 border border-emerald-500/40 flex items-center justify-center text-emerald-400" id="icon-available">
+<span class="material-symbols-outlined text-sm font-bold" data-icon="check">check</span>
+</div>
+<!-- Loading Spinner (Hidden by default) -->
+<div class="hidden" id="icon-loading">
+<span class="material-symbols-outlined animate-spin text-primary-container text-xl" data-icon="progress_activity">progress_activity</span>
+</div>
+<!-- Error Icon (Hidden by default) -->
+<div class="hidden w-6 h-6 rounded-full bg-error-container/60 border border-error/50 flex items-center justify-center text-error" id="icon-taken">
+<span class="material-symbols-outlined text-sm font-bold" data-icon="priority_high">priority_high</span>
+</div>
+</div>
+</div>
+<!-- Dynamic Helper Badges -->
+<div class="pt-1 min-h-[1.5rem]">
+<!-- Available state text -->
+<div class="flex items-center gap-1.5 text-xs text-emerald-400 font-medium" id="feedback-available">
+<span class="material-symbols-outlined text-sm" data-icon="check_circle">check_circle</span>
+<span>✓ <span class="font-bold">@alex_cinephile</span> is available</span>
+</div>
+<!-- Loading state text -->
+<div class="hidden flex items-center gap-1.5 text-xs text-primary-fixed-dim font-medium" id="feedback-loading">
+<span class="material-symbols-outlined text-sm animate-pulse" data-icon="search">search</span>
+<span>Checking availability...</span>
+</div>
+<!-- Taken state text -->
+<div class="hidden flex items-center gap-1.5 text-xs text-error font-medium" id="feedback-taken">
+<span class="material-symbols-outlined text-sm" data-icon="error">error</span>
+<span>⚠ @alex is already taken, try another one</span>
+</div>
+</div>
+</div>
+<!-- Note & Immutability Warning -->
+<div class="p-3 rounded-xl bg-surface-card border border-primary/15 flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary-container text-base shrink-0 mt-0.5" data-icon="info" data-weight="fill">info</span>
+<p class="text-xs text-on-surface-variant leading-relaxed">
+<strong class="text-secondary font-semibold">Note:</strong> You cannot change your pseudo later. Choose carefully to make sure your film club friends recognize you!
+            </p>
+</div>
+<!-- 3. ACTIONS -->
+<div class="pt-2 space-y-3">
+<!-- Primary Action CTA Button -->
+<button class="w-full py-3.5 px-6 rounded-xl bg-primary-container hover:bg-primary text-on-primary-container font-headline-sm text-center flex items-center justify-center gap-2 shadow-lg shadow-primary-container/25 transition-all duration-150 hover:scale-[1.02] active:scale-95 cursor-pointer" id="submit-cta" type="submit">
+<span>Continue</span>
+<span class="material-symbols-outlined text-lg" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<!-- Secondary / Exit Button -->
+<div class="text-center pt-1">
+<button class="inline-flex items-center gap-1.5 text-xs font-semibold text-on-surface-variant hover:text-primary transition-colors py-1 px-3 rounded-lg hover:bg-primary/10 active:scale-95" type="button">
+<span class="material-symbols-outlined text-sm" data-icon="logout">logout</span>
+<span>Log out</span>
+</button>
+</div>
+</div>
+</form>
+<!-- Subtle Back Exit Caption -->
+<p class="mt-4 text-center text-label-xs font-label-xs text-outline/80 tracking-tight">
+          Pressing back or closing exits the application
+        </p>
+</section>
+</main>
+<!-- Bottom Aesthetic Padding -->
+<div class="h-4 w-full"></div>
+</div>
+<!-- Micro-Interactions Script for Pseudo States Demo -->
+<script>
+    const btnAvailable = document.getElementById('btn-state-available');
+    const btnLoading = document.getElementById('btn-state-loading');
+    const btnTaken = document.getElementById('btn-state-taken');
+
+    const iconAvailable = document.getElementById('icon-available');
+    const iconLoading = document.getElementById('icon-loading');
+    const iconTaken = document.getElementById('icon-taken');
+
+    const feedbackAvailable = document.getElementById('feedback-available');
+    const feedbackLoading = document.getElementById('feedback-loading');
+    const feedbackTaken = document.getElementById('feedback-taken');
+
+    const inputContainer = document.getElementById('input-container');
+    const pseudoInput = document.getElementById('pseudo-input');
+    const submitCta = document.getElementById('submit-cta');
+    const charCounter = document.getElementById('char-counter');
+
+    function resetTabs() {
+      [btnAvailable, btnLoading, btnTaken].forEach(b => {
+        b.className = "px-2.5 py-1 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-all text-label-xs";
+      });
+      [iconAvailable, iconLoading, iconTaken].forEach(el => el.classList.add('hidden'));
+      [feedbackAvailable, feedbackLoading, feedbackTaken].forEach(el => el.classList.add('hidden'));
+      inputContainer.classList.remove('border-error', 'focus-within:border-error', 'focus-within:ring-error/20');
+      inputContainer.classList.add('border-primary/30');
+    }
+
+    function setStateAvailable() {
+      resetTabs();
+      btnAvailable.className = "px-2.5 py-1 rounded-lg bg-primary-container text-on-primary font-bold shadow-sm text-label-xs";
+      iconAvailable.classList.remove('hidden');
+      feedbackAvailable.classList.remove('hidden');
+      pseudoInput.value = "alex_cinephile";
+      charCounter.textContent = `${pseudoInput.value.length}/20`;
+      submitCta.disabled = false;
+      submitCta.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+
+    function setStateLoading() {
+      resetTabs();
+      btnLoading.className = "px-2.5 py-1 rounded-lg bg-primary-container text-on-primary font-bold shadow-sm text-label-xs";
+      iconLoading.classList.remove('hidden');
+      feedbackLoading.classList.remove('hidden');
+      pseudoInput.value = "alex_c";
+      charCounter.textContent = `${pseudoInput.value.length}/20`;
+      submitCta.disabled = true;
+      submitCta.classList.add('opacity-50', 'cursor-not-allowed');
+    }
+
+    function setStateTaken() {
+      resetTabs();
+      btnTaken.className = "px-2.5 py-1 rounded-lg bg-primary-container text-on-primary font-bold shadow-sm text-label-xs";
+      iconTaken.classList.remove('hidden');
+      feedbackTaken.classList.remove('hidden');
+      inputContainer.classList.remove('border-primary/30');
+      inputContainer.classList.add('border-error', 'focus-within:border-error', 'focus-within:ring-error/20');
+      pseudoInput.value = "alex";
+      charCounter.textContent = `${pseudoInput.value.length}/20`;
+      submitCta.disabled = true;
+      submitCta.classList.add('opacity-50', 'cursor-not-allowed');
+    }
+
+    btnAvailable.addEventListener('click', setStateAvailable);
+    btnLoading.addEventListener('click', setStateLoading);
+    btnTaken.addEventListener('click', setStateTaken);
+
+    // Live typing counter update
+    pseudoInput.addEventListener('input', (e) => {
+      charCounter.textContent = `${e.target.value.length}/20`;
+    });
+  </script>
+</body></html>
