@@ -50,7 +50,7 @@ fun SocialInviteDomainModel.toSentInviteUiModel(): InviteUiModel =
     )
 
 @OptIn(ExperimentalTime::class)
-fun InviteUiModel.toInvitation(): Invitation =
+fun InviteUiModel.toInvitation(isBusy: Boolean = false): Invitation =
     Invitation(
         ownerId = this.ownerId,
         invitationId = this.inviteId,
@@ -59,15 +59,16 @@ fun InviteUiModel.toInvitation(): Invitation =
         invitationGuestPseudo = this.guestPseudo,
         invitationGuestAvatarUrl = this.guestAvatarUrl,
         invitationTime = this.inviteTime.toTimeAgo(),
-        invitationStatus = this.inviteStatus.name
+        invitationStatus = this.inviteStatus.name,
+        isBusy = isBusy
     )
 
-fun ImmutableList<InviteUiModel>.toReceivedInvitations(): ImmutableList<Invitation> {
-    return map { it.toInvitation() }.toImmutableList()
+fun ImmutableList<InviteUiModel>.toReceivedInvitations(busyInviteIds: Set<String>): ImmutableList<Invitation> {
+    return map { it.toInvitation(isBusy = it.inviteId in busyInviteIds) }.toImmutableList()
 }
 
-fun ImmutableList<InviteUiModel>.toSentInvitations(): ImmutableList<Invitation> {
-    return map { it.toInvitation() }.toImmutableList()
+fun ImmutableList<InviteUiModel>.toSentInvitations(busyInviteIds: Set<String>): ImmutableList<Invitation> {
+    return map { it.toInvitation(isBusy = it.inviteId in busyInviteIds) }.toImmutableList()
 }
 
 fun InviteStatus.toInviteStatusUiModel(): InviteStatusUiModel =

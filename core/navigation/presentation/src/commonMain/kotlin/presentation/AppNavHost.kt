@@ -420,6 +420,7 @@ fun AppNavHost(
             }
 
             val sentInvites by socialViewModel.sentInvites.collectAsStateWithLifecycle()
+            val busyInviteIds by socialViewModel.busyInviteIds.collectAsStateWithLifecycle()
             val incomingInvites by socialViewModel.incomingInvites.collectAsStateWithLifecycle()
             val snackBarHostState = remember { SnackbarHostState() }
             var capacityMessage by remember { mutableStateOf<String?>(null) }
@@ -444,6 +445,7 @@ fun AppNavHost(
                 sentInvites = sentInvites,
                 incomingInvites = incomingInvites,
                 tabs = socialTabs,
+                busyInviteIds = busyInviteIds,
                 snackBarHostState = snackBarHostState,
                 onEvent = socialViewModel::onEvent
             )

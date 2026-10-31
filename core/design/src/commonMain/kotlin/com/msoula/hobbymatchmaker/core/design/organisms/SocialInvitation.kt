@@ -48,6 +48,7 @@ fun ReceivedInvitationSection(
                     guestName = invitation.invitationGuestName,
                     guestPseudo = invitation.invitationGuestPseudo,
                     inviteTime = invitation.invitationTime,
+                    isBusy = invitation.isBusy,
                     onAcceptInvitationClick = onAcceptInvitationClick,
                     onDeclineInvitationClick = onDeclineInvitationClick
                 )
@@ -75,6 +76,7 @@ fun SentInvitationSection(
                     guestPseudo = invitation.invitationGuestPseudo,
                     inviteStatus = invitation.invitationStatus,
                     inviteTime = invitation.invitationTime,
+                    isBusy = invitation.isBusy,
                     onCancelInvitationClick = onCancelInvitationClick
                 )
             }

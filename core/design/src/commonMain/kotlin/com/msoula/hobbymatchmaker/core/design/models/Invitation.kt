@@ -8,5 +8,6 @@ data class Invitation(
     val invitationGuestPseudo: String,
     val invitationGuestAvatarUrl: String,
     val invitationTime: String,
-    val invitationStatus: String
+    val invitationStatus: String,
+    val isBusy: Boolean = false
 )

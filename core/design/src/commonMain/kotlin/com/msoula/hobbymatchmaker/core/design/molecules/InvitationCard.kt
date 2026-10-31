@@ -46,6 +46,7 @@ fun SentInvitationCard(
     guestPseudo: String,
     inviteStatus: String,
     inviteTime: String,
+    isBusy: Boolean = false,
     onCancelInvitationClick: (invitationId: String) -> Unit = {}
 ) {
     val status = inviteStatus.lowercase()
@@ -147,6 +148,7 @@ fun SentInvitationCard(
                 SpacerHeight16()
                 Button(
                     onClick = { onCancelInvitationClick(invitationId) },
+                    enabled = !isBusy,
                     shape = RoundedCornerShape(CustomSize.Eight),
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
@@ -177,6 +179,7 @@ fun ReceivedInvitationCard(
     guestName: String,
     guestPseudo: String,
     inviteTime: String,
+    isBusy: Boolean = false,
     onAcceptInvitationClick: (invitationId: String, guestUid: String) -> Unit = { _, _ -> },
     onDeclineInvitationClick: (invitationId: String) -> Unit = {}
 ) {
@@ -218,6 +221,7 @@ fun ReceivedInvitationCard(
             ) {
                 Button(
                     onClick = { onAcceptInvitationClick(invitationId, guestUid) },
+                    enabled = !isBusy,
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(CustomSize.Eight),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
@@ -240,6 +244,7 @@ fun ReceivedInvitationCard(
 
                 Button(
                     onClick = { onDeclineInvitationClick(invitationId) },
+                    enabled = !isBusy,
                     modifier = Modifier.weight(1f),
                     border = BorderStroke(
                         1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = .8f)

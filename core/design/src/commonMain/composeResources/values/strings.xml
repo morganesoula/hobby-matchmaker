@@ -202,6 +202,12 @@
     <string name="social_invite_already_pending">Vous avez déjà envoyé une invitation à cette personne.</string>
     <string name="social_invite_already_member">Cette personne fait déjà partie de votre cercle.</string>
     <string name="social_invite_cooldown">Cette personne a décliné votre invitation. Vous pourrez la renvoyer dans 30 jours.</string>
+    <string name="social_invite_sent_success">Invitation envoyée !</string>
+    <string name="social_invite_accepted_success">Invitation acceptée, la personne a rejoint votre cercle.</string>
+    <string name="social_invite_declined_success">Invitation refusée.</string>
+    <string name="social_invite_canceled_success">Invitation annulée.</string>
+    <string name="social_decline_dialog_title">Refuser cette invitation ?</string>
+    <string name="social_decline_dialog_message">La personne ne pourra pas vous réinviter avant 30 jours.</string>
     <string name="social_capacity_reached">Il semblerait que vous ou votre invité ait atteint la limite maximale (5) de personnes autorisées à rejoindre le cercle d'amis !</string>
 
     <string name="social_movie_match_notification">Match avec %1$s !</string>
