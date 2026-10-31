@@ -28,6 +28,7 @@ import com.msoula.hobbymatchmaker.features.social.domain.useCases.SocialUseCases
 import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toIncomingInviteUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toSentInviteUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toSocialSummaryUiModel
+import com.msoula.hobbymatchmaker.features.social.presentation.models.InviteStatusUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.InviteUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUiEventModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUserSummaryUiModel
@@ -39,6 +40,8 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -49,6 +52,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
+
+private const val SEARCH_DEBOUNCE_MILLIS = 300L
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SocialViewModel(
@@ -80,11 +85,22 @@ class SocialViewModel(
     private val currentUserPseudo: String?
         get() = currentUserProfile.value?.pseudo
 
-    val searchResults: StateFlow<ImmutableList<SocialUserSummaryUiModel>>
-        field = MutableStateFlow<ImmutableList<SocialUserSummaryUiModel>>(persistentListOf())
+    private val foundUsers = MutableStateFlow<ImmutableList<SocialUserSummaryUiModel>>(persistentListOf())
+    private var searchJob: Job? = null
 
     val sentInvites: StateFlow<UiState<ImmutableList<InviteUiModel>>>
         field = MutableStateFlow<UiState<ImmutableList<InviteUiModel>>>(UiState.Loading)
+
+    // Users that already have a pending invite from the current user are flagged, not hidden
+    val searchResults: StateFlow<ImmutableList<SocialUserSummaryUiModel>> =
+        combine(foundUsers, sentInvites) { users, sent ->
+            val pendingPseudos = (sent as? UiState.Success)?.data.orEmpty()
+                .filter { it.inviteStatus == InviteStatusUiModel.PENDING }
+                .map { it.guestPseudo.lowercase() }
+                .toSet()
+
+            users.map { it.copy(isInvited = it.pseudo.lowercase() in pendingPseudos) }.toImmutableList()
+        }.stateIn(scope, SharingStarted.Eagerly, persistentListOf())
 
     val incomingInvites: StateFlow<UiState<ImmutableList<InviteUiModel>>>
         field = MutableStateFlow<UiState<ImmutableList<InviteUiModel>>>(UiState.Loading)
@@ -178,11 +194,7 @@ class SocialViewModel(
 
     fun onEvent(event: SocialUiEventModel) {
         when (event) {
-            is SocialUiEventModel.OnSearchPeople -> {
-                scope.launch {
-                    searchUsers(event.value)
-                }
-            }
+            is SocialUiEventModel.OnSearchPeople -> searchPeople(event.value)
 
             is SocialUiEventModel.OnInviteToSocialCircle -> {
                 scope.launch {
@@ -224,10 +236,25 @@ class SocialViewModel(
         }
     }
 
+    // Typing fires one event per character: only the last query is sent, older ones are dropped
+    private fun searchPeople(query: String) {
+        searchJob?.cancel()
+
+        if (query.isBlank()) {
+            foundUsers.update { persistentListOf() }
+            return
+        }
+
+        searchJob = scope.launch {
+            delay(SEARCH_DEBOUNCE_MILLIS)
+            searchUsers(query)
+        }
+    }
+
     private suspend fun searchUsers(pseudo: String) {
         socialUseCases.searchUsersByPseudoUseCase(pseudo, currentUserUid)
             .onSuccess { list ->
-                searchResults.update { list.map { it.toSocialSummaryUiModel() }.toImmutableList() }
+                foundUsers.update { list.map { it.toSocialSummaryUiModel() }.toImmutableList() }
             }
             .onFailure { error ->
                 eventHandler.sendEvent(

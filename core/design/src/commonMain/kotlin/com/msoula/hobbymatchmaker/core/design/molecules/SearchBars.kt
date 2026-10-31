@@ -30,6 +30,7 @@ import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMember
+import com.msoula.hobbymatchmaker.core.design.social_search_already_invited
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.user_profile_social_circle_main_add_people_form_field_hint
 import kotlinx.collections.immutable.ImmutableList
@@ -62,9 +63,7 @@ fun PseudoSearchBar(
                     query = textFieldState.text.toString(),
                     onQueryChange = { query ->
                         textFieldState.edit { replace(0, length, query) }
-                        if (query.isNotEmpty()) {
-                            onSearch(query)
-                        }
+                        onSearch(query)
                     },
                     onSearch = {
                         onSearch(textFieldState.text.toString())
@@ -96,8 +95,11 @@ fun PseudoSearchBar(
                 searchResults.forEach { result ->
                     ListItem(
                         headlineContent = { Text(text = result.pseudo) },
+                        supportingContent = if (result.isInvited) {
+                            { Text(text = stringResource(Res.string.social_search_already_invited)) }
+                        } else null,
                         modifier = Modifier
-                            .clickable {
+                            .clickable(enabled = !result.isInvited) {
                                 textFieldState.edit { replace(0, length, result.pseudo) }
                                 expanded = false
                                 onPseudoSelected(result.pseudo, result.name)

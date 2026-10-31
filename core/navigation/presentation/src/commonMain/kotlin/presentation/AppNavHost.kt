@@ -391,7 +391,8 @@ fun AppNavHost(
                         name = member.name,
                         pseudo = member.pseudo,
                         avatarUrl = member.avatarUrl,
-                        commonMoviesCount = member.commonMoviesCount
+                        commonMoviesCount = member.commonMoviesCount,
+                        isInvited = member.isInvited
                     )
                 }.toImmutableList()
 

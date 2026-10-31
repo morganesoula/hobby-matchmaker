@@ -9,7 +9,8 @@ data class ProfileSocialMember(
     val pseudo: String = "",
     val avatarUrl: String? = "",
     val commonMoviesCount: Int? = 0,
-    val sharedMovieIds: List<Long>? = emptyList()
+    val sharedMovieIds: List<Long>? = emptyList(),
+    val isInvited: Boolean = false
 ) {
     companion object {
         val Initial = ProfileSocialMember()

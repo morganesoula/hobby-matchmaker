@@ -208,6 +208,7 @@
     <string name="social_invite_canceled_success">Invitation canceled.</string>
     <string name="social_decline_dialog_title">Decline this invitation?</string>
     <string name="social_decline_dialog_message">This person will not be able to invite you again for 30 days.</string>
+    <string name="social_search_already_invited">Invitation sent</string>
     <string name="social_capacity_reached">It seems like you or your invitee have reached the maximum number (5) of people allowed in your circle!</string>
 
     <string name="social_movie_match_notification">Match with %1$s !</string>

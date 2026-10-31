@@ -8,7 +8,8 @@ data class SocialUserSummaryUiModel(
     val pseudo: String = "",
     val name: String? = null,
     val avatarUrl: String? = null,
-    val commonMoviesCount: Int? = null
+    val commonMoviesCount: Int? = null,
+    val isInvited: Boolean = false
 ) {
     companion object {
         val Initial = SocialUserSummaryUiModel()

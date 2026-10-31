@@ -66,6 +66,17 @@ class SocialRemoteDataSourceImpl(
                 throw e
             }
 
+            val circleMemberUids = ownerUid?.let { uid ->
+                firestore
+                    .collection(FirestoreUsersCollection)
+                    .document(uid)
+                    .collection(FirestoreCircleCollection)
+                    .get()
+                    .documents
+                    .map { it.id }
+                    .toSet()
+            }.orEmpty()
+
             val results = documents
                 .mapNotNull { document ->
                     val uid = document.id
@@ -74,7 +85,7 @@ class SocialRemoteDataSourceImpl(
                     val avatar = document.get<String?>("information.avatarUrl")
                     val moviesLiked = document.get<List<Long>?>("movies")
 
-                    if (uid == ownerUid) return@mapNotNull null
+                    if (uid == ownerUid || uid in circleMemberUids) return@mapNotNull null
 
                     if (userPseudo != null && userPseudo.lowercase().contains(searchTerm)) {
                         SocialCircleMemberRemoteDataModel(
