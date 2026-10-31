@@ -7,6 +7,9 @@ import com.msoula.hobbymatchmaker.core.design.authentication_already_exists
 import com.msoula.hobbymatchmaker.core.design.authentication_invalid_credentials
 import com.msoula.hobbymatchmaker.core.design.authentication_recent_login_required
 import com.msoula.hobbymatchmaker.core.design.profile_pseudo_missing_error
+import com.msoula.hobbymatchmaker.core.design.social_invite_already_member
+import com.msoula.hobbymatchmaker.core.design.social_invite_already_pending
+import com.msoula.hobbymatchmaker.core.design.social_invite_cooldown
 import com.msoula.hobbymatchmaker.core.design.profile_pseudo_taken_error
 import com.msoula.hobbymatchmaker.core.design.authentication_account_exists_other_provider
 import com.msoula.hobbymatchmaker.core.design.authentication_unknown
@@ -106,10 +109,17 @@ object DefaultErrorMessageMapper : ErrorMessageMapper {
         )
 
         is AppError.Profile -> error.toProfileUIText()
+        is AppError.Social -> error.toSocialUIText()
     }
 
     private fun AppError.Profile.toProfileUIText(): UIText = when (this) {
         AppError.Profile.PseudoTaken -> UIText.Resource(Res.string.profile_pseudo_taken_error)
         AppError.Profile.PseudoMissing -> UIText.Resource(Res.string.profile_pseudo_missing_error)
+    }
+
+    private fun AppError.Social.toSocialUIText(): UIText = when (this) {
+        AppError.Social.InviteAlreadyPending -> UIText.Resource(Res.string.social_invite_already_pending)
+        AppError.Social.InviteAlreadyAccepted -> UIText.Resource(Res.string.social_invite_already_member)
+        AppError.Social.InviteCooldown -> UIText.Resource(Res.string.social_invite_cooldown)
     }
 }

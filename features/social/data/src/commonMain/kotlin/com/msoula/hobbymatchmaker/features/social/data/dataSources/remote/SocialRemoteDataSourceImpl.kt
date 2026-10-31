@@ -5,6 +5,7 @@ import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.data.FirestoreCircleCollection
 import com.msoula.hobbymatchmaker.core.common.data.FirestoreUsersCollection
+import com.msoula.hobbymatchmaker.core.common.flatMap
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.common.NetworkConnectivityChecker
 import com.msoula.hobbymatchmaker.core.common.safeNetworkCall
@@ -14,6 +15,7 @@ import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.SocialCircleEntryRemoteDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.SocialCircleMemberRemoteDataModel
 import dev.gitlive.firebase.firestore.Direction
+import dev.gitlive.firebase.firestore.DocumentSnapshot
 import dev.gitlive.firebase.firestore.FieldValue
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,6 +27,8 @@ import kotlinx.coroutines.flow.map
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
+
+private const val INVITE_COOLDOWN_MILLIS = 30L * 24 * 60 * 60 * 1000
 
 class SocialRemoteDataSourceImpl(
     private val firestore: FirebaseFirestore,
@@ -113,17 +117,45 @@ class SocialRemoteDataSourceImpl(
     override suspend fun sendInvite(inviteDataModel: InviteDataModel): AppResult<Unit, AppError> =
         safeNetworkCall(connectivityChecker) {
             val inviteId = "${inviteDataModel.fromUid}_${inviteDataModel.toPseudo}"
-            firestore.collection("socialInvites").document(inviteId).set(
-                mapOf(
-                    "fromUid" to inviteDataModel.fromUid,
-                    "toPseudo" to inviteDataModel.toPseudo,
-                    "fromPseudo" to inviteDataModel.fromPseudo,
-                    "name" to inviteDataModel.name,
-                    "status" to inviteDataModel.status,
-                    "createdAt" to inviteDataModel.createdAt
-                ),
-                merge = true
-            )
+            val inviteRef = firestore.collection("socialInvites").document(inviteId)
+            val existing = inviteRef.get()
+            val blockedBy = if (existing.exists) existing.sendBlockingError() else null
+
+            if (blockedBy == null) {
+                inviteRef.set(
+                    buildMap {
+                        put("fromUid", inviteDataModel.fromUid)
+                        put("toPseudo", inviteDataModel.toPseudo)
+                        put("fromPseudo", inviteDataModel.fromPseudo)
+                        put("name", inviteDataModel.name)
+                        put("status", inviteDataModel.status)
+                        put("createdAt", inviteDataModel.createdAt)
+                        // Re-inviting after the cooldown starts a fresh invitation
+                        if (existing.exists) put("declinedAt", FieldValue.delete)
+                    },
+                    merge = true
+                )
+            }
+            blockedBy
+        }.flatMap { blockedBy ->
+            if (blockedBy == null) AppResult.Success(Unit) else AppResult.Failure(blockedBy)
+        }
+
+    // An invitation can only be sent again once a decline is older than the cooldown
+    @OptIn(ExperimentalTime::class)
+    private fun DocumentSnapshot.sendBlockingError(): AppError? =
+        when (get<String?>("status")?.toInviteStatusData()) {
+            InviteStatusData.PENDING -> AppError.Social.InviteAlreadyPending
+            InviteStatusData.ACCEPTED -> AppError.Social.InviteAlreadyAccepted
+            InviteStatusData.DECLINED -> {
+                val declinedAt = get<Long?>("declinedAt")
+                val nowMillis = Clock.System.now().toEpochMilliseconds()
+                if (declinedAt != null && nowMillis < declinedAt + INVITE_COOLDOWN_MILLIS) {
+                    AppError.Social.InviteCooldown
+                } else null
+            }
+
+            null -> null
         }
 
     @OptIn(ExperimentalTime::class)
@@ -295,7 +327,10 @@ class SocialRemoteDataSourceImpl(
             firestore
                 .collection("socialInvites")
                 .document(inviteId)
-                .update("status" to InviteStatusData.DECLINED)
+                .update(
+                    "status" to InviteStatusData.DECLINED,
+                    "declinedAt" to Clock.System.now().toEpochMilliseconds()
+                )
         }
 
     override suspend fun cancelInvitation(inviteId: String): AppResult<Unit, AppError> =

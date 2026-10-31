@@ -199,6 +199,9 @@
     <string name="social_sent_requests_status_declined">Refusée</string>
     <string name="social_sent_requests_no_data_title">Aucune invitation envoyée</string>
     <string name="social_sent_requests_no_data_description">Ajoutez des personnes via votre écran profil pour profiter de l'expérience au maximum !</string>
+    <string name="social_invite_already_pending">Vous avez déjà envoyé une invitation à cette personne.</string>
+    <string name="social_invite_already_member">Cette personne fait déjà partie de votre cercle.</string>
+    <string name="social_invite_cooldown">Cette personne a décliné votre invitation. Vous pourrez la renvoyer dans 30 jours.</string>
     <string name="social_capacity_reached">Il semblerait que vous ou votre invité ait atteint la limite maximale (5) de personnes autorisées à rejoindre le cercle d'amis !</string>
 
     <string name="social_movie_match_notification">Match avec %1$s !</string>

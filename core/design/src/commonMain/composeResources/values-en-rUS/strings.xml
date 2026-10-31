@@ -199,6 +199,9 @@
     <string name="social_sent_requests_status_declined">Declined</string>
     <string name="social_sent_requests_no_data_title">No invitations sent</string>
     <string name="social_sent_requests_no_data_description">Add people from your profile screen to enjoy the full experience!</string>
+    <string name="social_invite_already_pending">You already sent an invitation to this person.</string>
+    <string name="social_invite_already_member">This person is already in your circle.</string>
+    <string name="social_invite_cooldown">This person declined your invitation. You can invite them again in 30 days.</string>
     <string name="social_capacity_reached">It seems like you or your invitee have reached the maximum number (5) of people allowed in your circle!</string>
 
     <string name="social_movie_match_notification">Match with %1$s !</string>

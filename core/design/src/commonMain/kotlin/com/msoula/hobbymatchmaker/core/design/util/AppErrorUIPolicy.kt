@@ -43,6 +43,9 @@ fun AppError.hint(): UIErrorHint = when (this) {
     is AppError.Storage.WriteFailed -> UIErrorHint(RetryPolicy.WithBackoff, true)
     is AppError.Storage.Corrupted -> UIErrorHint(RetryPolicy.Never, false)
 
+    // The user has to wait or accept the situation: retrying cannot change the outcome
+    is AppError.Social -> UIErrorHint(RetryPolicy.Never, true)
+
     // Every authentication and profile error needs the user to act and is never retried
     is AppError.Authentication,
     is AppError.Profile -> UIErrorHint(RetryPolicy.Never, true)

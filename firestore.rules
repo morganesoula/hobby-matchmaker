@@ -8,6 +8,13 @@ service cloud.firestore {
         .data.information.pseudo == invite.toPseudo;
     }
 
+    // A declined invite can only be sent again 30 days after the decline (invites declined by old app versions have no declinedAt)
+    function cooldownOver(invite) {
+      return invite.status != 'DECLINED'
+        || !('declinedAt' in invite)
+        || request.time.toMillis() > invite.declinedAt + 2592000000;
+    }
+
     match /users/{uid} {
       allow read: if signedIn();
       allow write: if signedIn() && request.auth.uid == uid;
@@ -33,9 +40,10 @@ service cloud.firestore {
       allow create: if signedIn() && request.resource.data.fromUid == request.auth.uid;
       allow update: if signedIn() && (
         (resource.data.fromUid == request.auth.uid
-          && request.resource.data.fromUid == request.auth.uid)
+          && request.resource.data.fromUid == request.auth.uid
+          && cooldownOver(resource.data))
         || (isRecipient(resource.data)
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']))
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'declinedAt']))
       );
       allow delete: if signedIn()
         && (resource.data.fromUid == request.auth.uid || isRecipient(resource.data));

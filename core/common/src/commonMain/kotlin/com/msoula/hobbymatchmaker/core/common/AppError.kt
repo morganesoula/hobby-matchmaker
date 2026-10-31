@@ -36,6 +36,12 @@ sealed interface AppError {
         data object PseudoMissing : Profile
     }
 
+    sealed interface Social : AppError {
+        data object InviteAlreadyPending : Social
+        data object InviteAlreadyAccepted : Social
+        data object InviteCooldown : Social
+    }
+
     sealed interface External : AppError {
         data class Service(val provider: String, val message: String? = null) : External
     }
