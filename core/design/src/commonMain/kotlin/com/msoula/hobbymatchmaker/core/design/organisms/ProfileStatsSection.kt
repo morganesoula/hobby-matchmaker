@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import com.msoula.hobbymatchmaker.core.common.MAX_SOCIAL_CIRCLE_SIZE
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.GenericCard
 import com.msoula.hobbymatchmaker.core.design.icons.FontAwesomeUserFriends
@@ -58,7 +59,7 @@ fun ProfileStatsSection(
 
             StatItem(
                 icon = FontAwesomeUserFriends,
-                value = "$socialMembersCount/5",
+                value = "$socialMembersCount/$MAX_SOCIAL_CIRCLE_SIZE",
                 label = if (socialMembersCount < 2)
                     stringResource(Res.string.social_members_count_title_singular)
                 else

@@ -154,7 +154,7 @@ class MovieDetailViewModel(
                 UiEvent.ShowSnackBar(
                     UIText.Resource(
                         Res.string.social_movie_match_notification,
-                        listOf(result.matchingMemberDomainModels)
+                        listOf(result.matchingMemberDomainModels.joinToString { it.displayName })
                     )
                 )
             )

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html><html lang="en" style=""><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>User Profile</title>
@@ -47,7 +47,7 @@
       min-height: max(884px, 100dvh);
     }
   </style>
-  </head>
+</head>
 <body class="flex justify-center items-center min-h-screen p-0 sm:p-4 bg-[#120e0d]">
 <!-- Mobile Device Frame Container -->
 <main class="w-full max-w-[420px] bg-[#201a19] min-h-screen sm:min-h-[890px] sm:rounded-[36px] shadow-2xl overflow-hidden flex flex-col justify-between border border-[#352b29] relative">
@@ -71,169 +71,84 @@
 </button>
 </nav>
 <!-- Main Scrollable Profile Content -->
-<div class="flex-1 overflow-y-auto px-5 pb-6 space-y-6">
-<!-- Avatar & User Info Section -->
-<section class="flex flex-col items-center pt-2">
-<!-- Circular Avatar with Warm Orange Accent Ring -->
-<div class="relative group cursor-pointer">
-<div class="size-28 rounded-full p-[3px] bg-gradient-to-tr from-[#ec5b13] via-[#ff9900] to-[#fd9800] shadow-[0_0_24px_rgba(236,91,19,0.35)]">
-<div class="w-full h-full rounded-full bg-[#2b2220] flex items-center justify-center overflow-hidden border-2 border-[#201a19] relative">
-<img class="w-full h-full object-cover" data-alt="Modern studio portrait of Alex Chen against a dark warm cinematic background with subtle orange rim light and warm tones that match the aesthetic of a contemporary movie enthusiast profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxXzWYIFdoLPHbASbDXi6yISmKMlUU5ow8FzKyeBaBiDQVSuHNfJIh6UsK6XXgWrlxSEez9YaoHw6zTyn-wMNgklyO3b6JmFGgduReFL2gNIYWBF2k_VNyhDwWDwhIlGBofB7ec6vhEHasUjzEF8j-WwB0frYJYyRWPINeVobT68hljwOm2SzI11Zi9CdXxdBhLAweBp9qVfkNAtrYD5OImXo2SiNLOOqX0JnZ8LciiBpvFTcZ2iv9tg">
+<div class="flex-1 overflow-y-auto px-5 pb-6 space-y-6"><!-- Avatar & User Info Section -->
+<section class="flex flex-col items-center pt-1 text-center">
+<!-- Playful Cinephile Avatar Container -->
+<div class="relative group cursor-pointer mb-3">
+<div class="size-28 rounded-full p-[3px] bg-gradient-to-tr from-[#ec5b13] via-[#ff9900] to-[#fd9800] shadow-[0_0_24px_rgba(236,91,19,0.35)] relative">
+<div class="w-full h-full rounded-full bg-[#2b2220] flex items-center justify-center overflow-hidden border-2 border-[#201a19]">
+<img class="w-full h-full object-cover" data-alt="Alex Chen portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxXzWYIFdoLPHbASbDXi6yISmKMlUU5ow8FzKyeBaBiDQVSuHNfJIh6UsK6XXgWrlxSEez9YaoHw6zTyn-wMNgklyO3b6JmFGgduReFL2gNIYWBF2k_VNyhDwWDwhIlGBofB7ec6vhEHasUjzEF8j-WwB0frYJYyRWPINeVobT68hljwOm2SzI11Zi9CdXxdBhLAweBp9qVfkNAtrYD5OImXo2SiNLOOqX0JnZ8LciiBpvFTcZ2iv9tg">
 </div>
 </div>
-<!-- Edit badge mini indicator -->
-<button aria-label="Change photo" class="absolute bottom-1 right-1 size-7 bg-[#ec5b13] rounded-full border-2 border-[#201a19] flex items-center justify-center text-white shadow-md hover:bg-[#ff9900] transition-colors">
-<span class="material-symbols-outlined text-[14px]">photo_camera</span>
-</button>
+<!-- Cinephile playful status badge -->
+
 </div>
 <!-- User Identifiers -->
-<div class="text-center mt-3.5">
+<div class="mt-3.5 space-y-1">
+<div class="flex items-center justify-center gap-1.5">
 <h2 class="text-2xl font-bold tracking-tight text-white">Alex Chen</h2>
-<p class="text-xs font-medium text-[#ec5b13] mt-0.5 tracking-wide">@alexchen</p>
+<span class="material-symbols-outlined text-[#ff9900] text-[18px]" style="font-variation-settings: &quot;FILL&quot; 1;">verified</span>
 </div>
-<!-- Prominent Edit Profile Button -->
-<div class="w-full flex justify-center mt-4">
-<button class="flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-gradient-to-r from-[#ec5b13] to-[#fd9800] text-white font-semibold text-sm shadow-[0_4px_14px_rgba(236,91,19,0.35)] hover:shadow-[0_6px_20px_rgba(236,91,19,0.5)] hover:opacity-95 active:scale-98 transition-all" type="button">
-<span class="material-symbols-outlined text-[18px]">edit</span>
+<p class="text-xs font-semibold text-[#ec5b13] tracking-wide">@alexchen</p>
+<p class="text-xs text-[#c4b3af] max-w-[280px] pt-1 leading-relaxed italic">
+      "Looking for someone who won't talk during Interstellar 🌌"
+    </p>
+</div>
+<!-- Tactile Pill Edit Profile Button -->
+<div class="mt-3.5 flex items-center gap-2">
+<button class="flex items-center justify-center gap-2 px-5 py-2 rounded-full bg-gradient-to-r from-[#ec5b13] to-[#fd9800] text-white font-semibold text-xs shadow-[0_4px_14px_rgba(236,91,19,0.35)] hover:shadow-[0_6px_20px_rgba(236,91,19,0.5)] active:scale-98 transition-all" type="button">
+<span class="material-symbols-outlined text-[15px]">edit</span>
 <span class="">Edit Profile</span>
 </button>
+<button aria-label="Share profile" class="size-8 rounded-full bg-[#2a2220] border border-[#3e322f] flex items-center justify-center text-[#c4b3af] hover:text-white hover:border-[#ec5b13]/50 transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">ios_share</span>
+</button>
 </div>
 </section>
-<!-- Stats Row Cards -->
-<section aria-label="Profile Statistics" class="grid grid-cols-2 gap-3.5">
-<!-- Liked Movies Card -->
-<div class="flex flex-col justify-between bg-[#2a2220] border border-[#3e322f] rounded-2xl p-4 relative overflow-hidden transition-all hover:border-[#ec5b13]/50 hover:bg-[#322927]">
-<div class="flex items-center justify-between mb-3">
-<span class="text-xs font-medium text-[#c4b3af]">Liked Movies</span>
-<div class="size-8 rounded-lg bg-[#3a2c28] flex items-center justify-center text-[#ec5b13]">
-<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">movie</span>
-</div>
-</div>
-<div>
-<span class="text-3xl font-extrabold text-white tracking-tight leading-none">15</span>
-</div>
-<!-- Subtle decorative bottom indicator -->
-<div class="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#ec5b13] to-transparent opacity-80"></div>
-</div>
-<!-- Connections Card -->
-<div class="flex flex-col justify-between bg-[#2a2220] border border-[#3e322f] rounded-2xl p-4 relative overflow-hidden transition-all hover:border-[#ec5b13]/50 hover:bg-[#322927]">
-<div class="flex items-center justify-between mb-3">
-<span class="text-xs font-medium text-[#c4b3af]">Connections</span>
-<div class="size-8 rounded-lg bg-[#3a2c28] flex items-center justify-center text-[#ec5b13]">
-<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">group</span>
-</div>
-</div>
-<div>
-<span class="text-3xl font-extrabold text-white tracking-tight leading-none">4/5</span>
-</div>
-<div class="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#ec5b13] to-transparent opacity-80"></div>
-</div>
-</section>
-<!-- Interests Section -->
-<div class="px-1 text-center sm:text-left"><p class="text-xs text-[#c4b3af] leading-relaxed">Passionate cinephile exploring sci-fi worlds and gripping thrillers. Always up for a movie night discussion!</p></div><section class="space-y-2.5">
+<!-- Playful Gamified Stats Grid (3 bite-sized cards) -->
+<section aria-label="Cinema Stats" class="w-full"><div class="bg-[#2a2220] border border-[#ec5b13]/60 rounded-2xl p-3 flex items-center justify-between relative overflow-hidden group hover:border-[#ec5b13] transition-all px-5 py-3"><div class="flex items-center gap-3"><span class="text-2xl">🎬</span><div class="flex flex-col text-left"><span class="text-sm font-semibold text-white tracking-tight">Favorite Movies</span></div></div><div class="flex items-center gap-1.5"><span class="text-2xl font-extrabold text-[#ff9900] tracking-tight">15</span><span class="text-xs font-medium text-[#c4b3af]">movies</span></div><div class="absolute bottom-0 left-0 right-0 h-[2px] bg-[#ec5b13] opacity-60"></div></div></section>
+<!-- Currently Obsessed With / Cinema Vibe Card -->
+
+<!-- Favorite Cinema Vibes / Micro Chips -->
+<section class="space-y-2.5">
 <div class="flex items-center justify-between">
-<h3 class="text-base font-bold text-white tracking-tight flex items-center gap-1.5">
-<span class="">Interests</span>
-<span class="text-xs font-normal text-[#a69591]">(3)</span>
+<h3 class="text-sm font-bold text-white tracking-tight flex items-center gap-1.5">
+<span class="">Favorite Cinema Genres</span>
+<span class="text-xs font-normal text-[#a69591]">(4)</span>
 </h3>
 <button class="text-xs text-[#ec5b13] hover:underline font-semibold flex items-center gap-0.5" type="button">
-<span class="">Add</span>
-<span class="material-symbols-outlined text-[15px]">add</span>
+
+
 </button>
 </div>
-<div class="flex flex-wrap gap-2.5">
-<span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#2a2220] border border-[#ec5b13]/60 text-white text-xs font-semibold shadow-sm hover:border-[#ec5b13] transition-colors">
-<span class="size-1.5 rounded-full bg-[#ec5b13]"></span>
-            Action
-          </span>
-<span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#2a2220] border border-[#ec5b13]/60 text-white text-xs font-semibold shadow-sm hover:border-[#ec5b13] transition-colors">
-<span class="size-1.5 rounded-full bg-[#ec5b13]"></span>
-            Sci-Fi
-          </span>
-<span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#2a2220] border border-[#ec5b13]/60 text-white text-xs font-semibold shadow-sm hover:border-[#ec5b13] transition-colors">
-<span class="size-1.5 rounded-full bg-[#ec5b13]"></span>
-            Thriller
-          </span>
+<div class="flex flex-wrap gap-2">
+<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#2a2220] border border-[#ec5b13]/60 text-white text-xs font-semibold shadow-sm hover:border-[#ec5b13] transition-colors cursor-pointer">
+<span class="">🚀</span>
+<span class="">Sci-Fi</span>
+</span>
+<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#2a2220] border border-[#3e322f] text-[#d1c4c1] hover:text-white text-xs font-semibold shadow-sm hover:border-[#ec5b13]/60 transition-colors cursor-pointer">
+<span class="">🕵️</span>
+<span class="">Noir Thriller</span>
+</span>
+<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#2a2220] border border-[#3e322f] text-[#d1c4c1] hover:text-white text-xs font-semibold shadow-sm hover:border-[#ec5b13]/60 transition-colors cursor-pointer">
+<span class="">💥</span>
+<span class="">High-Octane Action</span>
+</span>
+<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#2a2220] border border-[#3e322f] text-[#d1c4c1] hover:text-white text-xs font-semibold shadow-sm hover:border-[#ec5b13]/60 transition-colors cursor-pointer">
+<span class="">🌀</span>
+<span class="">Mind-benders</span>
+</span>
 </div>
 </section>
-<!-- My Social Circle Section -->
-<section class="space-y-3">
-<!-- Section Header with Invite Button -->
-<div class="flex items-center justify-between">
-<div>
-<h3 class="text-base font-bold text-white tracking-tight">My Social Circle</h3>
-<p class="text-[11px] text-[#a69591]">Friends who share similar taste</p>
-</div>
-<button class="flex items-center gap-1 px-3.5 py-1.5 rounded-full bg-[#ec5b13] text-white text-xs font-bold shadow-[0_2px_10px_rgba(236,91,19,0.3)] hover:bg-[#ff9900] active:scale-95 transition-all" type="button">
-<span class="material-symbols-outlined text-[15px]">person_add</span>
-<span class="">Invite</span>
-</button>
-</div>
-<!-- Social Circle User Rows List -->
-<div class="bg-[#271f1d] border border-[#3a2f2c] rounded-2xl divide-y divide-[#352a28] overflow-hidden">
-<!-- User Row 1: Maxi Doudou -->
-<article class="flex items-center justify-between p-3.5 hover:bg-[#2d2422] transition-colors">
-<div class="flex items-center gap-3">
-<div class="relative size-11 rounded-full overflow-hidden border border-[#ec5b13]/40 bg-[#352a28]">
-<img class="w-full h-full object-cover" data-alt="Close up modern smiling portrait of Maxi Doudou with stylized warm studio ambient lighting in a sleek dark setting with subtle orange highlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPcCZ0uwCHOGbNi_QYeCbYME93rYivCcs_5xcfn1v8HCErtI9AVj8gN4sS1s39rXTELDHfMi8EL3t1cpJsZv5Vck0y7hkLxm2DIMkpsip7IG16DuGBQyg1LCqNSEbG07NNzZFvEH2PIosGM7ih53A5DgZaXW-kxAe7lgNCNubc7fEhw7_yC9UIwK8ap3Z1aJIcHYwxPbpCNAinDP5MAbj7IHaP3V5ujDEs9cU4owp_7OupM12S36ymMw">
-</div>
-<div>
-<h4 class="text-sm font-semibold text-white leading-tight">Maxi Doudou</h4>
-<p class="text-xs text-[#a69591] flex items-center gap-1 mt-0.5">
-<span class="size-1.5 rounded-full bg-emerald-500"></span>
-<span class="">Online now</span>
-</p>
-</div>
-</div>
-
-</article>
-<!-- User Row 2: Kitty Kitkat -->
-<article class="flex items-center justify-between p-3.5 hover:bg-[#2d2422] transition-colors">
-<div class="flex items-center gap-3">
-<div class="relative size-11 rounded-full overflow-hidden border border-[#ec5b13]/40 bg-[#352a28]">
-<img class="w-full h-full object-cover" data-alt="Creative cinematic portrait of a young woman Kitty Kitkat with soft dramatic lighting against an elegant dark background with warm orange tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqj-uFQAKeu7PVCnJEw4UmnlPfdUkizpA1tlGCW5g-Jfd1JWKs4CUAt11GeH_hnMZfix0QeiUjC0iMdZa1ghRuSYCAdMExWa7XeycQC1LggpVi7kTFXyFjI2mReA6LgPlN1rj3sxICuogvhoOdG7tMT6U2IHuI1DEK7jFyCHUQQLzN1MIZknhtDdCe8jC_XdcOVeWu_k7mSX6udfUMWbqFQ_i-bBdVbUCCUVJPXcaQ5091AC39sTN4zA">
-</div>
-<div>
-<h4 class="text-sm font-semibold text-white leading-tight">Kitty Kitkat</h4>
-<p class="text-xs text-[#a69591] flex items-center gap-1 mt-0.5">
-<span class="size-1.5 rounded-full bg-[#756663]"></span>
-<span class="">Watched Inception today</span>
-</p>
-</div>
-</div>
-
-</article>
-<!-- User Row 3: Leo -->
-<article class="flex items-center justify-between p-3.5 hover:bg-[#2d2422] transition-colors">
-<div class="flex items-center gap-3">
-<div class="relative size-11 rounded-full overflow-hidden border border-[#ec5b13]/40 bg-[#352a28]">
-<img class="w-full h-full object-cover" data-alt="Warm atmospheric headshot of Leo wearing a dark casual jacket illuminated by warm orange ambient light against a deep noir backdrop." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDy6BUlGeCvytG7UGCuvlY4CIAYKB8znyTo3w7L-h6RWF-DvSzuyCDzBLBKttpW55oB5elOVwUE1oug-clkCiRa_033NIgzGVKIRzWQObZvhsJ_DH_aEWJCrqcWzZJQDm2_7-Zx0yEgyKo-sZ11H6mvSc1d-hTHImyg7qV0-srI6Z1gd8mU9UnGhxZP_ZJOQV-MnFZCrcEcaqRjX2SI3BcaIhzJhKlOZ9EzMFsm_ca1IhACUp3m11AbbA">
-</div>
-<div>
-<h4 class="text-sm font-semibold text-white leading-tight">Leo</h4>
-<p class="text-xs text-[#a69591] flex items-center gap-1 mt-0.5">
-<span class="size-1.5 rounded-full bg-[#756663]"></span>
-<span class="">Active 2h ago</span>
-</p>
-</div>
-</div>
-
-</article>
-</div>
-</section>
-<!-- Logout Action Button -->
-<section class="pt-2 pb-1 flex justify-center">
-<button class="group flex items-center gap-2 px-5 py-2.5 rounded-xl text-[#ec5b13] hover:text-[#ff9900] hover:bg-[#2c2220] transition-all font-semibold text-sm" type="button">
-<span class="material-symbols-outlined text-[20px] transition-transform group-hover:translate-x-0.5">logout</span>
-<span class="">Logout</span>
-</button>
-</section>
+<!-- Taste Compass / Cinema Mood Banner -->
 </div>
 <!-- Bottom Home Indicator Bar (iOS Style) -->
 <footer class="w-full pb-2 pt-1 flex justify-center items-center select-none bg-[#201a19]">
 <div class="w-32 h-1 bg-[#473936] rounded-full"></div>
 </footer>
 </main>
+
+
 
 
 </body></html>

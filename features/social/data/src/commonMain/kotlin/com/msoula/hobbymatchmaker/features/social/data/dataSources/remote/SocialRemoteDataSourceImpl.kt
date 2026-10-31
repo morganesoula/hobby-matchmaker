@@ -3,6 +3,7 @@ package com.msoula.hobbymatchmaker.features.social.data.dataSources.remote
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Logger
+import com.msoula.hobbymatchmaker.core.common.MAX_SOCIAL_CIRCLE_SIZE
 import com.msoula.hobbymatchmaker.core.common.data.FirestoreCircleCollection
 import com.msoula.hobbymatchmaker.core.common.data.FirestoreUsersCollection
 import com.msoula.hobbymatchmaker.core.common.flatMap
@@ -34,8 +35,6 @@ class SocialRemoteDataSourceImpl(
     private val firestore: FirebaseFirestore,
     private val connectivityChecker: NetworkConnectivityChecker
 ) : SocialRemoteDataSource {
-    private val MAX_CIRCLE_SIZE = 5
-
     override suspend fun searchUsersByPseudo(
         pseudo: String,
         ownerUid: String?
@@ -116,7 +115,7 @@ class SocialRemoteDataSourceImpl(
                         memberUid = document.id,
                         commonMoviesCount = document.get<Int?>("commonMoviesCount") ?: 0,
                         avatarUrl = document.get<String?>("avatarUrl") ?: "",
-                        memberPseudo = document.get<String>("memberPseudo"),
+                        memberPseudo = document.get<String?>("memberPseudo"),
                         memberName = document.get<String?>("username"),
                         moviesLiked = document.get<List<Long>?>("moviesLiked") ?: emptyList(),
                         lastMatchAt = document.get<Long?>("lastMatchAt")
@@ -465,7 +464,7 @@ class SocialRemoteDataSourceImpl(
                 .collection(FirestoreCircleCollection)
                 .get()
                 .documents
-            ownerCircle.size < MAX_CIRCLE_SIZE && memberCircle.size < MAX_CIRCLE_SIZE
+            ownerCircle.size < MAX_SOCIAL_CIRCLE_SIZE && memberCircle.size < MAX_SOCIAL_CIRCLE_SIZE
         }
 
     override suspend fun getSocialCircleSnapshot(uid: String): AppResult<List<SocialCircleEntryRemoteDataModel>, AppError> =

@@ -66,6 +66,7 @@ import com.msoula.hobbymatchmaker.features.social.presentation.SocialViewModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUiEventModel
 import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.getString
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -407,15 +408,13 @@ fun AppNavHost(
         }
 
         composable<Social> {
-            val socialTabs = remember {
-                listOf(
-                    Destination.RECEIVED,
-                    Destination.SENT
-                ).map { destination ->
+            val tabLabels = Destination.entries.map { stringResource(it.label) }
+            val socialTabs = remember(tabLabels) {
+                Destination.entries.mapIndexed { index, destination ->
                     TabItem(
-                        label = destination.label,
+                        label = tabLabels[index],
                         icon = destination.icon,
-                        contentDescription = destination.contentDescription
+                        contentDescription = tabLabels[index]
                     )
                 }.toImmutableList()
             }

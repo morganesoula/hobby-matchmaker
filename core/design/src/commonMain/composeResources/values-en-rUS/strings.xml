@@ -184,7 +184,7 @@
     <string name="edit_profile_add_interests_hint">E.g. Hiking, Gaming...</string>
 
     <!-- SOCIAL -->
-    <string name="social_received_requests_description">Here you can find people who want to add you to their social circle. By accepting their request, you will be notified when you both like the same movie.</string>
+    <string name="social_received_requests_description">Here you can find people who want to add you to their social circle.</string>
     <string name="social_received_requests_title">Received</string>
     <string name="social_received_requests_time">ago</string>
     <string name="social_received_requests_common_movie">in common</string>
@@ -209,6 +209,8 @@
     <string name="social_decline_dialog_title">Decline this invitation?</string>
     <string name="social_decline_dialog_message">This person will not be able to invite you again for 30 days.</string>
     <string name="social_search_already_invited">Invitation sent</string>
+    <string name="social_tab_received">Received</string>
+    <string name="social_tab_sent">Sent</string>
     <string name="social_capacity_reached">It seems like you or your invitee have reached the maximum number (5) of people allowed in your circle!</string>
 
     <string name="social_movie_match_notification">Match with %1$s !</string>

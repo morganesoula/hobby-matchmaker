@@ -36,14 +36,15 @@ fun Long.toTimeAgo(): String {
     val locale = getDeviceLocale()
     val isFrench = locale.startsWith("fr", ignoreCase = true)
 
+    val dayUnit = if (isFrench) "j" else "d"
     val timeValue = when {
         differenceInSeconds < 60 -> return if (isFrench) "maintenant" else "now"
         differenceInSeconds < 120 -> "1m"
         differenceInSeconds < 3600 -> "${differenceInSeconds / 60}m"
         differenceInSeconds < 7200 -> "1h"
         differenceInSeconds < 86400 -> "${differenceInSeconds / 3600}h"
-        differenceInSeconds < 172800 -> "1j"
-        else -> "${differenceInSeconds / 86400}j"
+        differenceInSeconds < 172800 -> "1$dayUnit"
+        else -> "${differenceInSeconds / 86400}$dayUnit"
     }
 
     return if (isFrench) "il y a $timeValue" else "$timeValue ago"

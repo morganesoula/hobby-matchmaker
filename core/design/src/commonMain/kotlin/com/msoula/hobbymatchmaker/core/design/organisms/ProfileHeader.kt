@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.msoula.hobbymatchmaker.core.common.MAX_SOCIAL_CIRCLE_SIZE
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.ButtonWithStartIcon
 import com.msoula.hobbymatchmaker.core.design.atoms.CircleWithCustomPhoto
@@ -188,7 +189,7 @@ fun AuthentifiedProfileHeader(
                     contentColor = MaterialTheme.colorScheme.onSurface
                 )
 
-                if (!displayAddPeopleForm && (user.circleSize) < 5) {
+                if (!displayAddPeopleForm && (user.circleSize) < MAX_SOCIAL_CIRCLE_SIZE) {
                     SpacerHeight8()
 
                     ButtonWithStartIcon(

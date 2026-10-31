@@ -1,0 +1,222 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Settings - HobbyMatchMaker</title>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-secondary": "#4a2800",
+            "on-primary-fixed": "#2c1600",
+            "surface-bright": "#3f3836",
+            "outline": "#a38d7a",
+            "on-primary-container": "#653a00",
+            "secondary-container": "#663e0e",
+            "on-background": "#ece0de",
+            "on-tertiary": "#00344a",
+            "on-secondary-fixed-variant": "#663e0e",
+            "primary-fixed-dim": "#ffb86f",
+            "error-container": "#93000a",
+            "inverse-on-surface": "#362f2e",
+            "secondary-fixed-dim": "#f6bb81",
+            "on-secondary-container": "#e3aa71",
+            "on-tertiary-container": "#004965",
+            "surface": "#181211",
+            "on-tertiary-fixed-variant": "#004c69",
+            "secondary": "#f6bb81",
+            "surface-container-lowest": "#120d0c",
+            "primary": "#ffc082",
+            "tertiary-fixed": "#c4e7ff",
+            "surface-container-high": "#2f2827",
+            "text-muted": "#94a3b8",
+            "on-secondary-fixed": "#2c1600",
+            "secondary-fixed": "#ffdcbe",
+            "surface-card": "#271e15",
+            "surface-border": "rgba(255, 153, 0, 0.2)",
+            "background": "#181211",
+            "outline-variant": "#554434",
+            "on-primary": "#4a2800",
+            "surface-container-highest": "#3a3332",
+            "error": "#ffb4ab",
+            "tertiary-container": "#04beff",
+            "tertiary": "#8ed5ff",
+            "background-light": "#f8f7f5",
+            "primary-container": "#ff9900",
+            "on-surface-variant": "#dbc2ad",
+            "primary-fixed": "#ffdcbd",
+            "surface-dim": "#181211",
+            "surface-variant": "#3a3332",
+            "on-tertiary-fixed": "#001e2c",
+            "on-surface": "#ece0de",
+            "tertiary-fixed-dim": "#7cd0ff",
+            "on-error": "#690005",
+            "inverse-surface": "#ece0de",
+            "on-error-container": "#ffdad6",
+            "inverse-primary": "#8a5100",
+            "surface-container-low": "#201a19",
+            "on-primary-fixed-variant": "#693c00",
+            "surface-container": "#241e1d",
+            "surface-tint": "#ffb86f",
+            "background-dark": "#201a19"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-xs": "0.25rem",
+            "margin": "1.5rem",
+            "space-xl": "2rem",
+            "space-lg": "1.5rem",
+            "space-sm": "0.5rem",
+            "gutter": "1rem",
+            "space-md": "1rem"
+          },
+          "fontFamily": {
+            "label-md": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "label-xs": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "label-md": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.05em", "fontWeight": "600" }],
+            "headline-md": ["1.25rem", { "lineHeight": "1.75rem", "fontWeight": "700" }],
+            "headline-lg": ["1.875rem", { "lineHeight": "2.25rem", "fontWeight": "700" }],
+            "label-xs": ["10px", { "lineHeight": "12px", "letterSpacing": "-0.025em", "fontWeight": "700" }],
+            "headline-sm": ["1.125rem", { "lineHeight": "1.5rem", "fontWeight": "700" }],
+            "body-md": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "400" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface antialiased font-body-md min-h-screen selection:bg-primary-container selection:text-on-primary-container">
+<!-- Application Shell Constrained Mobile / Desktop Wrapper -->
+<div class="min-h-screen flex flex-col justify-between max-w-2xl mx-auto bg-surface relative shadow-2xl">
+<!-- Top Navigation Anchor (Shared TopAppBar Specs) -->
+<header class="bg-surface/80 backdrop-blur-md border-b border-surface-border docked full-width top-0 sticky z-50 shadow-sm">
+<div class="flex justify-between items-center w-full px-6 py-3 max-w-2xl mx-auto">
+<button aria-label="Go back to Profile" class="p-2 -ml-2 rounded-full hover:bg-primary/10 transition-colors text-primary active:scale-95 duration-150 flex items-center justify-center" type="button">
+<span class="material-symbols-outlined text-2xl" data-icon="arrow_back">arrow_back</span>
+</button>
+<div class="flex items-center space-x-2">
+<h1 class="text-headline-sm font-headline-sm text-primary tracking-tight">Settings</h1>
+<span class="text-on-surface-variant font-label-md text-label-md px-2 py-0.5 rounded-full bg-surface-container-high">Settings</span>
+</div>
+<button aria-label="Close settings" class="p-2 -mr-2 rounded-full hover:bg-primary/10 transition-colors text-on-surface-variant hover:text-primary active:scale-95 duration-150 flex items-center justify-center" type="button">
+<span class="material-symbols-outlined text-2xl" data-icon="close">close</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 px-6 py-6 space-y-6">
+<!-- User Account Summary Hero Card -->
+
+<!-- Preferences & Match Settings -->
+<section class="space-y-2">
+
+<div class="bg-surface-card rounded-2xl border border-primary/15 divide-y divide-surface-border overflow-hidden">
+<!-- Item 1: Matching Filters -->
+
+<!-- Item 2: Push Notifications -->
+
+<!-- Item 3: Social Circle Privacy -->
+
+<!-- Item 4: Theme Appearance -->
+
+</div>
+</section>
+<!-- Support & Problem Reporting Section -->
+<section class="space-y-2">
+<div class="flex items-center px-1 space-x-2">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="help_center">help_center</span>
+<h3 class="text-label-md font-label-md text-on-surface-variant uppercase tracking-wider">Support &amp; Community</h3>
+</div>
+<div class="bg-surface-card rounded-2xl border border-primary/15 divide-y divide-surface-border overflow-hidden">
+<!-- Priority Item: Report a Problem -->
+<a class="flex items-center justify-between p-4 bg-primary/5 hover:bg-primary/15 transition-all group" href="#">
+<div class="flex items-center space-x-3.5">
+<div class="w-10 h-10 rounded-xl bg-primary-container text-on-primary-container flex items-center justify-center shadow-md shadow-primary/20 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined" data-icon="report_problem">report_problem</span>
+</div>
+<div>
+<div class="flex items-center space-x-2">
+<p class="text-body-md font-headline-sm text-on-surface">Report a Problem</p>
+<span class="px-1.5 py-0.5 text-label-xs font-label-xs bg-primary-container/20 text-primary-container rounded border border-primary-container/40">Priority</span>
+</div>
+<p class="text-label-xs font-body-md text-text-muted">Submit bugs, incorrect movie data or match issues</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-xl text-primary group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</a>
+<!-- Help & FAQ -->
+
+<!-- Community Guidelines -->
+
+</div>
+</section>
+<!-- Account Actions & Danger Zone -->
+<section class="space-y-3 pt-2">
+<div class="flex items-center px-1 space-x-2">
+<span class="material-symbols-outlined text-error text-sm" data-icon="security">security</span>
+<h3 class="text-label-md font-label-md text-on-surface-variant uppercase tracking-wider">Account Actions</h3>
+</div>
+<div class="space-y-3">
+<!-- Log Out Button -->
+<button class="w-full flex items-center justify-center space-x-2 py-3.5 px-6 rounded-xl bg-surface-container-low hover:bg-primary/15 border border-primary/25 text-primary font-headline-sm text-body-md transition-all active:scale-[0.98] shadow-sm" type="button">
+<span class="material-symbols-outlined text-xl" data-icon="logout">logout</span>
+<span class="">Log Out</span>
+</button>
+<!-- Delete Account Danger Card -->
+<div class="bg-surface-container-lowest/80 border border-error/30 rounded-2xl p-4.5 space-y-3 transition-colors hover:border-error/50">
+<div class="flex items-start space-x-3.5">
+<div class="w-10 h-10 rounded-xl bg-error/10 text-error flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined" data-icon="delete_forever">delete_forever</span>
+</div>
+<div class="flex-1">
+<h4 class="text-body-md font-headline-sm text-error">Delete Account</h4>
+<p class="text-label-xs font-body-md text-text-muted leading-relaxed mt-0.5">
+                  Permanently remove Alex Chen (@alexchen), cinema compatibility history, liked movies list, and chat threads with your social circle. This action is irreversible.
+                </p>
+</div>
+</div>
+<button class="w-full py-2.5 px-4 rounded-xl bg-error/10 hover:bg-error/20 border border-error/30 text-error font-label-md text-label-md transition-all active:scale-[0.98] flex items-center justify-center space-x-2" type="button">
+<span class="material-symbols-outlined text-base" data-icon="delete">delete</span>
+<span class="">Permanently Delete My Account</span>
+</button>
+</div>
+</div>
+</section>
+<!-- App Meta / Version Info -->
+<footer class="pt-6 pb-4 text-center space-y-1.5">
+<p class="text-label-xs font-label-md text-text-muted tracking-wider">
+          HobbyMatchMaker v1.4.2 • Build 248
+        </p>
+
+<div class="pt-2">
+<div class="w-32 h-1 bg-surface-container-highest rounded-full mx-auto"></div>
+</div>
+</footer>
+</main>
+</div>
+
+
+</body></html>
