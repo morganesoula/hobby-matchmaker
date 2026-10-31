@@ -2,48 +2,43 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // This rule allows anyone with your Firestore database reference to view, edit,
-    // and delete all data in your Firestore database. It is useful for getting
-    // started, but it is configured to expire after 30 days because it
-    // leaves your app open to attackers. At that time, all client
-    // requests to your Firestore database will be denied.
-    //
-    // Make sure to write security rules for your app before that time, or else
-    // all client requests to your Firestore database will be denied until you Update
-    // your rules
-    match /{document=**} {
-      allow read, write: if request.time < timestamp.date(2027, 10, 3);
+    function signedIn() { return request.auth != null; }
+    function isRecipient(invite) {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid))
+        .data.information.pseudo == invite.toPseudo;
     }
 
-    // To deploy rules: firebase deploy --only firestore:rules
+    match /users/{uid} {
+      allow read: if signedIn();
+      allow write: if signedIn() && request.auth.uid == uid;
 
-    // Pseudo reservations - doc id is the lowercase pseudo, owned by one uid, never reassigned
+      match /circle/{memberUid} {
+        allow read: if signedIn();
+        allow write: if signedIn()
+          && (request.auth.uid == uid || request.auth.uid == memberUid);
+      }
+    }
+
     match /pseudos/{pseudoLowercase} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null
-                    && request.resource.data.uid == request.auth.uid
-                    && request.resource.data.pseudo.lower() == pseudoLowercase;
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.pseudo.lower() == pseudoLowercase;
       allow update: if false;
-      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
     }
 
-    // Profils utilisateurs - accès uniquement au propriétaire
-          // match /users/{userId} {
-            // allow read, write: if request.auth != null
-               //                 && request.auth.uid == userId;
-          // }
-
-          // Films publics - lecture pour tous les authentifiés
-          // match /movies/{movieId} {
-            // allow read: if request.auth != null;
-            // allow write: if false; // Écriture via backend uniquement
-          // }
-
-          // Cercle social
-          // match /social_circles/{odocId} {
-            // allow read, write: if request.auth != null
-               //                 && request.auth.uid in resource.data.members;
-          // }
+    match /socialInvites/{inviteId} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.fromUid == request.auth.uid;
+      allow update: if signedIn() && (
+        (resource.data.fromUid == request.auth.uid
+          && request.resource.data.fromUid == request.auth.uid)
+        || (isRecipient(resource.data)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']))
+      );
+      allow delete: if signedIn()
+        && (resource.data.fromUid == request.auth.uid || isRecipient(resource.data));
+    }
   }
 }
