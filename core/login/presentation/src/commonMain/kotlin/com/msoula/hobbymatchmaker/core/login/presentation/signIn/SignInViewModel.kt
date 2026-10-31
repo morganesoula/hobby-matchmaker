@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
@@ -16,6 +17,7 @@ import com.msoula.hobbymatchmaker.core.login.presentation.models.AuthenticationU
 import com.msoula.hobbymatchmaker.core.login.presentation.orchestrators.SignInOrchestrator
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.models.SignInFormStateModel
 import com.msoula.hobbymatchmaker.core.login.presentation.signIn.models.SocialClientsVM
+import dev.gitlive.firebase.auth.AuthCredential
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -32,6 +34,9 @@ class SignInViewModel(
 ) : ViewModel() {
 
     private val scope = externalScope ?: viewModelScope
+
+    // Credential refused because the email belongs to another provider: linked after the next successful sign-in
+    private var pendingLink: PendingLink? = null
     private val eventHandler = EventHandler()
     val events = eventHandler.events
 
@@ -79,12 +84,7 @@ class SignInViewModel(
                 handleSocialSignIn(ProviderType.APPLE)
 
             is AuthenticationUIEvent.OnFacebookButtonClicked -> scope.launch {
-                doSignIn {
-                    signInInteractor.signInSocial(
-                        ProviderType.FACEBOOK,
-                        credentialProvider = { event.credential }
-                    )
-                }
+                signInSocial(ProviderType.FACEBOOK, event.credential)
             }
 
             AuthenticationUIEvent.OnResetPasswordConfirmed -> {
@@ -92,7 +92,7 @@ class SignInViewModel(
             }
 
             AuthenticationUIEvent.SetAccountAsGuest -> scope.launch {
-                doSignIn {
+                doSignIn(linkPending = false) {
                     signInInteractor.signInAsGuest()
                 }
             }
@@ -125,9 +125,7 @@ class SignInViewModel(
                 is AppResult.Failure -> eventHandler.sendEvent(
                     UiEvent.ShowSnackBar(defaultErrorMessageMapper.toUIText(credentialResult.error))
                 )
-                is AppResult.Success -> doSignIn {
-                    signInInteractor.signInSocial(provider) { credentialResult.data }
-                }
+                is AppResult.Success -> signInSocial(provider, credentialResult.data)
             }
         }
     }
@@ -164,13 +162,34 @@ class SignInViewModel(
             }
     }
 
+    private suspend fun signInSocial(provider: ProviderType, credential: AuthCredential?) {
+        doSignIn {
+            signInInteractor.signInSocial(provider) { credential }
+                .onFailure { error ->
+                    if (error == AppError.Authentication.AccountExistsWithDifferentProvider && credential != null) {
+                        pendingLink = PendingLink(provider, credential)
+                    }
+                }
+        }
+    }
+
+    private suspend fun linkPendingCredential() {
+        val pending = pendingLink ?: return
+        pendingLink = null
+
+        signInInteractor.linkCredential(pending.provider) { pending.credential }
+            .onFailure { Logger.w("Linking ${pending.provider} after sign-in failed: $it") }
+    }
+
     private suspend fun doSignIn(
+        linkPending: Boolean = true,
         action: suspend () -> AppResult<Boolean, AppError>
     ) {
         signInState.update { UiState.Loading }
 
         action()
             .onSuccess { needsPseudo ->
+                if (linkPending) linkPendingCredential()
                 val destination =
                     if (needsPseudo) NavigationDestination.PickPseudo else NavigationDestination.Movies
                 eventHandler.sendEvent(UiEvent.Navigate(destination))
@@ -182,6 +201,8 @@ class SignInViewModel(
                 )
             }
     }
+
+    private data class PendingLink(val provider: ProviderType, val credential: AuthCredential)
 
     override fun onCleared() {
         super.onCleared()

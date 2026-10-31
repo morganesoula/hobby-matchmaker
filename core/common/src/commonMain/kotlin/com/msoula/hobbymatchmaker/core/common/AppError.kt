@@ -25,6 +25,7 @@ sealed interface AppError {
 
     sealed interface Authentication : AppError {
         data object AlreadyExists : Authentication
+        data object AccountExistsWithDifferentProvider : Authentication
         data object Unknown : Authentication
         data object InvalidCredentials : Authentication
         data object RecentLoginRequired : Authentication

@@ -136,10 +136,6 @@ fun SignInScreenContent(
                                 },
                                 onFacebookClick = {
                                     facebookUIClient?.let {
-                                        if (it.hasValidToken()) {
-                                            return@SignInSocialMedia
-                                        }
-
                                         it.registerCallback(
                                             onSuccess = { credential, _ ->
                                                 onEvent(

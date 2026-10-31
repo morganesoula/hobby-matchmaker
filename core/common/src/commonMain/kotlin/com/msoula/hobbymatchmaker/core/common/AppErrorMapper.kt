@@ -66,6 +66,7 @@ fun Throwable.toFirebaseError(): AppError = when (this) {
     is FirebaseException -> {
         val m = message.orEmpty()
         when {
+            RX_DIFFERENT_PROVIDER.containsMatchIn(m) -> AppError.Authentication.AccountExistsWithDifferentProvider
             RX_ALREADY_EXISTS.containsMatchIn(m) -> AppError.Authentication.AlreadyExists
             RX_WRONG_PASSWORD.containsMatchIn(m) -> AppError.Domain.Unauthorized
             RX_USER_NOT_FOUND.containsMatchIn(m) -> AppError.Domain.Unauthorized
@@ -85,6 +86,10 @@ fun Throwable.toFirebaseError(): AppError = when (this) {
 
 private val RX_ALREADY_EXISTS =
     Regex("already in use|email.*exists|ERROR_EMAIL_ALREADY_IN_USE", RegexOption.IGNORE_CASE)
+private val RX_DIFFERENT_PROVIDER = Regex(
+    "different (sign-in )?credential|ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL|ERROR_ACCOUNT_EXISTS",
+    RegexOption.IGNORE_CASE
+)
 private val RX_WRONG_PASSWORD = Regex(
     "wrong password|invalid password|INVALID_PASSWORD|ERROR_WRONG_PASSWORD",
     RegexOption.IGNORE_CASE

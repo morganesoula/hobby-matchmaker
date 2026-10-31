@@ -41,6 +41,8 @@ class AndroidFacebookUIClient(
     }
 
     override fun logIn() {
+        // A token left over from a failed Firebase sign-in must not block the next attempt
+        loginManager.logOut()
         loginManager.logInWithReadPermissions(
             activityProvider(),
             listOf("email", "public_profile")

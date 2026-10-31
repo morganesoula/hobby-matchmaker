@@ -1,6 +1,7 @@
 package com.msoula.hobbymatchmaker.core.login.presentation.orchestrators
 
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
+import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LinkInWithCredentialUseCase
 import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.ResetPasswordUseCase
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 class SignInOrchestrator(
     private val authFormValidationUseCases: LoginValidateFormUseCase,
     private val resetPasswordUseCase: ResetPasswordUseCase,
+    private val linkInWithCredentialUseCase: LinkInWithCredentialUseCase,
     private val sessionManager: SessionManager,
     private val authenticationManager: AuthenticationManager
 ) {
@@ -40,6 +42,12 @@ class SignInOrchestrator(
                 provider, credentialProvider
             )
         ).mapSuccess { it.needsPseudo }
+
+    suspend fun linkCredential(
+        provider: ProviderType,
+        credentialProvider: suspend () -> Any?
+    ): AppResult<Unit, AppError> =
+        linkInWithCredentialUseCase(provider, credentialProvider).mapSuccess { }
 
     suspend fun signInAsGuest(): AppResult<Boolean, AppError> =
         sessionManager.setCurrentUserProfileUuid().mapSuccess { false }
