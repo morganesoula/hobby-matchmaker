@@ -23,6 +23,9 @@ class SessionRepositoryImpl(
     override suspend fun createUser(user: SessionUserDomainModel) =
         sessionRemoteDataSource.createUser(user.toUserFireStoreModel())
 
+    override suspend fun removeLegacyEmail(uid: String) =
+        sessionRemoteDataSource.removeLegacyEmail(uid)
+
     override suspend fun setDontAskGuestDialogValue(dontAsk: Boolean) =
         sessionLocalDataSource.setDontAskGuestValue(dontAsk)
 

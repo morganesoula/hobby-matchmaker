@@ -6,4 +6,5 @@ import com.msoula.hobbymatchmaker.core.session.data.dataSources.remote.models.Us
 
 interface SessionRemoteDataSource {
     suspend fun createUser(user: UserFireStoreModel): AppResult<Unit, AppError>
+    suspend fun removeLegacyEmail(uid: String): AppResult<Unit, AppError>
 }

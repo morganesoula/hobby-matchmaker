@@ -5,7 +5,6 @@ import com.msoula.hobbymatchmaker.core.session.domain.models.SessionUserDomainMo
 
 fun SessionUserDomainModel.toUserFireStoreModel(): UserFireStoreModel {
     return UserFireStoreModel(
-        uid = this.uid,
-        email = this.email
+        uid = this.uid
     )
 }

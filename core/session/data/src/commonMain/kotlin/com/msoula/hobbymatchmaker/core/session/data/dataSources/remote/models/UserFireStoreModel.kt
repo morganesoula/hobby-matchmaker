@@ -4,6 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UserFireStoreModel(
-    val uid: String,
-    val email: String
+    val uid: String
 )

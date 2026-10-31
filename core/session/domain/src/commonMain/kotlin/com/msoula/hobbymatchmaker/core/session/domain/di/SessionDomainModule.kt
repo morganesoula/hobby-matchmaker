@@ -5,6 +5,7 @@ import com.msoula.hobbymatchmaker.core.session.domain.useCases.CreateUserUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveDontAskCheckboxValueUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveIsConnectedUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveSessionStateUseCase
+import com.msoula.hobbymatchmaker.core.session.domain.useCases.RemoveLegacyUserEmailUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetCurrentUserProfileUuidUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetDontAskGuestDialogUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.SetIsConnectedUseCase
@@ -15,6 +16,7 @@ val coreModuleSessionDomain = module {
     factoryOf(::ObserveIsConnectedUseCase)
     factoryOf(::SetIsConnectedUseCase)
     factoryOf(::CreateUserUseCase)
+    factoryOf(::RemoveLegacyUserEmailUseCase)
     factoryOf(::SetDontAskGuestDialogUseCase)
     factoryOf(::ObserveDontAskCheckboxValueUseCase)
     factoryOf(::SetCurrentUserProfileUuidUseCase)

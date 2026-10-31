@@ -8,9 +8,11 @@ import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.FetchFireb
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Logger
+import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ClearCurrentUserProfileUuidUseCase
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveIsConnectedUseCase
+import com.msoula.hobbymatchmaker.core.session.domain.useCases.RemoveLegacyUserEmailUseCase
 import com.msoula.hobbymatchmaker.core.splashscreen.presentation.model.SplashUiState
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.SyncLocalFavoritesToCloudUseCase
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.HydrateUserProfileUseCase
@@ -28,6 +30,7 @@ class SplashViewModel(
     private val fetchFirebaseUserInfo: FetchFirebaseUserInfoUseCase,
     private val clearCurrentUserProfileUuidUseCase: ClearCurrentUserProfileUuidUseCase,
     private val hydrateUserProfileUseCase: HydrateUserProfileUseCase,
+    private val removeLegacyUserEmailUseCase: RemoveLegacyUserEmailUseCase,
     syncLocalFavoritesToCloudUseCase: Lazy<SyncLocalFavoritesToCloudUseCase>,
     private val defaultErrorMessageMapper: ErrorMessageMapper
 ) : ViewModel() {
@@ -46,6 +49,10 @@ class SplashViewModel(
                         launch {
                             runCatching { syncLocalFavoritesToCloudUseCase() }
                                 .onFailure { Logger.w("Splash sync failed: ${it.message}") }
+                        }
+                        launch {
+                            removeLegacyUserEmailUseCase(authenticatedUser.uid)
+                                .onFailure { Logger.w("Legacy email cleanup failed: $it") }
                         }
                         if (needsPseudo(authenticatedUser)) SplashUiState.GoToPickPseudo
                         else SplashUiState.GoToMovies
