@@ -2,8 +2,10 @@ package com.msoula.hobbymatchmaker.features.social.domain.repositories
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.features.social.domain.models.BlockedUserDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialInviteDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel
+import com.msoula.hobbymatchmaker.features.social.domain.models.UserReportDomainModel
 import kotlinx.coroutines.flow.Flow
 
 interface SocialRepository {
@@ -37,6 +39,10 @@ interface SocialRepository {
     suspend fun acceptInvite(inviteId: String): AppResult<Unit, AppError>
     suspend fun declineInvite(inviteId: String): AppResult<Unit, AppError>
     suspend fun removeMember(ownerId: String, memberUid: String): AppResult<Unit, AppError>
+    suspend fun blockUser(ownerId: String, blockedUid: String): AppResult<Unit, AppError>
+    suspend fun unblockUser(ownerId: String, blockedUid: String): AppResult<Unit, AppError>
+    fun observeBlockedUsers(ownerId: String): Flow<List<BlockedUserDomainModel>>
+    suspend fun reportUser(report: UserReportDomainModel): AppResult<Unit, AppError>
     suspend fun addMember(
         ownerId: String,
         socialMemberDomainModel: SocialMemberDomainModel

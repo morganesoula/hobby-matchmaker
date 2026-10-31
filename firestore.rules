@@ -15,9 +15,20 @@ service cloud.firestore {
         || request.time.toMillis() > invite.declinedAt + 2592000000;
     }
 
+    // Recipient found through the pseudo reservation; users without one (legacy) cannot block yet
+    function senderIsBlocked(invite) {
+      let reservation = /databases/$(database)/documents/pseudos/$(invite.toPseudo.lower());
+      return exists(reservation)
+        && exists(/databases/$(database)/documents/users/$(get(reservation).data.uid)/blocked/$(request.auth.uid));
+    }
+
     match /users/{uid} {
       allow read: if signedIn();
       allow write: if signedIn() && request.auth.uid == uid;
+
+      match /blocked/{blockedUid} {
+        allow read, write: if signedIn() && request.auth.uid == uid;
+      }
 
       match /circle/{memberUid} {
         allow read: if signedIn();
@@ -37,16 +48,30 @@ service cloud.firestore {
 
     match /socialInvites/{inviteId} {
       allow read: if signedIn();
-      allow create: if signedIn() && request.resource.data.fromUid == request.auth.uid;
+      allow create: if signedIn()
+        && request.resource.data.fromUid == request.auth.uid
+        && !senderIsBlocked(request.resource.data);
       allow update: if signedIn() && (
         (resource.data.fromUid == request.auth.uid
           && request.resource.data.fromUid == request.auth.uid
-          && cooldownOver(resource.data))
+          && cooldownOver(resource.data)
+          && !senderIsBlocked(resource.data))
         || (isRecipient(resource.data)
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'declinedAt']))
       );
       allow delete: if signedIn()
         && (resource.data.fromUid == request.auth.uid || isRecipient(resource.data));
+    }
+
+    // Create-only: reports are reviewed in the Firebase console and can never be read back by the app
+    match /reports/{reportId} {
+      allow create: if signedIn()
+        && request.resource.data.reporterUid == request.auth.uid
+        && request.resource.data.reportedUid is string
+        && request.resource.data.reportedUid != request.auth.uid
+        && request.resource.data.reason in ['SPAM', 'HARASSMENT', 'FAKE_PROFILE', 'INAPPROPRIATE_CONTENT', 'OTHER']
+        && (!('note' in request.resource.data)
+          || (request.resource.data.note is string && request.resource.data.note.size() <= 500));
     }
   }
 }

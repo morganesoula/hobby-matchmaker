@@ -10,5 +10,10 @@ data class SocialUseCases(
     val declineInviteUseCase: DeclineInviteUseCase,
     val acceptInviteUseCase: AcceptInviteUseCase,
     val sendInvitesUseCase: SendInviteUseCase,
-    val checkSocialCircleLimitUseCase: CheckSocialCircleLimitUseCase
+    val checkSocialCircleLimitUseCase: CheckSocialCircleLimitUseCase,
+    val removeMemberUseCase: RemoveMemberUseCase,
+    val blockUserUseCase: BlockUserUseCase,
+    val unblockUserUseCase: UnblockUserUseCase,
+    val observeBlockedUsersUseCase: ObserveBlockedUsersUseCase,
+    val reportUserUseCase: ReportUserUseCase
 )

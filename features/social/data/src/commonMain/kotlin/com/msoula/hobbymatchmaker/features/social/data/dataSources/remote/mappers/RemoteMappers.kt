@@ -3,12 +3,16 @@ package com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappe
 import com.msoula.hobbymatchmaker.core.user.domain.models.UserSummaryDomainModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.models.SocialCircleMemberLocalDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.models.SocialInvitationDataModel
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.BlockedUserRemoteDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.InviteDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.InviteStatusData
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.SocialCircleMemberRemoteDataModel
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.UserReportRemoteDataModel
+import com.msoula.hobbymatchmaker.features.social.domain.models.BlockedUserDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.InviteStatus
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialInviteDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel
+import com.msoula.hobbymatchmaker.features.social.domain.models.UserReportDomainModel
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -92,3 +96,14 @@ fun InviteDataModel.toSocialInvitationDataModel(): SocialInvitationDataModel =
         createdAt = this.createdAt.toEpochMilliseconds(),
         updatedAt = this.updatedAt?.toEpochMilliseconds()
     )
+
+fun UserReportDomainModel.toUserReportData(): UserReportRemoteDataModel =
+    UserReportRemoteDataModel(
+        reporterUid = reporterUid,
+        reportedUid = reportedUid,
+        reason = reason.name,
+        note = note?.trim()?.takeIf { it.isNotEmpty() }
+    )
+
+fun BlockedUserRemoteDataModel.toBlockedUserDomainModel(): BlockedUserDomainModel =
+    BlockedUserDomainModel(uid = uid, pseudo = pseudo, blockedAt = blockedAt)

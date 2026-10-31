@@ -4,23 +4,30 @@ import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.MAX_SOCIAL_CIRCLE_SIZE
+import com.msoula.hobbymatchmaker.core.common.data.FirestoreBlockedCollection
 import com.msoula.hobbymatchmaker.core.common.data.FirestoreCircleCollection
+import com.msoula.hobbymatchmaker.core.common.data.FirestoreReportsCollection
+import com.msoula.hobbymatchmaker.core.common.data.FirestoreSocialInvitesCollection
 import com.msoula.hobbymatchmaker.core.common.data.FirestoreUsersCollection
 import com.msoula.hobbymatchmaker.core.common.flatMap
 import com.msoula.hobbymatchmaker.core.common.mapSuccess
 import com.msoula.hobbymatchmaker.core.common.NetworkConnectivityChecker
 import com.msoula.hobbymatchmaker.core.common.safeNetworkCall
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toInviteStatusData
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.BlockedUserRemoteDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.InviteDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.InviteStatusData
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.SocialCircleEntryRemoteDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.SocialCircleMemberRemoteDataModel
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.UserReportRemoteDataModel
 import dev.gitlive.firebase.firestore.Direction
+import dev.gitlive.firebase.firestore.DocumentReference
 import dev.gitlive.firebase.firestore.DocumentSnapshot
 import dev.gitlive.firebase.firestore.FieldValue
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -65,15 +72,11 @@ class SocialRemoteDataSourceImpl(
                 throw e
             }
 
-            val circleMemberUids = ownerUid?.let { uid ->
-                firestore
-                    .collection(FirestoreUsersCollection)
-                    .document(uid)
-                    .collection(FirestoreCircleCollection)
-                    .get()
-                    .documents
-                    .map { it.id }
-                    .toSet()
+            // People already in the circle or blocked by the user are not suggested
+            val excludedUids = ownerUid?.let { uid ->
+                val ownerRef = firestore.collection(FirestoreUsersCollection).document(uid)
+                val circleUids = ownerRef.collection(FirestoreCircleCollection).get().documents.map { it.id }
+                circleUids.toSet() + blockedUidsOnce(uid)
             }.orEmpty()
 
             val results = documents
@@ -84,7 +87,7 @@ class SocialRemoteDataSourceImpl(
                     val avatar = document.get<String?>("information.avatarUrl")
                     val moviesLiked = document.get<List<Long>?>("movies")
 
-                    if (uid == ownerUid || uid in circleMemberUids) return@mapNotNull null
+                    if (uid == ownerUid || uid in excludedUids) return@mapNotNull null
 
                     if (userPseudo != null && userPseudo.lowercase().contains(searchTerm)) {
                         SocialCircleMemberRemoteDataModel(
@@ -127,7 +130,7 @@ class SocialRemoteDataSourceImpl(
     override suspend fun sendInvite(inviteDataModel: InviteDataModel): AppResult<Unit, AppError> =
         safeNetworkCall(connectivityChecker) {
             val inviteId = "${inviteDataModel.fromUid}_${inviteDataModel.toPseudo}"
-            val inviteRef = firestore.collection("socialInvites").document(inviteId)
+            val inviteRef = firestore.collection(FirestoreSocialInvitesCollection).document(inviteId)
             val existing = inviteRef.get()
             val blockedBy = if (existing.exists) existing.sendBlockingError() else null
 
@@ -180,14 +183,17 @@ class SocialRemoteDataSourceImpl(
                 ?: return@safeNetworkCall emptyList()
 
             val documents = firestore
-                .collection("socialInvites")
+                .collection(FirestoreSocialInvitesCollection)
                 .where { "toPseudo" equalTo pseudo }
                 .where { "status" equalTo InviteStatusData.PENDING }
                 .get()
                 .documents
 
+            val blockedUids = blockedUidsOnce(ownerUid)
+
             documents.mapNotNull { document ->
                 val fromUid = document.get<String?>("fromUid") ?: return@mapNotNull null
+                if (fromUid in blockedUids) return@mapNotNull null
                 val fromPseudo = document.get<String?>("fromPseudo") ?: return@mapNotNull null
                 val toPseudo = document.get<String?>("toPseudo") ?: return@mapNotNull null
                 val name = document.get<String?>("name") ?: return@mapNotNull null
@@ -212,7 +218,7 @@ class SocialRemoteDataSourceImpl(
     override suspend fun refreshSentInvites(ownerUid: String): AppResult<List<InviteDataModel>, AppError> =
         safeNetworkCall(connectivityChecker) {
             val documents = firestore
-                .collection("socialInvites")
+                .collection(FirestoreSocialInvitesCollection)
                 .where { "fromUid" equalTo ownerUid }
                 .get()
                 .documents
@@ -239,8 +245,13 @@ class SocialRemoteDataSourceImpl(
             }
         }
 
-    @OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
     override fun observeIncomingInvites(ownerUid: String): Flow<List<InviteDataModel>> =
+        combine(observeIncomingInviteDocuments(ownerUid), observeBlockedUids(ownerUid)) { invites, blockedUids ->
+            invites.filterNot { it.fromUid in blockedUids }
+        }
+
+    @OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
+    private fun observeIncomingInviteDocuments(ownerUid: String): Flow<List<InviteDataModel>> =
         firestore
             .collection(FirestoreUsersCollection)
             .document(ownerUid)
@@ -254,7 +265,7 @@ class SocialRemoteDataSourceImpl(
                 }
 
                 firestore
-                    .collection("socialInvites")
+                    .collection(FirestoreSocialInvitesCollection)
                     .where { "toPseudo" equalTo pseudo }
                     .where { "status" equalTo InviteStatusData.PENDING }
                     .snapshots
@@ -290,7 +301,7 @@ class SocialRemoteDataSourceImpl(
     @OptIn(ExperimentalTime::class)
     override fun observeSentInvites(ownerUid: String): Flow<List<InviteDataModel>> =
         firestore
-            .collection("socialInvites")
+            .collection(FirestoreSocialInvitesCollection)
             .where { "fromUid" equalTo ownerUid }
             .snapshots
             .map { querySnapshot ->
@@ -324,7 +335,7 @@ class SocialRemoteDataSourceImpl(
     override suspend fun markInviteAsAccepted(inviteId: String): AppResult<Unit, AppError> =
         safeNetworkCall(connectivityChecker) {
             val inviteRef = firestore
-                .collection("socialInvites")
+                .collection(FirestoreSocialInvitesCollection)
                 .document(inviteId)
 
             firestore.runTransaction {
@@ -335,7 +346,7 @@ class SocialRemoteDataSourceImpl(
     override suspend fun markInviteAsDeclined(inviteId: String): AppResult<Unit, AppError> =
         safeNetworkCall(connectivityChecker) {
             firestore
-                .collection("socialInvites")
+                .collection(FirestoreSocialInvitesCollection)
                 .document(inviteId)
                 .update(
                     "status" to InviteStatusData.DECLINED,
@@ -346,7 +357,7 @@ class SocialRemoteDataSourceImpl(
     override suspend fun cancelInvitation(inviteId: String): AppResult<Unit, AppError> =
         safeNetworkCall(connectivityChecker) {
             firestore
-                .collection("socialInvites")
+                .collection(FirestoreSocialInvitesCollection)
                 .document(inviteId)
                 .delete()
         }
@@ -372,13 +383,103 @@ class SocialRemoteDataSourceImpl(
         memberUid: String
     ): AppResult<Unit, AppError> =
         safeNetworkCall(connectivityChecker) {
-            firestore
-                .collection(FirestoreUsersCollection)
-                .document(ownerUid)
-                .collection(FirestoreCircleCollection)
-                .document(memberUid)
-                .delete()
+            val relationship = findRelationship(ownerUid, memberUid)
+
+            firestore.batch().apply {
+                relationship.refs.forEach { delete(it) }
+            }.commit()
         }
+
+    override suspend fun blockUser(ownerUid: String, blockedUid: String): AppResult<Unit, AppError> =
+        safeNetworkCall(connectivityChecker) {
+            val relationship = findRelationship(ownerUid, blockedUid)
+
+            firestore.batch().apply {
+                relationship.refs.forEach { delete(it) }
+                set(
+                    blockedCollection(ownerUid).document(blockedUid),
+                    mapOf(
+                        "pseudo" to relationship.memberPseudo,
+                        "blockedAt" to Clock.System.now().toEpochMilliseconds()
+                    )
+                )
+            }.commit()
+        }
+
+    override suspend fun unblockUser(ownerUid: String, blockedUid: String): AppResult<Unit, AppError> =
+        safeNetworkCall(connectivityChecker) {
+            blockedCollection(ownerUid).document(blockedUid).delete()
+        }
+
+    override fun observeBlockedUsers(ownerUid: String): Flow<List<BlockedUserRemoteDataModel>> =
+        blockedCollection(ownerUid).snapshots.map { snapshot ->
+            snapshot.documents.map { document ->
+                BlockedUserRemoteDataModel(
+                    uid = document.id,
+                    pseudo = document.get<String?>("pseudo"),
+                    blockedAt = document.get<Long?>("blockedAt")
+                )
+            }
+        }
+
+    override suspend fun reportUser(report: UserReportRemoteDataModel): AppResult<Unit, AppError> =
+        safeNetworkCall(connectivityChecker) {
+            firestore.collection(FirestoreReportsCollection).add(
+                buildMap {
+                    put("reporterUid", report.reporterUid)
+                    put("reportedUid", report.reportedUid)
+                    put("reason", report.reason)
+                    report.note?.let { put("note", it) }
+                    put("createdAt", FieldValue.serverTimestamp)
+                }
+            )
+            Unit
+        }
+
+    private fun blockedCollection(ownerUid: String) =
+        firestore.collection(FirestoreUsersCollection).document(ownerUid).collection(FirestoreBlockedCollection)
+
+    private suspend fun blockedUidsOnce(ownerUid: String): Set<String> =
+        blockedCollection(ownerUid).get().documents.map { it.id }.toSet()
+
+    private fun observeBlockedUids(ownerUid: String): Flow<Set<String>> =
+        blockedCollection(ownerUid).snapshots.map { snapshot -> snapshot.documents.map { it.id }.toSet() }
+
+    private suspend fun pseudoOf(uid: String): String? =
+        firestore.collection(FirestoreUsersCollection).document(uid).get().get<String?>("information.pseudo")
+
+    /**
+     * Everything that ties two users together: both circle entries and the invites sent in either
+     * direction, so that either of them can invite the other again later.
+     */
+    private suspend fun findRelationship(ownerUid: String, memberUid: String): Relationship {
+        val usersCollection = firestore.collection(FirestoreUsersCollection)
+        val invitesCollection = firestore.collection(FirestoreSocialInvitesCollection)
+        val ownerPseudo = pseudoOf(ownerUid)
+        val memberPseudo = pseudoOf(memberUid)
+
+        suspend fun invitesBetween(fromUid: String, toPseudo: String?): List<DocumentReference> =
+            toPseudo?.let {
+                invitesCollection
+                    .where { "fromUid" equalTo fromUid }
+                    .where { "toPseudo" equalTo it }
+                    .get()
+                    .documents
+                    .map { document -> document.reference }
+            }.orEmpty()
+
+        val circleEntries = listOf(
+            usersCollection.document(ownerUid).collection(FirestoreCircleCollection).document(memberUid),
+            usersCollection.document(memberUid).collection(FirestoreCircleCollection).document(ownerUid)
+        )
+
+        return Relationship(
+            refs = circleEntries + invitesBetween(ownerUid, memberPseudo) + invitesBetween(memberUid, ownerPseudo),
+            memberPseudo = memberPseudo
+        )
+    }
+
+    private class Relationship(val refs: List<DocumentReference>, val memberPseudo: String?)
 
     override suspend fun acceptInviteAndAddMembers(
         inviteId: String,
@@ -388,7 +489,7 @@ class SocialRemoteDataSourceImpl(
         safeNetworkCall(connectivityChecker) {
             firestore.runTransaction {
                 val inviteRef = firestore
-                    .collection("socialInvites")
+                    .collection(FirestoreSocialInvitesCollection)
                     .document(inviteId)
 
                 val ownerCircleRef = firestore

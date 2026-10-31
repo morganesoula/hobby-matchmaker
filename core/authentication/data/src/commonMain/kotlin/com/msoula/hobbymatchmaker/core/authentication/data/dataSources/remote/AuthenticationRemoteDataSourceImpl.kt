@@ -6,8 +6,10 @@ import com.msoula.hobbymatchmaker.core.authentication.data.models.ProviderTypeDa
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Logger
+import com.msoula.hobbymatchmaker.core.common.data.FirestoreBlockedCollection
 import com.msoula.hobbymatchmaker.core.common.data.FirestoreCircleCollection
 import com.msoula.hobbymatchmaker.core.common.data.FirestorePseudosCollection
+import com.msoula.hobbymatchmaker.core.common.data.FirestoreSocialInvitesCollection
 import com.msoula.hobbymatchmaker.core.common.data.FirestoreUsersCollection
 import com.msoula.hobbymatchmaker.core.common.flatMap
 import com.msoula.hobbymatchmaker.core.common.flatMapSuspend
@@ -22,7 +24,6 @@ import kotlinx.coroutines.CancellationException
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
-private const val SOCIAL_INVITES_COLLECTION = "socialInvites"
 private const val AUTH_TIME_CLAIM = "auth_time"
 
 // Firebase rejects sensitive operations (account deletion) when the last sign-in is older than ~5 minutes
@@ -82,13 +83,15 @@ class AuthenticationRemoteDataSourceImpl(
 
         val circleRefs = userRef.collection(FirestoreCircleCollection).get().documents
             .map { it.reference }
-        val sentInviteRefs = firestore.collection(SOCIAL_INVITES_COLLECTION)
+        val blockedRefs = userRef.collection(FirestoreBlockedCollection).get().documents
+            .map { it.reference }
+        val sentInviteRefs = firestore.collection(FirestoreSocialInvitesCollection)
             .where { "fromUid" equalTo uid }
             .get()
             .documents
             .map { it.reference }
         val receivedInviteRefs = pseudo?.let {
-            firestore.collection(SOCIAL_INVITES_COLLECTION)
+            firestore.collection(FirestoreSocialInvitesCollection)
                 .where { "toPseudo" equalTo it }
                 .get()
                 .documents
@@ -105,7 +108,8 @@ class AuthenticationRemoteDataSourceImpl(
                 )
                 delete(memberEntry)
             }
-            (sentInviteRefs + receivedInviteRefs).forEach { delete(it) }
+            // Reports filed about or by this user are kept for safety reviews
+            (blockedRefs + sentInviteRefs + receivedInviteRefs).forEach { delete(it) }
             // Free the pseudo so it can be picked again
             pseudo?.let { delete(firestore.collection(FirestorePseudosCollection).document(it.lowercase())) }
             delete(userRef)

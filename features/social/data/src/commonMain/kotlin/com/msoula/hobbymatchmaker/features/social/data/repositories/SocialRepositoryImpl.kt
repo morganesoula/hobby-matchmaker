@@ -10,13 +10,17 @@ import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.SocialL
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.mappers.toSocialInviteDomainModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.local.models.SocialCircleMemberLocalDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.SocialRemoteDataSource
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toBlockedUserDomainModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toInviteData
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toSocialCircleMember
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toSocialInvitationDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toSocialMemberDomainModel
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toUserReportData
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.SocialCircleEntryRemoteDataModel
+import com.msoula.hobbymatchmaker.features.social.domain.models.BlockedUserDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialInviteDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel
+import com.msoula.hobbymatchmaker.features.social.domain.models.UserReportDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.repositories.SocialRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
@@ -195,6 +199,19 @@ class SocialRepositoryImpl(
         memberUid: String
     ): AppResult<Unit, AppError> =
         socialRemoteDataSource.removeFromSocialCircle(ownerId, memberUid)
+
+    override suspend fun blockUser(ownerId: String, blockedUid: String): AppResult<Unit, AppError> =
+        socialRemoteDataSource.blockUser(ownerId, blockedUid)
+
+    override suspend fun unblockUser(ownerId: String, blockedUid: String): AppResult<Unit, AppError> =
+        socialRemoteDataSource.unblockUser(ownerId, blockedUid)
+
+    override fun observeBlockedUsers(ownerId: String): Flow<List<BlockedUserDomainModel>> =
+        socialRemoteDataSource.observeBlockedUsers(ownerId)
+            .map { users -> users.map { it.toBlockedUserDomainModel() } }
+
+    override suspend fun reportUser(report: UserReportDomainModel): AppResult<Unit, AppError> =
+        socialRemoteDataSource.reportUser(report.toUserReportData())
 
     override suspend fun acceptInviteAndAddMembers(
         inviteId: String,

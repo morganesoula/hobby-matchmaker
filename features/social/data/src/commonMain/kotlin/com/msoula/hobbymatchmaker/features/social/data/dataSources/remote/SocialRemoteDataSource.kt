@@ -2,9 +2,11 @@ package com.msoula.hobbymatchmaker.features.social.data.dataSources.remote
 
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.BlockedUserRemoteDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.InviteDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.SocialCircleEntryRemoteDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.SocialCircleMemberRemoteDataModel
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.UserReportRemoteDataModel
 import kotlinx.coroutines.flow.Flow
 
 interface SocialRemoteDataSource {
@@ -25,6 +27,11 @@ interface SocialRemoteDataSource {
         ownerUid: String,
         memberUid: String
     ): AppResult<Unit, AppError>
+
+    suspend fun blockUser(ownerUid: String, blockedUid: String): AppResult<Unit, AppError>
+    suspend fun unblockUser(ownerUid: String, blockedUid: String): AppResult<Unit, AppError>
+    fun observeBlockedUsers(ownerUid: String): Flow<List<BlockedUserRemoteDataModel>>
+    suspend fun reportUser(report: UserReportRemoteDataModel): AppResult<Unit, AppError>
 
     suspend fun acceptInviteAndAddMembers(
         inviteId: String,
