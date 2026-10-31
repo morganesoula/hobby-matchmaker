@@ -25,6 +25,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.msoula.hobbymatchmaker.core.authentication.domain.models.ProviderType
 import com.msoula.hobbymatchmaker.core.design.Res
+import com.msoula.hobbymatchmaker.core.design.social_capacity_reached
 import com.msoula.hobbymatchmaker.core.design.atoms.MinimalDialog
 import com.msoula.hobbymatchmaker.core.design.atoms.asStringSuspend
 import com.msoula.hobbymatchmaker.core.design.models.MatchAnimationData
@@ -420,29 +421,30 @@ fun AppNavHost(
 
             val sentInvites by socialViewModel.sentInvites.collectAsStateWithLifecycle()
             val incomingInvites by socialViewModel.incomingInvites.collectAsStateWithLifecycle()
-            var showCapacityDialog by remember { mutableStateOf(false) }
+            val snackBarHostState = remember { SnackbarHostState() }
+            var capacityMessage by remember { mutableStateOf<String?>(null) }
 
             LaunchedEffect(Unit) {
                 socialViewModel.events.collect { event ->
                     when (event) {
-                        UiEvent.CapacityReached -> showCapacityDialog = true
+                        UiEvent.CapacityReached -> capacityMessage = getString(Res.string.social_capacity_reached)
+                        is UiEvent.ShowSnackBar ->
+                            snackBarHostState.showSnackbar(event.message.asStringSuspend())
+
                         else -> Unit
                     }
                 }
             }
 
-            if (showCapacityDialog) {
-                MinimalDialog(
-                    noDataText = ""
-                ) {
-                    showCapacityDialog = false
-                }
+            capacityMessage?.let { message ->
+                MinimalDialog(noDataText = message) { capacityMessage = null }
             }
 
             SocialContent(
                 sentInvites = sentInvites,
                 incomingInvites = incomingInvites,
                 tabs = socialTabs,
+                snackBarHostState = snackBarHostState,
                 onEvent = socialViewModel::onEvent
             )
         }

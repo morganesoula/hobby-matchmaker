@@ -1,172 +1,488 @@
 <!DOCTYPE html><html class="dark" lang="en" style=""><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>Social Hub - Sent Invites</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<title>Social Circle Hub - Sent Invites</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com" rel="preconnect">
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
 <script>
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          colors: {
-            primary: "#FD9800",
-            "background-light": "#F9F9FA",
-            "background-dark": "#161313",
-            "card-light": "#FFFFFF",
-            "card-dark": "#232025",
-          },
-          fontFamily: {
-            display: ["'Plus Jakarta Sans'", "sans-serif"],
-          },
-          borderRadius: {
-            DEFAULT: "1rem",
-          },
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          surface: "#181211",
+          "surface-container": "#201a19",
+          "surface-container-high": "#2a2220",
+          "surface-card": "#241d1b",
+          primary: "#ff9900",
+          "primary-light": "#ffb86f",
+          "on-surface": "#ece0de",
+          "on-surface-variant": "#dbc2ad",
+          "outline-variant": "rgba(255, 153, 0, 0.15)",
+          "outline-subtle": "rgba(255, 255, 255, 0.07)",
+          "background-dark": "#140f0e",
+        },
+        fontFamily: {
+          sans: ["'Plus Jakarta Sans'", "sans-serif"],
         },
       },
-    };
-  </script>
+    },
+  };
+</script>
 <style>
-    .material-symbols-outlined {
-      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-    }
-    .material-symbols-outlined.fill-icon {
-      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-    }
-  </style>
-<style>
-    body {
-      min-height: max(884px, 100dvh);
-    }
-  </style>
-  </head>
-<body class="bg-background-light dark:bg-background-dark font-display text-gray-900 dark:text-gray-100 min-h-screen antialiased flex justify-center selection:bg-primary/20">
-<div class="w-full max-w-md min-h-screen flex flex-col bg-background-light dark:bg-background-dark relative pb-20 shadow-2xl">
-<div class="w-full pt-3 px-6 pb-2 flex justify-between items-center text-xs font-semibold tracking-tight text-gray-900 dark:text-white select-none">
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  .material-symbols-outlined.fill-icon {
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  body {
+    min-height: max(884px, 100dvh);
+  }
+</style>
+</head>
+<body class="bg-background-dark font-sans text-on-surface min-h-screen antialiased flex justify-center selection:bg-primary/20">
+<div class="w-full max-w-md min-h-screen flex flex-col bg-surface relative pb-28 shadow-2xl">
+<!-- Status Bar -->
+<div class="w-full pt-3 px-6 pb-2 flex justify-between items-center text-xs font-semibold tracking-tight text-on-surface select-none">
 <div class="flex items-center space-x-1.5">
-<span class="material-symbols-outlined text-[15px]">signal_cellular_alt</span>
+<span class="material-symbols-outlined text-[15px] text-primary">signal_cellular_alt</span>
 <span class="text-[13px] tracking-normal">Voderatet</span>
 <span class="material-symbols-outlined text-[15px] ml-0.5">wifi</span>
 </div>
-<div class="text-[14px] font-bold">18:20</div>
-<div class="flex items-center space-x-1">
-<span class="material-symbols-outlined text-[19px]">battery_full</span>
+<div class="text-[14px] font-bold tracking-tight">18:20</div>
+<div class="flex items-center space-x-1.5">
+<span class="text-[11px] font-medium text-on-surface-variant">92%</span>
+<span class="material-symbols-outlined text-[19px] text-primary">battery_full</span>
 </div>
 </div>
-<header class="px-5 pt-3 pb-3 text-center">
-<h1 class="text-lg font-bold text-gray-900 dark:text-white tracking-wide">
-        Social Hub - Sent Invites
-      </h1>
+<!-- Header -->
+<header class="px-5 pt-2 pb-3 flex items-center justify-between">
+<div>
+<h1 class="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
+<span class="">Social Circle Hub</span>
+
+</h1>
+
+</div>
+<button onclick="document.getElementById('inviteModal').classList.remove('hidden')" class="inline-flex items-center gap-1.5 bg-gradient-to-r from-primary to-primary-light text-black font-bold px-3.5 py-1.5 rounded-full shadow-md shadow-primary/20 hover:opacity-95 active:scale-95 transition-all text-xs tracking-wide"><span class="material-symbols-outlined text-[16px]">person_add</span><span class="">Invite</span></button>
 </header>
-<div class="px-5 my-2">
-<div class="bg-gray-200/80 dark:bg-[#2A2626] p-1 rounded-2xl flex items-center justify-between">
-<button class="w-1/2 py-2 text-sm font-semibold rounded-xl text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all duration-200">
-          Received
-        </button>
-<button class="w-1/2 py-2 text-sm font-bold rounded-xl bg-primary text-white shadow-md transition-all duration-200">
-          Sent
-        </button>
-</div>
-</div>
-<main class="flex-1 px-4 py-2 space-y-3.5 overflow-y-auto">
-<div class="bg-card-light dark:bg-card-dark rounded-2xl p-4 flex items-center justify-between shadow-sm border border-gray-100 dark:border-white/5">
-<div class="flex items-center space-x-3.5">
-<div class="relative">
-<img alt="Avatar of User Bonsen" class="w-14 h-14 rounded-full object-cover ring-2 ring-transparent" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-xDHvZ0eNtZvui545e9Y_NOUab88RkxDOk0RK2L3EZhaq1FbZie_4nR6s1K1suWeAzczW-hFbuVvsrOT7DPqF3VO-Kh9kcohhIuz9FJ5NnXJxT6xhSJEMIPxHN-nZXv1n0dbOcXitAYZy0Rg7Sigy1FUtHOMP4bjV6DYRWFYgBpOce5fuQ0jnlHvB1IMhdIzot4XxayxfE-Y0MUbwaLXjSvWiyq6-LHXVIolknkhctdDO-omvwLWyIQ">
+<!-- Active Circle Slot Counter Banner -->
+<div class="px-5 pb-3">
+<div class="bg-gradient-to-r from-surface-container-high via-surface-card to-surface-container rounded-2xl p-3.5 border border-primary/20 shadow-md">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-lg bg-primary/15 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]">group</span>
 </div>
 <div>
-<h3 class="font-bold text-base text-gray-900 dark:text-white leading-tight">User Bonsen</h3>
-<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">5 common movies</p>
+<span class="text-xs font-bold text-white uppercase tracking-wider">Active Circle</span>
+<span class="text-[11px] text-on-surface-variant ml-1.5">4 of 5 filled</span>
 </div>
 </div>
-<div class="flex flex-col items-end space-y-1.5">
-<span class="px-5 py-1.5 rounded-xl border border-primary text-primary text-sm font-medium tracking-wide">
+<button class="text-xs font-semibold text-primary hover:text-primary-light flex items-center gap-0.5 transition-colors" onclick="document.getElementById('circleManagementSheet').classList.toggle('hidden')">
+          Manage
+          <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+<!-- Slot Progress Bar & Quick Mini Avatars -->
+<div class="flex items-center justify-between gap-3 pt-1">
+<div class="flex -space-x-2 overflow-hidden items-center">
+<img alt="Member 1" class="inline-block h-7 w-7 rounded-full ring-2 ring-surface object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaJFv55F8n7M0wRdzgdVK5F076vWHA27rXavJT7doLKVNUOy190VynY7kQhcUoHgNfdqzSd3b098WvTuk56TfitEo5P8uZhy45N9OavLkuqDtBGzEzgAv8XNdxQrmibwI4akvaothM48DR2250Z3aLxV-xdSjxiiAAAFWgxI0ZGbVAvqt0KsQhb-CMNNcVXUqHjYRmkeRIlLzEIQHL3CcvgbWTBrQQUYLlYqwoj2Tj">
+<img alt="Member 2" class="inline-block h-7 w-7 rounded-full ring-2 ring-surface object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD08ZqmU9X1ilO3b2lue0JySTcwD7k7HeFEE6Did9ayPlDDRf6m-XBkIPDwlENoKSfjNoyqlJtAMZxhG74-qfeJQgqbQwk9uVcFjUQsONfOHixY5vdYBZQQ2O6H9vjMWeoaQ6M8BY6tjTP9GDXw5714-sjWO8m7Ce5FXgjUM6IqWk21szQjWgUMrWGVecFWcLfuStkrRc6Uj_zCaYijQch1ce7O1yA6f4v3tk_bojn0">
+<img alt="Member 3" class="inline-block h-7 w-7 rounded-full ring-2 ring-surface object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUCh0vhLUtXkltQu4wgCHRCuxXIJL98klfYAm94Eg3Z_9rJ_EcqVaI-SKDykaLBkRW8TOavXD5muPD8nfwO-8QRtI53mktOItI7bAqkWH6MMymwEQTzuBMYBQkkamTXHieAja_XARQPu-2OMiwI7gnQjjfBaTHyBsviCRDc_nzYo4DivxBX-QOK7fopSbztmHkQX8WRO6vXqUbIj-1bx5UyfEmj6yaSAKcDwu_YzeH">
+<img alt="Member 4" class="inline-block h-7 w-7 rounded-full ring-2 ring-surface object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAH5OY-vUnz6kAney-PSKnd1Zd3nJmgt7jniDx_CVpt9orhy44zjKD2nsLvdIdZneAkUW0ffgEofe3mPCXZFFY8Nwtdv6AW_bVdA0nTML_L3LVSMiynj1olxXpq7Kf_-wmnuwmssJHVlGuomckbdFR0QHdhqBfCxdMGU2odAOTX0hQ_tZ3RQX5Yetp2tM0ailQhlPyEbCU1IlWOTeI7jEeeuvnoKaO_uQGNWI3CGPJk">
+<div class="inline-flex h-7 w-7 rounded-full ring-2 ring-surface items-center justify-center bg-primary/10 border border-dashed border-primary/50 text-primary">
+<span class="material-symbols-outlined text-[14px]">add</span>
+</div>
+</div>
+<div class="flex-1 max-w-[130px]">
+<div class="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-primary to-primary-light rounded-full" style="width: 80%"></div>
+</div>
+<p class="text-[10px] text-right text-on-surface-variant mt-1">1 slot available</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Segmented Navigation Tabs (Circle, Received, Sent) -->
+<div class="px-5 mb-3">
+<div class="bg-surface-container p-1 rounded-2xl flex items-center justify-between border border-outline-subtle">
+<!-- Tab 1: Circle -->
+<button class="flex-1 py-2 px-1 text-center rounded-xl text-xs font-semibold text-on-surface-variant hover:text-white transition-all flex items-center justify-center gap-1.5" onclick="document.getElementById('circleManagementSheet').classList.remove('hidden')">
+<span class="">Circle</span>
+<span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-white/10 text-on-surface-variant">4/5</span>
+</button>
+<!-- Tab 2: Received -->
+<button class="flex-1 py-2 px-1 text-center rounded-xl text-xs font-semibold text-on-surface-variant hover:text-white transition-all flex items-center justify-center gap-1.5">
+<span class="">Received</span>
+<span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-white/10 text-on-surface-variant">2</span>
+</button>
+<!-- Tab 3: Sent (Active) -->
+<button class="flex-1 py-2 px-1 text-center rounded-xl text-xs font-bold bg-primary text-black shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-1.5">
+<span class="">Sent</span>
+<span class="px-1.5 py-0.2 rounded-full text-[10px] font-extrabold bg-black/20 text-black">5</span>
+</button>
+</div>
+</div>
+<!-- Section Header Info -->
+<div class="px-5 mb-2 flex items-center justify-between">
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Outgoing Requests (5)</span>
+<span class="text-[11px] text-on-surface-variant/80">Pending confirmation</span>
+</div>
+<!-- Main Scrollable Invites List -->
+<main class="flex-1 px-4 space-y-3 overflow-y-auto">
+<!-- Card 1 -->
+<div class="bg-surface-card rounded-2xl p-4 border border-outline-variant hover:border-primary/40 transition-all duration-200 shadow-sm relative group">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-center space-x-3.5">
+<div class="relative">
+<img alt="Avatar of User Bonsen" class="w-13 h-13 rounded-2xl object-cover ring-2 ring-primary/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-xDHvZ0eNtZvui545e9Y_NOUab88RkxDOk0RK2L3EZhaq1FbZie_4nR6s1K1suWeAzczW-hFbuVvsrOT7DPqF3VO-Kh9kcohhIuz9FJ5NnXJxT6xhSJEMIPxHN-nZXv1n0dbOcXitAYZy0Rg7Sigy1FUtHOMP4bjV6DYRWFYgBpOce5fuQ0jnlHvB1IMhdIzot4XxayxfE-Y0MUbwaLXjSvWiyq6-LHXVIolknkhctdDO-omvwLWyIQ">
+<span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-amber-500 ring-2 ring-surface-card flex items-center justify-center">
+<span class="w-1.5 h-1.5 rounded-full bg-black"></span>
+</span>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<h3 class="font-bold text-sm text-white leading-tight">User Bonsen</h3>
+<span class="text-[11px] text-on-surface-variant">@bonsen_cine</span>
+</div>
+<div class="flex items-center gap-1.5 mt-1">
+<span class="material-symbols-outlined text-[14px] text-primary fill-icon">movie</span>
+<p class="text-xs text-primary font-medium">5 common movies</p>
+</div>
+<p class="text-[10px] text-on-surface-variant/70 mt-1">Sent 2 hours ago</p>
+</div>
+</div>
+<!-- Status & Actions -->
+<div class="flex flex-col items-end space-y-2">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
             Pending
           </span>
-<button class="flex items-center text-[11px] text-primary/90 hover:text-primary transition-colors pr-1 font-medium">
-<span class="material-symbols-outlined text-[13px] mr-1">person_remove</span>
+<button class="flex items-center text-[11px] text-on-surface-variant hover:text-red-400 transition-colors font-medium py-1 px-2 rounded-lg hover:bg-white/5">
+<span class="material-symbols-outlined text-[13px] mr-1">close</span>
             Cancel Request
           </button>
 </div>
 </div>
-<div class="bg-card-light dark:bg-card-dark rounded-2xl p-4 flex items-center justify-between shadow-sm border border-gray-100 dark:border-white/5">
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-card rounded-2xl p-4 border border-outline-variant hover:border-primary/40 transition-all duration-200 shadow-sm relative group">
+<div class="flex items-start justify-between gap-3">
 <div class="flex items-center space-x-3.5">
 <div class="relative">
-<img alt="Avatar of Marly Elattin" class="w-14 h-14 rounded-full object-cover ring-2 ring-transparent" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDejwoWVwiDtcAqRnGKQxcvq3E7_GkuJ3AI-zZSALln0b6oHLDYy_UDQdWJB1TTYWRRCm-7CNi4tipjasDGAWVluKDWJ8iiJWvi9W3q52xJZZCQ8L3WFE4eJSMEEJ50nRf1C5Ml6Q2WjFT70gDSEeuxfWaZI_Jiy_LTZjeY4M2myMacs0WD3Bw1xcTIUN-ZHD5BJSUXmvFvmibp8DVCECCLsOvmSXnqMlzAbTHmavI9VDGg_-IuRneelA">
+<img alt="Avatar of Marly Elattin" class="w-13 h-13 rounded-2xl object-cover ring-2 ring-primary/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDejwoWVwiDtcAqRnGKQxcvq3E7_GkuJ3AI-zZSALln0b6oHLDYy_UDQdWJB1TTYWRRCm-7CNi4tipjasDGAWVluKDWJ8iiJWvi9W3q52xJZZCQ8L3WFE4eJSMEEJ50nRf1C5Ml6Q2WjFT70gDSEeuxfWaZI_Jiy_LTZjeY4M2myMacs0WD3Bw1xcTIUN-ZHD5BJSUXmvFvmibp8DVCECCLsOvmSXnqMlzAbTHmavI9VDGg_-IuRneelA">
+<span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-amber-500 ring-2 ring-surface-card flex items-center justify-center">
+<span class="w-1.5 h-1.5 rounded-full bg-black"></span>
+</span>
 </div>
 <div>
-<h3 class="font-bold text-base text-gray-900 dark:text-white leading-tight">Marly Elattin</h3>
-<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">3 common movies</p>
+<div class="flex items-center gap-1.5">
+<h3 class="font-bold text-sm text-white leading-tight">Marly Elattin</h3>
+<span class="text-[11px] text-on-surface-variant">@marly_el</span>
+</div>
+<div class="flex items-center gap-1.5 mt-1">
+<span class="material-symbols-outlined text-[14px] text-primary fill-icon">movie</span>
+<p class="text-xs text-primary font-medium">3 common movies</p>
+</div>
+<p class="text-[10px] text-on-surface-variant/70 mt-1">Sent yesterday</p>
 </div>
 </div>
-<div class="flex flex-col items-end space-y-1.5">
-<span class="px-5 py-1.5 rounded-xl border border-primary text-primary text-sm font-medium tracking-wide">
+<div class="flex flex-col items-end space-y-2">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
             Pending
           </span>
-<button class="flex items-center text-[11px] text-primary/90 hover:text-primary transition-colors pr-1 font-medium">
-<span class="material-symbols-outlined text-[13px] mr-1">person_remove</span>
+<button class="flex items-center text-[11px] text-on-surface-variant hover:text-red-400 transition-colors font-medium py-1 px-2 rounded-lg hover:bg-white/5">
+<span class="material-symbols-outlined text-[13px] mr-1">close</span>
             Cancel Request
           </button>
 </div>
 </div>
-<div class="bg-card-light dark:bg-card-dark rounded-2xl p-4 flex items-center justify-between shadow-sm border border-gray-100 dark:border-white/5">
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-card rounded-2xl p-4 border border-outline-variant hover:border-primary/40 transition-all duration-200 shadow-sm relative group">
+<div class="flex items-start justify-between gap-3">
 <div class="flex items-center space-x-3.5">
 <div class="relative">
-<img alt="Avatar of Kitty Kitkat" class="w-14 h-14 rounded-full object-cover ring-2 ring-transparent" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOO9oij8DuXRch7FoGq3k-w4Ry4ti9BVNUM1SejcNz67ii6zYTF8Q0CdjBbcau0RqNajVo57JGDfLhoUXzl0ju0YHrGdAFeEi91NhLc36XxSKL8XJkAi7hza2NG4dA1bVbKfMLKrGzfrrzzkfwjK0_JDg2oM9cgy987GTWKomsYyRiQoKLnQYt0iKbBMk7CZPIpf7bel-xf9BvjNbQ9SLo_OICnBHZDv5MlEGcFLhVn33TroE0rvNBiA">
+<img alt="Avatar of Kitty Kitkat" class="w-13 h-13 rounded-2xl object-cover ring-2 ring-primary/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOO9oij8DuXRch7FoGq3k-w4Ry4ti9BVNUM1SejcNz67ii6zYTF8Q0CdjBbcau0RqNajVo57JGDfLhoUXzl0ju0YHrGdAFeEi91NhLc36XxSKL8XJkAi7hza2NG4dA1bVbKfMLKrGzfrrzzkfwjK0_JDg2oM9cgy987GTWKomsYyRiQoKLnQYt0iKbBMk7CZPIpf7bel-xf9BvjNbQ9SLo_OICnBHZDv5MlEGcFLhVn33TroE0rvNBiA">
+<span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-amber-500 ring-2 ring-surface-card flex items-center justify-center">
+<span class="w-1.5 h-1.5 rounded-full bg-black"></span>
+</span>
 </div>
 <div>
-<h3 class="font-bold text-base text-gray-900 dark:text-white leading-tight">Kitty Kitkat</h3>
-<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">8 common movies</p>
+<div class="flex items-center gap-1.5">
+<h3 class="font-bold text-sm text-white leading-tight">Kitty Kitkat</h3>
+<span class="text-[11px] text-on-surface-variant">@kitty_kat</span>
+</div>
+<div class="flex items-center gap-1.5 mt-1">
+<span class="material-symbols-outlined text-[14px] text-primary fill-icon">movie</span>
+<p class="text-xs text-primary font-medium">8 common movies</p>
+</div>
+<p class="text-[10px] text-on-surface-variant/70 mt-1">Sent 2 days ago</p>
 </div>
 </div>
-<div class="flex flex-col items-end">
-<span class="px-5 py-1.5 rounded-xl border border-primary text-primary text-sm font-medium tracking-wide">
+<div class="flex flex-col items-end space-y-2">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
             Pending
           </span>
+<button class="flex items-center text-[11px] text-on-surface-variant hover:text-red-400 transition-colors font-medium py-1 px-2 rounded-lg hover:bg-white/5">
+<span class="material-symbols-outlined text-[13px] mr-1">close</span>
+            Cancel Request
+          </button>
 </div>
 </div>
-<div class="bg-card-light dark:bg-card-dark rounded-2xl p-4 flex items-center justify-between shadow-sm border border-gray-100 dark:border-white/5">
+</div>
+<!-- Card 4 -->
+<div class="bg-surface-card rounded-2xl p-4 border border-outline-variant hover:border-primary/40 transition-all duration-200 shadow-sm relative group">
+<div class="flex items-start justify-between gap-3">
 <div class="flex items-center space-x-3.5">
 <div class="relative">
-<img alt="Avatar of Film Buff Ben" class="w-14 h-14 rounded-full object-cover ring-2 ring-transparent" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJupwC4AfW3N7Uz2NcbgY_5hNARxrj3WioYIbi-xr4FpvI5uUqOJ-gVDSmFIQCBzuilgJs7MUWww2F9Dh_4pgW89AY6sAeRHX4z37n3MHEQ5-CR5ubX_69LDt4gbhuE2Ay5CN6_LegsiAP-eRVUpdjd-D9Gk-ZOzPY7Wv7bye_m6YN9xP31f5FLIDiOCKOLjYzWXs_HGk2AOtqiXxV-FysU8m8NB3t5S7HCeo6oGIsGinWn5M53cqziQ">
+<img alt="Avatar of Film Buff Ben" class="w-13 h-13 rounded-2xl object-cover ring-2 ring-primary/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJupwC4AfW3N7Uz2NcbgY_5hNARxrj3WioYIbi-xr4FpvI5uUqOJ-gVDSmFIQCBzuilgJs7MUWww2F9Dh_4pgW89AY6sAeRHX4z37n3MHEQ5-CR5ubX_69LDt4gbhuE2Ay5CN6_LegsiAP-eRVUpdjd-D9Gk-ZOzPY7Wv7bye_m6YN9xP31f5FLIDiOCKOLjYzWXs_HGk2AOtqiXxV-FysU8m8NB3t5S7HCeo6oGIsGinWn5M53cqziQ">
+<span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-amber-500 ring-2 ring-surface-card flex items-center justify-center">
+<span class="w-1.5 h-1.5 rounded-full bg-black"></span>
+</span>
 </div>
 <div>
-<h3 class="font-bold text-base text-gray-900 dark:text-white leading-tight">Film Buff Ben</h3>
-<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">2 common movies</p>
+<div class="flex items-center gap-1.5">
+<h3 class="font-bold text-sm text-white leading-tight">Film Buff Ben</h3>
+<span class="text-[11px] text-on-surface-variant">@ben_films</span>
+</div>
+<div class="flex items-center gap-1.5 mt-1">
+<span class="material-symbols-outlined text-[14px] text-primary fill-icon">movie</span>
+<p class="text-xs text-primary font-medium">2 common movies</p>
+</div>
+<p class="text-[10px] text-on-surface-variant/70 mt-1">Sent 3 days ago</p>
 </div>
 </div>
-<div class="flex flex-col items-end">
-<span class="px-5 py-1.5 rounded-xl border border-primary text-primary text-sm font-medium tracking-wide">
+<div class="flex flex-col items-end space-y-2">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
             Pending
           </span>
+<button class="flex items-center text-[11px] text-on-surface-variant hover:text-red-400 transition-colors font-medium py-1 px-2 rounded-lg hover:bg-white/5">
+<span class="material-symbols-outlined text-[13px] mr-1">close</span>
+            Cancel Request
+          </button>
 </div>
 </div>
-<div class="bg-card-light dark:bg-card-dark rounded-2xl p-4 flex items-center justify-between shadow-sm border border-gray-100 dark:border-white/5">
+</div>
+<!-- Card 5 -->
+<div class="bg-surface-card rounded-2xl p-4 border border-outline-variant hover:border-primary/40 transition-all duration-200 shadow-sm relative group">
+<div class="flex items-start justify-between gap-3">
 <div class="flex items-center space-x-3.5">
 <div class="relative">
-<img alt="Avatar of Movie Maven Mia" class="w-14 h-14 rounded-full object-cover ring-2 ring-transparent" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6fp955K0d_9rW8dcPV7cyG-pBC1MAa8RBMDcsO9eNw5wisJi0m7pmiQtW2Tk4FfjJ0tv7_TQ97q7590Ozth9uLzg-h-RRT8mZVtbhgsuG1BRMCR6w1FqXa9wbRooqq7zF-3gdm3gKhPrwr_afXdRIv-4Nsa_zKW1300b73jQxtaX3u2fmjecjS79Gh-e_C5PNNpUwBZiFM_o68uq9vYxWVHIiLrtvApfd9TFvVQOZhWQFLY45ua8DEQ">
+<img alt="Avatar of Movie Maven Mia" class="w-13 h-13 rounded-2xl object-cover ring-2 ring-primary/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6fp955K0d_9rW8dcPV7cyG-pBC1MAa8RBMDcsO9eNw5wisJi0m7pmiQtW2Tk4FfjJ0tv7_TQ97q7590Ozth9uLzg-h-RRT8mZVtbhgsuG1BRMCR6w1FqXa9wbRooqq7zF-3gdm3gKhPrwr_afXdRIv-4Nsa_zKW1300b73jQxtaX3u2fmjecjS79Gh-e_C5PNNpUwBZiFM_o68uq9vYxWVHIiLrtvApfd9TFvVQOZhWQFLY45ua8DEQ">
+<span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-amber-500 ring-2 ring-surface-card flex items-center justify-center">
+<span class="w-1.5 h-1.5 rounded-full bg-black"></span>
+</span>
 </div>
 <div>
-<h3 class="font-bold text-base text-gray-900 dark:text-white leading-tight">Movie Maven Mia</h3>
-<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">10 common movies</p>
+<div class="flex items-center gap-1.5">
+<h3 class="font-bold text-sm text-white leading-tight">Movie Maven Mia</h3>
+<span class="text-[11px] text-on-surface-variant">@mia_cinema</span>
+</div>
+<div class="flex items-center gap-1.5 mt-1">
+<span class="material-symbols-outlined text-[14px] text-primary fill-icon">movie</span>
+<p class="text-xs text-primary font-medium">10 common movies</p>
+</div>
+<p class="text-[10px] text-on-surface-variant/70 mt-1">Sent 4 days ago</p>
 </div>
 </div>
-<div class="flex flex-col items-end">
-<span class="px-5 py-1.5 rounded-xl border border-primary text-primary text-sm font-medium tracking-wide">
+<div class="flex flex-col items-end space-y-2">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
             Pending
           </span>
+<button class="flex items-center text-[11px] text-on-surface-variant hover:text-red-400 transition-colors font-medium py-1 px-2 rounded-lg hover:bg-white/5">
+<span class="material-symbols-outlined text-[13px] mr-1">close</span>
+            Cancel Request
+          </button>
+</div>
 </div>
 </div>
 </main>
-<div class="fixed bottom-20 right-5 z-20">
+<!-- Floating Action Button: Add/Invite Friends -->
 
+<!-- Circle Members Management Bottom Sheet / Section Modal (Included & Accessible) -->
+<div class="hidden fixed inset-0 z-40 bg-black/75 backdrop-blur-sm flex items-end justify-center transition-opacity" id="circleManagementSheet">
+<div class="bg-surface-container-high w-full max-w-md rounded-t-3xl border-t border-outline-variant p-5 max-h-[85vh] flex flex-col shadow-2xl animate-in slide-in-from-bottom duration-200">
+<!-- Handle -->
+<div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-4 cursor-pointer" onclick="document.getElementById('circleManagementSheet').classList.add('hidden')"></div>
+<div class="flex items-center justify-between pb-3 border-b border-white/10">
+<div>
+<h2 class="text-lg font-bold text-white">Circle Members</h2>
+<p class="text-xs text-on-surface-variant">4 of 5 friend slots occupied</p>
 </div>
-
+<button class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-on-surface-variant hover:text-white" onclick="document.getElementById('circleManagementSheet').classList.add('hidden')">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
 </div>
-
+<!-- Circle Members List with 3-dot dropdowns -->
+<div class="flex-1 overflow-y-auto py-3 space-y-3">
+<!-- Active Member 1 -->
+<div class="bg-surface-card rounded-xl p-3 flex items-center justify-between border border-white/5">
+<div class="flex items-center gap-3">
+<img alt="Clara Rios" class="w-11 h-11 rounded-full object-cover ring-2 ring-primary/40" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOgWR469GQ6ov7rwFN5wF_oYn6d4A4_X1bhupngPZ4udM19Yo_x3CBcFn-pj6qNsO2xhI4-CxDOng3AMTdvLn_aK1x5Uib2oY3qlsorfI2SKJVqNEE9pCGprpef-WnQ6J2ByTiODfxR1XjH7wYjoyvd_T0JYXEVkkvV82mqNyuArILA1rkfSxG6aB3UxROgkyZveXiwAKcINH-hwDynxmR8Dw9emoRUfrRZ6zy4TEW">
+<div>
+<div class="flex items-center gap-1.5">
+<h4 class="text-sm font-bold text-white">Clara Rios</h4>
+<span class="text-[10px] px-1.5 py-0.5 rounded bg-primary/20 text-primary font-bold">Inner Circle</span>
+</div>
+<p class="text-xs text-on-surface-variant">@clararios · 14 common movies</p>
+</div>
+</div>
+<div class="relative">
+<button class="w-8 h-8 rounded-lg hover:bg-white/10 flex items-center justify-center text-on-surface-variant hover:text-white" onclick="toggleActionMenu('menu-clara')">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+<!-- Dropdown Menu for Member Management (Remove, Report, Block) -->
+<div class="hidden absolute right-0 top-9 w-44 bg-surface rounded-xl border border-outline-variant shadow-2xl py-1.5 z-50" id="menu-clara">
+<button class="w-full text-left px-3 py-2 text-xs font-semibold text-on-surface hover:bg-white/10 flex items-center gap-2" onclick="alert('Removed Clara Rios from Circle'); toggleActionMenu('menu-clara')">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">person_remove</span>
+                Remove from Circle
+              </button>
+<div class="h-px bg-white/10 my-1"></div>
+<button class="w-full text-left px-3 py-2 text-xs font-semibold text-amber-400 hover:bg-amber-400/10 flex items-center gap-2" onclick="alert('Report submitted for Clara Rios'); toggleActionMenu('menu-clara')">
+<span class="material-symbols-outlined text-[16px]">flag</span>
+                Report Member
+              </button>
+<button class="w-full text-left px-3 py-2 text-xs font-semibold text-red-400 hover:bg-red-400/10 flex items-center gap-2" onclick="alert('Blocked Clara Rios'); toggleActionMenu('menu-clara')">
+<span class="material-symbols-outlined text-[16px]">block</span>
+                Block User
+              </button>
+</div>
+</div>
+</div>
+<!-- Active Member 2 -->
+<div class="bg-surface-card rounded-xl p-3 flex items-center justify-between border border-white/5">
+<div class="flex items-center gap-3">
+<img alt="Jordan Lee" class="w-11 h-11 rounded-full object-cover ring-2 ring-primary/40" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcu1SN8TCBGjaweGSpr37QymFv3qvs1a0hek3QP5iG0THHLnmbpw8Vy1bKa9ao0-0_YFaFCpPT77XZbYnzi8JHatadBFuc6w9nKkrfWT8U-lhUavre7btAKTOvnoRuag-ERdHYEczU-ROI3dTL1cMjUoQ60WPQ57yFUbp0cxRfcW3gJTVMkyMyeob62G8uR1NDLocnaQkKQ4AID4yysOsFHpA5wtDYtfknF9Sgynkw">
+<div>
+<h4 class="text-sm font-bold text-white">Jordan Lee</h4>
+<p class="text-xs text-on-surface-variant">@jordan_screen · 9 common movies</p>
+</div>
+</div>
+<div class="relative">
+<button class="w-8 h-8 rounded-lg hover:bg-white/10 flex items-center justify-center text-on-surface-variant hover:text-white" onclick="toggleActionMenu('menu-jordan')">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+<div class="hidden absolute right-0 top-9 w-44 bg-surface rounded-xl border border-outline-variant shadow-2xl py-1.5 z-50" id="menu-jordan">
+<button class="w-full text-left px-3 py-2 text-xs font-semibold text-on-surface hover:bg-white/10 flex items-center gap-2" onclick="toggleActionMenu('menu-jordan')">
+<span class="material-symbols-outlined text-[16px]">person_remove</span>
+                Remove from Circle
+              </button>
+<div class="h-px bg-white/10 my-1"></div>
+<button class="w-full text-left px-3 py-2 text-xs font-semibold text-amber-400 hover:bg-amber-400/10 flex items-center gap-2" onclick="toggleActionMenu('menu-jordan')">
+<span class="material-symbols-outlined text-[16px]">flag</span>
+                Report Member
+              </button>
+<button class="w-full text-left px-3 py-2 text-xs font-semibold text-red-400 hover:bg-red-400/10 flex items-center gap-2" onclick="toggleActionMenu('menu-jordan')">
+<span class="material-symbols-outlined text-[16px]">block</span>
+                Block User
+              </button>
+</div>
+</div>
+</div>
+<!-- Active Member 3 -->
+<div class="bg-surface-card rounded-xl p-3 flex items-center justify-between border border-white/5">
+<div class="flex items-center gap-3">
+<img alt="Devon Lane" class="w-11 h-11 rounded-full object-cover ring-2 ring-primary/40" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEsImNPs1KNs2IxKZG5SrnOFB-wxWaF_UeTyC3-3YkmW5njN3RBqklWSz4GK_I5nEHelCroZgrpLfBObq880Hp1Uc7cBQ6T9WxXb9-L8qJgLu1Bu0QSdwerUXeJ3mQA2OMv0f8TCYUDQG0iLnzWsAwbnBn8L30Nxwvrw5n1UNLi_RjjKq2E9D2c_zqv9ZZAMHYk_SWwVhwDtvn2SH5c1lZnq7WzJHIEnp72ZQwSB3H">
+<div>
+<h4 class="text-sm font-bold text-white">Devon Lane</h4>
+<p class="text-xs text-on-surface-variant">@devon_l · 6 common movies</p>
+</div>
+</div>
+<button class="w-8 h-8 rounded-lg hover:bg-white/10 flex items-center justify-center text-on-surface-variant hover:text-white">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+<!-- Active Member 4 -->
+<div class="bg-surface-card rounded-xl p-3 flex items-center justify-between border border-white/5">
+<div class="flex items-center gap-3">
+<img alt="Samira Cruz" class="w-11 h-11 rounded-full object-cover ring-2 ring-primary/40" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1_Fju5FV5z0fDCX3lX4Cc4vbplg4r199z52yLLu41YTFgtYyeyWCqwRCzvJadskwob7AS7Mq0fmOl4-kJLV2eGqW1K-5qmt007crAYl0wE_6YccHSwC40UHyXTWPyCp9jXdbYqQlLKM1W--BRqdY4PupZkJ5oJHxZqWi8RMLlbhydzerMLPj6Es8oBzHgC_XMuJhZX0Jg-nuHFxzSBSCbsc8JkqOsJHxVbT_KTFF6">
+<div>
+<h4 class="text-sm font-bold text-white">Samira Cruz</h4>
+<p class="text-xs text-on-surface-variant">@samira_c · 12 common movies</p>
+</div>
+</div>
+<button class="w-8 h-8 rounded-lg hover:bg-white/10 flex items-center justify-center text-on-surface-variant hover:text-white">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+<!-- Empty slot representation -->
+<div class="border-2 border-dashed border-primary/30 rounded-xl p-4 flex items-center justify-between bg-primary/5">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full border border-dashed border-primary/60 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</div>
+<div>
+<h4 class="text-xs font-bold text-white">Empty Circle Slot</h4>
+<p class="text-[11px] text-on-surface-variant">Invite 1 more friend to sync tastes</p>
+</div>
+</div>
+<button class="px-3 py-1.5 rounded-lg bg-primary text-black font-bold text-xs hover:bg-primary-light transition-colors" onclick="document.getElementById('circleManagementSheet').classList.add('hidden'); document.getElementById('inviteModal').classList.remove('hidden');">
+            Invite
+          </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Invite Friends Modal -->
+<div class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" id="inviteModal">
+<div class="bg-surface-container-high w-full max-w-sm rounded-2xl border border-outline-variant p-5 shadow-2xl">
+<div class="flex items-center justify-between pb-3 border-b border-white/10">
+<h3 class="text-base font-bold text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">person_add</span>
+          Invite to Circle
+        </h3>
+<button class="w-7 h-7 rounded-full bg-white/5 flex items-center justify-center text-on-surface-variant hover:text-white" onclick="document.getElementById('inviteModal').classList.add('hidden')">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</div>
+<div class="py-4 space-y-3">
+<div>
+<label class="block text-xs font-medium text-on-surface-variant mb-1.5">Search by Username or Handle</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-[18px]">search</span>
+<input class="w-full bg-surface-card border border-white/10 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-on-surface-variant/50 focus:outline-none focus:border-primary" placeholder="@username or email..." type="text">
+</div>
+</div>
+<div class="pt-2">
+<label class="block text-xs font-medium text-on-surface-variant mb-1.5">Or share quick invite link</label>
+<div class="flex items-center gap-2">
+<input class="flex-1 bg-surface-card border border-white/10 rounded-xl px-3 py-2 text-xs text-on-surface-variant select-all" readonly="" type="text" value="https://kinohub.app/invite/c49x1">
+<button class="px-3 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold transition-colors flex items-center gap-1" onclick="alert('Invite link copied!')">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+              Copy
+            </button>
+</div>
+</div>
+</div>
+<div class="pt-2 flex gap-2">
+<button class="flex-1 py-2.5 rounded-xl bg-white/5 text-on-surface text-xs font-semibold hover:bg-white/10 transition-colors" onclick="document.getElementById('inviteModal').classList.add('hidden')">
+          Cancel
+        </button>
+<button class="flex-1 py-2.5 rounded-xl bg-primary text-black text-xs font-bold hover:bg-primary-light transition-colors" onclick="alert('Invitation sent!'); document.getElementById('inviteModal').classList.add('hidden')">
+          Send Invite
+        </button>
+</div>
+</div>
+</div>
+</div>
+<script>
+  function toggleActionMenu(id) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.classList.toggle('hidden');
+    }
+  }
+</script>
 
 
 </body></html>

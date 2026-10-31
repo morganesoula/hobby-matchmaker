@@ -33,6 +33,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
@@ -78,6 +79,8 @@ class SocialViewModel(
     val incomingInvites: StateFlow<UiState<ImmutableList<InviteUiModel>>>
         field = MutableStateFlow<UiState<ImmutableList<InviteUiModel>>>(UiState.Loading)
 
+    private val retryTrigger = MutableStateFlow(0)
+
     init {
         observeSessionAndInvites()
         refreshInvitesWhenAuthenticated()
@@ -87,7 +90,7 @@ class SocialViewModel(
     private fun observeSessionAndInvites() {
         // Sent invitations
         scope.launch {
-            sessionState
+            combine(sessionState, retryTrigger) { state, _ -> state }
                 .flatMapLatest { state ->
                     when (state) {
                         is SessionState.Authenticated ->
@@ -103,7 +106,7 @@ class SocialViewModel(
 
         // Incoming invitations
         scope.launch {
-            currentUserProfile
+            combine(currentUserProfile, retryTrigger) { profile, _ -> profile }
                 .flatMapLatest { profile ->
                     val pseudo = profile?.pseudo
                     val uid = currentUserUid
@@ -192,13 +195,19 @@ class SocialViewModel(
                 }
             }
 
-            is SocialUiEventModel.OnRetrySocialCircle ->
+            is SocialUiEventModel.OnRetrySocialCircle -> {
+                sentInvites.update { UiState.Loading }
+                incomingInvites.update { UiState.Loading }
+                retryTrigger.update { it + 1 }
                 scope.launch {
                     currentUserUid?.let { uid ->
                         socialUseCases.refreshIncomingInvitesUseCase(uid)
+                            .onFailure { Logger.e("Retry: failed to refresh incoming invites: $it") }
                         socialUseCases.refreshSentInvitesUseCase(uid)
+                            .onFailure { Logger.e("Retry: failed to refresh sent invites: $it") }
                     }
                 }
+            }
         }
     }
 

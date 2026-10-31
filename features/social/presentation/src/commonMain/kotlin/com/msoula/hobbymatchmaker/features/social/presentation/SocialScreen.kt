@@ -1,6 +1,8 @@
 package com.msoula.hobbymatchmaker.features.social.presentation
 
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.EmptyStateScreen
@@ -30,9 +32,10 @@ fun SocialContent(
     sentInvites: UiState<ImmutableList<InviteUiModel>>,
     incomingInvites: UiState<ImmutableList<InviteUiModel>>,
     tabs: ImmutableList<TabItem>,
+    snackBarHostState: SnackbarHostState,
     onEvent: (SocialUiEventModel) -> Unit
 ) {
-    Scaffold { paddingValues ->
+    Scaffold(snackbarHost = { SnackbarHost(snackBarHostState) }) { paddingValues ->
         SocialLayout(
             paddingValues = paddingValues,
             tabs = tabs,
