@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
+import coil3.compose.SubcomposeAsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.msoula.hobbymatchmaker.core.design.Res
@@ -253,4 +254,48 @@ fun FormIconPreview() {
         size = IconSize.TwentyFour,
         tint = MaterialTheme.colorScheme.primary
     )
+}
+
+@Composable
+fun UserAvatar(
+    modifier: Modifier = Modifier,
+    avatarUrl: String?,
+    contentDescription: String? = null,
+    size: Dp = CustomSize.FortyEight + CustomSize.Eight
+) {
+    val placeholder: @Composable () -> Unit = {
+        Box(
+            modifier = Modifier
+                .size(size)
+                .background(MaterialTheme.colorScheme.surfaceVariant),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = BootstrapPerson,
+                contentDescription = contentDescription,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(size / 2)
+            )
+        }
+    }
+
+    Box(
+        modifier = modifier
+            .size(size)
+            .clip(CircleShape)
+            .border(CustomSize.Two, MaterialTheme.colorScheme.primary.copy(alpha = .6f), CircleShape)
+    ) {
+        if (avatarUrl.isNullOrBlank()) {
+            placeholder()
+        } else {
+            SubcomposeAsyncImage(
+                model = avatarUrl,
+                contentDescription = contentDescription,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.size(size),
+                loading = { placeholder() },
+                error = { placeholder() }
+            )
+        }
+    }
 }

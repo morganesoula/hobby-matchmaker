@@ -219,6 +219,12 @@
     <string name="social_active_circle_slots_available">%1$d places disponibles</string>
     <string name="social_active_circle_full">Cercle complet</string>
     <string name="social_active_circle_manage">Gérer</string>
+    <string name="social_received_section_title">Invitations reçues en attente</string>
+    <string name="social_sent_section_title">Demandes envoyées (%1$d)</string>
+    <string name="social_sent_section_hint">En attente de confirmation</string>
+    <string name="social_sent_time">Envoyée %1$s</string>
+    <string name="social_common_favorite_singular">1 favori en commun</string>
+    <string name="social_common_favorites_plural">%1$d favoris en commun</string>
     <string name="social_capacity_reached">Il semblerait que vous ou votre invité ait atteint la limite maximale (5) de personnes autorisées à rejoindre le cercle d'amis !</string>
 
     <string name="social_movie_match_notification">Match avec %1$s !</string>

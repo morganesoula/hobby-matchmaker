@@ -192,12 +192,18 @@ class SocialViewModel(
                 is ObserveSentInvitesSuccess.Empty,
                 is ObserveIncomingInvitesSuccess.Empty -> UiState.Empty
 
-                is ObserveSentInvitesSuccess.Success -> UiState.Success(
-                    data.invites.map { it.toSentInviteUiModel() }.toImmutableList()
-                )
+                // Accepted invites are people already in the circle, so only pending and declined are listed
+                is ObserveSentInvitesSuccess.Success -> data.invites
+                    .map { it.toSentInviteUiModel() }
+                    .filter { it.inviteStatus != InviteStatusUiModel.ACCEPTED }
+                    .sortedByDescending { it.inviteTime }
+                    .toImmutableList()
+                    .let { if (it.isEmpty()) UiState.Empty else UiState.Success(it) }
 
                 is ObserveIncomingInvitesSuccess.Success -> UiState.Success(
-                    data.invites.map { it.toIncomingInviteUiModel() }.toImmutableList()
+                    data.invites.map { it.toIncomingInviteUiModel() }
+                        .sortedByDescending { it.inviteTime }
+                        .toImmutableList()
                 )
 
                 else -> {

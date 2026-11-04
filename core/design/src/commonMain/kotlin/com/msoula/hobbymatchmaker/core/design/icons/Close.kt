@@ -20,16 +20,6 @@ val MaterialIconsClose: ImageVector
             path(
                 fill = SolidColor(Color.Black)
             ) {
-                moveTo(0f, 0f)
-                horizontalLineToRelative(24f)
-                verticalLineToRelative(24f)
-                horizontalLineTo(0f)
-                verticalLineTo(0f)
-                close()
-            }
-            path(
-                fill = SolidColor(Color.Black)
-            ) {
                 moveTo(19f, 6.41f)
                 lineTo(17.59f, 5f)
                 lineTo(12f, 10.59f)

@@ -8,31 +8,37 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
-import com.msoula.hobbymatchmaker.core.design.atoms.CircleWithDefaultIcon
 import com.msoula.hobbymatchmaker.core.design.atoms.GenericCard
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight4
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWidth4
+import com.msoula.hobbymatchmaker.core.design.atoms.UserAvatar
 import com.msoula.hobbymatchmaker.core.design.icons.BootstrapCheck
 import com.msoula.hobbymatchmaker.core.design.icons.FeatherClock
-import com.msoula.hobbymatchmaker.core.design.icons.HeroiconsSparkles
+import com.msoula.hobbymatchmaker.core.design.icons.LucideFilm
 import com.msoula.hobbymatchmaker.core.design.icons.MaterialIconsClose
-import com.msoula.hobbymatchmaker.core.design.icons.MaterialSymbolsDelete
+import com.msoula.hobbymatchmaker.core.design.social_common_favorite_singular
+import com.msoula.hobbymatchmaker.core.design.social_common_favorites_plural
 import com.msoula.hobbymatchmaker.core.design.social_received_requests_accept_button_text
 import com.msoula.hobbymatchmaker.core.design.social_received_requests_decline_button_text
 import com.msoula.hobbymatchmaker.core.design.social_sent_requests_cancel_invitation_text
+import com.msoula.hobbymatchmaker.core.design.social_sent_time
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.util.asInviteStatusText
 import org.jetbrains.compose.resources.stringResource
@@ -44,125 +50,88 @@ fun SentInvitationCard(
     guestAvatarUrl: String,
     guestName: String,
     guestPseudo: String,
+    commonMoviesCount: Int = 0,
     inviteStatus: String,
     inviteTime: String,
     isBusy: Boolean = false,
     onCancelInvitationClick: (invitationId: String) -> Unit = {}
 ) {
     val status = inviteStatus.lowercase()
+    val isPending = status == "pending"
 
-    val backgroundColorStatus = when (status) {
-        "pending" -> MaterialTheme.colorScheme.primary.copy(alpha = .15f)
-        "declined" -> MaterialTheme.colorScheme.error.copy(alpha = .15f)
-        else -> MaterialTheme.colorScheme.tertiary.copy(alpha = .15f)
-    }
-
-    val textColorStatus = when (status) {
+    val statusColor = when (status) {
         "pending" -> MaterialTheme.colorScheme.primary
         "declined" -> MaterialTheme.colorScheme.error
         else -> MaterialTheme.colorScheme.tertiary
     }
 
-    val icon = when (status) {
+    val statusIcon = when (status) {
         "pending" -> FeatherClock
         "declined" -> MaterialIconsClose
         else -> BootstrapCheck
     }
 
     GenericCard(
-        modifier = modifier.padding(start = CustomSize.Eight, end = CustomSize.Eight),
+        modifier = modifier.padding(horizontal = CustomSize.Sixteen),
         containerColor = MaterialTheme.colorScheme.surfaceContainer
     ) {
-        Column {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(CustomSize.Eight)
-            ) {
-                CircleWithDefaultIcon(
-                    backgroundColor = MaterialTheme.colorScheme.onSurface,
-                    icon = HeroiconsSparkles,
-                    iconTint = MaterialTheme.colorScheme.primary,
-                    size = CustomSize.FortyEight
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(CustomSize.Sixteen)
+        ) {
+            UserAvatar(avatarUrl = guestAvatarUrl, contentDescription = guestName)
+
+            Column(modifier = Modifier.weight(1f)) {
+                InvitationIdentity(guestName = guestName, guestPseudo = guestPseudo)
+                CommonFavoritesLabel(commonMoviesCount)
+                Text(
+                    text = stringResource(Res.string.social_sent_time, inviteTime),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = CustomSize.Four)
                 )
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = guestName.ifBlank { "@$guestPseudo" },
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                        Row(
-                            modifier = Modifier.border(
-                                1.dp,
-                                backgroundColorStatus,
-                                RoundedCornerShape(CustomSize.Eight)
-                            )
-                                .background(
-                                    backgroundColorStatus,
-                                    RoundedCornerShape(
-                                        CustomSize.Eight
-                                    )
-                                )
-                                .padding(CustomSize.Four),
-                            horizontalArrangement = Arrangement.spacedBy(CustomSize.Four)
-                        ) {
-                            Icon(
-                                imageVector = icon,
-                                contentDescription = "Time",
-                                tint = textColorStatus
-                            )
-
-                            Text(
-                                text = inviteStatus.asInviteStatusText(),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = textColorStatus
-                            )
-                        }
-                    }
-
-                    SpacerHeight4()
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = if (guestName.isBlank()) "" else "@$guestPseudo",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Text(
-                            text = inviteTime,
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(end = CustomSize.Four)
-                        )
-                    }
-                }
             }
 
-            if (inviteStatus.lowercase() == "pending") {
-                SpacerHeight16()
-                Button(
-                    onClick = { onCancelInvitationClick(invitationId) },
-                    enabled = !isBusy,
-                    shape = RoundedCornerShape(CustomSize.Eight),
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Row(
+                    modifier = Modifier
+                        .border(1.dp, statusColor.copy(alpha = .4f), RoundedCornerShape(CustomSize.Sixteen))
+                        .background(statusColor.copy(alpha = .15f), RoundedCornerShape(CustomSize.Sixteen))
+                        .padding(horizontal = CustomSize.Eight, vertical = CustomSize.Four),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(CustomSize.Four)
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
+                    Icon(
+                        imageVector = statusIcon,
+                        contentDescription = null,
+                        tint = statusColor,
+                        modifier = Modifier.size(CustomSize.Sixteen)
+                    )
+                    Text(
+                        text = inviteStatus.asInviteStatusText(),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        color = statusColor
+                    )
+                }
+
+                if (isPending) {
+                    TextButton(
+                        onClick = { onCancelInvitationClick(invitationId) },
+                        enabled = !isBusy,
+                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurfaceVariant)
                     ) {
                         Icon(
-                            imageVector = MaterialSymbolsDelete,
-                            contentDescription = ""
+                            imageVector = MaterialIconsClose,
+                            contentDescription = null,
+                            modifier = Modifier.size(CustomSize.Sixteen)
                         )
-
                         SpacerWidth4()
-
-                        Text(text = stringResource(Res.string.social_sent_requests_cancel_invitation_text))
+                        Text(
+                            text = stringResource(Res.string.social_sent_requests_cancel_invitation_text),
+                            style = MaterialTheme.typography.labelMedium
+                        )
                     }
                 }
             }
@@ -178,39 +147,34 @@ fun ReceivedInvitationCard(
     guestAvatarUrl: String,
     guestName: String,
     guestPseudo: String,
+    commonMoviesCount: Int = 0,
     inviteTime: String,
     isBusy: Boolean = false,
     onAcceptInvitationClick: (invitationId: String, guestUid: String) -> Unit = { _, _ -> },
     onDeclineInvitationClick: (invitationId: String) -> Unit = {}
 ) {
     GenericCard(
-        modifier = modifier.padding(start = CustomSize.Eight, end = CustomSize.Eight),
+        modifier = modifier.padding(horizontal = CustomSize.Sixteen),
         containerColor = MaterialTheme.colorScheme.surfaceContainer
     ) {
         Column {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(CustomSize.Eight)
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.spacedBy(CustomSize.Sixteen)
             ) {
-                CircleWithDefaultIcon(
-                    backgroundColor = MaterialTheme.colorScheme.onSurface,
-                    icon = HeroiconsSparkles,
-                    iconTint = MaterialTheme.colorScheme.primary,
-                    size = CustomSize.FortyEight
-                )
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(text = guestName, style = MaterialTheme.typography.bodyLarge)
-                        Text(text = inviteTime, style = MaterialTheme.typography.bodyMedium)
-                    }
+                UserAvatar(avatarUrl = guestAvatarUrl, contentDescription = guestName)
 
-                    Text(text = "@$guestPseudo", style = MaterialTheme.typography.bodyMedium)
+                Column(modifier = Modifier.weight(1f)) {
+                    InvitationIdentity(guestName = guestName, guestPseudo = guestPseudo)
+                    CommonFavoritesLabel(commonMoviesCount)
                 }
+
+                Text(
+                    text = inviteTime,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
 
             SpacerHeight16()
@@ -223,52 +187,91 @@ fun ReceivedInvitationCard(
                     onClick = { onAcceptInvitationClick(invitationId, guestUid) },
                     enabled = !isBusy,
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(CustomSize.Eight),
+                    shape = RoundedCornerShape(CustomSize.Sixteen),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = BootstrapCheck,
-                            contentDescription = "Accept",
-                            tint = MaterialTheme.colorScheme.onPrimary
-                        )
-                        SpacerWidth4()
-                        Text(
-                            text = stringResource(Res.string.social_received_requests_accept_button_text),
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                    }
+                    Icon(
+                        imageVector = BootstrapCheck,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
+                    SpacerWidth4()
+                    Text(
+                        text = stringResource(Res.string.social_received_requests_accept_button_text),
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
                 }
 
                 Button(
                     onClick = { onDeclineInvitationClick(invitationId) },
                     enabled = !isBusy,
                     modifier = Modifier.weight(1f),
-                    border = BorderStroke(
-                        1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = .8f)
-                    ),
-                    shape = RoundedCornerShape(CustomSize.Eight),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface)
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = .4f)),
+                    shape = RoundedCornerShape(CustomSize.Sixteen),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = MaterialSymbolsDelete,
-                            contentDescription = "Decline",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                        SpacerWidth4()
-                        Text(
-                            text = stringResource(Res.string.social_received_requests_decline_button_text),
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
+                    Icon(
+                        imageVector = MaterialIconsClose,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                    SpacerWidth4()
+                    Text(
+                        text = stringResource(Res.string.social_received_requests_decline_button_text),
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
                 }
             }
         }
+    }
+}
+
+// Without a name, the pseudo takes its place so the card never shows an empty title
+@Composable
+private fun InvitationIdentity(guestName: String, guestPseudo: String) {
+    Text(
+        text = guestName.ifBlank { "@$guestPseudo" },
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.Bold,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+    )
+    if (guestName.isNotBlank()) {
+        Text(
+            text = "@$guestPseudo",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+@Composable
+private fun CommonFavoritesLabel(count: Int) {
+    if (count <= 0) return
+
+    SpacerHeight4()
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            imageVector = LucideFilm,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(CustomSize.Sixteen)
+        )
+        SpacerWidth4()
+        Text(
+            text = if (count == 1) {
+                stringResource(Res.string.social_common_favorite_singular)
+            } else {
+                stringResource(Res.string.social_common_favorites_plural, count)
+            },
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.primary
+        )
     }
 }
 
@@ -281,6 +284,7 @@ fun ReceivedInvitationCardPreview() {
         guestAvatarUrl = "",
         guestName = "Test received card",
         guestPseudo = "testCard",
+        commonMoviesCount = 5,
         inviteTime = "2h"
     )
 }
@@ -293,9 +297,9 @@ fun SentInvitationCardPreview() {
         guestAvatarUrl = "",
         guestName = "Test name",
         guestPseudo = "pseudo",
+        commonMoviesCount = 3,
         inviteStatus = "Pending",
         inviteTime = "1d",
         onCancelInvitationClick = {}
     )
 }
-

@@ -43,7 +43,6 @@ import com.msoula.hobbymatchmaker.core.design.util.UiState
 import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toReceivedInvitations
 import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toSentInvitations
 import com.msoula.hobbymatchmaker.features.social.presentation.models.CircleMemberUiModel
-import com.msoula.hobbymatchmaker.features.social.presentation.models.InviteStatusUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.InviteUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUiEventModel
 import kotlinx.collections.immutable.ImmutableList
@@ -80,7 +79,7 @@ fun SocialContent(
     }
 
     val receivedCount = incomingInvites.countOrZero()
-    val sentCount = sentInvites.countOrZero { it.inviteStatus != InviteStatusUiModel.ACCEPTED }
+    val sentCount = sentInvites.countOrZero()
     val tabs = persistentListOf(
         SocialTab(stringResource(Res.string.social_tab_circle), "${circleMembers.size}/$MAX_SOCIAL_CIRCLE_SIZE"),
         SocialTab(stringResource(Res.string.social_tab_received), receivedCount.toString()),
@@ -141,9 +140,8 @@ private object SocialTabIndex {
     const val SENT = 2
 }
 
-private inline fun UiState<ImmutableList<InviteUiModel>>.countOrZero(
-    predicate: (InviteUiModel) -> Boolean = { true }
-): Int = (this as? UiState.Success)?.data?.count(predicate) ?: 0
+private fun UiState<ImmutableList<InviteUiModel>>.countOrZero(): Int =
+    (this as? UiState.Success)?.data?.size ?: 0
 
 @Composable
 private fun ReceivedTabContent(

@@ -9,5 +9,6 @@ data class Invitation(
     val invitationGuestAvatarUrl: String,
     val invitationTime: String,
     val invitationStatus: String,
+    val commonMoviesCount: Int = 0,
     val isBusy: Boolean = false
 )

@@ -20,16 +20,6 @@ val MaterialIconsArrow_back: ImageVector
             path(
                 fill = SolidColor(Color.Black)
             ) {
-                moveTo(0f, 0f)
-                horizontalLineToRelative(24f)
-                verticalLineToRelative(24f)
-                horizontalLineTo(0f)
-                verticalLineTo(0f)
-                close()
-            }
-            path(
-                fill = SolidColor(Color.Black)
-            ) {
                 moveTo(20f, 11f)
                 horizontalLineTo(7.83f)
                 lineToRelative(5.59f, -5.59f)

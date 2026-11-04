@@ -72,6 +72,7 @@ fun InviteUiModel.toInvitation(isBusy: Boolean = false): Invitation =
         invitationGuestAvatarUrl = this.guestAvatarUrl,
         invitationTime = this.inviteTime.toTimeAgo(),
         invitationStatus = this.inviteStatus.name,
+        commonMoviesCount = this.commonMoviesCount,
         isBusy = isBusy
     )
 
