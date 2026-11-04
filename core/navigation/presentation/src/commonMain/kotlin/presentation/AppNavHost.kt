@@ -30,7 +30,6 @@ import com.msoula.hobbymatchmaker.core.design.atoms.MinimalDialog
 import com.msoula.hobbymatchmaker.core.design.atoms.asStringSuspend
 import com.msoula.hobbymatchmaker.core.design.models.MatchAnimationData
 import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMember
-import com.msoula.hobbymatchmaker.core.design.models.TabItem
 import com.msoula.hobbymatchmaker.core.design.reset_password
 import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
@@ -408,17 +407,7 @@ fun AppNavHost(
         }
 
         composable<Social> {
-            val tabLabels = Destination.entries.map { stringResource(it.label) }
-            val socialTabs = remember(tabLabels) {
-                Destination.entries.mapIndexed { index, destination ->
-                    TabItem(
-                        label = tabLabels[index],
-                        icon = destination.icon,
-                        contentDescription = tabLabels[index]
-                    )
-                }.toImmutableList()
-            }
-
+            val circleMembers by socialViewModel.circleMembers.collectAsStateWithLifecycle()
             val sentInvites by socialViewModel.sentInvites.collectAsStateWithLifecycle()
             val busyInviteIds by socialViewModel.busyInviteIds.collectAsStateWithLifecycle()
             val incomingInvites by socialViewModel.incomingInvites.collectAsStateWithLifecycle()
@@ -444,9 +433,10 @@ fun AppNavHost(
             SocialContent(
                 sentInvites = sentInvites,
                 incomingInvites = incomingInvites,
-                tabs = socialTabs,
+                circleMembers = circleMembers,
                 busyInviteIds = busyInviteIds,
                 snackBarHostState = snackBarHostState,
+                onBack = { nav.popBackStack() },
                 onEvent = socialViewModel::onEvent
             )
         }

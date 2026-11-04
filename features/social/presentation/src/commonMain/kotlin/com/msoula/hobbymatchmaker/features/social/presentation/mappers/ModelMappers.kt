@@ -5,6 +5,7 @@ import com.msoula.hobbymatchmaker.core.design.models.Invitation
 import com.msoula.hobbymatchmaker.features.social.domain.models.InviteStatus
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialInviteDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel
+import com.msoula.hobbymatchmaker.features.social.presentation.models.CircleMemberUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.InviteStatusUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.InviteUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUserSummaryUiModel
@@ -14,6 +15,15 @@ import kotlin.time.ExperimentalTime
 
 fun SocialMemberDomainModel.toSocialSummaryUiModel(): SocialUserSummaryUiModel =
     SocialUserSummaryUiModel(
+        uid = this.uid,
+        name = this.name,
+        pseudo = this.pseudo,
+        avatarUrl = this.avatarUrl,
+        commonMoviesCount = this.commonMoviesCount
+    )
+
+fun SocialMemberDomainModel.toCircleMemberUiModel(): CircleMemberUiModel =
+    CircleMemberUiModel(
         uid = this.uid,
         name = this.name,
         pseudo = this.pseudo,

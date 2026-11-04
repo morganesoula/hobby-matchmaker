@@ -25,9 +25,11 @@ import com.msoula.hobbymatchmaker.features.profile.domain.useCases.ObserveCurren
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.ObserveIncomingInvitesSuccess
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.ObserveSentInvitesSuccess
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.SocialUseCases
+import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toCircleMemberUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toIncomingInviteUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toSentInviteUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toSocialSummaryUiModel
+import com.msoula.hobbymatchmaker.features.social.presentation.models.CircleMemberUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.InviteStatusUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.InviteUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUiEventModel
@@ -47,7 +49,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -88,6 +92,8 @@ class SocialViewModel(
     private val foundUsers = MutableStateFlow<ImmutableList<SocialUserSummaryUiModel>>(persistentListOf())
     private var searchJob: Job? = null
 
+    private val retryTrigger = MutableStateFlow(0)
+
     val sentInvites: StateFlow<UiState<ImmutableList<InviteUiModel>>>
         field = MutableStateFlow<UiState<ImmutableList<InviteUiModel>>>(UiState.Loading)
 
@@ -105,10 +111,20 @@ class SocialViewModel(
     val incomingInvites: StateFlow<UiState<ImmutableList<InviteUiModel>>>
         field = MutableStateFlow<UiState<ImmutableList<InviteUiModel>>>(UiState.Loading)
 
+    val circleMembers: StateFlow<ImmutableList<CircleMemberUiModel>> = combine(sessionState, retryTrigger) { state, _ -> state }
+        .flatMapLatest { state ->
+            when (state) {
+                is SessionState.Authenticated -> socialUseCases.observeSocialCircleUseCase(state.uid)
+                    .map { members -> members.map { it.toCircleMemberUiModel() }.toImmutableList() }
+                    .catch { Logger.e("Failed to observe social circle: $it") }
+
+                else -> flowOf(persistentListOf())
+            }
+        }
+        .stateIn(scope, SharingStarted.Eagerly, persistentListOf())
+
     val busyInviteIds: StateFlow<ImmutableSet<String>>
         field = MutableStateFlow<ImmutableSet<String>>(persistentSetOf())
-
-    private val retryTrigger = MutableStateFlow(0)
 
     init {
         observeSessionAndInvites()

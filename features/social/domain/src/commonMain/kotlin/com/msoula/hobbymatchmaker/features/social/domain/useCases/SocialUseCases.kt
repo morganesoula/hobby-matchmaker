@@ -3,6 +3,7 @@ package com.msoula.hobbymatchmaker.features.social.domain.useCases
 data class SocialUseCases(
     val searchUsersByPseudoUseCase: SearchUsersByPseudoUseCase,
     val observeSentInvitesUseCase: ObserveSentInvitesUseCase,
+    val observeSocialCircleUseCase: ObserveSocialCircleUseCase,
     val refreshIncomingInvitesUseCase: RefreshIncomingInvitesUseCase,
     val refreshSentInvitesUseCase: RefreshSentInvitesUseCase,
     val cancelInvitationUseCase: CancelInvitationUseCase,
