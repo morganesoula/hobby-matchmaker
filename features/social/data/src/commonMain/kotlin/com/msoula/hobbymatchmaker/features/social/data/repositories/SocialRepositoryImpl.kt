@@ -22,11 +22,14 @@ import com.msoula.hobbymatchmaker.features.social.domain.models.SocialInviteDoma
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.UserReportDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.repositories.SocialRepository
+import com.msoula.hobbymatchmaker.features.social.domain.utils.SocialMatchingUtils
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 class SocialRepositoryImpl(
     private val socialRemoteDataSource: SocialRemoteDataSource,
@@ -34,6 +37,10 @@ class SocialRepositoryImpl(
     private val userDataRepository: UserDataRepository,
     private val sessionRepository: SessionRepository
 ) : SocialRepository {
+    // A pseudo never changes owner, so a resolved uid stays valid for the whole session
+    private val uidByPseudo = mutableMapOf<String, String>()
+    private val uidByPseudoLock = Mutex()
+
     override suspend fun searchUsersByPseudo(
         pseudo: String,
         ownerId: String?
@@ -132,7 +139,10 @@ class SocialRepositoryImpl(
             }
 
             socialLocalDataSource.observeIncomingInvites(toPseudo)
-                .map { list -> list.map { it.toSocialInviteDomainModel() } }
+                .map { list ->
+                    list.map { it.toSocialInviteDomainModel() }
+                        .withCounterparts(ownerUid) { invite -> invite.fromUid }
+                }
                 .collect { send(it) }
         }
 
@@ -161,7 +171,10 @@ class SocialRepositoryImpl(
             }
 
             socialLocalDataSource.observeSentInvites(uid)
-                .map { list -> list.map { invite -> invite.toSocialInviteDomainModel() } }
+                .map { list ->
+                    list.map { invite -> invite.toSocialInviteDomainModel() }
+                        .withCounterparts(uid) { invite -> invite.toPseudo?.let { resolveUidByPseudo(it) } }
+                }
                 .collect { send(it) }
         }
 
@@ -171,6 +184,42 @@ class SocialRepositoryImpl(
                 uid,
                 invites.map { it.toSocialInvitationDataModel() })
         }
+
+    /**
+     * Fills in who is on the other side of each invite (name, avatar, common favorites). Without a
+     * connection, or for an unknown user, the invite is returned as is and the UI falls back to the pseudo.
+     */
+    private suspend fun List<SocialInviteDomainModel>.withCounterparts(
+        ownerUid: String,
+        counterpartUidOf: suspend (SocialInviteDomainModel) -> String?
+    ): List<SocialInviteDomainModel> {
+        if (isEmpty()) return this
+
+        val counterpartUids = map { counterpartUidOf(it)?.takeIf { uid -> uid.isNotBlank() } }
+        val users = userDataRepository.getUsers(counterpartUids.filterNotNull().distinct())
+            .let { (it as? AppResult.Success)?.data }
+            .orEmpty()
+        val ownerMovies = (userDataRepository.getUser(ownerUid) as? AppResult.Success)?.data?.moviesLiked
+
+        return mapIndexed { index, invite ->
+            val user = counterpartUids[index]?.let { users[it] } ?: return@mapIndexed invite
+            invite.copy(
+                counterpartUid = user.uid,
+                counterpartName = user.name,
+                counterpartAvatarUrl = user.avatarUrl,
+                commonMoviesCount = SocialMatchingUtils.calculateCommonMoviesCount(ownerMovies, user.moviesLiked)
+            )
+        }
+    }
+
+    private suspend fun resolveUidByPseudo(pseudo: String): String? {
+        val key = pseudo.lowercase()
+        uidByPseudoLock.withLock { uidByPseudo[key] }?.let { return it }
+
+        val uid = (socialRemoteDataSource.resolveUidByPseudo(pseudo) as? AppResult.Success)?.data ?: return null
+        uidByPseudoLock.withLock { uidByPseudo[key] = uid }
+        return uid
+    }
 
     override suspend fun sendInvite(invite: SocialInviteDomainModel) =
         socialRemoteDataSource.sendInvite(invite.toInviteData())

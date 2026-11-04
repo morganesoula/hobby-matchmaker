@@ -8,6 +8,7 @@ data class InviteUiModel(
     val guestName: String = "",
     val guestPseudo: String = "",
     val guestAvatarUrl: String = "",
+    val commonMoviesCount: Int = 0,
     val inviteTime: Long = 0L,
     val inviteStatus: InviteStatusUiModel = InviteStatusUiModel.PENDING
 ) {

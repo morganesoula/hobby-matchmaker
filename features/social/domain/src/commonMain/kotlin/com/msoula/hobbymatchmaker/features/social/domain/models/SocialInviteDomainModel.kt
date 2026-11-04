@@ -11,7 +11,12 @@ data class SocialInviteDomainModel(
     val name: String? = "",
     val status: InviteStatus = InviteStatus.PENDING,
     val createdAt: Instant = Clock.System.now(),
-    val updatedAt: Instant? = null
+    val updatedAt: Instant? = null,
+    // The other person of the invite (sender when received, recipient when sent); null when unknown
+    val counterpartUid: String? = null,
+    val counterpartName: String? = null,
+    val counterpartAvatarUrl: String? = null,
+    val commonMoviesCount: Int = 0
 ) {
     companion object {
         val Initial = SocialInviteDomainModel()

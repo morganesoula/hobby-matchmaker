@@ -6,6 +6,7 @@ import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.MAX_SOCIAL_CIRCLE_SIZE
 import com.msoula.hobbymatchmaker.core.common.data.FirestoreBlockedCollection
 import com.msoula.hobbymatchmaker.core.common.data.FirestoreCircleCollection
+import com.msoula.hobbymatchmaker.core.common.data.FirestorePseudosCollection
 import com.msoula.hobbymatchmaker.core.common.data.FirestoreReportsCollection
 import com.msoula.hobbymatchmaker.core.common.data.FirestoreSocialInvitesCollection
 import com.msoula.hobbymatchmaker.core.common.data.FirestoreUsersCollection
@@ -243,6 +244,15 @@ class SocialRemoteDataSourceImpl(
                     updatedAt = updatedAtStr?.let { Instant.parse(it) }
                 )
             }
+        }
+
+    override suspend fun resolveUidByPseudo(pseudo: String): AppResult<String?, AppError> =
+        safeNetworkCall(connectivityChecker) {
+            val reservation = firestore
+                .collection(FirestorePseudosCollection)
+                .document(pseudo.trim().lowercase())
+                .get()
+            if (reservation.exists) reservation.get<String?>("uid") else null
         }
 
     override fun observeIncomingInvites(ownerUid: String): Flow<List<InviteDataModel>> =

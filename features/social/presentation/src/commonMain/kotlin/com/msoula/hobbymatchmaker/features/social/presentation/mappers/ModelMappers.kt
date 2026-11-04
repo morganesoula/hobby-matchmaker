@@ -28,9 +28,10 @@ fun SocialInviteDomainModel.toIncomingInviteUiModel(): InviteUiModel =
         ownerId = "",
         ownerPseudo = this.toPseudo ?: InviteUiModel.Initial.ownerPseudo,
         guestUid = this.fromUid,
-        guestName = this.name ?: "",
+        guestName = this.counterpartName.orEmpty(),
         guestPseudo = this.fromPseudo ?: InviteUiModel.Initial.guestPseudo,
-        guestAvatarUrl = "",
+        guestAvatarUrl = this.counterpartAvatarUrl.orEmpty(),
+        commonMoviesCount = this.commonMoviesCount,
         inviteTime = this.createdAt.epochSeconds,
         inviteStatus = this.status.toInviteStatusUiModel()
     )
@@ -41,10 +42,11 @@ fun SocialInviteDomainModel.toSentInviteUiModel(): InviteUiModel =
         inviteId = this.inviteId,
         ownerId = this.fromUid,
         ownerPseudo = this.fromPseudo ?: InviteUiModel.Initial.guestPseudo,
-        guestUid = "",
-        guestName = this.name ?: "",
+        guestUid = this.counterpartUid.orEmpty(),
+        guestName = this.counterpartName ?: this.name.orEmpty(),
         guestPseudo = this.toPseudo ?: InviteUiModel.Initial.ownerPseudo,
-        guestAvatarUrl = "",
+        guestAvatarUrl = this.counterpartAvatarUrl.orEmpty(),
+        commonMoviesCount = this.commonMoviesCount,
         inviteTime = this.createdAt.epochSeconds,
         inviteStatus = this.status.toInviteStatusUiModel()
     )

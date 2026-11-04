@@ -52,6 +52,8 @@ interface SocialRemoteDataSource {
         isFavorite: Boolean
     ): AppResult<Unit, AppError>
 
+    suspend fun resolveUidByPseudo(pseudo: String): AppResult<String?, AppError>
+
     fun observeIncomingInvites(ownerUid: String): Flow<List<InviteDataModel>>
     fun observeSentInvites(ownerUid: String): Flow<List<InviteDataModel>>
 }
