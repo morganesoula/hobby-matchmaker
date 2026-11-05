@@ -365,6 +365,8 @@ Available templates: `SignInLayout`, `SignUpLayout`, `HubLayout`, `CompleteProfi
 
 ## Composable Rules
 
+Composable **should be** internal, never private.
+
 **Parameter order:**
 
 ```kotlin
