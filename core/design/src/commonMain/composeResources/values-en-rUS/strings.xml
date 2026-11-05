@@ -225,6 +225,11 @@
     <string name="social_sent_time">Sent %1$s</string>
     <string name="social_common_favorite_singular">1 favorite in common</string>
     <string name="social_common_favorites_plural">%1$d favorites in common</string>
+    <string name="social_circle_section_title">Circle members</string>
+    <string name="social_circle_empty_slot_title">Open slot</string>
+    <string name="social_circle_empty_slot_description">Invite someone to share tastes</string>
+    <string name="social_circle_empty_title">Your circle is empty</string>
+    <string name="social_circle_empty_description">Invite people to compare favorites and find what you have in common.</string>
     <string name="social_capacity_reached">It seems like you or your invitee have reached the maximum number (5) of people allowed in your circle!</string>
 
     <string name="social_movie_match_notification">Match with %1$s !</string>

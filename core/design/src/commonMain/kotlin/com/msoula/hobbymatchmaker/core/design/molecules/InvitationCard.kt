@@ -230,7 +230,7 @@ fun ReceivedInvitationCard(
 
 // Without a name, the pseudo takes its place so the card never shows an empty title
 @Composable
-private fun InvitationIdentity(guestName: String, guestPseudo: String) {
+internal fun InvitationIdentity(guestName: String, guestPseudo: String) {
     Text(
         text = guestName.ifBlank { "@$guestPseudo" },
         style = MaterialTheme.typography.titleMedium,
@@ -250,7 +250,7 @@ private fun InvitationIdentity(guestName: String, guestPseudo: String) {
 }
 
 @Composable
-private fun CommonFavoritesLabel(count: Int) {
+internal fun CommonFavoritesLabel(count: Int) {
     if (count <= 0) return
 
     SpacerHeight4()

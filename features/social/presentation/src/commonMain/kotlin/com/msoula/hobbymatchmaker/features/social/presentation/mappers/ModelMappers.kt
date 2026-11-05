@@ -1,6 +1,7 @@
 package com.msoula.hobbymatchmaker.features.social.presentation.mappers
 
 import com.msoula.hobbymatchmaker.core.common.toTimeAgo
+import com.msoula.hobbymatchmaker.core.design.models.CircleMember
 import com.msoula.hobbymatchmaker.core.design.models.Invitation
 import com.msoula.hobbymatchmaker.features.social.domain.models.InviteStatus
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialInviteDomainModel
@@ -30,6 +31,18 @@ fun SocialMemberDomainModel.toCircleMemberUiModel(): CircleMemberUiModel =
         avatarUrl = this.avatarUrl,
         commonMoviesCount = this.commonMoviesCount
     )
+
+fun CircleMemberUiModel.toCircleMember(): CircleMember =
+    CircleMember(
+        uid = this.uid,
+        name = this.name.orEmpty(),
+        pseudo = this.pseudo,
+        avatarUrl = this.avatarUrl.orEmpty(),
+        commonMoviesCount = this.commonMoviesCount
+    )
+
+fun ImmutableList<CircleMemberUiModel>.toCircleMembers(): ImmutableList<CircleMember> =
+    map { it.toCircleMember() }.toImmutableList()
 
 @OptIn(ExperimentalTime::class)
 fun SocialInviteDomainModel.toIncomingInviteUiModel(): InviteUiModel =

@@ -225,6 +225,11 @@
     <string name="social_sent_time">Envoyée %1$s</string>
     <string name="social_common_favorite_singular">1 favori en commun</string>
     <string name="social_common_favorites_plural">%1$d favoris en commun</string>
+    <string name="social_circle_section_title">Membres du cercle</string>
+    <string name="social_circle_empty_slot_title">Place libre</string>
+    <string name="social_circle_empty_slot_description">Invitez quelqu'un pour partager vos goûts</string>
+    <string name="social_circle_empty_title">Votre cercle est vide</string>
+    <string name="social_circle_empty_description">Invitez des personnes pour comparer vos favoris et découvrir ce que vous avez en commun.</string>
     <string name="social_capacity_reached">Il semblerait que vous ou votre invité ait atteint la limite maximale (5) de personnes autorisées à rejoindre le cercle d'amis !</string>
 
     <string name="social_movie_match_notification">Match avec %1$s !</string>

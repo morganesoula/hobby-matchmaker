@@ -95,7 +95,7 @@ fun SentInvitationSection(
 }
 
 @Composable
-private fun SectionHeader(title: String, hint: String? = null) {
+internal fun SectionHeader(title: String, hint: String? = null) {
     Row(
         modifier = Modifier
             .fillMaxWidth()

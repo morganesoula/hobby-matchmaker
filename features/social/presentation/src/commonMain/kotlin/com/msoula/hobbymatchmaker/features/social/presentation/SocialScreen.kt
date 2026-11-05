@@ -17,16 +17,20 @@ import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.StateContainer
 import com.msoula.hobbymatchmaker.core.design.icons.BootstrapSendCheck
 import com.msoula.hobbymatchmaker.core.design.icons.FeatherInbox
+import com.msoula.hobbymatchmaker.core.design.icons.FontAwesomeUserFriends
 import com.msoula.hobbymatchmaker.core.design.models.EmptyStateConfig
 import com.msoula.hobbymatchmaker.core.design.models.SocialTab
 import com.msoula.hobbymatchmaker.core.common.MAX_SOCIAL_CIRCLE_SIZE
 import com.msoula.hobbymatchmaker.core.common.isIosPlatform
 import com.msoula.hobbymatchmaker.core.design.organisms.ActiveCircleCard
+import com.msoula.hobbymatchmaker.core.design.organisms.CircleMembersSection
 import com.msoula.hobbymatchmaker.core.design.organisms.ReceivedInvitationSection
 import com.msoula.hobbymatchmaker.core.design.organisms.SocialHubHeader
 import com.msoula.hobbymatchmaker.core.design.organisms.SocialTabRow
 import com.msoula.hobbymatchmaker.core.design.organisms.SentInvitationSection
 import com.msoula.hobbymatchmaker.core.design.cancel
+import com.msoula.hobbymatchmaker.core.design.social_circle_empty_description
+import com.msoula.hobbymatchmaker.core.design.social_circle_empty_title
 import com.msoula.hobbymatchmaker.core.design.social_decline_dialog_message
 import com.msoula.hobbymatchmaker.core.design.social_tab_circle
 import com.msoula.hobbymatchmaker.core.design.social_tab_received
@@ -40,6 +44,7 @@ import com.msoula.hobbymatchmaker.core.design.social_sent_requests_no_data_title
 import com.msoula.hobbymatchmaker.core.design.templates.SocialLayout
 import com.msoula.hobbymatchmaker.core.design.util.UIText
 import com.msoula.hobbymatchmaker.core.design.util.UiState
+import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toCircleMembers
 import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toReceivedInvitations
 import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toSentInvitations
 import com.msoula.hobbymatchmaker.features.social.presentation.models.CircleMemberUiModel
@@ -126,8 +131,7 @@ fun SocialContent(
                         onEvent = onEvent
                     )
 
-                    // Members list of the Circle tab comes with its own step
-                    else -> Unit
+                    else -> CircleTabContent(circleMembers = circleMembers)
                 }
             }
         )
@@ -142,6 +146,24 @@ private object SocialTabIndex {
 
 private fun UiState<ImmutableList<InviteUiModel>>.countOrZero(): Int =
     (this as? UiState.Success)?.data?.size ?: 0
+
+@Composable
+private fun CircleTabContent(circleMembers: ImmutableList<CircleMemberUiModel>) {
+    if (circleMembers.isEmpty()) {
+        EmptyStateScreen(
+            config = EmptyStateConfig(
+                icon = FontAwesomeUserFriends,
+                title = UIText.Resource(Res.string.social_circle_empty_title),
+                description = UIText.Resource(Res.string.social_circle_empty_description)
+            )
+        )
+    } else {
+        CircleMembersSection(
+            members = circleMembers.toCircleMembers(),
+            maxMembers = MAX_SOCIAL_CIRCLE_SIZE
+        )
+    }
+}
 
 @Composable
 private fun ReceivedTabContent(
