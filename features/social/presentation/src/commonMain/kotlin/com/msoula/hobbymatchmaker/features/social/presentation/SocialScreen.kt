@@ -13,6 +13,7 @@ import androidx.compose.runtime.setValue
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.DestructiveConfirmationDialog
 import com.msoula.hobbymatchmaker.core.design.atoms.EmptyStateScreen
+import com.msoula.hobbymatchmaker.core.design.atoms.ReportReasonDialog
 import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.StateContainer
 import com.msoula.hobbymatchmaker.core.design.icons.BootstrapSendCheck
@@ -31,6 +32,15 @@ import com.msoula.hobbymatchmaker.core.design.organisms.SentInvitationSection
 import com.msoula.hobbymatchmaker.core.design.cancel
 import com.msoula.hobbymatchmaker.core.design.social_circle_empty_description
 import com.msoula.hobbymatchmaker.core.design.social_circle_empty_title
+import com.msoula.hobbymatchmaker.core.design.social_block_dialog_confirm
+import com.msoula.hobbymatchmaker.core.design.social_block_dialog_message
+import com.msoula.hobbymatchmaker.core.design.social_block_dialog_title
+import com.msoula.hobbymatchmaker.core.design.social_remove_dialog_confirm
+import com.msoula.hobbymatchmaker.core.design.social_remove_dialog_message
+import com.msoula.hobbymatchmaker.core.design.social_remove_dialog_title
+import com.msoula.hobbymatchmaker.core.design.social_report_dialog_confirm
+import com.msoula.hobbymatchmaker.core.design.social_report_dialog_message
+import com.msoula.hobbymatchmaker.core.design.social_report_dialog_title
 import com.msoula.hobbymatchmaker.core.design.social_decline_dialog_message
 import com.msoula.hobbymatchmaker.core.design.social_tab_circle
 import com.msoula.hobbymatchmaker.core.design.social_tab_received
@@ -44,6 +54,11 @@ import com.msoula.hobbymatchmaker.core.design.social_sent_requests_no_data_title
 import com.msoula.hobbymatchmaker.core.design.templates.SocialLayout
 import com.msoula.hobbymatchmaker.core.design.util.UIText
 import com.msoula.hobbymatchmaker.core.design.util.UiState
+import com.msoula.hobbymatchmaker.features.social.domain.models.ReportReason
+import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toLabelResource
+import com.msoula.hobbymatchmaker.features.social.presentation.models.MemberActionUiModel
+import kotlinx.collections.immutable.toImmutableList
+import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toCircleMembers
 import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toCircleMembers
 import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toReceivedInvitations
 import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toSentInvitations
@@ -67,6 +82,7 @@ fun SocialContent(
 ) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(SocialTabIndex.RECEIVED) }
     var inviteIdToDecline by remember { mutableStateOf<String?>(null) }
+    var pendingMemberAction by remember { mutableStateOf<MemberActionUiModel?>(null) }
 
     inviteIdToDecline?.let { inviteId ->
         DestructiveConfirmationDialog(
@@ -79,6 +95,17 @@ fun SocialContent(
             onConfirm = {
                 inviteIdToDecline = null
                 onEvent(SocialUiEventModel.OnDeclineInvitation(inviteId))
+            }
+        )
+    }
+
+    pendingMemberAction?.let { action ->
+        MemberActionDialog(
+            action = action,
+            onDismiss = { pendingMemberAction = null },
+            onEvent = {
+                pendingMemberAction = null
+                onEvent(it)
             }
         )
     }
@@ -122,6 +149,8 @@ fun SocialContent(
                         incomingInvites = incomingInvites,
                         busyInviteIds = busyInviteIds,
                         onDeclineClick = { inviteIdToDecline = it },
+                        onReportClick = { uid, name -> pendingMemberAction = MemberActionUiModel.Report(uid, name) },
+                        onBlockClick = { uid, name -> pendingMemberAction = MemberActionUiModel.Block(uid, name) },
                         onEvent = onEvent
                     )
 
@@ -131,7 +160,12 @@ fun SocialContent(
                         onEvent = onEvent
                     )
 
-                    else -> CircleTabContent(circleMembers = circleMembers)
+                    else -> CircleTabContent(
+                        circleMembers = circleMembers,
+                        onRemoveClick = { uid, name -> pendingMemberAction = MemberActionUiModel.Remove(uid, name) },
+                        onReportClick = { uid, name -> pendingMemberAction = MemberActionUiModel.Report(uid, name) },
+                        onBlockClick = { uid, name -> pendingMemberAction = MemberActionUiModel.Block(uid, name) }
+                    )
                 }
             }
         )
@@ -148,7 +182,12 @@ private fun UiState<ImmutableList<InviteUiModel>>.countOrZero(): Int =
     (this as? UiState.Success)?.data?.size ?: 0
 
 @Composable
-private fun CircleTabContent(circleMembers: ImmutableList<CircleMemberUiModel>) {
+internal fun CircleTabContent(
+    circleMembers: ImmutableList<CircleMemberUiModel>,
+    onRemoveClick: (memberUid: String, displayName: String) -> Unit,
+    onReportClick: (memberUid: String, displayName: String) -> Unit,
+    onBlockClick: (memberUid: String, displayName: String) -> Unit
+) {
     if (circleMembers.isEmpty()) {
         EmptyStateScreen(
             config = EmptyStateConfig(
@@ -160,7 +199,10 @@ private fun CircleTabContent(circleMembers: ImmutableList<CircleMemberUiModel>) 
     } else {
         CircleMembersSection(
             members = circleMembers.toCircleMembers(),
-            maxMembers = MAX_SOCIAL_CIRCLE_SIZE
+            maxMembers = MAX_SOCIAL_CIRCLE_SIZE,
+            onRemoveClick = onRemoveClick,
+            onReportClick = onReportClick,
+            onBlockClick = onBlockClick
         )
     }
 }
@@ -170,6 +212,8 @@ private fun ReceivedTabContent(
     incomingInvites: UiState<ImmutableList<InviteUiModel>>,
     busyInviteIds: ImmutableSet<String>,
     onDeclineClick: (String) -> Unit,
+    onReportClick: (guestUid: String, displayName: String) -> Unit,
+    onBlockClick: (guestUid: String, displayName: String) -> Unit,
     onEvent: (SocialUiEventModel) -> Unit
 ) {
     StateContainer(
@@ -197,7 +241,9 @@ private fun ReceivedTabContent(
                 onAcceptInvitationClick = { id, guestUid ->
                     onEvent(SocialUiEventModel.OnAcceptInvitation(id, guestUid))
                 },
-                onDeclineInvitationClick = onDeclineClick
+                onDeclineInvitationClick = onDeclineClick,
+                onReportClick = onReportClick,
+                onBlockClick = onBlockClick
             )
         }
     )
@@ -235,4 +281,46 @@ private fun SentTabContent(
             )
         }
     )
+}
+
+@Composable
+internal fun MemberActionDialog(
+    action: MemberActionUiModel,
+    onDismiss: () -> Unit,
+    onEvent: (SocialUiEventModel) -> Unit
+) {
+    when (action) {
+        is MemberActionUiModel.Remove -> DestructiveConfirmationDialog(
+            title = stringResource(Res.string.social_remove_dialog_title, action.displayName),
+            message = stringResource(Res.string.social_remove_dialog_message),
+            confirmButtonText = stringResource(Res.string.social_remove_dialog_confirm),
+            cancelButtonText = stringResource(Res.string.cancel),
+            isLoading = false,
+            onDismiss = onDismiss,
+            onConfirm = { onEvent(SocialUiEventModel.OnRemoveMember(action.uid)) }
+        )
+
+        is MemberActionUiModel.Block -> DestructiveConfirmationDialog(
+            title = stringResource(Res.string.social_block_dialog_title, action.displayName),
+            message = stringResource(Res.string.social_block_dialog_message),
+            confirmButtonText = stringResource(Res.string.social_block_dialog_confirm),
+            cancelButtonText = stringResource(Res.string.cancel),
+            isLoading = false,
+            onDismiss = onDismiss,
+            onConfirm = { onEvent(SocialUiEventModel.OnBlockUser(action.uid)) }
+        )
+
+        is MemberActionUiModel.Report -> {
+            val reasons = ReportReason.entries
+            ReportReasonDialog(
+                title = stringResource(Res.string.social_report_dialog_title, action.displayName),
+                message = stringResource(Res.string.social_report_dialog_message),
+                reasons = reasons.map { stringResource(it.toLabelResource()) }.toImmutableList(),
+                confirmButtonText = stringResource(Res.string.social_report_dialog_confirm),
+                cancelButtonText = stringResource(Res.string.cancel),
+                onDismiss = onDismiss,
+                onConfirm = { index -> onEvent(SocialUiEventModel.OnReportUser(action.uid, reasons[index])) }
+            )
+        }
+    }
 }

@@ -151,7 +151,9 @@ fun ReceivedInvitationCard(
     inviteTime: String,
     isBusy: Boolean = false,
     onAcceptInvitationClick: (invitationId: String, guestUid: String) -> Unit = { _, _ -> },
-    onDeclineInvitationClick: (invitationId: String) -> Unit = {}
+    onDeclineInvitationClick: (invitationId: String) -> Unit = {},
+    onReportClick: () -> Unit,
+    onBlockClick: () -> Unit
 ) {
     GenericCard(
         modifier = modifier.padding(horizontal = CustomSize.Sixteen),
@@ -173,8 +175,11 @@ fun ReceivedInvitationCard(
                 Text(
                     text = inviteTime,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = CustomSize.Four)
                 )
+
+                MemberActionsMenu(onReportClick = onReportClick, onBlockClick = onBlockClick)
             }
 
             SpacerHeight16()
@@ -285,7 +290,9 @@ fun ReceivedInvitationCardPreview() {
         guestName = "Test received card",
         guestPseudo = "testCard",
         commonMoviesCount = 5,
-        inviteTime = "2h"
+        inviteTime = "2h",
+        onReportClick = {},
+        onBlockClick = {}
     )
 }
 

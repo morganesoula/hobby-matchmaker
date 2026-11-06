@@ -31,7 +31,9 @@ import org.jetbrains.compose.resources.stringResource
 fun ReceivedInvitationSection(
     receivedInvitation: ImmutableList<Invitation>,
     onAcceptInvitationClick: (invitationId: String, guestUid: String) -> Unit,
-    onDeclineInvitationClick: (invitationId: String) -> Unit
+    onDeclineInvitationClick: (invitationId: String) -> Unit,
+    onReportClick: (guestUid: String, displayName: String) -> Unit,
+    onBlockClick: (guestUid: String, displayName: String) -> Unit
 ) {
     if (receivedInvitation.isNotEmpty()) {
         LazyColumn(
@@ -53,7 +55,13 @@ fun ReceivedInvitationSection(
                     inviteTime = invitation.invitationTime,
                     isBusy = invitation.isBusy,
                     onAcceptInvitationClick = onAcceptInvitationClick,
-                    onDeclineInvitationClick = onDeclineInvitationClick
+                    onDeclineInvitationClick = onDeclineInvitationClick,
+                    onReportClick = {
+                        onReportClick(invitation.invitationGuestUid, invitation.displayName())
+                    },
+                    onBlockClick = {
+                        onBlockClick(invitation.invitationGuestUid, invitation.displayName())
+                    }
                 )
             }
         }
@@ -93,6 +101,9 @@ fun SentInvitationSection(
         }
     }
 }
+
+private fun Invitation.displayName(): String =
+    invitationGuestName.ifBlank { "@$invitationGuestPseudo" }
 
 @Composable
 internal fun SectionHeader(title: String, hint: String? = null) {
@@ -137,7 +148,9 @@ fun ReceivedInvitationSectionPreview() {
                 )
             ),
             { _, _ -> },
-            {}
+            {},
+            { _, _ -> },
+            { _, _ -> }
         )
     }
 }

@@ -14,6 +14,9 @@ import com.msoula.hobbymatchmaker.core.design.social_invite_accepted_success
 import com.msoula.hobbymatchmaker.core.design.social_invite_canceled_success
 import com.msoula.hobbymatchmaker.core.design.social_invite_declined_success
 import com.msoula.hobbymatchmaker.core.design.social_invite_sent_success
+import com.msoula.hobbymatchmaker.core.design.social_member_removed_success
+import com.msoula.hobbymatchmaker.core.design.social_user_blocked_success
+import com.msoula.hobbymatchmaker.core.design.social_user_reported_success
 import com.msoula.hobbymatchmaker.core.design.util.UIText
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.design.util.UiState
@@ -22,6 +25,8 @@ import com.msoula.hobbymatchmaker.core.session.domain.models.SessionState
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveSessionStateUseCase
 import com.msoula.hobbymatchmaker.features.profile.domain.models.UserProfileNoCircleDomainModel
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.ObserveCurrentUserProfileStateUseCase
+import com.msoula.hobbymatchmaker.features.social.domain.models.ReportReason
+import com.msoula.hobbymatchmaker.features.social.domain.models.UserReportDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.ObserveIncomingInvitesSuccess
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.ObserveSentInvitesSuccess
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.SocialUseCases
@@ -242,6 +247,24 @@ class SocialViewModel(
                 }
             }
 
+            is SocialUiEventModel.OnRemoveMember -> {
+                scope.launch {
+                    removeMember(event.memberUid)
+                }
+            }
+
+            is SocialUiEventModel.OnBlockUser -> {
+                scope.launch {
+                    blockUser(event.userUid)
+                }
+            }
+
+            is SocialUiEventModel.OnReportUser -> {
+                scope.launch {
+                    reportUser(event.userUid, event.reason)
+                }
+            }
+
             is SocialUiEventModel.OnRetrySocialCircle -> {
                 sentInvites.update { UiState.Loading }
                 incomingInvites.update { UiState.Loading }
@@ -386,6 +409,48 @@ class SocialViewModel(
                     UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
                 )
             }
+    }
+
+    // The circle list updates itself, invites are deleted on both sides so both lists are reloaded
+    private suspend fun removeMember(memberUid: String) = runExclusive(memberUid) {
+        val ownerUid = currentUserUid ?: return@runExclusive notifyUnauthorized()
+
+        socialUseCases.removeMemberUseCase(ownerUid, memberUid)
+            .onSuccess {
+                eventHandler.sendEvent(successSnackBar(Res.string.social_member_removed_success))
+                refreshInvites(ownerUid)
+            }
+            .onFailure { error -> eventHandler.sendEvent(UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))) }
+    }
+
+    private suspend fun blockUser(userUid: String) = runExclusive(userUid) {
+        val ownerUid = currentUserUid ?: return@runExclusive notifyUnauthorized()
+
+        socialUseCases.blockUserUseCase(ownerUid, userUid)
+            .onSuccess {
+                eventHandler.sendEvent(successSnackBar(Res.string.social_user_blocked_success))
+                refreshInvites(ownerUid)
+            }
+            .onFailure { error -> eventHandler.sendEvent(UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))) }
+    }
+
+    private suspend fun reportUser(userUid: String, reason: ReportReason) = runExclusive(userUid) {
+        val reporterUid = currentUserUid ?: return@runExclusive notifyUnauthorized()
+
+        socialUseCases.reportUserUseCase(UserReportDomainModel(reporterUid, userUid, reason))
+            .onSuccess { eventHandler.sendEvent(successSnackBar(Res.string.social_user_reported_success)) }
+            .onFailure { error -> eventHandler.sendEvent(UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))) }
+    }
+
+    private suspend fun refreshInvites(uid: String) {
+        socialUseCases.refreshIncomingInvitesUseCase(uid)
+            .onFailure { Logger.e("Failed to refresh incoming invites: $it") }
+        socialUseCases.refreshSentInvitesUseCase(uid)
+            .onFailure { Logger.e("Failed to refresh sent invites: $it") }
+    }
+
+    private suspend fun notifyUnauthorized() {
+        eventHandler.sendEvent(UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(AppError.Domain.Unauthorized)))
     }
 
     private fun successSnackBar(message: StringResource) = UiEvent.ShowSnackBar(UIText.Resource(message))

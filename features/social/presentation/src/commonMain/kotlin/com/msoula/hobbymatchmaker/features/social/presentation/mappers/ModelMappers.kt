@@ -3,7 +3,14 @@ package com.msoula.hobbymatchmaker.features.social.presentation.mappers
 import com.msoula.hobbymatchmaker.core.common.toTimeAgo
 import com.msoula.hobbymatchmaker.core.design.models.CircleMember
 import com.msoula.hobbymatchmaker.core.design.models.Invitation
+import com.msoula.hobbymatchmaker.core.design.Res
+import com.msoula.hobbymatchmaker.core.design.social_report_reason_fake_profile
+import com.msoula.hobbymatchmaker.core.design.social_report_reason_harassment
+import com.msoula.hobbymatchmaker.core.design.social_report_reason_inappropriate_content
+import com.msoula.hobbymatchmaker.core.design.social_report_reason_other
+import com.msoula.hobbymatchmaker.core.design.social_report_reason_spam
 import com.msoula.hobbymatchmaker.features.social.domain.models.InviteStatus
+import com.msoula.hobbymatchmaker.features.social.domain.models.ReportReason
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialInviteDomainModel
 import com.msoula.hobbymatchmaker.features.social.domain.models.SocialMemberDomainModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.CircleMemberUiModel
@@ -12,6 +19,7 @@ import com.msoula.hobbymatchmaker.features.social.presentation.models.InviteUiMo
 import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUserSummaryUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import org.jetbrains.compose.resources.StringResource
 import kotlin.time.ExperimentalTime
 
 fun SocialMemberDomainModel.toSocialSummaryUiModel(): SocialUserSummaryUiModel =
@@ -103,3 +111,11 @@ fun InviteStatus.toInviteStatusUiModel(): InviteStatusUiModel =
         InviteStatus.DECLINED -> InviteStatusUiModel.DECLINED
         InviteStatus.PENDING -> InviteStatusUiModel.PENDING
     }
+
+fun ReportReason.toLabelResource(): StringResource = when (this) {
+    ReportReason.SPAM -> Res.string.social_report_reason_spam
+    ReportReason.HARASSMENT -> Res.string.social_report_reason_harassment
+    ReportReason.FAKE_PROFILE -> Res.string.social_report_reason_fake_profile
+    ReportReason.INAPPROPRIATE_CONTENT -> Res.string.social_report_reason_inappropriate_content
+    ReportReason.OTHER -> Res.string.social_report_reason_other
+}

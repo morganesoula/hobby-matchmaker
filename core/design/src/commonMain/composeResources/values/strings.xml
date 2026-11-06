@@ -230,6 +230,27 @@
     <string name="social_circle_empty_slot_description">Invitez quelqu'un pour partager vos goûts</string>
     <string name="social_circle_empty_title">Votre cercle est vide</string>
     <string name="social_circle_empty_description">Invitez des personnes pour comparer vos favoris et découvrir ce que vous avez en commun.</string>
+    <string name="social_member_menu_description">Plus d'actions</string>
+    <string name="social_member_menu_remove">Retirer du cercle</string>
+    <string name="social_member_menu_report">Signaler</string>
+    <string name="social_member_menu_block">Bloquer</string>
+    <string name="social_remove_dialog_title">Retirer %1$s du cercle ?</string>
+    <string name="social_remove_dialog_message">Vous ne verrez plus vos favoris en commun. Vous pourrez vous inviter de nouveau plus tard.</string>
+    <string name="social_remove_dialog_confirm">Retirer</string>
+    <string name="social_block_dialog_title">Bloquer %1$s ?</string>
+    <string name="social_block_dialog_message">Cette personne sera retirée de votre cercle, vos invitations seront supprimées et elle ne pourra plus vous inviter.</string>
+    <string name="social_block_dialog_confirm">Bloquer</string>
+    <string name="social_report_dialog_title">Signaler %1$s</string>
+    <string name="social_report_dialog_message">Pourquoi signalez-vous cette personne ?</string>
+    <string name="social_report_dialog_confirm">Signaler</string>
+    <string name="social_report_reason_spam">Spam</string>
+    <string name="social_report_reason_harassment">Harcèlement</string>
+    <string name="social_report_reason_fake_profile">Faux profil</string>
+    <string name="social_report_reason_inappropriate_content">Contenu inapproprié</string>
+    <string name="social_report_reason_other">Autre</string>
+    <string name="social_member_removed_success">Personne retirée de votre cercle.</string>
+    <string name="social_user_blocked_success">Personne bloquée.</string>
+    <string name="social_user_reported_success">Signalement envoyé, merci.</string>
     <string name="social_capacity_reached">Il semblerait que vous ou votre invité ait atteint la limite maximale (5) de personnes autorisées à rejoindre le cercle d'amis !</string>
 
     <string name="social_movie_match_notification">Match avec %1$s !</string>

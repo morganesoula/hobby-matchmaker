@@ -17,7 +17,10 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun CircleMembersSection(
     members: ImmutableList<CircleMember>,
-    maxMembers: Int
+    maxMembers: Int,
+    onRemoveClick: (memberUid: String, displayName: String) -> Unit,
+    onReportClick: (memberUid: String, displayName: String) -> Unit,
+    onBlockClick: (memberUid: String, displayName: String) -> Unit
 ) {
     LazyColumn(
         contentPadding = PaddingValues(bottom = CustomSize.Sixteen),
@@ -32,7 +35,10 @@ fun CircleMembersSection(
                 memberName = member.name,
                 memberPseudo = member.pseudo,
                 memberAvatarUrl = member.avatarUrl,
-                commonMoviesCount = member.commonMoviesCount
+                commonMoviesCount = member.commonMoviesCount,
+                onRemoveClick = { onRemoveClick(member.uid, member.displayName()) },
+                onReportClick = { onReportClick(member.uid, member.displayName()) },
+                onBlockClick = { onBlockClick(member.uid, member.displayName()) }
             )
         }
 
@@ -42,3 +48,5 @@ fun CircleMembersSection(
         }
     }
 }
+
+private fun CircleMember.displayName(): String = name.ifBlank { "@$pseudo" }

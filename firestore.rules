@@ -28,6 +28,8 @@ service cloud.firestore {
 
       match /blocked/{blockedUid} {
         allow read, write: if signedIn() && request.auth.uid == uid;
+        // The blocked person may check whether they are blocked, one owner at a time (hides the owner from their search)
+        allow get: if signedIn() && request.auth.uid == blockedUid;
       }
 
       match /circle/{memberUid} {

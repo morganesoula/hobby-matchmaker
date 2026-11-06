@@ -39,7 +39,10 @@ fun CircleMemberCard(
     memberName: String,
     memberPseudo: String,
     memberAvatarUrl: String,
-    commonMoviesCount: Int = 0
+    commonMoviesCount: Int = 0,
+    onRemoveClick: () -> Unit,
+    onReportClick: () -> Unit,
+    onBlockClick: () -> Unit
 ) {
     GenericCard(
         modifier = modifier.padding(horizontal = CustomSize.Sixteen),
@@ -56,6 +59,12 @@ fun CircleMemberCard(
                 InvitationIdentity(guestName = memberName, guestPseudo = memberPseudo)
                 CommonFavoritesLabel(commonMoviesCount)
             }
+
+            MemberActionsMenu(
+                onRemoveClick = onRemoveClick,
+                onReportClick = onReportClick,
+                onBlockClick = onBlockClick
+            )
         }
     }
 }

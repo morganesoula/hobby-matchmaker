@@ -27,6 +27,9 @@ import dev.gitlive.firebase.firestore.DocumentSnapshot
 import dev.gitlive.firebase.firestore.FieldValue
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -102,9 +105,16 @@ class SocialRemoteDataSourceImpl(
                         )
                     } else null
                 }
-                .take(10)
 
-            results
+            // Whoever blocked the user is hidden too, otherwise the invite would only be refused
+            val visibleResults = ownerUid?.let { uid ->
+                val blockerUids = coroutineScope {
+                    results.map { async { it.uid.takeIf { candidateUid -> hasBlocked(candidateUid, uid) } } }.awaitAll()
+                }.filterNotNull().toSet()
+                results.filterNot { it.uid in blockerUids }
+            } ?: results
+
+            visibleResults.take(10)
         }
 
     override fun observeSocialCircle(uid: String): Flow<List<SocialCircleEntryRemoteDataModel>> =
@@ -448,6 +458,15 @@ class SocialRemoteDataSourceImpl(
 
     private fun blockedCollection(ownerUid: String) =
         firestore.collection(FirestoreUsersCollection).document(ownerUid).collection(FirestoreBlockedCollection)
+
+    // A failed check keeps the person listed: the invite rule still refuses blocked senders
+    private suspend fun hasBlocked(blockerUid: String, blockedUid: String): Boolean =
+        try {
+            blockedCollection(blockerUid).document(blockedUid).get().exists
+        } catch (e: Exception) {
+            Logger.d("SocialRemoteDataSource: could not check block status of $blockerUid: ${e.message}")
+            false
+        }
 
     private suspend fun blockedUidsOnce(ownerUid: String): Set<String> =
         blockedCollection(ownerUid).get().documents.map { it.id }.toSet()
