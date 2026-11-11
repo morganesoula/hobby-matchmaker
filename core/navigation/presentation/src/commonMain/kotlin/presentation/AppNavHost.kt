@@ -60,7 +60,6 @@ import com.msoula.hobbymatchmaker.features.settings.presentation.SettingsViewMod
 import com.msoula.hobbymatchmaker.features.profile.presentation.UserProfileViewModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileActions
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileState
-import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiStateModel
 import com.msoula.hobbymatchmaker.features.social.presentation.SocialContent
 import com.msoula.hobbymatchmaker.features.social.presentation.SocialViewModel
 import com.msoula.hobbymatchmaker.core.design.util.UiState
@@ -310,7 +309,6 @@ fun AppNavHost(
             val editableProfile by userProfileViewModel.editableProfile.collectAsStateWithLifecycle()
 
             val searchedPseudos by socialViewModel.searchResults.collectAsStateWithLifecycle()
-            val profile = (profileState as? UserProfileUiStateModel.Success)?.userProfile
 
             LaunchedEffect(Unit) {
                 userProfileViewModel.events.collect { event ->
@@ -347,64 +345,61 @@ fun AppNavHost(
                 }
             }
 
-            if (profile != null) {
-                val userProfileActions = remember(userProfileViewModel, socialViewModel) {
-                    UserProfileActions(
-                        closeEdition = { userProfileViewModel.closeEdition() },
-                        onNavigate = { destination ->
-                            when (destination) {
-                                NavigationDestination.SignUp -> navCallbacks.navigateAndClearToAuth()
-                                NavigationDestination.Movies -> navCallbacks.navigateToMoviesFromProfile()
-                                NavigationDestination.Settings -> navCallbacks.navigateToSettingsFromProfile()
-                                else -> Unit
-                            }
-                        },
-                        onEvent = userProfileViewModel::onEvent,
-                        onSearchPeople = { query ->
-                            socialViewModel.onEvent(SocialUiEventModel.OnSearchPeople(query))
-                        },
-                        onInviteToSocialCircle = { pseudo, name ->
-                            socialViewModel.onEvent(
-                                SocialUiEventModel.OnInviteToSocialCircle(
-                                    pseudo,
-                                    name
-                                )
-                            )
+            val userProfileActions = remember(userProfileViewModel, socialViewModel) {
+                UserProfileActions(
+                    closeEdition = { userProfileViewModel.closeEdition() },
+                    onNavigate = { destination ->
+                        when (destination) {
+                            NavigationDestination.SignUp -> navCallbacks.navigateAndClearToAuth()
+                            NavigationDestination.Movies -> navCallbacks.navigateToMoviesFromProfile()
+                            NavigationDestination.Settings -> navCallbacks.navigateToSettingsFromProfile()
+                            else -> Unit
                         }
-                    )
-                }
-
-                val userProfileState = remember(
-                    profileState,
-                    editableProfile,
-                    isEditMode
-                ) {
-                    UserProfileState(
-                        profileState = profileState,
-                        editableProfile = editableProfile,
-                        isEditMode = isEditMode
-                    )
-                }
-
-                val mappedSearchResults = searchedPseudos.map { member ->
-                    ProfileSocialMember(
-                        uid = member.uid,
-                        name = member.name,
-                        pseudo = member.pseudo,
-                        avatarUrl = member.avatarUrl,
-                        commonMoviesCount = member.commonMoviesCount,
-                        isInvited = member.isInvited
-                    )
-                }.toImmutableList()
-
-                UserProfileContent(
-                    snackBarHostState = snackBarHostState,
-                    searchedPseudos = mappedSearchResults,
-                    profile = profile,
-                    userProfileState = userProfileState,
-                    userProfileActions = userProfileActions
+                    },
+                    onEvent = userProfileViewModel::onEvent,
+                    onSearchPeople = { query ->
+                        socialViewModel.onEvent(SocialUiEventModel.OnSearchPeople(query))
+                    },
+                    onInviteToSocialCircle = { pseudo, name ->
+                        socialViewModel.onEvent(
+                            SocialUiEventModel.OnInviteToSocialCircle(
+                                pseudo,
+                                name
+                            )
+                        )
+                    }
                 )
             }
+
+            val userProfileState = remember(
+                profileState,
+                editableProfile,
+                isEditMode
+            ) {
+                UserProfileState(
+                    profileState = profileState,
+                    editableProfile = editableProfile,
+                    isEditMode = isEditMode
+                )
+            }
+
+            val mappedSearchResults = searchedPseudos.map { member ->
+                ProfileSocialMember(
+                    uid = member.uid,
+                    name = member.name,
+                    pseudo = member.pseudo,
+                    avatarUrl = member.avatarUrl,
+                    commonMoviesCount = member.commonMoviesCount,
+                    isInvited = member.isInvited
+                )
+            }.toImmutableList()
+
+            UserProfileContent(
+                snackBarHostState = snackBarHostState,
+                searchedPseudos = mappedSearchResults,
+                userProfileState = userProfileState,
+                userProfileActions = userProfileActions
+            )
         }
 
         composable<Settings> {

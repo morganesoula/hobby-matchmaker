@@ -66,7 +66,6 @@ import com.msoula.hobbymatchmaker.features.profile.presentation.mappers.toProfil
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileActions
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileState
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiEventModel
-import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiStateModel
 import io.github.vinceglb.filekit.dialogs.FileKitMode
 import io.github.vinceglb.filekit.dialogs.FileKitType
@@ -80,7 +79,6 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun UserProfileContent(
-    profile: UserProfileUiModel,
     snackBarHostState: SnackbarHostState,
     searchedPseudos: ImmutableList<ProfileSocialMember>,
     userProfileState: UserProfileState,
@@ -174,6 +172,8 @@ fun UserProfileContent(
             }
 
             is UserProfileUiStateModel.Success -> {
+                val profile = userProfileState.profileState.userProfile
+
                 if (userProfileState.isEditMode) {
                     userProfileState.editableProfile?.let { currentEditableProfile ->
                         GenericProfileBackground(
