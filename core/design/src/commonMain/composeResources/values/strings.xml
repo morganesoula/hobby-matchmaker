@@ -184,15 +184,10 @@
     <string name="edit_profile_add_interests_hint">Ex: Randonnée, Jeux vidéos...</string>
 
     <!-- SOCIAL -->
-    <string name="social_received_requests_description">Retrouvez ici les personnes qui souhaitent vous ajouter à leur cercle social. </string>
-    <string name="social_received_requests_title">Demandes reçues</string>
-    <string name="social_received_requests_time">Il y a</string>
-    <string name="social_received_requests_common_movie">en commun</string>
     <string name="social_received_requests_accept_button_text">Accepter</string>
     <string name="social_received_requests_decline_button_text">Refuser</string>
     <string name="social_received_requests_no_data_title">Aucune invitation reçue</string>
     <string name="social_received_requests_no_data_description">Vous n'avez pas encore reçu d'invitation. Explorez et connectez-vous avec d'autres personnes !</string>
-    <string name="social_sent_requests_title">Demandes envoyées</string>
     <string name="social_sent_requests_cancel_invitation_text">Annuler l'invitation</string>
     <string name="social_sent_requests_dismiss_text">Retirer</string>
     <string name="social_sent_requests_status_pending">En attente</string>

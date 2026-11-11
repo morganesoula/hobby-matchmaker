@@ -184,15 +184,10 @@
     <string name="edit_profile_add_interests_hint">E.g. Hiking, Gaming...</string>
 
     <!-- SOCIAL -->
-    <string name="social_received_requests_description">Here you can find people who want to add you to their social circle.</string>
-    <string name="social_received_requests_title">Received</string>
-    <string name="social_received_requests_time">ago</string>
-    <string name="social_received_requests_common_movie">in common</string>
     <string name="social_received_requests_accept_button_text">Accept</string>
     <string name="social_received_requests_decline_button_text">Decline</string>
     <string name="social_received_requests_no_data_title">No invitations received</string>
     <string name="social_received_requests_no_data_description">You haven't received any invitations yet. Explore and connect with other players!</string>
-    <string name="social_sent_requests_title">Sent</string>
     <string name="social_sent_requests_cancel_invitation_text">Cancel invitation</string>
     <string name="social_sent_requests_dismiss_text">Dismiss</string>
     <string name="social_sent_requests_status_pending">Pending</string>
