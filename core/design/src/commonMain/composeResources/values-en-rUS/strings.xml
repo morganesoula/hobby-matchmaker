@@ -251,6 +251,12 @@
     <string name="social_member_removed_success">Person removed from your circle.</string>
     <string name="social_user_blocked_success">Person blocked.</string>
     <string name="social_user_reported_success">Report sent, thank you.</string>
+    <string name="social_invite_dialog_title">Invite to circle</string>
+    <string name="social_invite_dialog_search_hint">Search by pseudo</string>
+    <string name="social_invite_dialog_no_results">No one found.</string>
+    <string name="social_invite_dialog_send">Send invite</string>
+    <string name="social_circle_full_dialog_message">Your circle is full (%1$d people maximum). Remove someone to invite another person.</string>
+    <string name="social_dialog_ok">OK</string>
     <string name="social_capacity_reached">It seems like you or your invitee have reached the maximum number (5) of people allowed in your circle!</string>
 
     <string name="social_movie_match_notification">Match with %1$s !</string>

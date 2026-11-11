@@ -7,6 +7,7 @@ import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
+import com.msoula.hobbymatchmaker.core.design.models.InviteSearchStatus
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.design.util.EventHandler
 import com.msoula.hobbymatchmaker.core.design.Res
@@ -112,6 +113,10 @@ class SocialViewModel(
 
             users.map { it.copy(isInvited = it.pseudo.lowercase() in pendingPseudos) }.toImmutableList()
         }.stateIn(scope, SharingStarted.Eagerly, persistentListOf())
+
+    // Lets the invite dialog tell "still searching" from "nothing found"
+    val searchStatus: StateFlow<InviteSearchStatus>
+        field = MutableStateFlow(InviteSearchStatus.Idle)
 
     val incomingInvites: StateFlow<UiState<ImmutableList<InviteUiModel>>>
         field = MutableStateFlow<UiState<ImmutableList<InviteUiModel>>>(UiState.Loading)
@@ -287,12 +292,16 @@ class SocialViewModel(
 
         if (query.isBlank()) {
             foundUsers.update { persistentListOf() }
+            searchStatus.update { InviteSearchStatus.Idle }
             return
         }
 
+        searchStatus.update { InviteSearchStatus.Searching }
+        // A newer query cancels this job before Done is set, so only the last search ends the spinner
         searchJob = scope.launch {
             delay(SEARCH_DEBOUNCE_MILLIS)
             searchUsers(query)
+            searchStatus.update { InviteSearchStatus.Done }
         }
     }
 

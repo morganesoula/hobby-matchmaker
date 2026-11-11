@@ -3,6 +3,7 @@ package com.msoula.hobbymatchmaker.features.social.presentation.mappers
 import com.msoula.hobbymatchmaker.core.common.toTimeAgo
 import com.msoula.hobbymatchmaker.core.design.models.CircleMember
 import com.msoula.hobbymatchmaker.core.design.models.Invitation
+import com.msoula.hobbymatchmaker.core.design.models.InviteCandidate
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.social_report_reason_fake_profile
 import com.msoula.hobbymatchmaker.core.design.social_report_reason_harassment
@@ -119,3 +120,13 @@ fun ReportReason.toLabelResource(): StringResource = when (this) {
     ReportReason.INAPPROPRIATE_CONTENT -> Res.string.social_report_reason_inappropriate_content
     ReportReason.OTHER -> Res.string.social_report_reason_other
 }
+
+fun ImmutableList<SocialUserSummaryUiModel>.toInviteCandidates(): ImmutableList<InviteCandidate> =
+    map {
+        InviteCandidate(
+            pseudo = it.pseudo,
+            name = it.name.orEmpty(),
+            avatarUrl = it.avatarUrl.orEmpty(),
+            isInvited = it.isInvited
+        )
+    }.toImmutableList()

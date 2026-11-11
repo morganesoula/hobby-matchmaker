@@ -20,7 +20,8 @@ fun CircleMembersSection(
     maxMembers: Int,
     onRemoveClick: (memberUid: String, displayName: String) -> Unit,
     onReportClick: (memberUid: String, displayName: String) -> Unit,
-    onBlockClick: (memberUid: String, displayName: String) -> Unit
+    onBlockClick: (memberUid: String, displayName: String) -> Unit,
+    onInviteClick: () -> Unit
 ) {
     LazyColumn(
         contentPadding = PaddingValues(bottom = CustomSize.Sixteen),
@@ -43,8 +44,9 @@ fun CircleMembersSection(
         }
 
         val emptySlots = (maxMembers - members.size).coerceAtLeast(0)
-        items(emptySlots, key = { "slot-$it" }) {
-            EmptyCircleSlotCard()
+        // One Invite button is enough, on the first free slot
+        items(emptySlots, key = { "slot-$it" }) { index ->
+            EmptyCircleSlotCard(onInviteClick = if (index == 0) onInviteClick else null)
         }
     }
 }

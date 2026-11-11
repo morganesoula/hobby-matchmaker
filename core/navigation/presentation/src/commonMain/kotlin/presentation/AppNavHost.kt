@@ -411,6 +411,8 @@ fun AppNavHost(
             val sentInvites by socialViewModel.sentInvites.collectAsStateWithLifecycle()
             val busyInviteIds by socialViewModel.busyInviteIds.collectAsStateWithLifecycle()
             val incomingInvites by socialViewModel.incomingInvites.collectAsStateWithLifecycle()
+            val inviteSearchResults by socialViewModel.searchResults.collectAsStateWithLifecycle()
+            val inviteSearchStatus by socialViewModel.searchStatus.collectAsStateWithLifecycle()
             val snackBarHostState = remember { SnackbarHostState() }
             var capacityMessage by remember { mutableStateOf<String?>(null) }
 
@@ -435,6 +437,8 @@ fun AppNavHost(
                 incomingInvites = incomingInvites,
                 circleMembers = circleMembers,
                 busyInviteIds = busyInviteIds,
+                searchResults = inviteSearchResults,
+                searchStatus = inviteSearchStatus,
                 snackBarHostState = snackBarHostState,
                 onBack = { nav.popBackStack() },
                 onEvent = socialViewModel::onEvent

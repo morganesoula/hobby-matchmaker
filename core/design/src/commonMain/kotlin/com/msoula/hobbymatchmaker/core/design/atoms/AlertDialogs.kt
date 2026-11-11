@@ -155,3 +155,28 @@ fun MinimalDialog(
         }
     }
 }
+
+@Composable
+fun InfoDialog(
+    title: String,
+    message: String,
+    buttonText: String,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        title = {
+            Text(
+                text = title,
+                fontSize = CustomFontSize.Sixteen,
+                textAlign = TextAlign.Center
+            )
+        },
+        text = { Text(text = message) },
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            Button(onClick = onDismiss) {
+                Text(text = buttonText)
+            }
+        }
+    )
+}

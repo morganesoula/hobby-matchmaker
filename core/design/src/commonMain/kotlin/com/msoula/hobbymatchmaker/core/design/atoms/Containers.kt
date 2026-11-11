@@ -90,7 +90,7 @@ fun EmptyStateScreen(
             noDataText = config.description?.asString() ?: "",
             noDataBtnText = config.ctaText?.asString() ?: "",
             icon = config.icon,
-            onNoDataButtonClicked = { config.ctaAction }
+            onNoDataButtonClicked = { config.ctaAction?.invoke() }
         )
     }
 }

@@ -13,6 +13,7 @@ import androidx.compose.runtime.setValue
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.DestructiveConfirmationDialog
 import com.msoula.hobbymatchmaker.core.design.atoms.EmptyStateScreen
+import com.msoula.hobbymatchmaker.core.design.atoms.InfoDialog
 import com.msoula.hobbymatchmaker.core.design.atoms.ReportReasonDialog
 import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.StateContainer
@@ -20,10 +21,12 @@ import com.msoula.hobbymatchmaker.core.design.icons.BootstrapSendCheck
 import com.msoula.hobbymatchmaker.core.design.icons.FeatherInbox
 import com.msoula.hobbymatchmaker.core.design.icons.FontAwesomeUserFriends
 import com.msoula.hobbymatchmaker.core.design.models.EmptyStateConfig
+import com.msoula.hobbymatchmaker.core.design.models.InviteSearchStatus
 import com.msoula.hobbymatchmaker.core.design.models.SocialTab
 import com.msoula.hobbymatchmaker.core.common.MAX_SOCIAL_CIRCLE_SIZE
 import com.msoula.hobbymatchmaker.core.common.isIosPlatform
 import com.msoula.hobbymatchmaker.core.design.organisms.ActiveCircleCard
+import com.msoula.hobbymatchmaker.core.design.organisms.InviteToCircleDialog
 import com.msoula.hobbymatchmaker.core.design.organisms.CircleMembersSection
 import com.msoula.hobbymatchmaker.core.design.organisms.ReceivedInvitationSection
 import com.msoula.hobbymatchmaker.core.design.organisms.SocialHubHeader
@@ -41,6 +44,10 @@ import com.msoula.hobbymatchmaker.core.design.social_remove_dialog_title
 import com.msoula.hobbymatchmaker.core.design.social_report_dialog_confirm
 import com.msoula.hobbymatchmaker.core.design.social_report_dialog_message
 import com.msoula.hobbymatchmaker.core.design.social_report_dialog_title
+import com.msoula.hobbymatchmaker.core.design.social_active_circle_full
+import com.msoula.hobbymatchmaker.core.design.social_circle_full_dialog_message
+import com.msoula.hobbymatchmaker.core.design.social_dialog_ok
+import com.msoula.hobbymatchmaker.core.design.social_invite_button
 import com.msoula.hobbymatchmaker.core.design.social_decline_dialog_message
 import com.msoula.hobbymatchmaker.core.design.social_tab_circle
 import com.msoula.hobbymatchmaker.core.design.social_tab_received
@@ -58,6 +65,8 @@ import com.msoula.hobbymatchmaker.features.social.domain.models.ReportReason
 import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toLabelResource
 import com.msoula.hobbymatchmaker.features.social.presentation.models.MemberActionUiModel
 import kotlinx.collections.immutable.toImmutableList
+import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toInviteCandidates
+import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUserSummaryUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toCircleMembers
 import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toCircleMembers
 import com.msoula.hobbymatchmaker.features.social.presentation.mappers.toReceivedInvitations
@@ -76,6 +85,8 @@ fun SocialContent(
     incomingInvites: UiState<ImmutableList<InviteUiModel>>,
     circleMembers: ImmutableList<CircleMemberUiModel>,
     busyInviteIds: ImmutableSet<String>,
+    searchResults: ImmutableList<SocialUserSummaryUiModel>,
+    searchStatus: InviteSearchStatus,
     snackBarHostState: SnackbarHostState,
     onBack: () -> Unit,
     onEvent: (SocialUiEventModel) -> Unit
@@ -83,6 +94,39 @@ fun SocialContent(
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(SocialTabIndex.RECEIVED) }
     var inviteIdToDecline by remember { mutableStateOf<String?>(null) }
     var pendingMemberAction by remember { mutableStateOf<MemberActionUiModel?>(null) }
+    var isInviteDialogVisible by remember { mutableStateOf(false) }
+    var isCircleFullDialogVisible by remember { mutableStateOf(false) }
+
+    // A full circle explains itself instead of hiding the button
+    val onInviteClick = {
+        if (circleMembers.size >= MAX_SOCIAL_CIRCLE_SIZE) isCircleFullDialogVisible = true else isInviteDialogVisible = true
+    }
+
+    if (isInviteDialogVisible) {
+        val closeInviteDialog = {
+            isInviteDialogVisible = false
+            onEvent(SocialUiEventModel.OnSearchPeople(""))
+        }
+        InviteToCircleDialog(
+            candidates = searchResults.toInviteCandidates(),
+            searchStatus = searchStatus,
+            onSearch = { onEvent(SocialUiEventModel.OnSearchPeople(it)) },
+            onDismiss = closeInviteDialog,
+            onSendInvite = { pseudo, name ->
+                closeInviteDialog()
+                onEvent(SocialUiEventModel.OnInviteToSocialCircle(pseudo, name))
+            }
+        )
+    }
+
+    if (isCircleFullDialogVisible) {
+        InfoDialog(
+            title = stringResource(Res.string.social_active_circle_full),
+            message = stringResource(Res.string.social_circle_full_dialog_message, MAX_SOCIAL_CIRCLE_SIZE),
+            buttonText = stringResource(Res.string.social_dialog_ok),
+            onDismiss = { isCircleFullDialogVisible = false }
+        )
+    }
 
     inviteIdToDecline?.let { inviteId ->
         DestructiveConfirmationDialog(
@@ -125,8 +169,7 @@ fun SocialContent(
                 SocialHubHeader(
                     showBackArrow = isIosPlatform(),
                     onBack = onBack,
-                    // The invite dialog comes with the search move out of Profile
-                    onInviteClick = {}
+                    onInviteClick = onInviteClick
                 )
             },
             circleCard = if (selectedTabIndex == SocialTabIndex.CIRCLE) null else ({
@@ -164,7 +207,8 @@ fun SocialContent(
                         circleMembers = circleMembers,
                         onRemoveClick = { uid, name -> pendingMemberAction = MemberActionUiModel.Remove(uid, name) },
                         onReportClick = { uid, name -> pendingMemberAction = MemberActionUiModel.Report(uid, name) },
-                        onBlockClick = { uid, name -> pendingMemberAction = MemberActionUiModel.Block(uid, name) }
+                        onBlockClick = { uid, name -> pendingMemberAction = MemberActionUiModel.Block(uid, name) },
+                        onInviteClick = onInviteClick
                     )
                 }
             }
@@ -186,14 +230,17 @@ internal fun CircleTabContent(
     circleMembers: ImmutableList<CircleMemberUiModel>,
     onRemoveClick: (memberUid: String, displayName: String) -> Unit,
     onReportClick: (memberUid: String, displayName: String) -> Unit,
-    onBlockClick: (memberUid: String, displayName: String) -> Unit
+    onBlockClick: (memberUid: String, displayName: String) -> Unit,
+    onInviteClick: () -> Unit
 ) {
     if (circleMembers.isEmpty()) {
         EmptyStateScreen(
             config = EmptyStateConfig(
                 icon = FontAwesomeUserFriends,
                 title = UIText.Resource(Res.string.social_circle_empty_title),
-                description = UIText.Resource(Res.string.social_circle_empty_description)
+                description = UIText.Resource(Res.string.social_circle_empty_description),
+                ctaText = UIText.Resource(Res.string.social_invite_button),
+                ctaAction = onInviteClick
             )
         )
     } else {
@@ -202,7 +249,8 @@ internal fun CircleTabContent(
             maxMembers = MAX_SOCIAL_CIRCLE_SIZE,
             onRemoveClick = onRemoveClick,
             onReportClick = onReportClick,
-            onBlockClick = onBlockClick
+            onBlockClick = onBlockClick,
+            onInviteClick = onInviteClick
         )
     }
 }

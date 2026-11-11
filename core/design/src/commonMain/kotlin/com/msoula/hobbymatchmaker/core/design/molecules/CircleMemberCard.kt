@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -30,6 +31,7 @@ import com.msoula.hobbymatchmaker.core.design.atoms.UserAvatar
 import com.msoula.hobbymatchmaker.core.design.icons.MaterialSymbolsAdd_2
 import com.msoula.hobbymatchmaker.core.design.social_circle_empty_slot_description
 import com.msoula.hobbymatchmaker.core.design.social_circle_empty_slot_title
+import com.msoula.hobbymatchmaker.core.design.social_invite_button
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import org.jetbrains.compose.resources.stringResource
 
@@ -70,7 +72,10 @@ fun CircleMemberCard(
 }
 
 @Composable
-fun EmptyCircleSlotCard(modifier: Modifier = Modifier) {
+fun EmptyCircleSlotCard(
+    modifier: Modifier = Modifier,
+    onInviteClick: (() -> Unit)? = null
+) {
     val dashColor = MaterialTheme.colorScheme.primary.copy(alpha = .4f)
     val cornerRadius = CustomSize.Sixteen
 
@@ -105,7 +110,7 @@ fun EmptyCircleSlotCard(modifier: Modifier = Modifier) {
             )
         }
 
-        Column {
+        Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = stringResource(Res.string.social_circle_empty_slot_title),
                 style = MaterialTheme.typography.titleSmall,
@@ -116,6 +121,15 @@ fun EmptyCircleSlotCard(modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+        }
+
+        onInviteClick?.let {
+            Button(
+                onClick = it,
+                shape = RoundedCornerShape(CustomSize.Sixteen)
+            ) {
+                Text(text = stringResource(Res.string.social_invite_button))
+            }
         }
     }
 }
