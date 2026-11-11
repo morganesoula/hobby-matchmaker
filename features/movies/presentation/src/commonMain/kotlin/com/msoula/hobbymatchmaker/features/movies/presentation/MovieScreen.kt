@@ -56,6 +56,7 @@ fun MovieContent(
     snackBarHostState: SnackbarHostState,
     showMatchAnimation: Boolean,
     matchingAnimationData: MatchAnimationData,
+    pendingInvitesCount: Int,
     onNavigate: (NavigationDestination) -> Unit,
     onEvent: (MovieEventModel) -> Unit,
     onLoadMore: () -> Unit,
@@ -72,6 +73,7 @@ fun MovieContent(
     Scaffold(
         topBar = {
             NavigationTopBar(
+                pendingInvitesCount = pendingInvitesCount,
                 redirectToProfile = { onNavigate(NavigationDestination.Profile) },
                 redirectToSocial = { onNavigate(NavigationDestination.Social) }
             )

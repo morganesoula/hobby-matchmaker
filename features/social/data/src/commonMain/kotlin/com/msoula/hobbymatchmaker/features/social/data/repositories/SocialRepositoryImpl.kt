@@ -147,11 +147,10 @@ class SocialRepositoryImpl(
         }
 
     override suspend fun refreshIncomingInvites(ownerUid: String): AppResult<Unit, AppError> =
-        socialRemoteDataSource.refreshIncomingInvites(ownerUid).flatMap { invites ->
-            val mapped = invites.map { it.toSocialInvitationDataModel() }
-            val toPseudo = mapped.firstOrNull()?.toPseudo
-                ?: userDataRepository.getUser(ownerUid)
-                    .let { result -> (result as? AppResult.Success)?.data?.pseudo }
+        socialRemoteDataSource.refreshIncomingInvites(ownerUid).flatMap { snapshot ->
+            val mapped = snapshot.invites.map { it.toSocialInvitationDataModel() }
+            // Never read the pseudo from the cached user: it can be stale, and then an empty refresh clears nothing
+            val toPseudo = snapshot.toPseudo?.takeIf { it.isNotBlank() }
 
             if (toPseudo != null) {
                 socialLocalDataSource.replaceIncomingInvites(toPseudo, mapped)

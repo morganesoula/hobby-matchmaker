@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,6 +34,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun NavigationTopBar(
     modifier: Modifier = Modifier,
+    pendingInvitesCount: Int = 0,
     redirectToProfile: () -> Unit,
     redirectToSocial: () -> Unit
 ) {
@@ -48,11 +51,19 @@ fun NavigationTopBar(
                 IconButton(
                     onClick = { redirectToSocial() }
                 ) {
-                    Icon(
-                        imageVector = MaterialSymbolsGroup_add,
-                        contentDescription = "Invites",
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
+                    BadgedBox(
+                        badge = {
+                            if (pendingInvitesCount > 0) {
+                                Badge { Text(if (pendingInvitesCount > 9) "9+" else pendingInvitesCount.toString()) }
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = MaterialSymbolsGroup_add,
+                            contentDescription = "Invites",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
 
                 IconButton(

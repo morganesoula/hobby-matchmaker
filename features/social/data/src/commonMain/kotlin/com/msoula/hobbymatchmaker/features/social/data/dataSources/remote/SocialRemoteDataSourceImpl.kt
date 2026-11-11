@@ -16,6 +16,7 @@ import com.msoula.hobbymatchmaker.core.common.NetworkConnectivityChecker
 import com.msoula.hobbymatchmaker.core.common.safeNetworkCall
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.mappers.toInviteStatusData
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.BlockedUserRemoteDataModel
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.IncomingInvitesSnapshot
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.InviteDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.InviteStatusData
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.SocialCircleEntryRemoteDataModel
@@ -183,7 +184,7 @@ class SocialRemoteDataSourceImpl(
         }
 
     @OptIn(ExperimentalTime::class)
-    override suspend fun refreshIncomingInvites(ownerUid: String): AppResult<List<InviteDataModel>, AppError> =
+    override suspend fun refreshIncomingInvites(ownerUid: String): AppResult<IncomingInvitesSnapshot, AppError> =
         safeNetworkCall(connectivityChecker) {
             val userSnapshot = firestore
                 .collection(FirestoreUsersCollection)
@@ -191,7 +192,7 @@ class SocialRemoteDataSourceImpl(
                 .get()
 
             val pseudo = userSnapshot.get<String?>("information.pseudo")
-                ?: return@safeNetworkCall emptyList()
+                ?: return@safeNetworkCall IncomingInvitesSnapshot(toPseudo = null, invites = emptyList())
 
             val documents = firestore
                 .collection(FirestoreSocialInvitesCollection)
@@ -202,7 +203,7 @@ class SocialRemoteDataSourceImpl(
 
             val blockedUids = blockedUidsOnce(ownerUid)
 
-            documents.mapNotNull { document ->
+            val invites = documents.mapNotNull { document ->
                 val fromUid = document.get<String?>("fromUid") ?: return@mapNotNull null
                 if (fromUid in blockedUids) return@mapNotNull null
                 val fromPseudo = document.get<String?>("fromPseudo") ?: return@mapNotNull null
@@ -223,6 +224,8 @@ class SocialRemoteDataSourceImpl(
                     updatedAt = updatedAtStr?.let { Instant.parse(it) }
                 )
             }
+
+            IncomingInvitesSnapshot(toPseudo = pseudo, invites = invites)
         }
 
     @OptIn(ExperimentalTime::class)

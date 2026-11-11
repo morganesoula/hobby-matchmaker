@@ -62,6 +62,8 @@ import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfi
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiStateModel
 import com.msoula.hobbymatchmaker.features.social.presentation.SocialContent
 import com.msoula.hobbymatchmaker.features.social.presentation.SocialViewModel
+import com.msoula.hobbymatchmaker.core.design.util.UiState
+import com.msoula.hobbymatchmaker.features.social.presentation.models.InviteStatusUiModel
 import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUiEventModel
 import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.getString
@@ -239,8 +241,14 @@ fun AppNavHost(
         }
 
         composable<Main> {
+            // The same ViewModel instance as the Social screen, so the badge and the list never disagree
+            val incomingInvitesState by socialViewModel.incomingInvites.collectAsStateWithLifecycle()
+            val pendingInvitesCount = (incomingInvitesState as? UiState.Success)?.data
+                ?.count { it.inviteStatus == InviteStatusUiModel.PENDING } ?: 0
+
             MainScaffold(
-                navCallbacks = navCallbacks
+                navCallbacks = navCallbacks,
+                pendingInvitesCount = pendingInvitesCount
             )
         }
 
@@ -449,7 +457,8 @@ fun AppNavHost(
 
 @Composable
 fun MainScaffold(
-    navCallbacks: NavigationCallbacks
+    navCallbacks: NavigationCallbacks,
+    pendingInvitesCount: Int
 ) {
     val tabNavController = rememberNavController()
     val currentBackStack by tabNavController.currentBackStackEntryAsState()
@@ -532,6 +541,7 @@ fun MainScaffold(
 
                 MovieContent(
                     modifier = Modifier,
+                    pendingInvitesCount = pendingInvitesCount,
                     movieState = movieState,
                     paginationState = paginationState,
                     matchingAnimationData = matchingAnimationData,
@@ -568,7 +578,7 @@ fun MainScaffold(
                     onMemberClicked = { hubViewModel.onEvent(HubEvent.OnRecentMatchClicked(it)) },
                     navigateToMoviesScreen = { navigateToTab(Movies) },
                     navigateToMovieDetail = { navCallbacks.navigateToMovieDetailFromMoviesOrHub(it) },
-                    navigateToProfileScreen = { navCallbacks.navigateToProfileFromHub() },
+                    navigateToSocialScreen = { navCallbacks.navigateToSocialFromHub() },
                     selectedMatch = selectedMatch,
                     selectedMatchMoviesState = selectedMatchMoviesState
                 )

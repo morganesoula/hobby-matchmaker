@@ -67,7 +67,7 @@ fun HubRecentMatches(
 @Composable
 fun HubNoRecentMatchesSection(
     modifier: Modifier = Modifier,
-    navigateToProfileScreen: () -> Unit
+    navigateToSocialScreen: () -> Unit
 ) {
     // Section only gets 1/3 of the screen: let the card scroll rather than clip on small devices
     Column(
@@ -81,7 +81,7 @@ fun HubNoRecentMatchesSection(
             noDataText = stringResource(Res.string.hub_recent_matches_no_data_txt),
             noDataBtnText = stringResource(Res.string.hub_recent_matches_no_data_btn_txt),
             icon = MaterialSymbolsPerson_add,
-            onNoDataButtonClicked = navigateToProfileScreen,
+            onNoDataButtonClicked = navigateToSocialScreen,
         )
     }
 }

@@ -3,6 +3,7 @@ package com.msoula.hobbymatchmaker.features.social.data.dataSources.remote
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.BlockedUserRemoteDataModel
+import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.IncomingInvitesSnapshot
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.InviteDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.SocialCircleEntryRemoteDataModel
 import com.msoula.hobbymatchmaker.features.social.data.dataSources.remote.models.SocialCircleMemberRemoteDataModel
@@ -17,7 +18,7 @@ interface SocialRemoteDataSource {
 
     fun observeSocialCircle(uid: String): Flow<List<SocialCircleEntryRemoteDataModel>>
     suspend fun sendInvite(inviteDataModel: InviteDataModel): AppResult<Unit, AppError>
-    suspend fun refreshIncomingInvites(ownerUid: String): AppResult<List<InviteDataModel>, AppError>
+    suspend fun refreshIncomingInvites(ownerUid: String): AppResult<IncomingInvitesSnapshot, AppError>
     suspend fun refreshSentInvites(ownerUid: String): AppResult<List<InviteDataModel>, AppError>
     suspend fun markInviteAsAccepted(inviteId: String): AppResult<Unit, AppError>
     suspend fun markInviteAsDeclined(inviteId: String): AppResult<Unit, AppError>

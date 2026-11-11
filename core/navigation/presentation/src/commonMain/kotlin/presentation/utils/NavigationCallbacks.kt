@@ -83,8 +83,8 @@ class NavigationCallbacks(
     }
 
     // Hub lives in the tab graph: keep Main on the back stack so back returns to the Hub tab
-    val navigateToProfileFromHub: () -> Unit = {
-        navController.navigate(Profile) {
+    val navigateToSocialFromHub: () -> Unit = {
+        navController.navigate(Social) {
             launchSingleTop = true
         }
     }

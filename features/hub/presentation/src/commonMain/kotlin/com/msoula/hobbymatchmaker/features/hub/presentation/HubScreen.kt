@@ -35,7 +35,7 @@ fun HubContent(
     onMemberClicked: (member: ProfileSocialMember) -> Unit,
     navigateToMoviesScreen: () -> Unit,
     navigateToMovieDetail: (movieId: Long) -> Unit,
-    navigateToProfileScreen: () -> Unit,
+    navigateToSocialScreen: () -> Unit,
     selectedMatch: ProfileSocialMember?,
     selectedMatchMoviesState: UiState<ImmutableList<MovieCarouselItem>>
 ) {
@@ -46,7 +46,7 @@ fun HubContent(
                 StateContainer(
                     state = hubRecentMatches,
                     onEmpty = {
-                        HubNoRecentMatchesSection(navigateToProfileScreen = navigateToProfileScreen)
+                        HubNoRecentMatchesSection(navigateToSocialScreen = navigateToSocialScreen)
                     },
                     onError = { error, hint ->
                         HubSectionError {
