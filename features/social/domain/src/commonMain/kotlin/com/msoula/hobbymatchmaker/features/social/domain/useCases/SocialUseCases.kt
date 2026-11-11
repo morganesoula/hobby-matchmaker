@@ -7,6 +7,7 @@ data class SocialUseCases(
     val refreshIncomingInvitesUseCase: RefreshIncomingInvitesUseCase,
     val refreshSentInvitesUseCase: RefreshSentInvitesUseCase,
     val cancelInvitationUseCase: CancelInvitationUseCase,
+    val dismissDeclinedInviteUseCase: DismissDeclinedInviteUseCase,
     val observeIncomingInvitesUseCase: ObserveIncomingInvitesUseCase,
     val declineInviteUseCase: DeclineInviteUseCase,
     val acceptInviteUseCase: AcceptInviteUseCase,

@@ -23,6 +23,7 @@ interface SocialRemoteDataSource {
     suspend fun markInviteAsAccepted(inviteId: String): AppResult<Unit, AppError>
     suspend fun markInviteAsDeclined(inviteId: String): AppResult<Unit, AppError>
     suspend fun cancelInvitation(inviteId: String): AppResult<Unit, AppError>
+    suspend fun dismissDeclinedInvitation(inviteId: String): AppResult<Unit, AppError>
     suspend fun addToSocialCircle(socialCircleMemberDataModel: SocialCircleMemberRemoteDataModel): AppResult<Unit, AppError>
     suspend fun removeFromSocialCircle(
         ownerUid: String,

@@ -194,6 +194,7 @@
     <string name="social_received_requests_no_data_description">Vous n'avez pas encore reçu d'invitation. Explorez et connectez-vous avec d'autres personnes !</string>
     <string name="social_sent_requests_title">Demandes envoyées</string>
     <string name="social_sent_requests_cancel_invitation_text">Annuler l'invitation</string>
+    <string name="social_sent_requests_dismiss_text">Retirer</string>
     <string name="social_sent_requests_status_pending">En attente</string>
     <string name="social_sent_requests_status_accepted">Acceptée</string>
     <string name="social_sent_requests_status_declined">Refusée</string>

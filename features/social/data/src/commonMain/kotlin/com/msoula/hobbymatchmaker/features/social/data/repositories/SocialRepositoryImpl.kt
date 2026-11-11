@@ -226,6 +226,9 @@ class SocialRepositoryImpl(
     override suspend fun cancelInvite(inviteId: String): AppResult<Unit, AppError> =
         socialRemoteDataSource.cancelInvitation(inviteId)
 
+    override suspend fun dismissDeclinedInvite(inviteId: String): AppResult<Unit, AppError> =
+        socialRemoteDataSource.dismissDeclinedInvitation(inviteId)
+
     override suspend fun acceptInvite(inviteId: String): AppResult<Unit, AppError> =
         socialRemoteDataSource.markInviteAsAccepted(inviteId)
 

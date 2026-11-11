@@ -71,7 +71,8 @@ fun ReceivedInvitationSection(
 @Composable
 fun SentInvitationSection(
     sentInvitation: ImmutableList<Invitation>,
-    onCancelInvitationClick: (invitationId: String) -> Unit
+    onCancelInvitationClick: (invitationId: String) -> Unit,
+    onDismissInvitationClick: (invitationId: String) -> Unit
 ) {
     if (sentInvitation.isNotEmpty()) {
         LazyColumn(
@@ -95,7 +96,8 @@ fun SentInvitationSection(
                     inviteStatus = invitation.invitationStatus,
                     inviteTime = invitation.invitationTime,
                     isBusy = invitation.isBusy,
-                    onCancelInvitationClick = onCancelInvitationClick
+                    onCancelInvitationClick = onCancelInvitationClick,
+                    onDismissInvitationClick = onDismissInvitationClick
                 )
             }
         }

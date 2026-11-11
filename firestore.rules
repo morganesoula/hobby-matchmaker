@@ -60,6 +60,10 @@ service cloud.firestore {
           && !senderIsBlocked(resource.data))
         || (isRecipient(resource.data)
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'declinedAt']))
+        // The sender hides a declined invite from their Sent list without erasing the cooldown
+        || (resource.data.fromUid == request.auth.uid
+          && resource.data.status == 'DECLINED'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['senderDismissed']))
       );
       allow delete: if signedIn()
         && (resource.data.fromUid == request.auth.uid || isRecipient(resource.data));

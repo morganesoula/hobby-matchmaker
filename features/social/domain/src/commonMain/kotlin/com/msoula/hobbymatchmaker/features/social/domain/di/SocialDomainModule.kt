@@ -3,6 +3,7 @@ package com.msoula.hobbymatchmaker.features.social.domain.di
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.AcceptInviteUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.BlockUserUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.CancelInvitationUseCase
+import com.msoula.hobbymatchmaker.features.social.domain.useCases.DismissDeclinedInviteUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.CheckMovieMatchUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.CheckSocialCircleLimitUseCase
 import com.msoula.hobbymatchmaker.features.social.domain.useCases.ComputeCommonMoviesUseCase
@@ -30,6 +31,7 @@ val featuresModuleSocialDomain = module {
     factoryOf(::SearchUsersByPseudoUseCase)
     factoryOf(::AcceptInviteUseCase)
     factoryOf(::CancelInvitationUseCase)
+    factoryOf(::DismissDeclinedInviteUseCase)
     factoryOf(::DeclineInviteUseCase)
     factoryOf(::ObserveIncomingInvitesUseCase)
     factoryOf(::RefreshIncomingInvitesUseCase)

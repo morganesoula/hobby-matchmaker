@@ -156,7 +156,10 @@ class SocialRemoteDataSourceImpl(
                         put("status", inviteDataModel.status)
                         put("createdAt", inviteDataModel.createdAt)
                         // Re-inviting after the cooldown starts a fresh invitation
-                        if (existing.exists) put("declinedAt", FieldValue.delete)
+                        if (existing.exists) {
+                            put("declinedAt", FieldValue.delete)
+                            put("senderDismissed", FieldValue.delete)
+                        }
                     },
                     merge = true
                 )
@@ -238,6 +241,7 @@ class SocialRemoteDataSourceImpl(
                 .documents
 
             documents.mapNotNull { document ->
+                if (document.get<Boolean?>("senderDismissed") == true) return@mapNotNull null
                 val fromUid = document.get<String?>("fromUid") ?: return@mapNotNull null
                 val fromPseudo = document.get<String?>("fromPseudo") ?: return@mapNotNull null
                 val toPseudo = document.get<String?>("toPseudo") ?: return@mapNotNull null
@@ -329,6 +333,7 @@ class SocialRemoteDataSourceImpl(
             .snapshots
             .map { querySnapshot ->
                 querySnapshot.documents.mapNotNull { document ->
+                    if (document.get<Boolean?>("senderDismissed") == true) return@mapNotNull null
                     val fromUid =
                         document.get<String?>("fromUid") ?: return@mapNotNull null
                     val fromPseudo =
@@ -375,6 +380,15 @@ class SocialRemoteDataSourceImpl(
                     "status" to InviteStatusData.DECLINED,
                     "declinedAt" to Clock.System.now().toEpochMilliseconds()
                 )
+        }
+
+    // Not a delete: the document keeps declinedAt, so the re-invite cooldown still applies
+    override suspend fun dismissDeclinedInvitation(inviteId: String): AppResult<Unit, AppError> =
+        safeNetworkCall(connectivityChecker) {
+            firestore
+                .collection(FirestoreSocialInvitesCollection)
+                .document(inviteId)
+                .update("senderDismissed" to true)
         }
 
     override suspend fun cancelInvitation(inviteId: String): AppResult<Unit, AppError> =

@@ -252,6 +252,12 @@ class SocialViewModel(
                 }
             }
 
+            is SocialUiEventModel.OnDismissDeclinedInvitation -> {
+                scope.launch {
+                    dismissDeclinedInvitation(event.inviteId)
+                }
+            }
+
             is SocialUiEventModel.OnRemoveMember -> {
                 scope.launch {
                     removeMember(event.memberUid)
@@ -362,6 +368,20 @@ class SocialViewModel(
                 eventHandler.sendEvent(
                     UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
                 )
+            }
+    }
+
+    // No snackbar: the card simply leaves the list
+    private suspend fun dismissDeclinedInvitation(inviteId: String) = runExclusive(inviteId) {
+        socialUseCases.dismissDeclinedInviteUseCase(inviteId)
+            .onSuccess {
+                currentUserUid?.let { uid ->
+                    socialUseCases.refreshSentInvitesUseCase(uid)
+                        .onFailure { Logger.e("Failed to refresh sent invites after dismiss: $it") }
+                }
+            }
+            .onFailure { error ->
+                eventHandler.sendEvent(UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error)))
             }
     }
 

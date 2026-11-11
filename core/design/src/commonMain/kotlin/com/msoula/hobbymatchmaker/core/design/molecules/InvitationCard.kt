@@ -38,6 +38,7 @@ import com.msoula.hobbymatchmaker.core.design.social_common_favorites_plural
 import com.msoula.hobbymatchmaker.core.design.social_received_requests_accept_button_text
 import com.msoula.hobbymatchmaker.core.design.social_received_requests_decline_button_text
 import com.msoula.hobbymatchmaker.core.design.social_sent_requests_cancel_invitation_text
+import com.msoula.hobbymatchmaker.core.design.social_sent_requests_dismiss_text
 import com.msoula.hobbymatchmaker.core.design.social_sent_time
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import com.msoula.hobbymatchmaker.core.design.util.asInviteStatusText
@@ -54,10 +55,12 @@ fun SentInvitationCard(
     inviteStatus: String,
     inviteTime: String,
     isBusy: Boolean = false,
-    onCancelInvitationClick: (invitationId: String) -> Unit = {}
+    onCancelInvitationClick: (invitationId: String) -> Unit = {},
+    onDismissInvitationClick: (invitationId: String) -> Unit = {}
 ) {
     val status = inviteStatus.lowercase()
     val isPending = status == "pending"
+    val isDeclined = status == "declined"
 
     val statusColor = when (status) {
         "pending" -> MaterialTheme.colorScheme.primary
@@ -130,6 +133,19 @@ fun SentInvitationCard(
                         SpacerWidth4()
                         Text(
                             text = stringResource(Res.string.social_sent_requests_cancel_invitation_text),
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+                }
+
+                if (isDeclined) {
+                    TextButton(
+                        onClick = { onDismissInvitationClick(invitationId) },
+                        enabled = !isBusy,
+                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurfaceVariant)
+                    ) {
+                        Text(
+                            text = stringResource(Res.string.social_sent_requests_dismiss_text),
                             style = MaterialTheme.typography.labelMedium
                         )
                     }

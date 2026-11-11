@@ -325,7 +325,8 @@ private fun SentTabContent(
         onSuccess = { invites ->
             SentInvitationSection(
                 invites.toSentInvitations(busyInviteIds),
-                onCancelInvitationClick = { id -> onEvent(SocialUiEventModel.OnCancelInvitation(id)) }
+                onCancelInvitationClick = { id -> onEvent(SocialUiEventModel.OnCancelInvitation(id)) },
+                onDismissInvitationClick = { id -> onEvent(SocialUiEventModel.OnDismissDeclinedInvitation(id)) }
             )
         }
     )

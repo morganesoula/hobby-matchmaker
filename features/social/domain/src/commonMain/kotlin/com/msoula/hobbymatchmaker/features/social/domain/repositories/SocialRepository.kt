@@ -36,6 +36,7 @@ interface SocialRepository {
     suspend fun refreshSentInvites(uid: String): AppResult<Unit, AppError>
     suspend fun sendInvite(invite: SocialInviteDomainModel): AppResult<Unit, AppError>
     suspend fun cancelInvite(inviteId: String): AppResult<Unit, AppError>
+    suspend fun dismissDeclinedInvite(inviteId: String): AppResult<Unit, AppError>
     suspend fun acceptInvite(inviteId: String): AppResult<Unit, AppError>
     suspend fun declineInvite(inviteId: String): AppResult<Unit, AppError>
     suspend fun removeMember(ownerId: String, memberUid: String): AppResult<Unit, AppError>
