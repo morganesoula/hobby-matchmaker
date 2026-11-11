@@ -33,6 +33,7 @@ object Modules {
     const val PROFILE_DATA = ":features:profile:data"
     const val PROFILE_DOMAIN = ":features:profile:domain"
     const val PROFILE_PRESENTATION = ":features:profile:presentation"
+    const val SETTINGS_PRESENTATION = ":features:settings:presentation"
     const val SESSION_DATA = ":core:session:data"
     const val SESSION_DOMAIN = ":core:session:domain"
     const val SOCIAL_DATA = ":features:social:data"

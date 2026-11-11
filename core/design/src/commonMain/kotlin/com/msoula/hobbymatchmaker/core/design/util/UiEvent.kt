@@ -19,6 +19,7 @@ sealed class NavigationDestination {
     data object Movies : NavigationDestination()
     data object PickPseudo : NavigationDestination()
     data object Profile : NavigationDestination()
+    data object Settings : NavigationDestination()
     data object SignIn : NavigationDestination()
     data object SignUp : NavigationDestination()
     data object Social : NavigationDestination()

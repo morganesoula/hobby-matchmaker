@@ -50,6 +50,10 @@ object Profile
 @SerialName("social")
 object Social
 
+@Serializable
+@SerialName("settings")
+object Settings
+
 enum class MainTab(
     val route: Any,
     val label: String,

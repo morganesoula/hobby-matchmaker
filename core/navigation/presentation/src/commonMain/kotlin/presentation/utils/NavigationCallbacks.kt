@@ -7,6 +7,7 @@ import com.msoula.hobbymatchmaker.core.navigation.presentation.Main
 import com.msoula.hobbymatchmaker.core.navigation.presentation.PickPseudo
 import com.msoula.hobbymatchmaker.core.navigation.presentation.MovieDetail
 import com.msoula.hobbymatchmaker.core.navigation.presentation.Profile
+import com.msoula.hobbymatchmaker.core.navigation.presentation.Settings
 import com.msoula.hobbymatchmaker.core.navigation.presentation.Social
 import com.msoula.hobbymatchmaker.core.navigation.presentation.Splash
 
@@ -72,6 +73,12 @@ class NavigationCallbacks(
 
     val navigateToProfileFromMovies: () -> Unit = {
         navController.navigate(Profile) {
+            launchSingleTop = true
+        }
+    }
+
+    val navigateToSettingsFromProfile: () -> Unit = {
+        navController.navigate(Settings) {
             launchSingleTop = true
         }
     }

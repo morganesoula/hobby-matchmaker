@@ -279,4 +279,12 @@
     <string name="pseudo_rule_dot">Doesn't start or end with a dot</string>
     <string name="profile_share_pseudo">Share my pseudo</string>
     <string name="profile_pseudo_copied">Pseudo copied to clipboard</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_open_cd">Open settings</string>
+    <string name="settings_support_section">Support and community</string>
+    <string name="settings_report_description">Report a bug or a data issue</string>
+    <string name="settings_privacy_title">Privacy policy</string>
+    <string name="settings_privacy_description">How your data is used</string>
+    <string name="settings_account_section">Account actions</string>
+    <string name="settings_version">HobbyMatchMaker v%1$s • Build %2$s</string>
 </resources>

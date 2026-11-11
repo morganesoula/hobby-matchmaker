@@ -55,6 +55,8 @@ import com.msoula.hobbymatchmaker.features.moviedetail.presentation.models.Video
 import com.msoula.hobbymatchmaker.features.movies.presentation.MovieContent
 import com.msoula.hobbymatchmaker.features.movies.presentation.MovieViewModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.UserProfileContent
+import com.msoula.hobbymatchmaker.features.settings.presentation.SettingsContent
+import com.msoula.hobbymatchmaker.features.settings.presentation.SettingsViewModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.UserProfileViewModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileActions
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileState
@@ -359,6 +361,7 @@ fun AppNavHost(
                             when (destination) {
                                 NavigationDestination.SignUp -> navCallbacks.navigateAndClearToAuth()
                                 NavigationDestination.Movies -> navCallbacks.navigateToMoviesFromProfile()
+                                NavigationDestination.Settings -> navCallbacks.navigateToSettingsFromProfile()
                                 else -> Unit
                             }
                         },
@@ -412,6 +415,42 @@ fun AppNavHost(
                     userProfileActions = userProfileActions
                 )
             }
+        }
+
+        composable<Settings> {
+            val settingsViewModel = koinViewModel<SettingsViewModel>()
+            val appVersion by settingsViewModel.appVersion.collectAsStateWithLifecycle()
+            val isDeleteAccountDialogVisible by settingsViewModel.isDeleteAccountDialogVisible
+                .collectAsStateWithLifecycle()
+            val isDeletingAccount by settingsViewModel.isDeletingAccount.collectAsStateWithLifecycle()
+            val snackBarHostState = remember { SnackbarHostState() }
+
+            LaunchedEffect(Unit) {
+                settingsViewModel.events.collect { event ->
+                    when (event) {
+                        is UiEvent.ShowSnackBar ->
+                            snackBarHostState.showSnackbar(event.message.asStringSuspend())
+
+                        is UiEvent.Navigate -> {
+                            when (event.destination) {
+                                NavigationDestination.SignIn -> navCallbacks.navigateAndClearToAuth()
+                                else -> Unit
+                            }
+                        }
+
+                        else -> Unit
+                    }
+                }
+            }
+
+            SettingsContent(
+                appVersion = appVersion,
+                isDeleteAccountDialogVisible = isDeleteAccountDialogVisible,
+                isDeletingAccount = isDeletingAccount,
+                snackBarHostState = snackBarHostState,
+                onBack = { nav.popBackStack() },
+                onEvent = settingsViewModel::onEvent
+            )
         }
 
         composable<Social> {

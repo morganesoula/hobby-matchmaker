@@ -1,6 +1,8 @@
 package com.msoula.hobbymatchmaker.core.common.di
 
+import com.msoula.hobbymatchmaker.core.common.AndroidAppInfo
 import com.msoula.hobbymatchmaker.core.common.AndroidNetworkConnectivityChecker
+import com.msoula.hobbymatchmaker.core.common.AppInfo
 import com.msoula.hobbymatchmaker.core.common.BuildKonfig.APP_SECRET
 import com.msoula.hobbymatchmaker.core.common.ImageFileManager
 import com.msoula.hobbymatchmaker.core.common.NetworkConnectivityChecker
@@ -28,6 +30,7 @@ import org.koin.dsl.module
 actual val coreModuleCommonPlatformSpecific = module {
     single { createDataStore(androidContext()) }
     single { ImageFileManager(get(), get()) }
+    single<AppInfo> { AndroidAppInfo(androidContext()) }
 
     single<NetworkConnectivityChecker> { AndroidNetworkConnectivityChecker(get()) }
 

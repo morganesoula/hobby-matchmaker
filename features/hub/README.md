@@ -6,7 +6,7 @@ This module has for purpose to display two parts: recent matches and favorite ho
 
 - Display horizontal list of recent matches between user and any member from its social circle
 - Display grid list of user's favorite hobby items
-- Redirect to user profile when recent match list is empty
+- Redirect to the social screen when recent match list is empty
 - Redirect to hobby item detail on item tapped on list
 
 #### Design & UI

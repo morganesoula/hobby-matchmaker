@@ -1,5 +1,9 @@
 package com.msoula.hobbymatchmaker.features.profile.presentation
 
+import com.msoula.hobbymatchmaker.core.design.settings_open_cd
+import com.msoula.hobbymatchmaker.core.design.icons.LucideSettings
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Icon
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -154,10 +158,23 @@ fun UserProfileContent(
                     enableSave = enableSaveTopBarButton
                 )
             } else {
-                if (isIosPlatform()) {
-                    BackNavigationTopBar(onBack = {
-                        userProfileActions.onNavigate(NavigationDestination.Movies)
-                    })
+                val showSettings = userProfileState.profileState is UserProfileUiStateModel.Success
+                if (isIosPlatform() || showSettings) {
+                    BackNavigationTopBar(
+                        showBackArrow = isIosPlatform(),
+                        actions = {
+                            if (showSettings) {
+                                IconButton(onClick = { userProfileActions.onNavigate(NavigationDestination.Settings) }) {
+                                    Icon(
+                                        imageVector = LucideSettings,
+                                        contentDescription = stringResource(Res.string.settings_open_cd),
+                                        tint = MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
+                            }
+                        },
+                        onBack = { userProfileActions.onNavigate(NavigationDestination.Movies) }
+                    )
                 }
             }
         },

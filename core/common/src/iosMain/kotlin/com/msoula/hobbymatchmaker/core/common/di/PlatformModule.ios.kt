@@ -1,7 +1,9 @@
 package com.msoula.hobbymatchmaker.core.common.di
 
 import com.msoula.hobbymatchmaker.core.common.BuildKonfig.APP_SECRET
+import com.msoula.hobbymatchmaker.core.common.AppInfo
 import com.msoula.hobbymatchmaker.core.common.IOSNetworkConnectivityChecker
+import com.msoula.hobbymatchmaker.core.common.IosAppInfo
 import com.msoula.hobbymatchmaker.core.common.ImageFileManager
 import com.msoula.hobbymatchmaker.core.common.NetworkConnectivityChecker
 import com.msoula.hobbymatchmaker.core.common.createDataStore
@@ -27,6 +29,7 @@ import org.koin.dsl.module
 actual val coreModuleCommonPlatformSpecific = module {
     single { createDataStore() }
     single { ImageFileManager(get()) }
+    single<AppInfo> { IosAppInfo() }
 
     single<NetworkConnectivityChecker> { IOSNetworkConnectivityChecker() }
 

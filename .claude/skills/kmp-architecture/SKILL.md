@@ -58,6 +58,7 @@ No JVM, JS, or other targets are configured. iOS targets can be disabled during 
 :features:profile:data              ← User profile repository implementation, DTOs, mappers
 :features:profile:domain            ← User profile domain models, repo interfaces, use cases
 :features:profile:presentation      ← User profile ViewModel, composables, state
+:features:settings:presentation     ← Settings screen: report, privacy link, log out, delete account, app version (no data/domain layer — wraps existing use cases)
 :features:social:data               ← Social circle repository implementation, DTOs, mappers
 :features:social:domain             ← Social circle domain models, repo interfaces, use cases
 :features:social:presentation       ← Social circle ViewModel, composables, state

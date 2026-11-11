@@ -279,4 +279,12 @@
     <string name="pseudo_rule_dot">Ne commence ni ne finit par un point</string>
     <string name="profile_share_pseudo">Partager mon pseudo</string>
     <string name="profile_pseudo_copied">Pseudo copié dans le presse-papiers</string>
+    <string name="settings_title">Paramètres</string>
+    <string name="settings_open_cd">Ouvrir les paramètres</string>
+    <string name="settings_support_section">Support et communauté</string>
+    <string name="settings_report_description">Signalez un bug ou un problème de données</string>
+    <string name="settings_privacy_title">Politique de confidentialité</string>
+    <string name="settings_privacy_description">Comment vos données sont utilisées</string>
+    <string name="settings_account_section">Actions du compte</string>
+    <string name="settings_version">HobbyMatchMaker v%1$s • Build %2$s</string>
 </resources>

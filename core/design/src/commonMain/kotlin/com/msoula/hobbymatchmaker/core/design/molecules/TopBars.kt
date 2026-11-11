@@ -2,6 +2,7 @@ package com.msoula.hobbymatchmaker.core.design.molecules
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -19,6 +20,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
@@ -84,27 +86,41 @@ fun NavigationTopBar(
 @Composable
 fun BackNavigationTopBar(
     modifier: Modifier = Modifier,
+    title: String? = null,
+    showBackArrow: Boolean = true,
+    actions: @Composable RowScope.() -> Unit = {},
     onBack: () -> Unit
 ) {
     TopAppBar(
-        title = {},
+        title = {
+            title?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        },
         modifier = modifier.statusBarsPadding(),
+        actions = actions,
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.Transparent,
             scrolledContainerColor = Color.Transparent
         ),
         windowInsets = WindowInsets(0),
         navigationIcon = {
-            IconButton(
-                onClick = { onBack() },
-                content = {
-                    Icon(
-                        imageVector = MaterialIconsArrow_back,
-                        contentDescription = "Back",
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            )
+            if (showBackArrow) {
+                IconButton(
+                    onClick = { onBack() },
+                    content = {
+                        Icon(
+                            imageVector = MaterialIconsArrow_back,
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                )
+            }
         }
     )
 }
