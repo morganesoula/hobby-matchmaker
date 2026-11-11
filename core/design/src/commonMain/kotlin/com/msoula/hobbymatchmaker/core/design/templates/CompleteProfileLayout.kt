@@ -8,10 +8,7 @@ fun CompleteProfileLayout(
     headerSection: @Composable () -> Unit,
     statsSection: @Composable () -> Unit,
     interestsSection: @Composable () -> Unit,
-    socialSection: @Composable () -> Unit,
-    logOut: @Composable () -> Unit,
-    reportConcern: @Composable () -> Unit,
-    deleteAccount: @Composable () -> Unit
+    socialSection: @Composable () -> Unit
 ) {
     headerSection()
     SpacerHeight16()
@@ -20,10 +17,4 @@ fun CompleteProfileLayout(
     interestsSection()
     SpacerHeight16()
     socialSection()
-    SpacerHeight16()
-    logOut()
-    SpacerHeight16()
-    reportConcern()
-    SpacerHeight16()
-    deleteAccount()
 }

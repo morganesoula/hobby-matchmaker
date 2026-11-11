@@ -7,14 +7,11 @@ import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
 fun EditableProfileLayout(
     editPhotoProfileSection: @Composable () -> Unit,
     editBasicInformationSection: @Composable () -> Unit,
-    editInterestsSection: @Composable () -> Unit,
-    logOut: @Composable () -> Unit
+    editInterestsSection: @Composable () -> Unit
 ) {
     editPhotoProfileSection()
     SpacerHeight16()
     editBasicInformationSection()
     SpacerHeight16()
     editInterestsSection()
-    SpacerHeight16()
-    logOut()
 }

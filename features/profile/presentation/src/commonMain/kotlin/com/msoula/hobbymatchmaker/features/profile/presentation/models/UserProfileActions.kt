@@ -6,7 +6,6 @@ import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
 @Immutable
 data class UserProfileActions(
     val closeEdition: () -> Unit,
-    val logOut: (String) -> Unit,
     val onNavigate: (NavigationDestination) -> Unit,
     val onEvent: (UserProfileUiEventModel) -> Unit,
     val onSearchPeople: (String) -> Unit,

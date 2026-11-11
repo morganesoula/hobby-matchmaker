@@ -2,14 +2,12 @@ package com.msoula.hobbymatchmaker.features.profile.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.msoula.hobbymatchmaker.core.authentication.domain.useCases.LogOutUseCase
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.design.util.EventHandler
-import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
 import com.msoula.hobbymatchmaker.core.session.domain.models.SessionState
 import com.msoula.hobbymatchmaker.core.session.domain.useCases.ObserveSessionStateUseCase
@@ -40,7 +38,6 @@ import kotlin.time.ExperimentalTime
 class UserProfileViewModel(
     private val userProfileInteractor: UserProfileOrchestrator,
     private val defaultMessageMapper: ErrorMessageMapper,
-    private val logOutUseCase: LogOutUseCase,
     private val upsertUserUseCase: UpsertUserProfileUseCase,
     private val syncUserUseCase: SyncUserProfileUseCase,
     private val refreshSocialCircleUseCase: RefreshSocialCircleUseCase,
@@ -61,12 +58,6 @@ class UserProfileViewModel(
 
     val originalProfile: StateFlow<UserProfileUiModel?>
         field = MutableStateFlow<UserProfileUiModel?>(null)
-
-    val isDeleteAccountDialogVisible: StateFlow<Boolean>
-        field = MutableStateFlow<Boolean>(false)
-
-    val isDeletingAccount: StateFlow<Boolean>
-        field = MutableStateFlow<Boolean>(false)
 
     val screenState: StateFlow<UserProfileUiStateModel>
         field = MutableStateFlow<UserProfileUiStateModel>(UserProfileUiStateModel.Loading)
@@ -135,17 +126,6 @@ class UserProfileViewModel(
             UserProfileUiEventModel.OnSaveClicked -> saveProfile()
 
             UserProfileUiEventModel.OnEditModeClicked -> toggleEditMode()
-
-            UserProfileUiEventModel.OnSignUpButtonClicked -> logOut()
-
-            UserProfileUiEventModel.OnDeleteAccountClicked ->
-                isDeleteAccountDialogVisible.update { true }
-
-            UserProfileUiEventModel.OnDeleteAccountDismissed -> {
-                if (!isDeletingAccount.value) isDeleteAccountDialogVisible.update { false }
-            }
-
-            UserProfileUiEventModel.OnDeleteAccountConfirmed -> deleteAccount()
         }
     }
 
@@ -186,46 +166,6 @@ class UserProfileViewModel(
     override fun onCleared() {
         super.onCleared()
         eventHandler.close()
-    }
-
-    private fun logOut() {
-        scope.launch {
-            logOutUseCase()
-                .onSuccess {
-                    eventHandler.sendEvent(
-                        UiEvent.Navigate(NavigationDestination.SignIn)
-                    )
-                }
-                .onFailure { error ->
-                    eventHandler.sendEvent(
-                        UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
-                    )
-                }
-        }
-    }
-
-    private fun deleteAccount() {
-        if (isDeletingAccount.value) return
-
-        scope.launch {
-            isDeletingAccount.update { true }
-            userProfileInteractor.deleteAccount(localAvatarPath = editableProfile.value?.avatarUrl)
-                .onSuccess {
-                    isDeleteAccountDialogVisible.update { false }
-                    eventHandler.sendEvent(
-                        UiEvent.Navigate(NavigationDestination.SignIn)
-                    )
-                }
-                .onFailure { error ->
-                    Logger.e("Failed to delete account: $error")
-                    isDeleteAccountDialogVisible.update { false }
-                    eventHandler.sendEvent(
-                        UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
-                    )
-                }
-
-            isDeletingAccount.update { false }
-        }
     }
 
     fun closeEdition() {

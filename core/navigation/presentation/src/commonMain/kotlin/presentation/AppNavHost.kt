@@ -1,5 +1,7 @@
 package com.msoula.hobbymatchmaker.core.navigation.presentation
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -9,12 +11,10 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
@@ -60,7 +60,6 @@ import com.msoula.hobbymatchmaker.features.settings.presentation.SettingsViewMod
 import com.msoula.hobbymatchmaker.features.profile.presentation.UserProfileViewModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileActions
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileState
-import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiEventModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiStateModel
 import com.msoula.hobbymatchmaker.features.social.presentation.SocialContent
 import com.msoula.hobbymatchmaker.features.social.presentation.SocialViewModel
@@ -69,7 +68,6 @@ import com.msoula.hobbymatchmaker.features.social.presentation.models.InviteStat
 import com.msoula.hobbymatchmaker.features.social.presentation.models.SocialUiEventModel
 import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.getString
-import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -310,9 +308,6 @@ fun AppNavHost(
             val profileState by userProfileViewModel.screenState.collectAsStateWithLifecycle()
             val isEditMode by userProfileViewModel.isEditMode.collectAsStateWithLifecycle()
             val editableProfile by userProfileViewModel.editableProfile.collectAsStateWithLifecycle()
-            val isDeleteAccountDialogVisible by userProfileViewModel.isDeleteAccountDialogVisible
-                .collectAsStateWithLifecycle()
-            val isDeletingAccount by userProfileViewModel.isDeletingAccount.collectAsStateWithLifecycle()
 
             val searchedPseudos by socialViewModel.searchResults.collectAsStateWithLifecycle()
             val profile = (profileState as? UserProfileUiStateModel.Success)?.userProfile
@@ -356,7 +351,6 @@ fun AppNavHost(
                 val userProfileActions = remember(userProfileViewModel, socialViewModel) {
                     UserProfileActions(
                         closeEdition = { userProfileViewModel.closeEdition() },
-                        logOut = { userProfileViewModel.onEvent(UserProfileUiEventModel.OnSignUpButtonClicked) },
                         onNavigate = { destination ->
                             when (destination) {
                                 NavigationDestination.SignUp -> navCallbacks.navigateAndClearToAuth()
@@ -383,16 +377,12 @@ fun AppNavHost(
                 val userProfileState = remember(
                     profileState,
                     editableProfile,
-                    isEditMode,
-                    isDeleteAccountDialogVisible,
-                    isDeletingAccount
+                    isEditMode
                 ) {
                     UserProfileState(
                         profileState = profileState,
                         editableProfile = editableProfile,
-                        isEditMode = isEditMode,
-                        isDeleteAccountDialogVisible = isDeleteAccountDialogVisible,
-                        isDeletingAccount = isDeletingAccount
+                        isEditMode = isEditMode
                     )
                 }
 

@@ -14,7 +14,6 @@ val featuresModuleUserProfilePresentation = module {
         UserProfileViewModel(
             userProfileInteractor = get(),
             defaultMessageMapper = get(),
-            logOutUseCase = get(),
             upsertUserUseCase = get(),
             syncUserUseCase = get(),
             refreshSocialCircleUseCase = get(),

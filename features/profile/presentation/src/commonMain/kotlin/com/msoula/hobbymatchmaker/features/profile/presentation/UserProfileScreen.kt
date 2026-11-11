@@ -1,5 +1,6 @@
 package com.msoula.hobbymatchmaker.features.profile.presentation
 
+import androidx.compose.runtime.getValue
 import com.msoula.hobbymatchmaker.core.design.settings_open_cd
 import com.msoula.hobbymatchmaker.core.design.icons.LucideSettings
 import androidx.compose.material3.IconButton
@@ -13,27 +14,17 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.isIosPlatform
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.profile_pseudo_copied
-import com.msoula.hobbymatchmaker.core.design.atoms.DestructiveTextButton
-import com.msoula.hobbymatchmaker.core.design.atoms.DestructiveConfirmationDialog
 import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.ProfileLoadingScreen
-import com.msoula.hobbymatchmaker.core.design.atoms.SecondaryButton
-import com.msoula.hobbymatchmaker.core.design.delete_account
-import com.msoula.hobbymatchmaker.core.design.delete_account_dialog_cancel
-import com.msoula.hobbymatchmaker.core.design.delete_account_dialog_confirm
-import com.msoula.hobbymatchmaker.core.design.delete_account_dialog_message
-import com.msoula.hobbymatchmaker.core.design.delete_account_dialog_title
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_requirements_no_number
 import com.msoula.hobbymatchmaker.core.design.guest_build_circle_feature_description
 import com.msoula.hobbymatchmaker.core.design.guest_build_circle_feature_title
@@ -49,13 +40,9 @@ import com.msoula.hobbymatchmaker.core.design.guest_share_interests_feature_titl
 import com.msoula.hobbymatchmaker.core.design.icons.BootstrapPerson
 import com.msoula.hobbymatchmaker.core.design.icons.HeroiconsSparkles
 import com.msoula.hobbymatchmaker.core.design.icons.LucideFilm
-import com.msoula.hobbymatchmaker.core.design.log_out
-import com.msoula.hobbymatchmaker.core.design.report_concern
-import com.msoula.hobbymatchmaker.core.design.report_concern_email_subject
 import com.msoula.hobbymatchmaker.core.design.models.ProfileHeaderUiModel
 import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMember
 import com.msoula.hobbymatchmaker.core.design.molecules.BackNavigationTopBar
-import com.msoula.hobbymatchmaker.core.design.molecules.ContactLink
 import com.msoula.hobbymatchmaker.core.design.molecules.EditProfileTopBar
 import com.msoula.hobbymatchmaker.core.design.molecules.FeatureProfileCard
 import com.msoula.hobbymatchmaker.core.design.molecules.FeatureProfileCardWithButton
@@ -74,8 +61,6 @@ import com.msoula.hobbymatchmaker.core.design.templates.EditableProfileLayout
 import com.msoula.hobbymatchmaker.core.design.templates.GuestProfileLayout
 import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
 import com.msoula.hobbymatchmaker.core.design.util.RetryPolicy
-import com.msoula.hobbymatchmaker.core.design.util.SUPPORT_EMAIL
-import com.msoula.hobbymatchmaker.core.design.util.supportMailtoUri
 import com.msoula.hobbymatchmaker.core.design.util.UIErrorHint
 import com.msoula.hobbymatchmaker.features.profile.presentation.mappers.toProfileSocialMembers
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileActions
@@ -119,11 +104,9 @@ fun UserProfileContent(
         }
     }
 
-    val uriHandler = LocalUriHandler.current
     val clipboardManager = LocalClipboardManager.current
     val coroutineScope = rememberCoroutineScope()
     val pseudoCopiedMessage = stringResource(Res.string.profile_pseudo_copied)
-    val reportConcernSubject = stringResource(Res.string.report_concern_email_subject)
 
     val avatarLauncher = rememberFilePickerLauncher(
         type = FileKitType.Image,
@@ -235,14 +218,6 @@ fun UserProfileContent(
                                             )
                                         }
                                     )
-                                },
-                                logOut = {
-                                    SecondaryButton(
-                                        text = stringResource(Res.string.log_out),
-                                        onClick = {
-                                            userProfileActions.logOut("sign_in")
-                                        }
-                                    )
                                 }
                             )
                         }
@@ -297,31 +272,6 @@ fun UserProfileContent(
                                     socialMembers = profile.socialMembers.map { it.toProfileSocialMembers() }
                                         .toImmutableList()
                                 )
-                            },
-                            logOut = {
-                                SecondaryButton(
-                                    text = stringResource(Res.string.log_out),
-                                    onClick = { userProfileActions.logOut("sign_in") }
-                                )
-                            },
-                            reportConcern = {
-                                ContactLink(
-                                    text = stringResource(Res.string.report_concern),
-                                    contactInfo = SUPPORT_EMAIL,
-                                    onClick = {
-                                        // No email app: the address stays visible under the link
-                                        runCatching { uriHandler.openUri(supportMailtoUri(reportConcernSubject)) }
-                                            .onFailure { Logger.e("No app to open the report email: ${it.message}") }
-                                    }
-                                )
-                            },
-                            deleteAccount = {
-                                DestructiveTextButton(
-                                    text = stringResource(Res.string.delete_account),
-                                    onClick = {
-                                        userProfileActions.onEvent(UserProfileUiEventModel.OnDeleteAccountClicked)
-                                    }
-                                )
                             }
                         )
                     }
@@ -374,20 +324,5 @@ fun UserProfileContent(
             }
         }
 
-        if (userProfileState.isDeleteAccountDialogVisible) {
-            DestructiveConfirmationDialog(
-                title = stringResource(Res.string.delete_account_dialog_title),
-                message = stringResource(Res.string.delete_account_dialog_message),
-                confirmButtonText = stringResource(Res.string.delete_account_dialog_confirm),
-                cancelButtonText = stringResource(Res.string.delete_account_dialog_cancel),
-                isLoading = userProfileState.isDeletingAccount,
-                onDismiss = {
-                    userProfileActions.onEvent(UserProfileUiEventModel.OnDeleteAccountDismissed)
-                },
-                onConfirm = {
-                    userProfileActions.onEvent(UserProfileUiEventModel.OnDeleteAccountConfirmed)
-                }
-            )
-        }
     }
 }
