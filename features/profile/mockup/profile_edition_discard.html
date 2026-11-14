@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HobbyMatchMaker - Discard Changes</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "secondary-fixed-dim": "#f6bb81",
+            "surface-dim": "#181211",
+            "on-tertiary": "#00344a",
+            "on-secondary-fixed": "#2c1600",
+            "background-dark": "#201a19",
+            "primary-container": "#ff9900",
+            "on-background": "#ece0de",
+            "error-container": "#93000a",
+            "on-surface-variant": "#dbc2ad",
+            "background": "#181211",
+            "surface-border": "rgba(255, 153, 0, 0.2)",
+            "secondary-fixed": "#ffdcbe",
+            "error": "#ffb4ab",
+            "tertiary": "#8ed5ff",
+            "on-tertiary-container": "#004965",
+            "on-tertiary-fixed": "#001e2c",
+            "tertiary-fixed": "#c4e7ff",
+            "surface-container-highest": "#3a3332",
+            "on-surface": "#ece0de",
+            "on-primary-fixed-variant": "#693c00",
+            "on-primary": "#4a2800",
+            "surface-container": "#241e1d",
+            "surface-container-high": "#2f2827",
+            "on-tertiary-fixed-variant": "#004c69",
+            "inverse-surface": "#ece0de",
+            "on-error-container": "#ffdad6",
+            "tertiary-fixed-dim": "#7cd0ff",
+            "on-error": "#690005",
+            "surface-variant": "#3a3332",
+            "inverse-primary": "#8a5100",
+            "inverse-on-surface": "#362f2e",
+            "background-light": "#f8f7f5",
+            "on-secondary-fixed-variant": "#663e0e",
+            "primary-fixed": "#ffdcbd",
+            "on-primary-fixed": "#2c1600",
+            "secondary-container": "#663e0e",
+            "primary": "#ffc082",
+            "on-primary-container": "#653a00",
+            "surface": "#181211",
+            "text-muted": "#94a3b8",
+            "primary-fixed-dim": "#ffb86f",
+            "tertiary-container": "#04beff",
+            "outline": "#a38d7a",
+            "surface-container-low": "#201a19",
+            "outline-variant": "#554434",
+            "secondary": "#f6bb81",
+            "surface-container-lowest": "#120d0c",
+            "surface-card": "#271e15",
+            "on-secondary": "#4a2800",
+            "on-secondary-container": "#e3aa71",
+            "surface-tint": "#ffb86f",
+            "surface-bright": "#3f3836"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-md": "1rem",
+            "margin": "1.5rem",
+            "space-xs": "0.25rem",
+            "space-xl": "2rem",
+            "space-lg": "1.5rem",
+            "gutter": "1rem",
+            "space-sm": "0.5rem"
+          },
+          "fontFamily": {
+            "body-md": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "label-xs": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "body-md": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "400" }],
+            "headline-md": ["1.25rem", { "lineHeight": "1.75rem", "fontWeight": "700" }],
+            "headline-lg": ["1.875rem", { "lineHeight": "2.25rem", "fontWeight": "700" }],
+            "label-md": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.05em", "fontWeight": "600" }],
+            "headline-sm": ["1.125rem", { "lineHeight": "1.5rem", "fontWeight": "700" }],
+            "label-xs": ["10px", { "lineHeight": "12px", "letterSpacing": "-0.025em", "fontWeight": "700" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md antialiased min-h-screen selection:bg-primary-container selection:text-on-primary-container flex flex-col justify-between relative overflow-x-hidden">
+<!-- Background App Shell (Underlying 'Edit Profile' Screen) -->
+<div class="relative w-full max-w-2xl mx-auto flex flex-col min-h-screen pb-16">
+<!-- TopAppBar from Shared Components JSON -->
+<header class="bg-surface/80 dark:bg-surface/80 backdrop-blur-md text-primary dark:text-primary docked full-width top-0 sticky z-30 border-b border-surface-border backdrop-blur-md shadow-sm">
+<div class="flex justify-between items-center w-full px-6 py-3 max-w-2xl mx-auto">
+<button aria-label="Go back" class="flex items-center justify-center p-2 rounded-full hover:bg-primary/10 transition-colors active:scale-95 transition-transform duration-150 text-on-surface">
+<span class="material-symbols-outlined text-primary dark:text-primary">arrow_back</span>
+</button>
+<span class="text-headline-sm font-headline-sm text-primary dark:text-primary tracking-tight">HobbyMatchMaker</span>
+<button aria-label="Close" class="flex items-center justify-center p-2 rounded-full hover:bg-primary/10 transition-colors active:scale-95 transition-transform duration-150 text-on-surface">
+<span class="material-symbols-outlined text-on-surface-variant">close</span>
+</button>
+</div>
+</header>
+<!-- Content: Edit Profile Canvas (Behind Backdrop) -->
+<main class="flex-1 px-6 py-6 space-y-6">
+<div class="flex items-center justify-between">
+<div>
+<h1 class="text-headline-lg font-headline-lg text-on-surface">Edit Profile</h1>
+<p class="text-body-md font-body-md text-on-surface-variant">Update your interests, photos, and match preferences</p>
+</div>
+<span class="text-label-md font-label-md px-3 py-1 rounded-full bg-primary/10 text-primary border border-surface-border">
+          Unsaved changes
+        </span>
+</div>
+<!-- Avatar & Cover Section -->
+<div class="relative rounded-xl border border-surface-border bg-surface-container-low p-6 overflow-hidden">
+<div class="flex items-center gap-5">
+<div class="relative w-20 h-20 rounded-full border-2 border-primary ring-4 ring-primary/10 overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="A candid profile portrait of an enthusiastic young woman smiling gently in a sunlit art studio with warm terracotta walls, ceramic pottery, and soft ambient afternoon lighting casting subtle golden flares across the scene." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCm1FmtKddqRT9dvR7i0AjwhonCZai9_CPKkkAc0nhIbue6dTRFsSGS51m5pREXKqMXRAskdUeLrR8DtMjrfiTKV4oR9LiQdTE1zscYcuplwv2UCWtlkTC2oLfteh5ZPhOg3-nEsC6Evb-CzeBD9TZ1qCXjHmh3AKBCnsEZkgsB9OXTwl_mi-1AsBCh_ZjlmXL6PT7HlySABEal-IJlwPaZy8wfsp7kmeWPZYGYiAAo"/>
+<div class="absolute inset-0 bg-background-dark/40 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-xl">photo_camera</span>
+</div>
+</div>
+<div class="space-y-1">
+<h2 class="text-headline-sm font-headline-sm text-on-surface">Elena Vance</h2>
+<p class="text-body-md font-body-md text-on-surface-variant">Ceramics • Bouldering • Analog Synth</p>
+<div class="flex gap-2 pt-1">
+<span class="text-label-md font-label-md text-primary bg-primary/10 px-2.5 py-0.5 rounded-lg border border-primary/20">Change Photo</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Form Inputs Dummy Stack -->
+<div class="space-y-4">
+<div class="space-y-1.5">
+<label class="text-label-md font-label-md text-on-surface-variant">DISPLAY NAME</label>
+<input class="w-full bg-surface-container border border-surface-border rounded-xl px-4 py-3 text-on-surface text-body-md font-body-md focus:outline-none" readonly="" type="text" value="Elena Vance"/>
+</div>
+<div class="space-y-1.5">
+<label class="text-label-md font-label-md text-on-surface-variant">ABOUT ME &amp; HOBBY PASSION</label>
+<textarea class="w-full bg-surface-container border border-surface-border rounded-xl px-4 py-3 text-on-surface text-body-md font-body-md focus:outline-none resize-none" readonly="" rows="3">Currently exploring modular synthesis and tactile ceramic sculpture. Looking for community workshops, weekend co-creators, or outdoor bouldering partners in the valley.</textarea>
+</div>
+<div class="space-y-1.5">
+<div class="flex justify-between items-center">
+<label class="text-label-md font-label-md text-on-surface-variant">ACTIVE HOBBY TAGS</label>
+<span class="text-label-md font-label-md text-primary">+ Add New</span>
+</div>
+<div class="flex flex-wrap gap-2 pt-1">
+<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container border border-surface-border text-on-surface text-body-md font-body-md">
+<span class="material-symbols-outlined text-primary text-sm">palette</span> Pottery &amp; Glazing
+            </span>
+<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container border border-surface-border text-on-surface text-body-md font-body-md">
+<span class="material-symbols-outlined text-primary text-sm">terrain</span> Bouldering V4+
+            </span>
+<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container border border-surface-border text-on-surface text-body-md font-body-md">
+<span class="material-symbols-outlined text-primary text-sm">graphic_eq</span> Eurorack Synthesizers
+            </span>
+</div>
+</div>
+<div class="space-y-1.5 pt-2">
+<label class="text-label-md font-label-md text-on-surface-variant">SEARCH RADIUS &amp; FREQUENCY</label>
+<div class="w-full bg-surface-container border border-surface-border rounded-xl p-4 flex items-center justify-between">
+<span class="text-body-md font-body-md text-on-surface">Within 15 miles • Weekends</span>
+<span class="material-symbols-outlined text-primary text-sm">tune</span>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Focused Modal Overlay: Dimmed, warm darkened glass backdrop -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/70 backdrop-blur-sm transition-all duration-300">
+<!-- Clickable backdrop dismissal area -->
+<div aria-hidden="true" class="absolute inset-0"></div>
+<!-- Centered Dialog Card with Warm Dark Surface and Amber Accent Ring -->
+<div aria-describedby="modal-desc" aria-labelledby="modal-title" aria-modal="true" class="relative w-full max-w-sm sm:max-w-md bg-surface-container-high border border-surface-border rounded-xl shadow-2xl shadow-black/80 overflow-hidden transform transition-all duration-200" role="alertdialog">
+<!-- Subtle top amber accent light highlight -->
+<div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
+<div class="p-6 sm:p-7 space-y-5">
+<!-- Visual Warning / State Icon -->
+<div class="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary ring-8 ring-primary/5">
+<span class="material-symbols-outlined text-2xl" data-icon="warning">warning</span>
+</div>
+<!-- Typography Cluster -->
+<div class="space-y-2">
+<h2 class="text-headline-md font-headline-md text-on-surface tracking-tight" id="modal-title">
+            Discard changes?
+          </h2>
+<p class="text-body-md font-body-md text-on-surface-variant leading-relaxed" id="modal-desc">
+            You have unsaved edits. If you leave now, any changes you made will be lost.
+          </p>
+</div>
+<!-- Action CTAs Stack -->
+<div class="flex flex-col-reverse sm:flex-row items-center gap-3 pt-2">
+<!-- Destructive / Exit Action Button -->
+<button class="w-full sm:w-1/2 py-3 px-5 rounded-xl border border-outline-variant hover:border-error/50 bg-transparent hover:bg-error-container/20 text-error font-semibold text-body-md transition-all duration-150 flex items-center justify-center gap-1.5 active:scale-95" type="button">
+<span>Discard</span>
+</button>
+<!-- Primary CTA Button: Keep editing -->
+<button class="w-full sm:w-1/2 py-3 px-5 rounded-xl bg-primary hover:bg-primary-fixed hover:scale-[1.02] text-background-dark font-semibold text-body-md shadow-lg shadow-primary/20 transition-all duration-150 flex items-center justify-center gap-1.5 active:scale-95" type="button">
+<span>Keep editing</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</body></html>

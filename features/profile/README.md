@@ -78,6 +78,10 @@ Source HTML: [profile_empty](mockup/profile_empty.html)
 ![Edit user profile mockup](mockup/profile_edition.png)
 Source HTML: [profile_edition](mockup/profile_edition.html)
 
+**4. User Profile Edition - Discarding save:**
+![Discarding edition profile mockup](mockup/profile_edition_discard.png)
+Source HTML: [discard_edition](mockup/profile_edition_discard.html)
+
 ## Architecture
 
 This module follows a Clean, Modular Architecture, designed for Kotlin Multiplatform. Each layer has

@@ -35,10 +35,11 @@ fun PrimaryTextField(
     keyboardOptions: KeyboardOptions? = null,
     keyboardActions: KeyboardActions? = null,
     trailingIcon: (@Composable () -> Unit)? = null,
-    showSupportingText: Boolean = false
+    leadingIcon: (@Composable () -> Unit)? = null,
+    showSupportingText: Boolean = false,
+    maxChar: Int = 120,
+    minLines: Int = 1
 ) {
-    val maxChar = 120
-
     OutlinedTextField(
         modifier = modifier,
         value = text,
@@ -50,9 +51,11 @@ fun PrimaryTextField(
         readOnly = readOnly,
         label = { label?.let { Text(text = it) } },
         singleLine = singleLine,
+        minLines = minLines,
         colors = HMMTextFieldColors(),
         keyboardOptions = keyboardOptions ?: KeyboardOptions.Default,
         keyboardActions = keyboardActions ?: rememberSubmitKeyBoardActions {},
+        leadingIcon = leadingIcon,
         supportingText = {
             if (showSupportingText) {
                 Text(

@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -24,6 +26,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.design.Res
+import com.msoula.hobbymatchmaker.core.design.edit_profile_save_button_title
+import com.msoula.hobbymatchmaker.core.design.edit_profile_title
+import com.msoula.hobbymatchmaker.core.design.back
 import com.msoula.hobbymatchmaker.core.design.atoms.SpacerWidth4
 import com.msoula.hobbymatchmaker.core.design.cancel
 import com.msoula.hobbymatchmaker.core.design.icons.BootstrapPerson
@@ -134,46 +139,37 @@ fun EditProfileTopBar(
     onBack: () -> Unit,
     onSave: () -> Unit
 ) {
-    TopAppBar(
-        title = {},
-        modifier = modifier,
+    CenterAlignedTopAppBar(
+        title = {
+            Text(
+                text = stringResource(Res.string.edit_profile_title),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        modifier = modifier.statusBarsPadding(),
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            scrolledContainerColor = Color.Transparent,
-            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+            containerColor = Color.Transparent,
+            scrolledContainerColor = Color.Transparent
         ),
+        windowInsets = WindowInsets(0),
         actions = {
-            Button(
-                onClick = { onSave() },
-                enabled = enableSave,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.onPrimary,
-                    disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = .4f)
-                )
-            ) {
+            TextButton(onClick = { onSave() }, enabled = enableSave) {
                 Text(
-                    text = "Save",
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(
-                        CustomSize.Four
-                    )
+                    text = stringResource(Res.string.edit_profile_save_button_title),
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = if (enableSave) 1f else .4f),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
                 )
             }
         },
         navigationIcon = {
             if (isIOS) {
                 IconButton(onClick = { onBack() }) {
-                    Row {
-                        Icon(
-                            imageVector = MaterialIconsArrow_back,
-                            contentDescription = "Back"
-                        )
-                        SpacerWidth4()
-                        Text(
-                            text = stringResource(Res.string.cancel),
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                    }
+                    Icon(
+                        imageVector = MaterialIconsArrow_back,
+                        contentDescription = stringResource(Res.string.back)
+                    )
                 }
             }
         }

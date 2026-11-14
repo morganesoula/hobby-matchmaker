@@ -196,7 +196,6 @@ fun UserProfileContent(
                                                 )
                                             )
                                         },
-                                        pseudo = profile.pseudo,
                                         bio = currentEditableProfile.bio,
                                         onBioChanged = { bio ->
                                             userProfileActions.onEvent(

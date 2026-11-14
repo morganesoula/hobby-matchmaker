@@ -172,16 +172,33 @@
     <string name="authentified_no_social_members_description">No social members yet</string>
 
     <string name="edit_profile_save_button_title">Save</string>
-    <string name="edit_profile_edit_photo_title">Tap to change profile picture</string>
-    <string name="edit_profile_basic_information_title">Basic Information</string>
+    <string name="edit_profile_title">Edit profile</string>
+    <string name="edit_profile_optional">Optional</string>
+    <string name="edit_profile_interests_hint">Pick up to 5 interests to share with your friends</string>
+    <string name="edit_profile_interests_add_own">Add your own</string>
+    <string name="edit_profile_interests_custom_placeholder">Your interest…</string>
+    <string name="edit_profile_interests_add_confirm_cd">Add this interest</string>
+    <string name="edit_profile_interests_limit">5 max, remove one to add another</string>
+    <string name="interest_suggestion_sci_fi">Sci-Fi</string>
+    <string name="interest_suggestion_thriller">Thriller</string>
+    <string name="interest_suggestion_drama">Drama</string>
+    <string name="interest_suggestion_comedy">Comedy</string>
+    <string name="interest_suggestion_action">Action</string>
+    <string name="interest_suggestion_animation">Animation</string>
+    <string name="interest_suggestion_horror">Horror</string>
+    <string name="interest_suggestion_romance">Romance</string>
+    <string name="interest_suggestion_documentary">Documentary</string>
+    <string name="interest_suggestion_fantasy">Fantasy</string>
+    <string name="interest_suggestion_music">Music</string>
+    <string name="interest_suggestion_travel">Travel</string>
+    <string name="discard_changes_title">Discard changes?</string>
+    <string name="discard_changes_message">You have unsaved edits. If you leave now, any changes you made will be lost.</string>
+    <string name="discard_changes_keep_editing">Keep editing</string>
+    <string name="discard_changes_discard">Discard</string>
     <string name="edit_profile_basic_information_name_title">Name</string>
     <string name="edit_profile_basic_information_requirements_title">Requirements:</string>
     <string name="edit_profile_basic_information_requirements_no_number">No numbers allowed</string>
-    <string name="edit_profile_basic_information_pseudo_title">Pseudo</string>
     <string name="edit_profile_basic_information_bio_title">Bio</string>
-    <string name="edit_profile_add_interests_title">Add Interest</string>
-    <string name="edit_profile_add_interests_description">Tip: Separate your interests with commas to add multiple tags at once</string>
-    <string name="edit_profile_add_interests_hint">E.g. Hiking, Gaming...</string>
 
     <!-- SOCIAL -->
     <string name="social_received_requests_accept_button_text">Accept</string>
@@ -278,9 +295,6 @@
     <string name="pseudo_rule_chars">Letters, digits, _ and . only</string>
     <string name="pseudo_rule_dot">Doesn't start or end with a dot</string>
     <string name="profile_share_pseudo">Share my pseudo</string>
-    <string name="profile_pseudo_copied">Pseudo copied to clipboard</string>
-    <string name="settings_title">Settings</string>
-    <string name="settings_open_cd">Open settings</string>
     <string name="profile_favorites_title">Favorites</string>
     <string name="profile_share_message">Find me on HobbyMatchMaker! My pseudo: @%1$s</string>
     <string name="profile_see_all">See all</string>
@@ -299,6 +313,9 @@
     <string name="settings_support_section">Support and community</string>
     <string name="settings_report_description">Report a bug or a data issue</string>
     <string name="settings_privacy_title">Privacy policy</string>
+    <string name="profile_pseudo_copied">Pseudo copied to clipboard</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_open_cd">Open settings</string>
     <string name="settings_privacy_description">How your data is used</string>
     <string name="settings_account_section">Account actions</string>
     <string name="settings_version">HobbyMatchMaker v%1$s • Build %2$s</string>

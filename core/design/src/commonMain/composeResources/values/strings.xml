@@ -172,16 +172,33 @@
     <string name="authentified_no_social_members_description">Pas de membres ajoutés</string>
 
     <string name="edit_profile_save_button_title">Enregistrer</string>
-    <string name="edit_profile_edit_photo_title">Tapez pour changer votre photo</string>
-    <string name="edit_profile_basic_information_title">Informations</string>
+    <string name="edit_profile_title">Modifier le profil</string>
+    <string name="edit_profile_optional">Optionnel</string>
+    <string name="edit_profile_interests_hint">Choisis jusqu'à 5 centres d'intérêt à partager avec tes amis</string>
+    <string name="edit_profile_interests_add_own">Ajouter le tien</string>
+    <string name="edit_profile_interests_custom_placeholder">Ton centre d'intérêt…</string>
+    <string name="edit_profile_interests_add_confirm_cd">Ajouter ce centre d'intérêt</string>
+    <string name="edit_profile_interests_limit">5 maximum, retires-en un pour en ajouter un autre</string>
+    <string name="interest_suggestion_sci_fi">Science-fiction</string>
+    <string name="interest_suggestion_thriller">Thriller</string>
+    <string name="interest_suggestion_drama">Drame</string>
+    <string name="interest_suggestion_comedy">Comédie</string>
+    <string name="interest_suggestion_action">Action</string>
+    <string name="interest_suggestion_animation">Animation</string>
+    <string name="interest_suggestion_horror">Horreur</string>
+    <string name="interest_suggestion_romance">Romance</string>
+    <string name="interest_suggestion_documentary">Documentaire</string>
+    <string name="interest_suggestion_fantasy">Fantastique</string>
+    <string name="interest_suggestion_music">Musique</string>
+    <string name="interest_suggestion_travel">Voyage</string>
+    <string name="discard_changes_title">Abandonner les modifications ?</string>
+    <string name="discard_changes_message">Tu as des modifications non enregistrées. Si tu quittes maintenant, elles seront perdues.</string>
+    <string name="discard_changes_keep_editing">Continuer à modifier</string>
+    <string name="discard_changes_discard">Abandonner</string>
     <string name="edit_profile_basic_information_requirements_title">Condition:</string>
     <string name="edit_profile_basic_information_requirements_no_number">Pas de nombre autorisé</string>
     <string name="edit_profile_basic_information_name_title">Nom</string>
-    <string name="edit_profile_basic_information_pseudo_title">Pseudo</string>
     <string name="edit_profile_basic_information_bio_title">Bio</string>
-    <string name="edit_profile_add_interests_title">Ajoutez des intérêts</string>
-    <string name="edit_profile_add_interests_description">Astuce: Séparez vos intérêts par des virgules pour en ajouter plusieurs à la fois</string>
-    <string name="edit_profile_add_interests_hint">Ex: Randonnée, Jeux vidéos...</string>
 
     <!-- SOCIAL -->
     <string name="social_received_requests_accept_button_text">Accepter</string>
@@ -278,9 +295,6 @@
     <string name="pseudo_rule_chars">Lettres, chiffres, _ et . uniquement</string>
     <string name="pseudo_rule_dot">Ne commence ni ne finit par un point</string>
     <string name="profile_share_pseudo">Partager mon pseudo</string>
-    <string name="profile_pseudo_copied">Pseudo copié dans le presse-papiers</string>
-    <string name="settings_title">Paramètres</string>
-    <string name="settings_open_cd">Ouvrir les paramètres</string>
     <string name="profile_favorites_title">Favoris</string>
     <string name="profile_share_message">Retrouve-moi sur HobbyMatchMaker ! Mon pseudo : @%1$s</string>
     <string name="profile_see_all">Voir tout</string>
@@ -299,6 +313,9 @@
     <string name="settings_support_section">Support et communauté</string>
     <string name="settings_report_description">Signalez un bug ou un problème de données</string>
     <string name="settings_privacy_title">Politique de confidentialité</string>
+    <string name="profile_pseudo_copied">Pseudo copié dans le presse-papiers</string>
+    <string name="settings_title">Paramètres</string>
+    <string name="settings_open_cd">Ouvrir les paramètres</string>
     <string name="settings_privacy_description">Comment vos données sont utilisées</string>
     <string name="settings_account_section">Actions du compte</string>
     <string name="settings_version">HobbyMatchMaker v%1$s • Build %2$s</string>

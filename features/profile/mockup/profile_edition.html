@@ -1,7 +1,9 @@
-<!DOCTYPE html><html class="dark" lang="en" style=""><head>
+<!DOCTYPE html><html class="dark" lang="en"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>Edit Profile - HobbyMatchMaker</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <!-- Google Fonts: Plus Jakarta Sans -->
 <link href="https://fonts.googleapis.com" rel="preconnect">
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
@@ -9,66 +11,64 @@
 <!-- Material Symbols Outlined -->
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
-<!-- Tailwind CSS CDN -->
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script id="tailwind-config">
     tailwind.config = {
       darkMode: "class",
       theme: {
         extend: {
           "colors": {
-            "on-background": "#ece0de",
-            "on-error": "#690005",
-            "tertiary-fixed": "#c4e7ff",
-            "background": "#181211",
-            "on-error-container": "#ffdad6",
-            "surface": "#181211",
-            "outline-variant": "#554434",
-            "error-container": "#93000a",
-            "inverse-surface": "#ece0de",
-            "surface-container-highest": "#3a3332",
-            "text-muted": "#94a3b8",
-            "on-surface": "#ece0de",
-            "tertiary-container": "#04beff",
-            "on-tertiary": "#00344a",
-            "outline": "#a38d7a",
-            "surface-bright": "#3f3836",
-            "on-primary": "#4a2800",
-            "background-light": "#f8f7f5",
-            "surface-container-low": "#201a19",
-            "surface-card": "#271e15",
-            "surface-dim": "#181211",
-            "on-primary-fixed-variant": "#693c00",
-            "surface-container": "#241e1d",
             "secondary-fixed-dim": "#f6bb81",
-            "on-tertiary-fixed-variant": "#004c69",
-            "surface-tint": "#ffb86f",
+            "surface-dim": "#181211",
+            "on-tertiary": "#00344a",
             "on-secondary-fixed": "#2c1600",
-            "primary-fixed": "#ffdcbd",
-            "secondary-fixed": "#ffdcbe",
-            "on-secondary-fixed-variant": "#663e0e",
-            "on-primary-container": "#653a00",
-            "surface-variant": "#3a3332",
             "background-dark": "#201a19",
-            "tertiary-fixed-dim": "#7cd0ff",
-            "on-primary-fixed": "#2c1600",
-            "inverse-on-surface": "#362f2e",
-            "inverse-primary": "#8a5100",
-            "surface-container-high": "#2f2827",
             "primary-container": "#ff9900",
-            "on-secondary": "#4a2800",
-            "secondary": "#f6bb81",
-            "surface-container-lowest": "#120d0c",
-            "error": "#ffb4ab",
-            "on-secondary-container": "#e3aa71",
+            "on-background": "#ece0de",
+            "error-container": "#93000a",
             "on-surface-variant": "#dbc2ad",
-            "primary-fixed-dim": "#ffb86f",
-            "secondary-container": "#663e0e",
+            "background": "#181211",
+            "surface-border": "rgba(255, 153, 0, 0.2)",
+            "secondary-fixed": "#ffdcbe",
+            "error": "#ffb4ab",
+            "tertiary": "#8ed5ff",
             "on-tertiary-container": "#004965",
             "on-tertiary-fixed": "#001e2c",
-            "tertiary": "#8ed5ff",
+            "tertiary-fixed": "#c4e7ff",
+            "surface-container-highest": "#3a3332",
+            "on-surface": "#ece0de",
+            "on-primary-fixed-variant": "#693c00",
+            "on-primary": "#4a2800",
+            "surface-container": "#241e1d",
+            "surface-container-high": "#2f2827",
+            "on-tertiary-fixed-variant": "#004c69",
+            "inverse-surface": "#ece0de",
+            "on-error-container": "#ffdad6",
+            "tertiary-fixed-dim": "#7cd0ff",
+            "on-error": "#690005",
+            "surface-variant": "#3a3332",
+            "inverse-primary": "#8a5100",
+            "inverse-on-surface": "#362f2e",
+            "background-light": "#f8f7f5",
+            "on-secondary-fixed-variant": "#663e0e",
+            "primary-fixed": "#ffdcbd",
+            "on-primary-fixed": "#2c1600",
+            "secondary-container": "#663e0e",
             "primary": "#ffc082",
-            "surface-border": "rgba(255, 153, 0, 0.2)"
+            "on-primary-container": "#653a00",
+            "surface": "#181211",
+            "text-muted": "#94a3b8",
+            "primary-fixed-dim": "#ffb86f",
+            "tertiary-container": "#04beff",
+            "outline": "#a38d7a",
+            "surface-container-low": "#201a19",
+            "outline-variant": "#554434",
+            "secondary": "#f6bb81",
+            "surface-container-lowest": "#120d0c",
+            "surface-card": "#271e15",
+            "on-secondary": "#4a2800",
+            "on-secondary-container": "#e3aa71",
+            "surface-tint": "#ffb86f",
+            "surface-bright": "#3f3836"
           },
           "borderRadius": {
             "DEFAULT": "0.25rem",
@@ -78,199 +78,392 @@
           },
           "spacing": {
             "space-md": "1rem",
-            "space-lg": "1.5rem",
+            "margin": "1.5rem",
             "space-xs": "0.25rem",
             "space-xl": "2rem",
-            "margin": "1.5rem",
-            "space-sm": "0.5rem",
-            "gutter": "1rem"
+            "space-lg": "1.5rem",
+            "gutter": "1rem",
+            "space-sm": "0.5rem"
           },
           "fontFamily": {
-            "label-xs": ["Plus Jakarta Sans"],
             "body-md": ["Plus Jakarta Sans"],
-            "headline-sm": ["Plus Jakarta Sans"],
             "headline-md": ["Plus Jakarta Sans"],
             "headline-lg": ["Plus Jakarta Sans"],
-            "label-md": ["Plus Jakarta Sans"]
+            "label-md": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "label-xs": ["Plus Jakarta Sans"]
           },
           "fontSize": {
-            "label-xs": ["10px", { "lineHeight": "12px", "letterSpacing": "-0.025em", "fontWeight": "700" }],
             "body-md": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "400" }],
-            "headline-sm": ["1.125rem", { "lineHeight": "1.5rem", "fontWeight": "700" }],
             "headline-md": ["1.25rem", { "lineHeight": "1.75rem", "fontWeight": "700" }],
             "headline-lg": ["1.875rem", { "lineHeight": "2.25rem", "fontWeight": "700" }],
-            "label-md": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.05em", "fontWeight": "600" }]
+            "label-md": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.05em", "fontWeight": "600" }],
+            "headline-sm": ["1.125rem", { "lineHeight": "1.5rem", "fontWeight": "700" }],
+            "label-xs": ["10px", { "lineHeight": "12px", "letterSpacing": "-0.025em", "fontWeight": "700" }]
           }
-        },
-      },
+        }
+      }
     }
   </script>
 <style>
+    body {
+      background-color: #181211;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
     .material-symbols-outlined {
-      font-family: 'Material Symbols Outlined';
-      font-weight: normal;
-      font-style: normal;
-      font-size: 24px;
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
       line-height: 1;
-      letter-spacing: normal;
-      text-transform: none;
       display: inline-block;
-      white-space: nowrap;
-      word-wrap: normal;
-      direction: ltr;
-      -webkit-font-smoothing: antialiased;
+      vertical-align: middle;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+    }
+    /* Smooth transitions for interactive chips */
+    .chip-item {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
   </style>
 </head>
-<body class="bg-background text-on-surface font-body-md text-body-md min-h-screen flex flex-col items-center selection:bg-primary-container selection:text-background-dark">
-<!-- Main Device Viewport Wrapper -->
-<div class="w-full max-w-2xl bg-surface min-h-screen flex flex-col shadow-2xl relative pb-28">
-<!-- Top App Bar (Task-focused contextual screen with Back & Quick Save action) -->
-<header class="sticky top-0 z-40 bg-surface/80 backdrop-blur-md border-b border-primary/10 shadow-sm shadow-primary/5">
-<div class="flex justify-between items-center w-full px-6 py-3.5 max-w-2xl mx-auto">
-<button aria-label="Go back" class="p-2 -ml-2 rounded-full text-on-surface-variant hover:bg-primary/10 hover:text-primary transition-colors duration-150 active:scale-95 flex items-center justify-center" type="button">
-<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+<body class="bg-surface text-on-surface min-h-screen antialiased flex flex-col selection:bg-primary-container selection:text-background-dark">
+<!-- Mobile-first App Shell Container (max-w-2xl) -->
+<div class="w-full max-w-2xl mx-auto flex flex-col min-h-screen relative pb-12">
+<!-- 1. Top App Bar -->
+<header class="sticky top-0 z-50 w-full bg-surface/80 backdrop-blur-md px-6 py-3 flex items-center justify-between transition-colors">
+<!-- Back Arrow -->
+<button aria-label="Go back" class="p-2 -ml-2 rounded-full text-on-surface hover:bg-primary/10 active:scale-95 transition-all flex items-center justify-center" type="button">
+<span class="material-symbols-outlined text-[24px]">arrow_back</span>
 </button>
-<h1 class="text-headline-sm font-headline-sm text-on-surface tracking-tight font-bold">
-          Edit Profile
-        </h1>
-<button class="text-label-md font-label-md px-3.5 py-1.5 rounded-lg bg-primary-container text-background-dark font-bold hover:brightness-110 active:scale-95 transition-all duration-150 shadow-sm shadow-primary-container/30 flex items-center gap-1" type="button">
-<span>Save</span>
-<span class="material-symbols-outlined text-[16px]" data-icon="check">check</span>
-</button>
-</div>
+<!-- Center Title -->
+<h1 class="text-headline-sm font-headline-sm text-on-surface tracking-tight">Edit profile</h1>
+<!-- Right Save Action Button -->
+<button class="text-label-md font-label-md font-bold px-3 py-1.5 rounded-lg text-primary-container hover:bg-primary/10 active:scale-95 transition-all duration-150" id="save-btn" type="button">
+        Save
+      </button>
 </header>
 <!-- Main Content Canvas -->
-<main class="flex-1 px-6 pt-6 pb-8 space-y-6">
-<!-- Profile Avatar Section with Ambient Warm Glow -->
-<section class="flex flex-col items-center justify-center pt-2 pb-4">
+<main class="flex-1 px-6 pt-6 flex flex-col gap-8">
+<!-- 2. Avatar Presentation Section -->
+<section class="flex flex-col items-center justify-center pt-2">
 <div class="relative group">
-<!-- Ambient Radial Warmth Glow Behind Avatar -->
-<div class="absolute -inset-2 bg-gradient-to-tr from-primary-container/20 to-primary/30 rounded-full blur-lg opacity-70 group-hover:opacity-100 transition-opacity duration-300"></div>
-<!-- Circular Avatar Frame -->
-<div class="relative w-28 h-28 rounded-full ring-2 ring-primary/40 p-1 bg-surface-container-low shadow-xl">
-<img class="w-full h-full rounded-full object-cover" data-alt="Close-up portrait of Alex Chen with modern warm rim lighting against a moody dark cinema backdrop. The subject wears dark stylish casual attire with subtle amber refractions illuminating the face, conveying an approachable, movie enthusiast aesthetic with rich cinematic film tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbpFjUljGu92yc6wF49RFBJEAsmhqmspCy255EwXsQ91snjj-NQijDF3FbMy3M_dhQ4Ytx7KbyQhpeCJfR4R5o3OPhyjyv0XiaCaR6uM_6mysJCX46nS2Y7Ea6_R7YVtvQoriruyciV9RKuDC_ytAfwEOmb9U6H_N9xNg5WSnHHR7S93DfsBgXUVcIUI3ERgDQRvjOyRYTd1D5-fi3CmeCxY3Vq0lqCZnBTgWqVjO09QYcphOBgJB1Hg">
+<!-- Main Avatar with Warm Amber Ring Glow -->
+<div class="w-28 h-28 rounded-full p-1 ring-2 ring-primary-container/40 shadow-lg shadow-primary-container/10 relative overflow-hidden bg-surface-container flex items-center justify-center">
+<img alt="Alex Chen Profile Photo" class="w-full h-full object-cover rounded-full" data-alt="A candid profile portrait of an approachable smiling individual in their twenties outdoors during golden hour sunset lighting. Warm amber ambient highlights accentuate their friendly expression, surrounded by soft bokeh and gentle natural warmth. Contemporary high-end mobile app editorial style." id="avatar-image" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWVsXjLmZ8KVb8oLhT5hQtfAsyhnr2ZZ3-1Q8Z0kY7Hlokf4m7oH5itR7vAPYqg1htwydX9T3q_AtlMtGibVtJgzJ24YopdbDvmGPsicL2l44EblD_8aAWEwiYUrIVfv6Fxh7FWbY21GhAyZ4WrO5JbgD-YToqxJa7AZoN4C8qKclAiOuBZDnTzG36heZ_-aoThzvc7FIio0OkVXZIZvcu-qjDRUqXSq7PY1fLdwTY">
 </div>
-<!-- Edit Avatar Camera Overlay Button -->
-<button aria-label="Change profile photo" class="absolute bottom-0 right-0 bg-primary-container text-background-dark p-2.5 rounded-full shadow-lg shadow-primary-container/40 hover:scale-105 active:scale-95 transition-transform duration-150 ring-4 ring-surface" type="button">
-<span class="material-symbols-outlined text-[20px]" data-icon="photo_camera">photo_camera</span>
+<!-- Camera Badge on Bottom-Right Edge -->
+<button aria-label="Change photo" class="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shadow-md shadow-primary-container/30 hover:scale-105 active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: &quot;FILL&quot; 1;">photo_camera</span>
 </button>
 </div>
-<button class="mt-3.5 text-primary text-label-md font-label-md hover:underline tracking-wide flex items-center gap-1.5 transition-colors" type="button">
-<span>Change profile picture</span>
-</button>
+<!-- Secondary empty/dashed photo trigger option -->
+<div class="mt-4 flex items-center gap-3">
+
+</div>
 </section>
-<!-- Form Inputs Container -->
-<form class="space-y-6" onsubmit="event.preventDefault()">
-<!-- Field 1: Full Name -->
-<div class="space-y-2">
-<label class="block text-label-md font-label-md text-on-surface-variant uppercase tracking-wider" for="full-name">
-            Full Name
+<!-- Form Inputs Group -->
+<div class="flex flex-col gap-6">
+<!-- 3. Name Field -->
+<div class="flex flex-col gap-1.5">
+<label class="text-label-md font-label-md tracking-wider text-on-surface-variant font-bold" for="name-input">
+            NAME
           </label>
-<div class="relative rounded-xl bg-surface-container-low border border-primary/20 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all duration-150">
-<div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-on-surface-variant/70">
-<span class="material-symbols-outlined text-[20px]" data-icon="badge">badge</span>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3.5 text-on-surface-variant/70 text-[20px] pointer-events-none">
+              person
+            </span>
+<input class="w-full bg-surface-container-low text-on-surface text-body-md font-body-md rounded-xl pl-11 pr-4 py-3 border border-surface-border focus:border-primary-container transition-all" id="name-input" placeholder="Your full name" type="text" value="Alex Chen">
 </div>
-<input class="w-full pl-11 pr-4 py-3 bg-transparent text-on-surface font-body-md text-body-md rounded-xl border-0 focus:ring-0 focus:outline-none placeholder:text-text-muted" id="full-name" name="fullName" placeholder="Enter your full name" type="text" value="Alex Chen">
-</div>
-</div>
-<!-- Field 2: Username (With Helper Hint above and Inline Error State below) -->
-<div class="space-y-2">
-<div class="flex flex-col gap-1">
-<label class="block text-label-md font-label-md text-on-surface-variant uppercase tracking-wider" for="username">
-              Username
-            </label>
-<!-- Helper / Hint Text DIRECTLY ABOVE input -->
-<p class="text-label-md font-label-md text-primary/80 flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px]" data-icon="info">info</span>
-<span>Your username must be unique across the platform</span>
+<!-- Inline Error & Feedback State Line -->
+<p class="text-label-xs font-label-xs text-error flex items-center gap-1 hidden" id="name-error-msg">
+<span class="material-symbols-outlined text-[14px]">error</span>
+<span>Name can't be empty</span>
 </p>
 </div>
-<!-- Input field with @ prefix & active Error Border state -->
-<div class="relative rounded-xl bg-surface-container-low border-2 border-error/70 focus-within:border-error focus-within:ring-1 focus-within:ring-error transition-all duration-150 shadow-sm shadow-error/10">
-<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-primary font-bold">
-<span class="text-body-md font-body-md font-bold">@</span>
-</div>
-<input aria-describedby="username-error" aria-invalid="true" class="w-full pl-9 pr-10 py-3 bg-transparent text-on-surface font-body-md text-body-md rounded-xl border-0 focus:ring-0 focus:outline-none text-error" id="username" name="username" placeholder="username" type="text" value="alex_c">
-<div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-error">
-<span class="material-symbols-outlined text-[20px]" data-icon="error">error</span>
-</div>
-</div>
-<!-- Inline Validation Error Message -->
-<p class="text-label-md font-label-md text-error flex items-center gap-1.5 pt-0.5" id="username-error">
-<span class="material-symbols-outlined text-[15px]" data-icon="warning">warning</span>
-<span>This username is already taken. Please choose another.</span>
-</p>
-</div>
-<!-- Field 3: Biography / Bio -->
-<div class="space-y-2">
+<!-- 4. Bio Field -->
+<div class="flex flex-col gap-1.5">
 <div class="flex items-center justify-between">
-<label class="block text-label-md font-label-md text-on-surface-variant uppercase tracking-wider" for="bio">
-              Biography
+<label class="text-label-md font-label-md tracking-wider text-on-surface-variant font-bold" for="bio-input">
+              BIO
             </label>
-<span class="text-label-md font-label-md text-text-muted">Optional</span>
-</div>
-<div class="relative rounded-xl bg-surface-container-low border border-primary/20 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all duration-150 p-1">
-<textarea class="w-full px-3 py-2 bg-transparent text-on-surface font-body-md text-body-md border-0 focus:ring-0 focus:outline-none resize-none placeholder:text-text-muted/60" id="bio" maxlength="120" name="bio" placeholder="Tell other film and hobby fans about yourself..." rows="3">Movie enthusiast, sci-fi fanatic and cinema lover who enjoys discussing plots and easter eggs...</textarea>
-</div>
-<!-- Character counter indicator -->
-<div class="flex justify-end pr-1">
-<span class="text-label-xs font-label-xs text-text-muted">
-<span class="text-primary font-bold">84</span> / 120 max characters
+<span class="text-label-xs font-label-xs text-outline px-2 py-0.5 rounded-full bg-surface-container-low border border-surface-border">
+              Optional
             </span>
 </div>
+<div class="relative">
+<textarea class="w-full bg-surface-container-low text-on-surface text-body-md font-body-md rounded-xl p-3.5 border border-surface-border focus:border-primary-container transition-all resize-none" id="bio-input" maxlength="120" placeholder="Tell others what you love exploring in your spare time..." rows="3">Weekend trail runner, analog synth collector, and specialty pour-over enthusiast.</textarea>
+<!-- Character Counter Bottom-Right -->
+<div class="absolute bottom-2.5 right-3 text-label-xs font-label-xs text-on-surface-variant/80 select-none">
+<span id="char-count">81</span>/120
+            </div>
 </div>
-<!-- Field 4: Interests & Tags -->
-<div class="space-y-3">
-<div class="flex flex-col gap-1">
-<div class="flex items-center justify-between"><div class="flex items-center gap-2"><label class="block text-label-md font-label-md text-on-surface-variant uppercase tracking-wider" for="interests-input">Interests</label><span class="text-label-md font-label-md text-text-muted">Optional</span></div><span class="text-label-xs font-label-xs text-primary font-bold bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">3/5 selected</span></div>
-<!-- Helper text DIRECTLY ABOVE input -->
-<p class="text-label-md font-label-md text-on-surface-variant/80 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]" data-icon="sell">sell</span><span class="">Type one or more interests separated by commas and tap Add (max 5 interests)</span></p>
 </div>
-<!-- Comma Tag Input Field -->
-<div class="relative rounded-xl bg-surface-container-low border border-primary/20 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all duration-150"><div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-on-surface-variant/70"><span class="material-symbols-outlined text-[20px]" data-icon="sell">sell</span></div><input class="w-full pl-11 pr-20 py-3 bg-transparent text-on-surface font-body-md text-body-md rounded-xl border-0 focus:ring-0 focus:outline-none placeholder:text-text-muted/50" id="interests-input" placeholder="e.g. Noir, Comedy (tap Add)" type="text"><div class="absolute inset-y-0 right-0 pr-2 flex items-center"><button class="px-3 py-1.5 rounded-lg bg-primary/10 hover:bg-primary-container text-primary hover:text-background-dark text-label-md font-label-md font-bold transition-all duration-150 flex items-center gap-1 active:scale-95 border border-primary/20" type="button"><span class="material-symbols-outlined text-[16px]" data-icon="add">add</span><span class="">Add</span></button></div></div>
-<!-- Chip / Tag Preview Container -->
-<div class="flex flex-wrap items-center gap-2 pt-1">
-<!-- Chip 1: Action -->
-<div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-high border border-primary/30 text-on-surface text-label-md font-label-md shadow-sm">
-<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
-<span>Action</span>
-<button aria-label="Remove Action tag" class="ml-1 text-on-surface-variant hover:text-error hover:bg-error/10 rounded p-0.5 transition-colors" type="button">
-<span class="material-symbols-outlined text-[14px]" data-icon="close">close</span>
-</button>
+<!-- 5. Interests Section (Interactive Chip System) -->
+<section class="flex flex-col gap-3 pt-2">
+<!-- Section Title & Counter Pill -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="text-label-md font-label-md tracking-wider text-on-surface-variant font-bold">
+                INTERESTS
+              </span>
+<span class="px-2 py-0.5 rounded-full bg-primary-container/20 text-primary text-label-xs font-label-xs font-bold border border-primary/30" id="interest-badge">5/5</span>
 </div>
-<!-- Chip 2: Sci-Fi -->
-<div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-high border border-primary/30 text-on-surface text-label-md font-label-md shadow-sm">
-<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
-<span>Sci-Fi</span>
-<button aria-label="Remove Sci-Fi tag" class="ml-1 text-on-surface-variant hover:text-error hover:bg-error/10 rounded p-0.5 transition-colors" type="button">
-<span class="material-symbols-outlined text-[14px]" data-icon="close">close</span>
-</button>
-</div>
-<!-- Chip 3: Thriller -->
-<div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-high border border-primary/30 text-on-surface text-label-md font-label-md shadow-sm">
-<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
-<span>Thriller</span>
-<button aria-label="Remove Thriller tag" class="ml-1 text-on-surface-variant hover:text-error hover:bg-error/10 rounded p-0.5 transition-colors" type="button">
-<span class="material-symbols-outlined text-[14px]" data-icon="close">close</span>
-</button>
-</div>
-<!-- Add suggestion badge -->
-<button class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-dashed border-primary/30 text-primary hover:bg-primary/10 text-label-md font-label-md transition-colors" type="button">
 
-
+</div>
+<!-- Helper Explanatory Text -->
+<p class="text-label-xs font-label-xs text-on-surface-variant/70 -mt-1">
+            Pick up to 5 passions to connect with fellow hobbyists nearby.
+          </p>
+<!-- Chips Wrap Container -->
+<div class="flex flex-wrap gap-2.5 pt-1" id="chips-container">
+<!-- Selected Initial Chip 1 -->
+<button class="chip-item selected flex items-center gap-1.5 px-4 py-2 rounded-xl text-body-md font-body-md font-semibold bg-primary-container text-on-primary-container shadow-md shadow-primary-container/20" data-chip="Board Games" type="button">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: &quot;FILL&quot; 1;">check</span>
+<span>Board Games</span>
+</button>
+<!-- Selected Initial Chip 2 -->
+<button class="chip-item selected flex items-center gap-1.5 px-4 py-2 rounded-xl text-body-md font-body-md font-semibold bg-primary-container text-on-primary-container shadow-md shadow-primary-container/20" data-chip="Photography" type="button">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: &quot;FILL&quot; 1;">check</span>
+<span>Photography</span>
+</button>
+<!-- Selected Initial Chip 3 -->
+<button class="chip-item selected flex items-center gap-1.5 px-4 py-2 rounded-xl text-body-md font-body-md font-semibold bg-primary-container text-on-primary-container shadow-md shadow-primary-container/20" data-chip="Bouldering" type="button">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: &quot;FILL&quot; 1;">check</span>
+<span>Bouldering</span>
+</button>
+<!-- Unselected Chip -->
+<button class="chip-item flex items-center gap-1.5 px-4 py-2 rounded-xl text-body-md font-body-md hover:border-primary/40 active:scale-95 selected bg-primary-container text-on-primary-container font-semibold shadow-md shadow-primary-container/20" data-chip="Ceramics" type="button"><span class="material-symbols-outlined text-[16px]" style="font-variation-settings: &quot;FILL&quot; 1;">check</span>
+<span>Ceramics</span>
+</button>
+<!-- Unselected Chip -->
+<button class="chip-item flex items-center gap-1.5 px-4 py-2 rounded-xl text-body-md font-body-md hover:border-primary/40 active:scale-95 selected bg-primary-container text-on-primary-container font-semibold shadow-md shadow-primary-container/20" data-chip="Cooking" type="button"><span class="material-symbols-outlined text-[16px]" style="font-variation-settings: &quot;FILL&quot; 1;">check</span>
+<span>Cooking</span>
+</button>
+<!-- Unselected Chip -->
+<button class="chip-item unselected flex items-center gap-1.5 px-4 py-2 rounded-xl text-body-md font-body-md bg-surface-container-low text-on-surface border border-surface-border hover:border-primary/40 active:scale-95" data-chip="Synthesizers" type="button">
+<span>Synthesizers</span>
+</button>
+<!-- Unselected Chip -->
+<button class="chip-item unselected flex items-center gap-1.5 px-4 py-2 rounded-xl text-body-md font-body-md bg-surface-container-low text-on-surface border border-surface-border hover:border-primary/40 active:scale-95" data-chip="Gardening" type="button">
+<span>Gardening</span>
+</button>
+<!-- Unselected Chip -->
+<button class="chip-item unselected flex items-center gap-1.5 px-4 py-2 rounded-xl text-body-md font-body-md bg-surface-container-low text-on-surface border border-surface-border hover:border-primary/40 active:scale-95" data-chip="Archery" type="button">
+<span>Archery</span>
+</button>
+<!-- Add Your Own Trigger Chip -->
+<button class="flex items-center gap-1.5 px-4 py-2 rounded-xl text-body-md font-body-md text-primary border border-dashed border-primary/40 hover:bg-primary/10 active:scale-95 transition-colors" id="add-tag-btn" type="button">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>Add your own</span>
 </button>
 </div>
+<!-- Inline Custom Tag Input Container (Hidden by default) -->
+<div class="hidden items-center gap-2 mt-2 p-2 rounded-xl bg-surface-container-low border border-primary/30" id="custom-tag-form">
+<input class="bg-transparent text-on-surface text-body-md font-body-md px-3 py-1 w-full focus:outline-none placeholder:text-outline" id="custom-tag-input" maxlength="20" placeholder="Enter custom hobby..." type="text">
+<button class="px-3 py-1.5 rounded-lg bg-primary text-background-dark font-label-md text-label-md font-bold hover:scale-105 active:scale-95 transition-all" id="submit-custom-tag" type="button">
+              Add
+            </button>
+<button class="p-1 rounded-lg text-outline hover:text-on-surface transition-colors" id="cancel-custom-tag" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
 </div>
-</form>
+<!-- Notice Banner: Max limit reminder / feedback -->
+<div class="items-center gap-2 px-3.5 py-2.5 rounded-xl bg-primary-container/10 border border-primary-container/30 text-primary flex" id="max-limit-banner">
+<span class="material-symbols-outlined text-[18px]">info</span>
+<span class="text-label-xs font-label-xs">5 max, remove one to add another</span>
+</div>
+</section>
+</div>
 </main>
-<!-- Bottom Sticky Actions Dock (No Logout button as requested) -->
-<div class="fixed bottom-0 left-0 w-full z-30 bg-surface/90 backdrop-blur-xl border-t border-primary/10 py-3.5 px-6">
-<div class="max-w-2xl mx-auto flex items-center justify-between gap-4">
+<!-- Save confirmation toast -->
+<div class="fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 rounded-full bg-surface-container-high border border-primary-container text-on-surface text-body-md font-body-md shadow-2xl flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 z-50" id="toast">
+<span class="material-symbols-outlined text-primary-container text-[20px]" style="font-variation-settings: &quot;FILL&quot; 1;">check_circle</span>
+<span>Profile updated successfully</span>
+</div>
+</div>
+<!-- Interactive Logic -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Elements
+      const nameInput = document.getElementById('name-input');
+      const nameErrorMsg = document.getElementById('name-error-msg');
+      const bioInput = document.getElementById('bio-input');
+      const charCount = document.getElementById('char-count');
+      const chipsContainer = document.getElementById('chips-container');
+      const interestBadge = document.getElementById('interest-badge');
+      const maxBanner = document.getElementById('max-limit-banner');
+      const addTagBtn = document.getElementById('add-tag-btn');
+      const customTagForm = document.getElementById('custom-tag-form');
+      const customTagInput = document.getElementById('custom-tag-input');
+      const submitCustomTag = document.getElementById('submit-custom-tag');
+      const cancelCustomTag = document.getElementById('cancel-custom-tag');
+      const saveBtn = document.getElementById('save-btn');
+      const toast = document.getElementById('toast');
 
-</div>
-</div>
-</div>
+      const MAX_INTERESTS = 5;
+
+      // 1. Name Validation
+      function validateName() {
+        if (!nameInput.value.trim()) {
+          nameErrorMsg.classList.remove('hidden');
+          nameInput.classList.add('border-error');
+          nameInput.classList.remove('border-surface-border', 'focus:border-primary-container');
+          return false;
+        } else {
+          nameErrorMsg.classList.add('hidden');
+          nameInput.classList.remove('border-error');
+          nameInput.classList.add('border-surface-border', 'focus:border-primary-container');
+          return true;
+        }
+      }
+
+      nameInput.addEventListener('input', validateName);
+
+      // 2. Bio Character Counter
+      bioInput.addEventListener('input', () => {
+        const length = bioInput.value.length;
+        charCount.textContent = length;
+        if (length >= 120) {
+          charCount.classList.add('text-error');
+        } else {
+          charCount.classList.remove('text-error');
+        }
+      });
+
+      // Initialize counter
+      charCount.textContent = bioInput.value.length;
+
+      // 3. Chip State Management
+      function updateBadgeAndBanner() {
+        const selectedChips = chipsContainer.querySelectorAll('.chip-item.selected');
+        const count = selectedChips.length;
+        interestBadge.textContent = `${count}/${MAX_INTERESTS}`;
+
+        if (count >= MAX_INTERESTS) {
+          maxBanner.classList.remove('hidden');
+          maxBanner.classList.add('flex');
+        } else {
+          maxBanner.classList.add('hidden');
+          maxBanner.classList.remove('flex');
+        }
+      }
+
+      function toggleChip(button) {
+        const isSelected = button.classList.contains('selected');
+        const currentCount = chipsContainer.querySelectorAll('.chip-item.selected').length;
+
+        if (!isSelected) {
+          // Attempting to select
+          if (currentCount >= MAX_INTERESTS) {
+            // Flash banner
+            maxBanner.classList.remove('hidden');
+            maxBanner.classList.add('flex');
+            maxBanner.classList.add('animate-bounce');
+            setTimeout(() => maxBanner.classList.remove('animate-bounce'), 800);
+            return;
+          }
+
+          // Select chip
+          button.classList.remove('unselected', 'bg-surface-container-low', 'text-on-surface', 'border', 'border-surface-border');
+          button.classList.add('selected', 'bg-primary-container', 'text-on-primary-container', 'font-semibold', 'shadow-md', 'shadow-primary-container/20');
+          
+          // Insert check icon if not present
+          if (!button.querySelector('.material-symbols-outlined')) {
+            const checkIcon = document.createElement('span');
+            checkIcon.className = 'material-symbols-outlined text-[16px]';
+            checkIcon.style = "font-variation-settings: 'FILL' 1;";
+            checkIcon.textContent = 'check';
+            button.prepend(checkIcon);
+          }
+        } else {
+          // Deselect chip
+          button.classList.remove('selected', 'bg-primary-container', 'text-on-primary-container', 'font-semibold', 'shadow-md', 'shadow-primary-container/20');
+          button.classList.add('unselected', 'bg-surface-container-low', 'text-on-surface', 'border', 'border-surface-border');
+
+          // Remove check icon
+          const icon = button.querySelector('.material-symbols-outlined');
+          if (icon) icon.remove();
+        }
+
+        updateBadgeAndBanner();
+      }
+
+      // Attach click events on current chips
+      chipsContainer.addEventListener('click', (e) => {
+        const chipBtn = e.target.closest('.chip-item');
+        if (chipBtn) {
+          toggleChip(chipBtn);
+        }
+      });
+
+      // 4. Custom Tag Inline Creation
+      addTagBtn.addEventListener('click', () => {
+        customTagForm.classList.remove('hidden');
+        customTagForm.classList.add('flex');
+        customTagInput.focus();
+      });
+
+      cancelCustomTag.addEventListener('click', () => {
+        customTagForm.classList.add('hidden');
+        customTagForm.classList.remove('flex');
+        customTagInput.value = '';
+      });
+
+      function addCustomTag() {
+        const val = customTagInput.value.trim();
+        if (!val) return;
+
+        const currentCount = chipsContainer.querySelectorAll('.chip-item.selected').length;
+        const newChip = document.createElement('button');
+        newChip.type = 'button';
+        newChip.dataset.chip = val;
+
+        if (currentCount < MAX_INTERESTS) {
+          newChip.className = 'chip-item selected flex items-center gap-1.5 px-4 py-2 rounded-xl text-body-md font-body-md font-semibold bg-primary-container text-on-primary-container shadow-md shadow-primary-container/20';
+          newChip.innerHTML = `<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check</span><span>${val}</span>`;
+        } else {
+          newChip.className = 'chip-item unselected flex items-center gap-1.5 px-4 py-2 rounded-xl text-body-md font-body-md bg-surface-container-low text-on-surface border border-surface-border hover:border-primary/40 active:scale-95';
+          newChip.innerHTML = `<span>${val}</span>`;
+        }
+
+        // Insert before the "+ Add your own" button
+        chipsContainer.insertBefore(newChip, addTagBtn);
+
+        customTagInput.value = '';
+        customTagForm.classList.add('hidden');
+        customTagForm.classList.remove('flex');
+
+        updateBadgeAndBanner();
+      }
+
+      submitCustomTag.addEventListener('click', addCustomTag);
+      customTagInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          addCustomTag();
+        }
+      });
+
+      // 5. Save Action
+      saveBtn.addEventListener('click', () => {
+        if (!validateName()) return;
+
+        // Feedback toast trigger
+        toast.classList.remove('opacity-0', 'pointer-events-none');
+        toast.classList.add('opacity-100');
+        
+        saveBtn.disabled = true;
+        saveBtn.classList.add('opacity-50');
+
+        setTimeout(() => {
+          toast.classList.remove('opacity-100');
+          toast.classList.add('opacity-0', 'pointer-events-none');
+          saveBtn.disabled = false;
+          saveBtn.classList.remove('opacity-50');
+        }, 2200);
+      });
+    });
+  </script>
 
 
 </body></html>
