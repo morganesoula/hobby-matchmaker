@@ -1,6 +1,7 @@
 package com.msoula.hobbymatchmaker.features.profile.presentation.models
 
 import androidx.compose.runtime.Immutable
+import com.msoula.hobbymatchmaker.core.design.models.MovieCarouselItem
 
 @Immutable
 data class UserProfileUiModel(
@@ -9,7 +10,8 @@ data class UserProfileUiModel(
     val avatarUrl: String? = null,
     val bio: String? = null,
     val interests: List<String>? = null,
-    val moviesLikedCount: Int = 0
+    val moviesLikedCount: Int = 0,
+    val favorites: List<MovieCarouselItem> = emptyList()
 ) {
     companion object {
         val Initial = UserProfileUiModel()

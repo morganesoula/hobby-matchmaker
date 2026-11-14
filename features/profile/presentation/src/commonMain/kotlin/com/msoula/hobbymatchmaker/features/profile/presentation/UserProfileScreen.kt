@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.isIosPlatform
 import com.msoula.hobbymatchmaker.core.design.Res
-import com.msoula.hobbymatchmaker.core.design.profile_pseudo_copied
 import com.msoula.hobbymatchmaker.core.design.atoms.ErrorStateScreen
 import com.msoula.hobbymatchmaker.core.design.atoms.ProfileLoadingScreen
 import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_requirements_no_number
@@ -52,8 +51,13 @@ import com.msoula.hobbymatchmaker.core.design.organisms.GuestProfileHeader
 import com.msoula.hobbymatchmaker.core.design.organisms.ProfileEditInformationForm
 import com.msoula.hobbymatchmaker.core.design.organisms.ProfileEditInterestsForm
 import com.msoula.hobbymatchmaker.core.design.organisms.ProfileEditProfilePicture
+import com.msoula.hobbymatchmaker.core.design.organisms.ProfileFavoritesSection
+import com.msoula.hobbymatchmaker.core.design.organisms.ProfileInterestsEmptySection
 import com.msoula.hobbymatchmaker.core.design.organisms.ProfileInterestsSection
-import com.msoula.hobbymatchmaker.core.design.organisms.ProfileStatsSection
+import com.msoula.hobbymatchmaker.core.design.profile_pseudo_copied
+import com.msoula.hobbymatchmaker.core.design.profile_share_message
+import com.msoula.hobbymatchmaker.core.design.util.rememberShareText
+import org.jetbrains.compose.resources.getString
 import com.msoula.hobbymatchmaker.core.design.templates.CompleteProfileLayout
 import com.msoula.hobbymatchmaker.core.design.templates.EditableProfileLayout
 import com.msoula.hobbymatchmaker.core.design.templates.GuestProfileLayout
@@ -97,8 +101,9 @@ fun UserProfileContent(
         }
     }
 
-    val clipboardManager = LocalClipboardManager.current
+    val shareText = rememberShareText()
     val coroutineScope = rememberCoroutineScope()
+    val clipboardManager = LocalClipboardManager.current
     val pseudoCopiedMessage = stringResource(Res.string.profile_pseudo_copied)
 
     val avatarLauncher = rememberFilePickerLauncher(
@@ -221,6 +226,11 @@ fun UserProfileContent(
                     GenericProfileBackground(
                         padding = padding
                     ) {
+                        val openEditMode = { userProfileActions.onEvent(UserProfileUiEventModel.OnEditModeClicked) }
+                        val isNewProfile = profile.bio.isNullOrBlank() &&
+                            profile.favorites.isEmpty() &&
+                            profile.interests.isNullOrEmpty()
+
                         CompleteProfileLayout(
                             headerSection = {
                                 AuthentifiedProfileHeader(
@@ -230,25 +240,41 @@ fun UserProfileContent(
                                         biography = profile.bio ?: "",
                                         avatarUrl = profile.avatarUrl
                                     ),
-                                    onEditProfileClicked = {
-                                        userProfileActions.onEvent(UserProfileUiEventModel.OnEditModeClicked)
-                                    },
-                                    onSharePseudoClicked = {
+                                    showShareHint = isNewProfile,
+                                    onChangePhotoClicked = openEditMode,
+                                    onCopyPseudoClicked = {
                                         clipboardManager.setText(AnnotatedString("@${profile.pseudo}"))
                                         coroutineScope.launch { snackBarHostState.showSnackbar(pseudoCopiedMessage) }
+                                    },
+                                    onAddBioClicked = openEditMode,
+                                    onEditProfileClicked = openEditMode,
+                                    onShareProfileClicked = {
+                                        coroutineScope.launch {
+                                            shareText(getString(Res.string.profile_share_message, profile.pseudo))
+                                        }
                                     }
                                 )
                             },
-                            statsSection = {
-                                ProfileStatsSection(moviesLikedCount = profile.moviesLikedCount)
+                            favoritesSection = {
+                                ProfileFavoritesSection(
+                                    favorites = profile.favorites.toImmutableList(),
+                                    favoritesCount = profile.moviesLikedCount,
+                                    onSeeAllClicked = { userProfileActions.onNavigate(NavigationDestination.Movies) },
+                                    onMovieClicked = { movieId ->
+                                        userProfileActions.onNavigate(NavigationDestination.MovieDetail(movieId))
+                                    },
+                                    onDiscoverClicked = { userProfileActions.onNavigate(NavigationDestination.Movies) }
+                                )
                             },
                             interestsSection = {
-                                profile.interests?.let {
-                                    if (it.isNotEmpty()) {
-                                        ProfileInterestsSection(
-                                            interests = it.toImmutableList()
-                                        )
-                                    }
+                                val interests = profile.interests.orEmpty()
+                                if (interests.isEmpty()) {
+                                    ProfileInterestsEmptySection(onAddClicked = openEditMode)
+                                } else {
+                                    ProfileInterestsSection(
+                                        interests = interests.toImmutableList(),
+                                        onAddClicked = openEditMode
+                                    )
                                 }
                             }
                         )

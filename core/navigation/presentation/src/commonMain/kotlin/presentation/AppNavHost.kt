@@ -339,6 +339,8 @@ fun AppNavHost(
                             NavigationDestination.SignUp -> navCallbacks.navigateAndClearToAuth()
                             NavigationDestination.Movies -> navCallbacks.navigateToMoviesFromProfile()
                             NavigationDestination.Settings -> navCallbacks.navigateToSettingsFromProfile()
+                            is NavigationDestination.MovieDetail ->
+                                navCallbacks.navigateToMovieDetailFromMoviesOrHub(destination.movieId)
                             else -> Unit
                         }
                     },

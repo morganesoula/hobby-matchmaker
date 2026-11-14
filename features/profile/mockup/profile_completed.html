@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en" style=""><head>
+<!DOCTYPE html><html lang="en"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>User Profile</title>
@@ -47,7 +47,7 @@
       min-height: max(884px, 100dvh);
     }
   </style>
-</head>
+  </head>
 <body class="flex justify-center items-center min-h-screen p-0 sm:p-4 bg-[#120e0d]">
 <!-- Mobile Device Frame Container -->
 <main class="w-full max-w-[420px] bg-[#201a19] min-h-screen sm:min-h-[890px] sm:rounded-[36px] shadow-2xl overflow-hidden flex flex-col justify-between border border-[#352b29] relative">
@@ -71,82 +71,179 @@
 </button>
 </nav>
 <!-- Main Scrollable Profile Content -->
-<div class="flex-1 overflow-y-auto px-5 pb-6 space-y-6"><!-- Avatar & User Info Section -->
-<section class="flex flex-col items-center pt-1 text-center">
-<!-- Playful Cinephile Avatar Container -->
-<div class="relative group cursor-pointer mb-3">
-<div class="size-28 rounded-full p-[3px] bg-gradient-to-tr from-[#ec5b13] via-[#ff9900] to-[#fd9800] shadow-[0_0_24px_rgba(236,91,19,0.35)] relative">
-<div class="w-full h-full rounded-full bg-[#2b2220] flex items-center justify-center overflow-hidden border-2 border-[#201a19]">
-<img class="w-full h-full object-cover" data-alt="Alex Chen portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxXzWYIFdoLPHbASbDXi6yISmKMlUU5ow8FzKyeBaBiDQVSuHNfJIh6UsK6XXgWrlxSEez9YaoHw6zTyn-wMNgklyO3b6JmFGgduReFL2gNIYWBF2k_VNyhDwWDwhIlGBofB7ec6vhEHasUjzEF8j-WwB0frYJYyRWPINeVobT68hljwOm2SzI11Zi9CdXxdBhLAweBp9qVfkNAtrYD5OImXo2SiNLOOqX0JnZ8LciiBpvFTcZ2iv9tg">
-</div>
-</div>
-<!-- Cinephile playful status badge -->
+<div class="flex-1 overflow-y-auto px-5 pb-6 space-y-6"><!-- Pillar 1: Who you are & Pillar 3: Clear actions -->
+<section class="flex flex-col items-center pt-2 space-y-4">
+  <!-- Circular Avatar with warm amber glow -->
+  <div class="relative group cursor-pointer">
+    <div class="size-28 rounded-full p-[3px] bg-gradient-to-tr from-[#ec5b13] via-[#ff9900] to-[#fd9800] shadow-[0_0_24px_rgba(236,91,19,0.35)]">
+      <div class="w-full h-full rounded-full bg-[#2b2220] flex items-center justify-center overflow-hidden border-2 border-[#201a19] relative">
+        <img class="w-full h-full object-cover" alt="Alex Chen portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxXzWYIFdoLPHbASbDXi6yISmKMlUU5ow8FzKyeBaBiDQVSuHNfJIh6UsK6XXgWrlxSEez9YaoHw6zTyn-wMNgklyO3b6JmFGgduReFL2gNIYWBF2k_VNyhDwWDwhIlGBofB7ec6vhEHasUjzEF8j-WwB0frYJYyRWPINeVobT68hljwOm2SzI11Zi9CdXxdBhLAweBp9qVfkNAtrYD5OImXo2SiNLOOqX0JnZ8LciiBpvFTcZ2iv9tg">
+      </div>
+    </div>
+    <button aria-label="Change photo" class="absolute bottom-1 right-1 size-7 bg-[#ec5b13] rounded-full border-2 border-[#201a19] flex items-center justify-center text-white shadow-md hover:bg-[#ff9900] transition-colors">
+      <span class="material-symbols-outlined text-[14px]">photo_camera</span>
+    </button>
+  </div>
 
-</div>
-<!-- User Identifiers -->
-<div class="mt-3.5 space-y-1">
-<div class="flex items-center justify-center gap-1.5">
-<h2 class="text-2xl font-bold tracking-tight text-white">Alex Chen</h2>
-<span class="material-symbols-outlined text-[#ff9900] text-[18px]" style="font-variation-settings: &quot;FILL&quot; 1;">verified</span>
-</div>
-<p class="text-xs font-semibold text-[#ec5b13] tracking-wide">@alexchen</p>
-<p class="text-xs text-[#c4b3af] max-w-[280px] pt-1 leading-relaxed italic">
-      "Looking for someone who won't talk during Interstellar 🌌"
+  <!-- Name, Pseudo Badge with One-Tap Share / Copy, & Bio -->
+  <div class="text-center space-y-2 w-full px-2">
+    <h2 class="text-2xl font-bold tracking-tight text-white">Alex Chen</h2>
+    <!-- Pseudo Badge with One-Tap Share / Copy -->
+    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#2a2220] border border-[#3e322f] hover:border-[#ec5b13]/60 transition-colors shadow-sm cursor-pointer group" title="Copy username">
+      <span class="text-xs font-semibold text-[#ec5b13] tracking-wide">@alexchen</span>
+      <span class="material-symbols-outlined text-[15px] text-[#c4b3af] group-hover:text-white transition-colors">content_copy</span>
+    </div>
+    <!-- Short bio directly below identity -->
+    <p class="text-xs text-[#c4b3af] leading-relaxed max-w-[340px] mx-auto pt-1">
+      Passionate cinephile exploring sci-fi worlds and gripping thrillers. Always up for a movie night discussion!
     </p>
-</div>
-<!-- Tactile Pill Edit Profile Button -->
-<div class="mt-3.5 flex items-center gap-2">
-<button class="flex items-center justify-center gap-2 px-5 py-2 rounded-full bg-gradient-to-r from-[#ec5b13] to-[#fd9800] text-white font-semibold text-xs shadow-[0_4px_14px_rgba(236,91,19,0.35)] hover:shadow-[0_6px_20px_rgba(236,91,19,0.5)] active:scale-98 transition-all" type="button">
-<span class="material-symbols-outlined text-[15px]">edit</span>
-<span class="">Edit Profile</span>
-</button>
-<button aria-label="Share profile" class="size-8 rounded-full bg-[#2a2220] border border-[#3e322f] flex items-center justify-center text-[#c4b3af] hover:text-white hover:border-[#ec5b13]/50 transition-colors" type="button">
-<span class="material-symbols-outlined text-[16px]">ios_share</span>
-</button>
-</div>
+  </div>
+
+  <!-- Pillar 3: Actions Grouped (Edit Profile & Share Profile) -->
+  <div class="w-full flex items-center justify-center gap-3 pt-1">
+    <button class="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#ec5b13] to-[#fd9800] text-white font-semibold text-sm shadow-[0_4px_14px_rgba(236,91,19,0.35)] hover:shadow-[0_6px_20px_rgba(236,91,19,0.5)] hover:opacity-95 active:scale-98 transition-all" type="button">
+      <span class="material-symbols-outlined text-[18px]">edit</span>
+      <span>Edit Profile</span>
+    </button>
+    <button class="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#2a2220] border border-[#3e322f] text-[#d1c4c1] hover:text-white hover:bg-[#322927] hover:border-[#ec5b13]/50 font-semibold text-sm transition-all" type="button" aria-label="Share profile">
+      <span class="material-symbols-outlined text-[18px] text-[#ec5b13]">share</span>
+      <span>Share</span>
+    </button>
+  </div>
 </section>
-<!-- Playful Gamified Stats Grid (3 bite-sized cards) -->
-<section aria-label="Cinema Stats" class="w-full"><div class="bg-[#2a2220] border border-[#ec5b13]/60 rounded-2xl p-3 flex items-center justify-between relative overflow-hidden group hover:border-[#ec5b13] transition-all px-5 py-3"><div class="flex items-center gap-3"><span class="text-2xl">🎬</span><div class="flex flex-col text-left"><span class="text-sm font-semibold text-white tracking-tight">Favorite Movies</span></div></div><div class="flex items-center gap-1.5"><span class="text-2xl font-extrabold text-[#ff9900] tracking-tight">15</span><span class="text-xs font-medium text-[#c4b3af]">movies</span></div><div class="absolute bottom-0 left-0 right-0 h-[2px] bg-[#ec5b13] opacity-60"></div></div></section>
-<!-- Currently Obsessed With / Cinema Vibe Card -->
 
-<!-- Favorite Cinema Vibes / Micro Chips -->
-<section class="space-y-2.5">
-<div class="flex items-center justify-between">
-<h3 class="text-sm font-bold text-white tracking-tight flex items-center gap-1.5">
-<span class="">Favorite Cinema Genres</span>
-<span class="text-xs font-normal text-[#a69591]">(4)</span>
-</h3>
-<button class="text-xs text-[#ec5b13] hover:underline font-semibold flex items-center gap-0.5" type="button">
+<!-- Pillar 2: What you like -->
+<div class="space-y-6 pt-1">
+  <!-- Favorite Movies with visual horizontal poster strip -->
+  <section class="space-y-3">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <h3 class="text-base font-bold text-white tracking-tight">Favorite Movies</h3>
+        <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#3a2c28] text-[#ec5b13] border border-[#ec5b13]/30">15</span>
+      </div>
+      <button class="text-xs text-[#ec5b13] hover:underline font-semibold flex items-center gap-0.5" type="button">
+        <span>See all</span>
+        <span class="material-symbols-outlined text-[15px]">chevron_right</span>
+      </button>
+    </div>
 
+    <!-- Horizontal Scrollable Poster Strip -->
+    <div class="flex gap-3 overflow-x-auto pb-2 pt-1 -mx-5 px-5 select-none no-scrollbar">
+      <!-- Movie Card 1: Dune -->
+      <div class="flex-shrink-0 w-24 group cursor-pointer">
+        <div class="w-24 h-36 rounded-xl overflow-hidden bg-[#2a2220] border border-[#3e322f] relative shadow-md group-hover:border-[#ec5b13] transition-all">
+          <img class="w-full h-full object-cover" alt="Dune: Part Two poster" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMsZ5g-5s7l_XkZJ7fG1-V9i4s3R6E4lqOQj_3zJ8zF3=w300">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-2">
+            <div class="flex items-center gap-1 text-[11px] font-bold text-[#ff9900]">
+              <span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">star</span>
+              <span>8.6</span>
+            </div>
+          </div>
+        </div>
+        <p class="text-xs font-medium text-white truncate mt-1.5 group-hover:text-[#ec5b13] transition-colors">Dune: Part Two</p>
+        <p class="text-[10px] text-[#a69591]">Sci-Fi • 2024</p>
+      </div>
 
-</button>
-</div>
-<div class="flex flex-wrap gap-2">
-<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#2a2220] border border-[#ec5b13]/60 text-white text-xs font-semibold shadow-sm hover:border-[#ec5b13] transition-colors cursor-pointer">
-<span class="">🚀</span>
-<span class="">Sci-Fi</span>
-</span>
-<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#2a2220] border border-[#3e322f] text-[#d1c4c1] hover:text-white text-xs font-semibold shadow-sm hover:border-[#ec5b13]/60 transition-colors cursor-pointer">
-<span class="">🕵️</span>
-<span class="">Noir Thriller</span>
-</span>
-<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#2a2220] border border-[#3e322f] text-[#d1c4c1] hover:text-white text-xs font-semibold shadow-sm hover:border-[#ec5b13]/60 transition-colors cursor-pointer">
-<span class="">💥</span>
-<span class="">High-Octane Action</span>
-</span>
-<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#2a2220] border border-[#3e322f] text-[#d1c4c1] hover:text-white text-xs font-semibold shadow-sm hover:border-[#ec5b13]/60 transition-colors cursor-pointer">
-<span class="">🌀</span>
-<span class="">Mind-benders</span>
-</span>
-</div>
-</section>
-<!-- Taste Compass / Cinema Mood Banner -->
-</div>
+      <!-- Movie Card 2: Blade Runner 2049 -->
+      <div class="flex-shrink-0 w-24 group cursor-pointer">
+        <div class="w-24 h-36 rounded-xl overflow-hidden bg-[#2a2220] border border-[#3e322f] relative shadow-md group-hover:border-[#ec5b13] transition-all">
+          <img class="w-full h-full object-cover" alt="Blade Runner 2049 poster" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHXbB_HnUeTqm9q_i8o2U_B1p_3r9qYv4gT0pZ8qJ4Z1=w300">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-2">
+            <div class="flex items-center gap-1 text-[11px] font-bold text-[#ff9900]">
+              <span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">star</span>
+              <span>8.0</span>
+            </div>
+          </div>
+        </div>
+        <p class="text-xs font-medium text-white truncate mt-1.5 group-hover:text-[#ec5b13] transition-colors">Blade Runner 2049</p>
+        <p class="text-[10px] text-[#a69591]">Sci-Fi • 2017</p>
+      </div>
+
+      <!-- Movie Card 3: Interstellar -->
+      <div class="flex-shrink-0 w-24 group cursor-pointer">
+        <div class="w-24 h-36 rounded-xl overflow-hidden bg-[#2a2220] border border-[#3e322f] relative shadow-md group-hover:border-[#ec5b13] transition-all">
+          <img class="w-full h-full object-cover" alt="Interstellar poster" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhBfQ_VnSeZqm1w_h2k4U_J7n_6m5rPq0bC4kX7pS8D1=w300">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-2">
+            <div class="flex items-center gap-1 text-[11px] font-bold text-[#ff9900]">
+              <span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">star</span>
+              <span>8.7</span>
+            </div>
+          </div>
+        </div>
+        <p class="text-xs font-medium text-white truncate mt-1.5 group-hover:text-[#ec5b13] transition-colors">Interstellar</p>
+        <p class="text-[10px] text-[#a69591]">Sci-Fi • 2014</p>
+      </div>
+
+      <!-- Movie Card 4: Inception -->
+      <div class="flex-shrink-0 w-24 group cursor-pointer">
+        <div class="w-24 h-36 rounded-xl overflow-hidden bg-[#2a2220] border border-[#3e322f] relative shadow-md group-hover:border-[#ec5b13] transition-all">
+          <img class="w-full h-full object-cover" alt="Inception poster" src="https://lh3.googleusercontent.com/aida-public/AB6AXuExZcB_LmTeYqm7v_f4u8U_H5r_8k2lPn9aF2vC5tR6L3=w300">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-2">
+            <div class="flex items-center gap-1 text-[11px] font-bold text-[#ff9900]">
+              <span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">star</span>
+              <span>8.8</span>
+            </div>
+          </div>
+        </div>
+        <p class="text-xs font-medium text-white truncate mt-1.5 group-hover:text-[#ec5b13] transition-colors">Inception</p>
+        <p class="text-[10px] text-[#a69591]">Action • 2010</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interests Chips Section -->
+  <section class="space-y-2.5 pb-2">
+    <div class="flex items-center justify-between">
+      <h3 class="text-base font-bold text-white tracking-tight flex items-center gap-1.5">
+        <span>Interests</span>
+        <span class="text-xs font-normal text-[#a69591]">(3)</span>
+      </h3>
+      <button class="text-xs text-[#ec5b13] hover:underline font-semibold flex items-center gap-0.5" type="button">
+        <span>Add</span>
+        <span class="material-symbols-outlined text-[15px]">add</span>
+      </button>
+    </div>
+    <div class="flex flex-wrap gap-2.5">
+      <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#2a2220] border border-[#ec5b13]/60 text-white text-xs font-semibold shadow-sm hover:border-[#ec5b13] transition-colors">
+        <span class="size-1.5 rounded-full bg-[#ec5b13]"></span>
+        Action
+      </span>
+      <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#2a2220] border border-[#ec5b13]/60 text-white text-xs font-semibold shadow-sm hover:border-[#ec5b13] transition-colors">
+        <span class="size-1.5 rounded-full bg-[#ec5b13]"></span>
+        Sci-Fi
+      </span>
+      <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#2a2220] border border-[#ec5b13]/60 text-white text-xs font-semibold shadow-sm hover:border-[#ec5b13] transition-colors">
+        <span class="size-1.5 rounded-full bg-[#ec5b13]"></span>
+        Thriller
+      </span>
+    </div>
+  </section>
+</div></div>
 <!-- Bottom Home Indicator Bar (iOS Style) -->
-<footer class="w-full pb-2 pt-1 flex justify-center items-center select-none bg-[#201a19]">
+<!-- Bottom Navigation Bar -->
+<nav class="w-full bg-[#1c1615] border-t border-[#352b29] px-6 py-2.5 flex items-center justify-between select-none">
+  <button class="flex flex-col items-center gap-1 text-[#a69591] hover:text-[#d1c4c1] transition-colors" type="button">
+    <span class="material-symbols-outlined text-[22px]">explore</span>
+    <span class="text-[10px] font-medium">Discover</span>
+  </button>
+  <button class="flex flex-col items-center gap-1 text-[#a69591] hover:text-[#d1c4c1] transition-colors" type="button">
+    <span class="material-symbols-outlined text-[22px]">favorite</span>
+    <span class="text-[10px] font-medium">Matches</span>
+  </button>
+  <button class="flex flex-col items-center gap-1 text-[#a69591] hover:text-[#d1c4c1] transition-colors" type="button">
+    <span class="material-symbols-outlined text-[22px]">event</span>
+    <span class="text-[10px] font-medium">Events</span>
+  </button>
+  <button class="flex flex-col items-center gap-1 text-[#ec5b13]" type="button">
+    <span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">person</span>
+    <span class="text-[10px] font-bold">Profile</span>
+  </button>
+</nav><footer class="w-full pb-2 pt-1 flex justify-center items-center select-none bg-[#201a19]">
 <div class="w-32 h-1 bg-[#473936] rounded-full"></div>
 </footer>
 </main>
+
+
 
 
 

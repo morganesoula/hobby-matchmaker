@@ -6,12 +6,12 @@ import com.msoula.hobbymatchmaker.core.design.atoms.SpacerHeight16
 @Composable
 fun CompleteProfileLayout(
     headerSection: @Composable () -> Unit,
-    statsSection: @Composable () -> Unit,
+    favoritesSection: @Composable () -> Unit,
     interestsSection: @Composable () -> Unit
 ) {
     headerSection()
     SpacerHeight16()
-    statsSection()
+    favoritesSection()
     SpacerHeight16()
     interestsSection()
 }
