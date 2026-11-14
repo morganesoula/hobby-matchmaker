@@ -7,35 +7,58 @@ invitations, and shared interests).
 
 #### Logic
 
-- A specific top bar is displayed, separated into two tabs:
-    - **Received tab**:
-        - The user receives a list of pending invitations.
-        - The user can accept or reject them directly from this tab.
-        - **Limit enforcement:** Before accepting an invitation, the app strictly verifies that *
-          *both** the sender and the receiver have not exceeded the maximum social circle limit of 5
-          members (**CheckSocialCircleLimitUseCase**). If full, a capacity-reached feedback is
-          triggered.
-    - **Sent & Search tab**:
-        - The user can track the status of the invitations they sent and cancel them if needed.
-        - Every signed-in user has a pseudo (mandatory PickPseudo onboarding step), so everyone can
-          be found and invited. Sending an invite without a pseudo fails with
-          `AppError.Profile.PseudoMissing` as a safeguard.
-        - The user can search for someone using a pseudo. The search is optimized using a lowercase
-          prefix matching system and limits the results to 10 pertinent profiles to save bandwidth.
-        - The user can add up to 5 people to their social circle.
-        - The data flow is highly reactive: the UI observes local data streams while background
-          syncs (refreshes) are performed with the remote server.
+The Social screen has a header (title, iOS back arrow, **Invite** button), an **Active Circle** card
+(filled slots out of 5, progress, slots left) and three tabs with a count: **Circle**, **Received**
+and **Sent**. The circle is capped at `MAX_SOCIAL_CIRCLE_SIZE` (5) members.
+
+- **Circle tab**
+    - Lists the members (avatar, name, `@pseudo`, number of favorites in common) and dashed empty
+      slots. The first empty slot, and the empty state, have an **Invite** button.
+    - Each member has a `⋮` menu: **Remove from circle**, **Report** and **Block**. Remove and Block
+      ask for a confirmation; Report opens a dialog with 5 reasons (spam, harassment, fake profile,
+      inappropriate content, other).
+    - **Remove** deletes both circle entries and the invites in both directions in one batch, so
+      either person can invite again later (**RemoveMemberUseCase**).
+    - **Block** (`users/{uid}/blocked/{blockedUid}`) does the same as remove and also hides the
+      person from search and from incoming invites. People who blocked you are hidden from your
+      search too.
+    - **Report** writes to the create-only `reports` collection (reporter, reported user, reason,
+      date). Reports are reviewed by hand in the Firebase console, nothing alerts on new ones.
+    - There is no screen yet to **unblock** someone (the use case exists, see the Settings README).
+- **Received tab**
+    - Pending invitations with the sender's name, avatar and favorites in common. The user can
+      accept, or decline after a confirmation. Cards have a `⋮` menu with **Report** and **Block**.
+    - **Limit enforcement:** before accepting, the app verifies that **both** the sender and the
+      receiver are under the circle limit (**CheckSocialCircleLimitUseCase**). If full, a
+      capacity-reached message is shown.
+- **Sent tab**
+    - Pending and declined invitations, newest first. Pending ones can be cancelled, declined ones
+      can be dismissed (`senderDismissed`). Accepted invites are not listed: the person is in the
+      circle.
+    - A declined invite cannot be sent again for **30 days** (`declinedAt`, enforced both in the app
+      and in the Firestore rules). Sending to someone already pending or accepted is refused
+      (`AppError.Social`).
+- **Invite dialog** (from the header, an empty slot or the empty state)
+    - Searches by pseudo with a 300 ms debounce, lowercase prefix matching, 10 results max. Circle
+      members are hidden, people already invited are greyed out, and a full circle shows an
+      explanation instead of the dialog.
+    - Every signed-in user has a pseudo (mandatory PickPseudo step), so everyone can be found.
+      Sending an invite without a pseudo fails with `AppError.Profile.PseudoMissing` as a safeguard.
+- Each accept, decline, cancel, remove, block and report has a busy state (no double taps) and a
+  success or error snackbar.
+- The data flow is reactive: the UI observes local data streams while refreshes from Firestore run
+  in the background. The circle and the invites are refreshed when the app starts for a signed-in
+  user (**RefreshSocialCircleUseCase**, **RefreshIncomingInvitesUseCase**,
+  **RefreshSentInvitesUseCase**). Retry on an error state restarts the observers.
 
 - **Cross-feature logic (Movie matching & synchronization):**
     - When the user likes a movie (triggered externally), this feature dynamically checks if the
       movie is also liked by a member of their social circle (**CheckMovieMatchUseCase**).
     - To enable fast matching, liked movies are directly duplicated and synchronized within each
       circle connection (`UpdateMovieLikedInCircleEntries`).
-
-- **Cross-feature logic (Profile interaction):**
-    - The logic to remove an existing member from the social circle is handled by this module
-      (RemoveMemberUseCase), but the **UI triggering this action is located in the user `Profile`
-      module**.
+- **Cross-feature logic (Navigation):**
+    - The Movies top bar icon shows a badge with the number of pending invitations.
+    - The Hub's "no recent matches" card leads here, and guests are sent to sign-up instead.
 
 #### Design & UI
 
@@ -48,7 +71,7 @@ Source HTML: [social_circle_received_invites](mockup/social_circle_received_invi
 
 **2: Received invitations (Empty state):**
 ![Empty received invitation mockup](mockup/social_circle_received_invites_empty_state.png)
-Source HTML: [social_circle_received_invites_empty_state](mockup/social_circle_sent_invites_empty_state.html)
+Source HTML: [social_circle_received_invites_empty_state](mockup/social_circle_received_invites_empty_state.html)
 
 **3. Sent invitations (With data):**
 ![Sent invitation mockup](mockup/social_circle_sent_invites.png)
@@ -58,6 +81,12 @@ Source HTML: [social_circle_sent_invites](mockup/social_circle_sent_invites.html
 ![Empty sent invitation mockup](mockup/social_circle_sent_invites_empty_state.png)
 Source
 HTML: [social_circle_sent_invites_empty_state](mockup/social_circle_sent_invites_empty_state.html)
+
+The Circle tab, the invite dialog and the Active Circle card have no dedicated mock-up of their own:
+they follow the hidden overlays and the header of the **Sent** HTML. Differences from the mock-ups:
+the "Network & Friends" and "Inner Circle" labels, the "share quick invite link" row and the
+notification promises are not implemented, and the Active Circle card sits below the tabs so the
+tabs never move.
 
 ## Architecture
 
@@ -97,9 +126,8 @@ implements a Repository pattern with a single source of truth, coordinating betw
 
 This feature communicates with the following modules:
 
-- **User, Session and Profile** → This module depends on their **domain**. Conversely, the Profile
-  module depends on the `Social` domain to trigger specific actions (like removing a member via *
-  *RemoveMemberUseCase**).
+- **User, Session and Profile** → This module depends on their **domain**. The Profile module no
+  longer depends on `Social`.
 - **Other**: Common, Database, Network, and Design modules.
 
 ## Tech Stack

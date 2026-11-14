@@ -1,7 +1,8 @@
 # Profile module
 
 The purpose of this module is to manage everything related to the user's profile such as its avatar,
-pseudo, biography, social circle, etc...
+pseudo, biography, interests and a preview of their favorites. Friends and invitations live in the
+`Social` module, and account actions (log out, delete account, report) in the `Settings` module.
 
 ## Functional Specifications
 
@@ -15,51 +16,52 @@ pseudo, biography, social circle, etc...
       screen (after sign-up, after a sign-in that finds no pseudo, or from the splash) and cannot
       reach the app until one is reserved. Guests skip it. If the remote lookup fails (offline), the
       user is let in and the splash checks again on the next launch.
-    - The profile displays:
-        - an avatar (or placeholder when empty)
-        - user's name
-        - two spaces: the number of movies liked and the number of connexions made (up to 5)
-        - user's interests - if empty, it doesn't display
-        - user's social circle: displays friends and specifically calculates _the number of movies
-          in common_ with each friend (**ComputeCommonMoviesUseCase**).
-    - The profile data is fully reactive: the UI observes a local stream (*
-      *ObserveCurrentUserProfileStateUseCase**) which is dynamically tied to the active session (*
-      *ObserveSessionStateUseCase**).
+    - The profile displays, top to bottom:
+        - an avatar with a camera badge (dashed placeholder when there is no photo). Tapping it, or
+          the badge, opens the edit screen.
+        - the name, and the `@pseudo` in a pill: tapping it copies the pseudo to the clipboard.
+        - the bio, or a tappable "tell us about your tastes" card when it is empty.
+        - a **Share** button (system share sheet with a message containing the pseudo, via
+          `rememberShareText`) and an **Edit profile** button.
+        - **Favorites**: the total count and a strip of the latest favorites (up to 8, poster and
+          title, newest first, **ObserveFavoriteMoviesUseCase**). Tapping a poster opens its detail.
+          "See all" and the empty-state "Discover" button both go back to the main screen (it
+          cannot select the Hub tab from outside the tab navigation yet).
+        - **Interests** with their count and an "Add" action, or an invitation card when empty.
+        - a gear in the top bar that opens Settings. Guests see a dedicated sign-up layout instead.
+    - The profile data is fully reactive: the UI observes a local stream
+      (**ObserveCurrentUserProfileStateUseCase**) combined with the liked count and the favorites,
+      dynamically tied to the active session (**ObserveSessionStateUseCase**). If the observation
+      fails, an error screen offers a working Retry that restarts it.
 
 - Edition
-    - Offline-first approach: Edits are instantly saved locally for immediate UI feedback (*
-      *UpsertUserUseCase**), and synchronized to the remote database in the background (*
-      *SyncUserUseCase**).
-    - User can pick a profile picture from their gallery. The app automatically caches the new image
-      and _cleans up the old local avatar_ to save device storage (**ImageManager**).
-    - The pseudo is chosen once on the PickPseudo screen and is read-only afterwards (invites are
-      keyed by pseudo). Rules (**PseudoValidator**): 3–20 characters, letters/digits/`_`/`.`, not
-      starting or ending with a dot.
+    - Offline-first approach: edits are saved locally first (**UpsertUserProfileUseCase**) and
+      synchronized to Firestore right after (**SyncUserProfileUseCase**). If the remote sync fails, a
+      snackbar says it was saved on this device only; there is no automatic retry yet.
+    - **Profile photo:** picking a photo from the gallery only shows a preview. It is uploaded to
+      Firebase Storage (`avatars/{uid}/avatar.jpg`) when the user taps **Save**. Cancel or Discard
+      leave the online photo untouched. If the upload fails, the user stays in edit mode with a
+      message (offline, not allowed, or a service error).
+    - **Name:** required, trimmed, no digits, 40 characters max.
+    - **Bio:** optional, 120 characters max, with a counter.
+    - **Interests:** up to 5, picked from localized suggestions (tap to toggle) or added as a single
+      custom tag (20 characters max, case-insensitive de-duplication). Stored as plain strings.
+    - **The pseudo is not shown in the edit screen.** It is chosen once on the PickPseudo screen and
+      is read-only afterwards (invites are keyed by pseudo). Rules (**PseudoValidator**): 3–20
+      characters, letters/digits/`_`/`.`, not starting or ending with a dot.
     - Availability is checked live (debounced) and case-insensitively (**IsPseudoAvailableUseCase**),
       but uniqueness is enforced by a Firestore transaction on the `pseudos/{pseudoLowercase}`
       reservation doc (**ReservePseudoUseCase**).
-    - The profile header shows `@pseudo` with a copy action so users can share it.
-    - User can add a biography - up to 120 characters (optional)
-    - User can add interests (optional) - up to 5.
+    - **Save** is enabled only when something changed and the name is valid. While saving it shows a
+      spinner and ignores further taps. A successful save closes edit mode and shows "Profile
+      updated".
+    - **Leaving with unsaved changes** (top-bar back, Android system back) opens a "Discard
+      changes?" dialog where "Keep editing" is the emphasized action. Without changes, back leaves
+      directly. iOS has no system back, only the arrow.
 
-- **Cross-feature logic (Log out):**
-    - The UI provides a logout button, but the logic is delegated to the `Authentication` module
-
-- **Cross-feature logic (Delete account):**
-    - A "Delete my account" destructive text button sits at the very bottom of the profile (view
-      mode only), below Log out, and opens a confirmation dialog.
-    - The logic lives in the `Authentication` module (**DeleteAccountUseCase**), called through
-      **UserProfileOrchestrator**. It first checks the sign-in is recent (Firebase requires it): if
-      not, nothing is deleted and the user is asked to sign in again
-      (`AppError.Authentication.RecentLoginRequired`).
-    - Then it deletes, in one Firestore batch: the user's `users/{uid}` document, both sides of
-      every circle entry, and all invitations sent or received. Then the Storage avatar, the
-      Firebase Auth user, the provider sessions, and finally all local user data (SQLDelight wipe +
-      session flags + cached avatar file).
-
-- **Cross-feature logic (Removing a member):**
-    - The UI allows interaction with the social circle (e.g. removing a member) which triggers logic
-      from the `Social` module's domain.
+- **Cross-feature logic (Settings):**
+    - Log out, Delete account and Report a problem moved to the `Settings` module (opened from the
+      gear in the profile top bar). See `features/settings/README.md`.
 
 #### Design & UI
 
@@ -82,6 +84,17 @@ Source HTML: [profile_edition](mockup/profile_edition.html)
 ![Discarding edition profile mockup](mockup/profile_edition_discard.png)
 Source HTML: [discard_edition](mockup/profile_edition_discard.html)
 
+Differences from the mock-ups (the `.png` wins otherwise):
+
+- Only the **dialog** of the discard mock-up is a reference. Its background shows an older design
+  (search radius, match preferences, hobby tags) that does not exist in the app.
+- Favorite posters show only the poster and the title (no year, rating or genre).
+- Buttons use the plain primary color (no gradient). On the profile, **Share** is the filled button
+  and **Edit profile** the outlined one.
+- The edit screen has no pseudo field, and interest suggestions mix movie genres with a few hobbies.
+- The empty profile's suggested interest chips and the bottom navigation bars of the mock-ups are not
+  implemented as such (the app has its own tab bar).
+
 ## Architecture
 
 This module follows a Clean, Modular Architecture, designed for Kotlin Multiplatform. Each layer has
@@ -94,8 +107,9 @@ Unidirectional Data Flow (MVI-like) using UiEvents (**UserProfileUiEventModel**)
 Note: All UseCases are aggregated into a single **UserProfileOrchestrator** wrapper class to
 simplify ViewModel injection and respect linter recommandation.
 Edit Mode State Management: The ViewModel utilizes dual state streams (`editableProfile` and
-`originalProfile`) to handle modifications seamlessly, allowing users to safely discard unsaved
-changes without triggering new database queries.
+`originalProfile`) to handle modifications seamlessly. `isDirty` (editable differs from original)
+drives the Save button and the discard dialog, and `isSaving` guards against double taps. A picked
+photo stays a preview (`pendingAvatarSource`) until Save, so discarding never touches storage.
 Dynamic Session Handling: The ViewModel listens to the Authentication state to ensure the displayed
 profile dynamically matches the currently logged-in user (`currentUserUid`).
 
@@ -123,7 +137,8 @@ This layer implements a Repository pattern with a single source of truth, coordi
 
 This feature communicates with the following modules:
 
-- **Session, Authentication, Movie, and Social** → This module depends on their **domain**.
+- **Session, Authentication and Movie** → This module depends on their **domain** (Movie for the
+  favorites strip, Authentication for the PickPseudo sign-out). It no longer depends on `Social`.
 - **Other**: Common, Database, Network, and Design modules.
 
 ## Tech Stack

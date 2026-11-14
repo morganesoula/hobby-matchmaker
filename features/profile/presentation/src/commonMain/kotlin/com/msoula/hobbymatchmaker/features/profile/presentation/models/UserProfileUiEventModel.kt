@@ -7,4 +7,5 @@ sealed interface UserProfileUiEventModel {
     data class OnAvatarSelected(val path: String) : UserProfileUiEventModel
     data object OnSaveClicked : UserProfileUiEventModel
     data object OnEditModeClicked : UserProfileUiEventModel
+    data object OnRetryClicked : UserProfileUiEventModel
 }

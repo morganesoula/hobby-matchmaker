@@ -144,17 +144,7 @@
     <string name="delete_account_dialog_confirm">Supprimer</string>
     <string name="delete_account_dialog_cancel">Annuler</string>
 
-    <string name="movies_liked_count_title_singular">Film aimé</string>
-    <string name="movies_liked_count_title_plural">Films aimés</string>
-    <string name="social_members_count_title_singular">Connexion</string>
-    <string name="social_members_count_title_plural">Connexions</string>
     <string name="user_profile_interests_title">Intérêts</string>
-    <string name="user_profile_social_circle_main_title">Mon cercle social</string>
-    <string name="user_profile_social_circle_main_add_people_text_button">Inviter</string>
-    <string name="user_profile_social_circle_main_add_people_form_title">Ajouter un membre</string>
-    <string name="user_profile_social_circle_main_add_people_form_field_hint">Entrez un pseudo...</string>
-    <string name="user_profile_social_circle_common_movies_count_singular">1 film en commun</string>
-    <string name="user_profile_social_circle_common_movies_count_plural">films en commun</string>
 
     <string name="guest_header_title">Bienvenue sur HobbyMatchMaker</string>
     <string name="guest_header_description">Connectez-vous à d'autres personnes pour partagez vos passions</string>
@@ -194,9 +184,6 @@
     <string name="discard_changes_message">Tu as des modifications non enregistrées. Si tu quittes maintenant, elles seront perdues.</string>
     <string name="discard_changes_keep_editing">Continuer à modifier</string>
     <string name="discard_changes_discard">Abandonner</string>
-    <string name="edit_profile_basic_information_requirements_title">Condition:</string>
-    <string name="edit_profile_basic_information_requirements_no_number">Pas de nombre autorisé</string>
-    <string name="edit_profile_basic_information_name_title">Nom</string>
     <string name="profile_updated_message">Profil mis à jour</string>
     <string name="profile_sync_failed">Enregistré sur cet appareil, mais pas en ligne. Réessaie plus tard.</string>
     <string name="edit_profile_basic_information_requirements_not_empty">Le nom ne peut pas être vide</string>
@@ -204,6 +191,9 @@
     <string name="edit_profile_basic_information_bio_title">Bio</string>
 
     <!-- SOCIAL -->
+    <string name="edit_profile_basic_information_requirements_title">Condition:</string>
+    <string name="edit_profile_basic_information_requirements_no_number">Pas de nombre autorisé</string>
+    <string name="edit_profile_basic_information_name_title">Nom</string>
     <string name="social_received_requests_accept_button_text">Accepter</string>
     <string name="social_received_requests_decline_button_text">Refuser</string>
     <string name="social_received_requests_no_data_title">Aucune invitation reçue</string>
@@ -297,7 +287,6 @@
     <string name="pseudo_rule_length">Entre 3 et 20 caractères</string>
     <string name="pseudo_rule_chars">Lettres, chiffres, _ et . uniquement</string>
     <string name="pseudo_rule_dot">Ne commence ni ne finit par un point</string>
-    <string name="profile_share_pseudo">Partager mon pseudo</string>
     <string name="profile_favorites_title">Favoris</string>
     <string name="profile_share_message">Retrouve-moi sur HobbyMatchMaker ! Mon pseudo : @%1$s</string>
     <string name="profile_see_all">Voir tout</string>
@@ -316,10 +305,10 @@
     <string name="profile_pseudo_copied">Pseudo copié dans le presse-papiers</string>
     <string name="settings_title">Paramètres</string>
     <string name="settings_open_cd">Ouvrir les paramètres</string>
-    <string name="settings_privacy_description">Comment vos données sont utilisées</string>
-    <string name="settings_account_section">Actions du compte</string>
-    <string name="settings_version">HobbyMatchMaker v%1$s • Build %2$s</string>
     <string name="settings_support_section">Support et communauté</string>
     <string name="settings_report_description">Signalez un bug ou un problème de données</string>
     <string name="settings_privacy_title">Politique de confidentialité</string>
 </resources>
+    <string name="settings_privacy_description">Comment vos données sont utilisées</string>
+    <string name="settings_account_section">Actions du compte</string>
+    <string name="settings_version">HobbyMatchMaker v%1$s • Build %2$s</string>

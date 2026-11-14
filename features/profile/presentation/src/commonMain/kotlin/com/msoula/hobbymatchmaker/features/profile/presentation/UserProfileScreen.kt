@@ -196,7 +196,7 @@ fun UserProfileContent(
                 ErrorStateScreen(
                     error = userProfileState.profileState.errorMessage,
                     hint = UIErrorHint(retry = RetryPolicy.Manual),
-                    onRetry = {}
+                    onRetry = { userProfileActions.onEvent(UserProfileUiEventModel.OnRetryClicked) }
                 )
             }
 

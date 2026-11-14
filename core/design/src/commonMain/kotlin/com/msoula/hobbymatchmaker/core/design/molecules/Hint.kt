@@ -30,49 +30,6 @@ import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun TipTextField(
-    modifier: Modifier = Modifier,
-    hintText: String,
-    icon: ImageVector,
-    iconColor: Color? = null,
-    textColor: Color? = null
-) {
-    Row(
-        modifier = modifier
-            .background(
-                MaterialTheme.colorScheme.primary.copy(alpha = .1f),
-                RoundedCornerShape(
-                    CustomSize.Eight
-                )
-            )
-            .border(
-                1.dp,
-                MaterialTheme.colorScheme.primary.copy(alpha = .3f),
-                RoundedCornerShape(CustomSize.Eight)
-            )
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            modifier = Modifier.padding(start = CustomSize.Sixteen).size(IconSize.Sixteen),
-            tint = iconColor ?: MaterialTheme.colorScheme.primary
-        )
-        Text(
-            text = hintText,
-            color = textColor ?: MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(
-                vertical = CustomSize.Sixteen,
-                horizontal = CustomSize.Sixteen
-            ),
-            style = MaterialTheme.typography.bodySmall
-        )
-    }
-}
-
-@Composable
 fun WarningTextField(
     modifier: Modifier = Modifier,
     warningText: String

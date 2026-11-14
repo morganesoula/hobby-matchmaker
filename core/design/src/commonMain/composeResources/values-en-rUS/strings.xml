@@ -145,16 +145,7 @@
     <string name="delete_account_dialog_confirm">Delete</string>
     <string name="delete_account_dialog_cancel">Cancel</string>
 
-    <string name="movies_liked_count_title_singular">Movie Liked</string>
-    <string name="movies_liked_count_title_plural">Movies Liked</string>
-    <string name="social_members_count_title_singular">Connection</string>
-    <string name="social_members_count_title_plural">Connections</string>
     <string name="user_profile_interests_title">Interests</string>
-    <string name="user_profile_social_circle_main_title">My Social Circle</string>
-    <string name="user_profile_social_circle_main_add_people_text_button">Add</string>
-    <string name="user_profile_social_circle_main_add_people_form_field_hint">Enter pseudo...</string>
-    <string name="user_profile_social_circle_common_movies_count_singular">1 common movie</string>
-    <string name="user_profile_social_circle_common_movies_count_plural">common movies</string>
 
     <string name="guest_header_title">Welcome to HobbyMatchMaker</string>
     <string name="guest_header_description">Connect with people who share your passions</string>
@@ -194,9 +185,6 @@
     <string name="discard_changes_message">You have unsaved edits. If you leave now, any changes you made will be lost.</string>
     <string name="discard_changes_keep_editing">Keep editing</string>
     <string name="discard_changes_discard">Discard</string>
-    <string name="edit_profile_basic_information_name_title">Name</string>
-    <string name="edit_profile_basic_information_requirements_title">Requirements:</string>
-    <string name="edit_profile_basic_information_requirements_no_number">No numbers allowed</string>
     <string name="profile_updated_message">Profile updated</string>
     <string name="profile_sync_failed">Saved on this device, but not online. Try again later.</string>
     <string name="edit_profile_basic_information_requirements_not_empty">Name can't be empty</string>
@@ -204,6 +192,9 @@
     <string name="edit_profile_basic_information_bio_title">Bio</string>
 
     <!-- SOCIAL -->
+    <string name="edit_profile_basic_information_name_title">Name</string>
+    <string name="edit_profile_basic_information_requirements_title">Requirements:</string>
+    <string name="edit_profile_basic_information_requirements_no_number">No numbers allowed</string>
     <string name="social_received_requests_accept_button_text">Accept</string>
     <string name="social_received_requests_decline_button_text">Decline</string>
     <string name="social_received_requests_no_data_title">No invitations received</string>
@@ -297,7 +288,6 @@
     <string name="pseudo_rule_length">Between 3 and 20 characters</string>
     <string name="pseudo_rule_chars">Letters, digits, _ and . only</string>
     <string name="pseudo_rule_dot">Doesn't start or end with a dot</string>
-    <string name="profile_share_pseudo">Share my pseudo</string>
     <string name="profile_favorites_title">Favorites</string>
     <string name="profile_share_message">Find me on HobbyMatchMaker! My pseudo: @%1$s</string>
     <string name="profile_see_all">See all</string>
@@ -316,10 +306,10 @@
     <string name="profile_pseudo_copied">Pseudo copied to clipboard</string>
     <string name="settings_title">Settings</string>
     <string name="settings_open_cd">Open settings</string>
-    <string name="settings_privacy_description">How your data is used</string>
-    <string name="settings_account_section">Account actions</string>
-    <string name="settings_version">HobbyMatchMaker v%1$s • Build %2$s</string>
     <string name="settings_support_section">Support and community</string>
     <string name="settings_report_description">Report a bug or a data issue</string>
     <string name="settings_privacy_title">Privacy policy</string>
 </resources>
+    <string name="settings_privacy_description">How your data is used</string>
+    <string name="settings_account_section">Account actions</string>
+    <string name="settings_version">HobbyMatchMaker v%1$s • Build %2$s</string>

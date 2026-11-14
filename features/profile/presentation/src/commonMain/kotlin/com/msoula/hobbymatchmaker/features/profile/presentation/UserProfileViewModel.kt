@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.common.AppError
 import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Logger
+import com.msoula.hobbymatchmaker.core.common.toGenericAppError
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
 import com.msoula.hobbymatchmaker.core.design.Res
@@ -25,9 +26,11 @@ import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfi
 import com.msoula.hobbymatchmaker.features.profile.presentation.orchestrators.UserProfileOrchestrator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -49,6 +52,8 @@ class UserProfileViewModel(
 ) : ViewModel() {
 
     private val scope = externalScope ?: viewModelScope
+
+    private var observeJob: Job? = null
 
     private val eventHandler = EventHandler()
     val events = eventHandler.events
@@ -87,7 +92,8 @@ class UserProfileViewModel(
 
     private fun observeProfile() {
         Logger.d("Observing profile")
-        scope.launch {
+        observeJob?.cancel()
+        observeJob = scope.launch {
             observeSessionStateUseCase()
                 .flatMapLatest { session ->
                     when (session) {
@@ -99,6 +105,12 @@ class UserProfileViewModel(
                             }
 
                         null -> flowOf(UserProfileUiStateModel.Loading)
+                    }
+                }
+                .catch { error ->
+                    Logger.e("Failed to observe profile: ${error.message}")
+                    screenState.update {
+                        UserProfileUiStateModel.Error(defaultMessageMapper.toUIText(error.toGenericAppError()))
                     }
                 }
                 .collect { state ->
@@ -129,7 +141,14 @@ class UserProfileViewModel(
             UserProfileUiEventModel.OnSaveClicked -> saveProfile()
 
             UserProfileUiEventModel.OnEditModeClicked -> toggleEditMode()
+
+            UserProfileUiEventModel.OnRetryClicked -> retryObservation()
         }
+    }
+
+    private fun retryObservation() {
+        screenState.update { UserProfileUiStateModel.Loading }
+        observeProfile()
     }
 
     private fun toggleEditMode() {
