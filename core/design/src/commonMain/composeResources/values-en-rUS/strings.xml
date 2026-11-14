@@ -171,7 +171,6 @@
     <string name="authentified_edit_button_title">Edit Profile</string>
     <string name="authentified_no_social_members_description">No social members yet</string>
 
-    <string name="edit_profile_save_button_title">Save</string>
     <string name="edit_profile_title">Edit profile</string>
     <string name="edit_profile_optional">Optional</string>
     <string name="edit_profile_interests_hint">Pick up to 5 interests to share with your friends</string>
@@ -198,6 +197,10 @@
     <string name="edit_profile_basic_information_name_title">Name</string>
     <string name="edit_profile_basic_information_requirements_title">Requirements:</string>
     <string name="edit_profile_basic_information_requirements_no_number">No numbers allowed</string>
+    <string name="profile_updated_message">Profile updated</string>
+    <string name="profile_sync_failed">Saved on this device, but not online. Try again later.</string>
+    <string name="edit_profile_basic_information_requirements_not_empty">Name can't be empty</string>
+    <string name="edit_profile_save_button_title">Save</string>
     <string name="edit_profile_basic_information_bio_title">Bio</string>
 
     <!-- SOCIAL -->
@@ -310,13 +313,13 @@
     <string name="profile_interests_add">Add</string>
     <string name="profile_interests_empty_text">Pick the topics and worlds you love to fine-tune your matches.</string>
     <string name="profile_interests_empty_button">Add interests</string>
-    <string name="settings_support_section">Support and community</string>
-    <string name="settings_report_description">Report a bug or a data issue</string>
-    <string name="settings_privacy_title">Privacy policy</string>
     <string name="profile_pseudo_copied">Pseudo copied to clipboard</string>
     <string name="settings_title">Settings</string>
     <string name="settings_open_cd">Open settings</string>
     <string name="settings_privacy_description">How your data is used</string>
     <string name="settings_account_section">Account actions</string>
     <string name="settings_version">HobbyMatchMaker v%1$s • Build %2$s</string>
+    <string name="settings_support_section">Support and community</string>
+    <string name="settings_report_description">Report a bug or a data issue</string>
+    <string name="settings_privacy_title">Privacy policy</string>
 </resources>

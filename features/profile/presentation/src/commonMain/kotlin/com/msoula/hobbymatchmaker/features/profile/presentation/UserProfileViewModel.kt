@@ -3,9 +3,14 @@ package com.msoula.hobbymatchmaker.features.profile.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msoula.hobbymatchmaker.core.common.AppError
+import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.core.common.onFailure
 import com.msoula.hobbymatchmaker.core.common.onSuccess
+import com.msoula.hobbymatchmaker.core.design.Res
+import com.msoula.hobbymatchmaker.core.design.profile_sync_failed
+import com.msoula.hobbymatchmaker.core.design.profile_updated_message
+import com.msoula.hobbymatchmaker.core.design.util.UIText
 import com.msoula.hobbymatchmaker.core.design.util.ErrorMessageMapper
 import com.msoula.hobbymatchmaker.core.design.util.EventHandler
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
@@ -23,6 +28,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -31,7 +37,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class UserProfileViewModel(
@@ -59,6 +64,17 @@ class UserProfileViewModel(
 
     val screenState: StateFlow<UserProfileUiStateModel>
         field = MutableStateFlow<UserProfileUiStateModel>(UserProfileUiStateModel.Loading)
+
+    val isSaving: StateFlow<Boolean>
+        field = MutableStateFlow(false)
+
+    // True only while editing and something differs from what was on screen when editing started
+    val isDirty: StateFlow<Boolean> = combine(isEditMode, editableProfile, originalProfile) { editing, editable, original ->
+        editing && editable != original
+    }.stateIn(scope, SharingStarted.Eagerly, false)
+
+    // Picked photo (content URI or file path): shown as a preview, only uploaded when saving
+    private var pendingAvatarSource: String? = null
 
     private val currentUserUid: StateFlow<String?> = observeSessionStateUseCase()
         .map { state -> (state as? SessionState.Authenticated)?.uid }
@@ -122,31 +138,60 @@ class UserProfileViewModel(
     }
 
     private fun saveProfile() {
+        if (isSaving.value) return
+        val editable = editableProfile.value ?: return
+        if (!editable.isNameValid) return
+        val uid = currentUserUid.value ?: run {
+            Logger.e("SaveProfile called with null uid")
+            return
+        }
+
+        isSaving.update { true }
         scope.launch {
-            val editable = editableProfile.value ?: return@launch
-            val uid = currentUserUid.value ?: run {
-                Logger.e("SaveProfile called with null uid")
-                return@launch
-            }
-            val editableToDomain = editable.toUserProfileDomainModel(uid)
+            try {
+                var toSave = editable.copy(
+                    name = editable.name.trim(),
+                    bio = editable.bio?.trim()
+                )
 
-            upsertUserUseCase(editableToDomain)
-                .onSuccess {
-                    originalProfile.update { editable }
-
-                    eventHandler.sendEvent(UiEvent.OnDataReady("profile_updated"))
-                    launch {
-                        syncUserUseCase(editableToDomain)
-                            .onFailure {
-                                Logger.e("Failed to sync profile remotely - $uid")
-                            }
+                pendingAvatarSource?.let { source ->
+                    when (val upload = userProfileInteractor.saveAvatar(uid, originalProfile.value?.avatarUrl, source)) {
+                        is AppResult.Success -> toSave = toSave.copy(avatarUrl = upload.data)
+                        is AppResult.Failure -> {
+                            // Stay in edit mode: nothing was saved, the user can retry or cancel
+                            eventHandler.sendEvent(UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(upload.error)))
+                            return@launch
+                        }
                     }
                 }
-                .onFailure { error ->
-                    eventHandler.sendEvent(
-                        UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
-                    )
-                }
+
+                val domainModel = toSave.toUserProfileDomainModel(uid)
+                upsertUserUseCase(domainModel)
+                    .onSuccess {
+                        originalProfile.update { toSave }
+                        editableProfile.update { toSave }
+                        pendingAvatarSource = null
+
+                        // Close edit mode first: the screen shows snackbars one after the other
+                        eventHandler.sendEvent(UiEvent.OnDataReady("profile_updated"))
+                        eventHandler.sendEvent(UiEvent.ShowSnackBar(UIText.Resource(Res.string.profile_updated_message)))
+
+                        launch {
+                            syncUserUseCase(domainModel)
+                                .onFailure {
+                                    Logger.e("Failed to sync profile remotely - $uid")
+                                    eventHandler.sendEvent(
+                                        UiEvent.ShowSnackBar(UIText.Resource(Res.string.profile_sync_failed))
+                                    )
+                                }
+                        }
+                    }
+                    .onFailure { error ->
+                        eventHandler.sendEvent(UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error)))
+                    }
+            } finally {
+                isSaving.update { false }
+            }
         }
     }
 
@@ -156,30 +201,13 @@ class UserProfileViewModel(
     }
 
     fun closeEdition() {
+        pendingAvatarSource = null
         editableProfile.update { originalProfile.value }
         isEditMode.update { false }
     }
 
-    @OptIn(ExperimentalTime::class)
     private fun onAvatarSelected(avatarPath: String) {
-        scope.launch {
-            val uid = currentUserUid.value ?: run {
-                eventHandler.sendEvent(
-                    UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(AppError.Domain.Unauthorized))
-                )
-                return@launch
-            }
-            val old = editableProfile.value?.avatarUrl
-
-            userProfileInteractor.saveAvatar(uid, old, avatarPath)
-                .onSuccess { newPath ->
-                    editableProfile.update { it?.copy(avatarUrl = newPath) }
-                }
-                .onFailure { error ->
-                    eventHandler.sendEvent(
-                        UiEvent.ShowSnackBar(defaultMessageMapper.toUIText(error))
-                    )
-                }
-        }
+        pendingAvatarSource = avatarPath
+        editableProfile.update { it?.copy(avatarUrl = avatarPath) }
     }
 }

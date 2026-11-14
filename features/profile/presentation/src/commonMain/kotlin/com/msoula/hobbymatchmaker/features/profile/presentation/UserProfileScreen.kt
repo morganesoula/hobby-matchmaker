@@ -1,6 +1,9 @@
 package com.msoula.hobbymatchmaker.features.profile.presentation
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import com.msoula.hobbymatchmaker.core.design.settings_open_cd
 import com.msoula.hobbymatchmaker.core.design.icons.LucideSettings
 import androidx.compose.material3.IconButton
@@ -13,7 +16,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -45,7 +47,9 @@ import com.msoula.hobbymatchmaker.core.design.molecules.EditProfileTopBar
 import com.msoula.hobbymatchmaker.core.design.molecules.FeatureProfileCard
 import com.msoula.hobbymatchmaker.core.design.molecules.FeatureProfileCardWithButton
 import com.msoula.hobbymatchmaker.core.design.molecules.ValidationRequirement
+import com.msoula.hobbymatchmaker.core.design.edit_profile_basic_information_requirements_not_empty
 import com.msoula.hobbymatchmaker.core.design.organisms.AuthentifiedProfileHeader
+import com.msoula.hobbymatchmaker.core.design.organisms.DiscardChangesDialog
 import com.msoula.hobbymatchmaker.core.design.organisms.GenericProfileBackground
 import com.msoula.hobbymatchmaker.core.design.organisms.GuestProfileHeader
 import com.msoula.hobbymatchmaker.core.design.organisms.ProfileEditInformationForm
@@ -62,6 +66,7 @@ import com.msoula.hobbymatchmaker.core.design.templates.CompleteProfileLayout
 import com.msoula.hobbymatchmaker.core.design.templates.EditableProfileLayout
 import com.msoula.hobbymatchmaker.core.design.templates.GuestProfileLayout
 import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
+import com.msoula.hobbymatchmaker.core.design.util.PlatformBackHandler
 import com.msoula.hobbymatchmaker.core.design.util.RetryPolicy
 import com.msoula.hobbymatchmaker.core.design.util.UIErrorHint
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileActions
@@ -86,19 +91,42 @@ fun UserProfileContent(
     val noNumberRequirement =
         stringResource(Res.string.edit_profile_basic_information_requirements_no_number)
 
-    val requirements = remember(userProfileState.editableProfile) {
+    val notEmptyRequirement =
+        stringResource(Res.string.edit_profile_basic_information_requirements_not_empty)
+
+    val requirements = remember(userProfileState.editableProfile?.name) {
+        val name = userProfileState.editableProfile?.name.orEmpty()
         listOf(
-            ValidationRequirement(
-                text = noNumberRequirement,
-                isValid = userProfileState.editableProfile?.name?.all { !it.isDigit() } == true
-            )
+            ValidationRequirement(text = notEmptyRequirement, isValid = name.isNotBlank()),
+            ValidationRequirement(text = noNumberRequirement, isValid = name.none { it.isDigit() })
         )
     }
 
-    val enableSaveTopBarButton by remember(userProfileState.editableProfile) {
-        derivedStateOf {
-            userProfileState.editableProfile?.name?.all { !it.isDigit() } == true
+    // Save only when something changed, the name is valid and no save is already running
+    val enableSaveTopBarButton = userProfileState.isDirty &&
+        userProfileState.editableProfile?.isNameValid == true &&
+        !userProfileState.isSaving
+
+    var showDiscardDialog by rememberSaveable { mutableStateOf(false) }
+    val requestLeaveEdition = {
+        when {
+            userProfileState.isSaving -> Unit
+            userProfileState.isDirty -> showDiscardDialog = true
+            else -> userProfileActions.closeEdition()
         }
+    }
+
+    // Android system back (and the iOS back gesture) must not silently drop unsaved edits
+    PlatformBackHandler(enabled = userProfileState.isEditMode) { requestLeaveEdition() }
+
+    if (showDiscardDialog && userProfileState.isEditMode) {
+        DiscardChangesDialog(
+            onKeepEditing = { showDiscardDialog = false },
+            onDiscard = {
+                showDiscardDialog = false
+                userProfileActions.closeEdition()
+            }
+        )
     }
 
     val shareText = rememberShareText()
@@ -134,8 +162,9 @@ fun UserProfileContent(
             if (userProfileState.isEditMode) {
                 EditProfileTopBar(
                     isIOS = isIosPlatform(),
-                    onBack = { userProfileActions.closeEdition() },
+                    onBack = requestLeaveEdition,
                     onSave = { userProfileActions.onEvent(UserProfileUiEventModel.OnSaveClicked) },
+                    isSaving = userProfileState.isSaving,
                     enableSave = enableSaveTopBarButton
                 )
             } else {

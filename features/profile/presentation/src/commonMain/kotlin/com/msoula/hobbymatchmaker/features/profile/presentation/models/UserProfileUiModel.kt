@@ -13,6 +13,8 @@ data class UserProfileUiModel(
     val moviesLikedCount: Int = 0,
     val favorites: List<MovieCarouselItem> = emptyList()
 ) {
+    val isNameValid: Boolean get() = name.isNotBlank() && name.none { it.isDigit() }
+
     companion object {
         val Initial = UserProfileUiModel()
     }

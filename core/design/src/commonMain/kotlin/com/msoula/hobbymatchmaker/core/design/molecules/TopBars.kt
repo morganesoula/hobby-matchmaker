@@ -5,11 +5,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -137,7 +139,8 @@ fun EditProfileTopBar(
     isIOS: Boolean,
     enableSave: Boolean,
     onBack: () -> Unit,
-    onSave: () -> Unit
+    onSave: () -> Unit,
+    isSaving: Boolean = false
 ) {
     CenterAlignedTopAppBar(
         title = {
@@ -154,13 +157,20 @@ fun EditProfileTopBar(
         ),
         windowInsets = WindowInsets(0),
         actions = {
-            TextButton(onClick = { onSave() }, enabled = enableSave) {
-                Text(
-                    text = stringResource(Res.string.edit_profile_save_button_title),
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = if (enableSave) 1f else .4f),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
+            TextButton(onClick = { onSave() }, enabled = enableSave && !isSaving) {
+                if (isSaving) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(CustomSize.TwentyFour),
+                        strokeWidth = CustomSize.Two
+                    )
+                } else {
+                    Text(
+                        text = stringResource(Res.string.edit_profile_save_button_title),
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = if (enableSave) 1f else .4f),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
             }
         },
         navigationIcon = {

@@ -305,6 +305,8 @@ fun AppNavHost(
 
             val profileState by userProfileViewModel.screenState.collectAsStateWithLifecycle()
             val isEditMode by userProfileViewModel.isEditMode.collectAsStateWithLifecycle()
+            val isSaving by userProfileViewModel.isSaving.collectAsStateWithLifecycle()
+            val isDirty by userProfileViewModel.isDirty.collectAsStateWithLifecycle()
             val editableProfile by userProfileViewModel.editableProfile.collectAsStateWithLifecycle()
 
             LaunchedEffect(Unit) {
@@ -351,12 +353,16 @@ fun AppNavHost(
             val userProfileState = remember(
                 profileState,
                 editableProfile,
-                isEditMode
+                isEditMode,
+                isSaving,
+                isDirty
             ) {
                 UserProfileState(
                     profileState = profileState,
                     editableProfile = editableProfile,
-                    isEditMode = isEditMode
+                    isEditMode = isEditMode,
+                    isSaving = isSaving,
+                    isDirty = isDirty
                 )
             }
 

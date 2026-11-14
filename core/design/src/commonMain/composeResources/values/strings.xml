@@ -171,7 +171,6 @@
     <string name="authentified_edit_button_title">Editer mon profil</string>
     <string name="authentified_no_social_members_description">Pas de membres ajoutés</string>
 
-    <string name="edit_profile_save_button_title">Enregistrer</string>
     <string name="edit_profile_title">Modifier le profil</string>
     <string name="edit_profile_optional">Optionnel</string>
     <string name="edit_profile_interests_hint">Choisis jusqu'à 5 centres d'intérêt à partager avec tes amis</string>
@@ -198,6 +197,10 @@
     <string name="edit_profile_basic_information_requirements_title">Condition:</string>
     <string name="edit_profile_basic_information_requirements_no_number">Pas de nombre autorisé</string>
     <string name="edit_profile_basic_information_name_title">Nom</string>
+    <string name="profile_updated_message">Profil mis à jour</string>
+    <string name="profile_sync_failed">Enregistré sur cet appareil, mais pas en ligne. Réessaie plus tard.</string>
+    <string name="edit_profile_basic_information_requirements_not_empty">Le nom ne peut pas être vide</string>
+    <string name="edit_profile_save_button_title">Enregistrer</string>
     <string name="edit_profile_basic_information_bio_title">Bio</string>
 
     <!-- SOCIAL -->
@@ -310,13 +313,13 @@
     <string name="profile_interests_add">Ajouter</string>
     <string name="profile_interests_empty_text">Sélectionne les thèmes et univers que tu aimes pour affiner tes correspondances.</string>
     <string name="profile_interests_empty_button">Ajouter des intérêts</string>
-    <string name="settings_support_section">Support et communauté</string>
-    <string name="settings_report_description">Signalez un bug ou un problème de données</string>
-    <string name="settings_privacy_title">Politique de confidentialité</string>
     <string name="profile_pseudo_copied">Pseudo copié dans le presse-papiers</string>
     <string name="settings_title">Paramètres</string>
     <string name="settings_open_cd">Ouvrir les paramètres</string>
     <string name="settings_privacy_description">Comment vos données sont utilisées</string>
     <string name="settings_account_section">Actions du compte</string>
     <string name="settings_version">HobbyMatchMaker v%1$s • Build %2$s</string>
+    <string name="settings_support_section">Support et communauté</string>
+    <string name="settings_report_description">Signalez un bug ou un problème de données</string>
+    <string name="settings_privacy_title">Politique de confidentialité</string>
 </resources>

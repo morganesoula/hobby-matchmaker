@@ -6,5 +6,7 @@ import androidx.compose.runtime.Immutable
 data class UserProfileState(
     val profileState: UserProfileUiStateModel,
     val editableProfile: UserProfileUiModel?,
-    val isEditMode: Boolean
+    val isEditMode: Boolean,
+    val isSaving: Boolean = false,
+    val isDirty: Boolean = false
 )
