@@ -41,7 +41,6 @@ import com.msoula.hobbymatchmaker.core.design.icons.BootstrapPerson
 import com.msoula.hobbymatchmaker.core.design.icons.HeroiconsSparkles
 import com.msoula.hobbymatchmaker.core.design.icons.LucideFilm
 import com.msoula.hobbymatchmaker.core.design.models.ProfileHeaderUiModel
-import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMember
 import com.msoula.hobbymatchmaker.core.design.molecules.BackNavigationTopBar
 import com.msoula.hobbymatchmaker.core.design.molecules.EditProfileTopBar
 import com.msoula.hobbymatchmaker.core.design.molecules.FeatureProfileCard
@@ -54,7 +53,6 @@ import com.msoula.hobbymatchmaker.core.design.organisms.ProfileEditInformationFo
 import com.msoula.hobbymatchmaker.core.design.organisms.ProfileEditInterestsForm
 import com.msoula.hobbymatchmaker.core.design.organisms.ProfileEditProfilePicture
 import com.msoula.hobbymatchmaker.core.design.organisms.ProfileInterestsSection
-import com.msoula.hobbymatchmaker.core.design.organisms.ProfileSocialSection
 import com.msoula.hobbymatchmaker.core.design.organisms.ProfileStatsSection
 import com.msoula.hobbymatchmaker.core.design.templates.CompleteProfileLayout
 import com.msoula.hobbymatchmaker.core.design.templates.EditableProfileLayout
@@ -62,7 +60,6 @@ import com.msoula.hobbymatchmaker.core.design.templates.GuestProfileLayout
 import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
 import com.msoula.hobbymatchmaker.core.design.util.RetryPolicy
 import com.msoula.hobbymatchmaker.core.design.util.UIErrorHint
-import com.msoula.hobbymatchmaker.features.profile.presentation.mappers.toProfileSocialMembers
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileActions
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileState
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiEventModel
@@ -71,7 +68,6 @@ import io.github.vinceglb.filekit.dialogs.FileKitMode
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.path
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
@@ -80,7 +76,6 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun UserProfileContent(
     snackBarHostState: SnackbarHostState,
-    searchedPseudos: ImmutableList<ProfileSocialMember>,
     userProfileState: UserProfileState,
     userProfileActions: UserProfileActions
 ) {
@@ -233,18 +228,10 @@ fun UserProfileContent(
                                         name = profile.name,
                                         pseudo = profile.pseudo,
                                         biography = profile.bio ?: "",
-                                        avatarUrl = profile.avatarUrl,
-                                        circleSize = profile.socialMembersCount
+                                        avatarUrl = profile.avatarUrl
                                     ),
                                     onEditProfileClicked = {
                                         userProfileActions.onEvent(UserProfileUiEventModel.OnEditModeClicked)
-                                    },
-                                    onSearchPeople = {
-                                        userProfileActions.onSearchPeople(it)
-                                    },
-                                    searchResult = searchedPseudos,
-                                    onInviteToSocialCircle = { pseudo, name ->
-                                        userProfileActions.onInviteToSocialCircle(pseudo, name)
                                     },
                                     onSharePseudoClicked = {
                                         clipboardManager.setText(AnnotatedString("@${profile.pseudo}"))
@@ -253,10 +240,7 @@ fun UserProfileContent(
                                 )
                             },
                             statsSection = {
-                                ProfileStatsSection(
-                                    moviesLikedCount = profile.moviesLikedCount,
-                                    socialMembersCount = profile.socialMembersCount
-                                )
+                                ProfileStatsSection(moviesLikedCount = profile.moviesLikedCount)
                             },
                             interestsSection = {
                                 profile.interests?.let {
@@ -266,12 +250,6 @@ fun UserProfileContent(
                                         )
                                     }
                                 }
-                            },
-                            socialSection = {
-                                ProfileSocialSection(
-                                    socialMembers = profile.socialMembers.map { it.toProfileSocialMembers() }
-                                        .toImmutableList()
-                                )
                             }
                         )
                     }

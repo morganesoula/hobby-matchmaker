@@ -7,7 +7,5 @@ import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
 data class UserProfileActions(
     val closeEdition: () -> Unit,
     val onNavigate: (NavigationDestination) -> Unit,
-    val onEvent: (UserProfileUiEventModel) -> Unit,
-    val onSearchPeople: (String) -> Unit,
-    val onInviteToSocialCircle: (pseudo: String, name: String?) -> Unit
+    val onEvent: (UserProfileUiEventModel) -> Unit
 )

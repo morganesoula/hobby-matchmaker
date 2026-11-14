@@ -29,7 +29,6 @@ import com.msoula.hobbymatchmaker.core.design.social_capacity_reached
 import com.msoula.hobbymatchmaker.core.design.atoms.MinimalDialog
 import com.msoula.hobbymatchmaker.core.design.atoms.asStringSuspend
 import com.msoula.hobbymatchmaker.core.design.models.MatchAnimationData
-import com.msoula.hobbymatchmaker.core.design.models.ProfileSocialMember
 import com.msoula.hobbymatchmaker.core.design.reset_password
 import com.msoula.hobbymatchmaker.core.design.util.NavigationDestination
 import com.msoula.hobbymatchmaker.core.design.util.UiEvent
@@ -308,8 +307,6 @@ fun AppNavHost(
             val isEditMode by userProfileViewModel.isEditMode.collectAsStateWithLifecycle()
             val editableProfile by userProfileViewModel.editableProfile.collectAsStateWithLifecycle()
 
-            val searchedPseudos by socialViewModel.searchResults.collectAsStateWithLifecycle()
-
             LaunchedEffect(Unit) {
                 userProfileViewModel.events.collect { event ->
                     when (event) {
@@ -334,18 +331,7 @@ fun AppNavHost(
                 }
             }
 
-            LaunchedEffect(Unit) {
-                socialViewModel.events.collect { event ->
-                    when (event) {
-                        is UiEvent.ShowSnackBar ->
-                            snackBarHostState.showSnackbar(event.message.asStringSuspend())
-
-                        else -> Unit
-                    }
-                }
-            }
-
-            val userProfileActions = remember(userProfileViewModel, socialViewModel) {
+            val userProfileActions = remember(userProfileViewModel) {
                 UserProfileActions(
                     closeEdition = { userProfileViewModel.closeEdition() },
                     onNavigate = { destination ->
@@ -356,18 +342,7 @@ fun AppNavHost(
                             else -> Unit
                         }
                     },
-                    onEvent = userProfileViewModel::onEvent,
-                    onSearchPeople = { query ->
-                        socialViewModel.onEvent(SocialUiEventModel.OnSearchPeople(query))
-                    },
-                    onInviteToSocialCircle = { pseudo, name ->
-                        socialViewModel.onEvent(
-                            SocialUiEventModel.OnInviteToSocialCircle(
-                                pseudo,
-                                name
-                            )
-                        )
-                    }
+                    onEvent = userProfileViewModel::onEvent
                 )
             }
 
@@ -383,20 +358,8 @@ fun AppNavHost(
                 )
             }
 
-            val mappedSearchResults = searchedPseudos.map { member ->
-                ProfileSocialMember(
-                    uid = member.uid,
-                    name = member.name,
-                    pseudo = member.pseudo,
-                    avatarUrl = member.avatarUrl,
-                    commonMoviesCount = member.commonMoviesCount,
-                    isInvited = member.isInvited
-                )
-            }.toImmutableList()
-
             UserProfileContent(
                 snackBarHostState = snackBarHostState,
-                searchedPseudos = mappedSearchResults,
                 userProfileState = userProfileState,
                 userProfileActions = userProfileActions
             )

@@ -9,9 +9,7 @@ data class UserProfileUiModel(
     val avatarUrl: String? = null,
     val bio: String? = null,
     val interests: List<String>? = null,
-    val moviesLikedCount: Int = 0,
-    val socialMembersCount: Int = 0,
-    val socialMembers: List<SocialMemberUiModel> = emptyList()
+    val moviesLikedCount: Int = 0
 ) {
     companion object {
         val Initial = UserProfileUiModel()

@@ -4,6 +4,7 @@ data class SocialUseCases(
     val searchUsersByPseudoUseCase: SearchUsersByPseudoUseCase,
     val observeSentInvitesUseCase: ObserveSentInvitesUseCase,
     val observeSocialCircleUseCase: ObserveSocialCircleUseCase,
+    val refreshSocialCircleUseCase: RefreshSocialCircleUseCase,
     val refreshIncomingInvitesUseCase: RefreshIncomingInvitesUseCase,
     val refreshSentInvitesUseCase: RefreshSentInvitesUseCase,
     val cancelInvitationUseCase: CancelInvitationUseCase,

@@ -2,7 +2,6 @@ package com.msoula.hobbymatchmaker.features.profile.presentation.mappers
 
 import com.msoula.hobbymatchmaker.features.profile.domain.models.UserProfileDomainModel
 import com.msoula.hobbymatchmaker.features.profile.domain.models.UserProfileNoCircleDomainModel
-import com.msoula.hobbymatchmaker.features.profile.presentation.models.SocialMemberUiModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiModel
 
 fun UserProfileUiModel.toUserProfileDomainModel(uid: String): UserProfileDomainModel =
@@ -13,13 +12,11 @@ fun UserProfileUiModel.toUserProfileDomainModel(uid: String): UserProfileDomainM
         avatarUrl = this.avatarUrl,
         bio = this.bio,
         interests = this.interests ?: emptyList(),
-        likedMoviesCount = this.moviesLikedCount,
-        socialCircle = this.socialMembers.map { model -> model.toUserSummaryDomainModel() }
+        likedMoviesCount = this.moviesLikedCount
     )
 
 fun UserProfileNoCircleDomainModel.toUserProfileUiModel(
-    likedMoviesCount: Int,
-    socialCircle: List<SocialMemberUiModel>
+    likedMoviesCount: Int
 ): UserProfileUiModel =
     UserProfileUiModel(
         name = this.name,
@@ -27,7 +24,5 @@ fun UserProfileNoCircleDomainModel.toUserProfileUiModel(
         avatarUrl = this.avatarUrl,
         bio = this.bio,
         interests = this.interests,
-        moviesLikedCount = likedMoviesCount,
-        socialMembersCount = socialCircle.size,
-        socialMembers = socialCircle
+        moviesLikedCount = likedMoviesCount
     )

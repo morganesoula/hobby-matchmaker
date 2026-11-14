@@ -23,7 +23,6 @@ kotlin {
             implementation(project(Modules.MOVIE_DOMAIN))
             implementation(project(Modules.PROFILE_DOMAIN))
             implementation(project(Modules.SESSION_DOMAIN))
-            implementation(project(Modules.SOCIAL_DOMAIN))
         }
     }
 }

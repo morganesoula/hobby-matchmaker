@@ -184,6 +184,8 @@ class SocialViewModel(
                     when (state) {
                         is SessionState.Authenticated -> {
                             val uid = state.uid
+                            socialUseCases.refreshSocialCircleUseCase(uid)
+                                .onFailure { Logger.e("Failed to refresh social circle: $it") }
                             socialUseCases.refreshIncomingInvitesUseCase(uid)
                                 .onFailure { Logger.e("Failed to refresh incoming invites: $it") }
                             socialUseCases.refreshSentInvitesUseCase(uid)

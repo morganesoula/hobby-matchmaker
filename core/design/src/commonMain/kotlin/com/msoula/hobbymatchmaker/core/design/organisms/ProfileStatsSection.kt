@@ -18,23 +18,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import com.msoula.hobbymatchmaker.core.common.MAX_SOCIAL_CIRCLE_SIZE
 import com.msoula.hobbymatchmaker.core.design.Res
 import com.msoula.hobbymatchmaker.core.design.atoms.GenericCard
-import com.msoula.hobbymatchmaker.core.design.icons.FontAwesomeUserFriends
 import com.msoula.hobbymatchmaker.core.design.icons.LucideFilm
 import com.msoula.hobbymatchmaker.core.design.movies_liked_count_title_plural
 import com.msoula.hobbymatchmaker.core.design.movies_liked_count_title_singular
-import com.msoula.hobbymatchmaker.core.design.social_members_count_title_plural
-import com.msoula.hobbymatchmaker.core.design.social_members_count_title_singular
 import com.msoula.hobbymatchmaker.core.design.theme.CustomSize
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ProfileStatsSection(
     modifier: Modifier = Modifier,
-    moviesLikedCount: Int,
-    socialMembersCount: Int
+    moviesLikedCount: Int
 ) {
     GenericCard(
         modifier = modifier
@@ -55,15 +50,6 @@ fun ProfileStatsSection(
                     stringResource(Res.string.movies_liked_count_title_singular)
                 else
                     stringResource(Res.string.movies_liked_count_title_plural)
-            )
-
-            StatItem(
-                icon = FontAwesomeUserFriends,
-                value = "$socialMembersCount/$MAX_SOCIAL_CIRCLE_SIZE",
-                label = if (socialMembersCount < 2)
-                    stringResource(Res.string.social_members_count_title_singular)
-                else
-                    stringResource(Res.string.social_members_count_title_plural)
             )
         }
     }

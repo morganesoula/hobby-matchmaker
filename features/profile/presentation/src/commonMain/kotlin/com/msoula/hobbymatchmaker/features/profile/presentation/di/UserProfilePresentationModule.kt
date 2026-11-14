@@ -16,7 +16,6 @@ val featuresModuleUserProfilePresentation = module {
             defaultMessageMapper = get(),
             upsertUserUseCase = get(),
             syncUserUseCase = get(),
-            refreshSocialCircleUseCase = get(),
             observeSessionStateUseCase = get(),
             externalScope = null
         )

@@ -18,7 +18,6 @@ import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfi
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiStateModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.orchestrators.UserProfileOrchestrator
-import com.msoula.hobbymatchmaker.features.social.domain.useCases.RefreshSocialCircleUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,7 +39,6 @@ class UserProfileViewModel(
     private val defaultMessageMapper: ErrorMessageMapper,
     private val upsertUserUseCase: UpsertUserProfileUseCase,
     private val syncUserUseCase: SyncUserProfileUseCase,
-    private val refreshSocialCircleUseCase: RefreshSocialCircleUseCase,
     private val observeSessionStateUseCase: ObserveSessionStateUseCase,
     externalScope: CoroutineScope? = null
 ) : ViewModel() {
@@ -69,7 +67,6 @@ class UserProfileViewModel(
     init {
         Logger.d("UserProfileViewModel created")
         observeProfile()
-        refreshProfileData()
     }
 
     private fun observeProfile() {
@@ -93,16 +90,6 @@ class UserProfileViewModel(
                     if (state is UserProfileUiStateModel.Success && !isEditMode.value) {
                         editableProfile.update { state.userProfile }
                     }
-                }
-        }
-    }
-
-    private fun refreshProfileData() {
-        scope.launch {
-            val uid = currentUserUid.filterNotNull().first()
-            refreshSocialCircleUseCase(uid)
-                .onFailure { error ->
-                    Logger.e("Failed to refresh profile data: $error")
                 }
         }
     }

@@ -5,50 +5,27 @@ import com.msoula.hobbymatchmaker.core.common.AppResult
 import com.msoula.hobbymatchmaker.core.common.ImageFileManager
 import com.msoula.hobbymatchmaker.core.common.Logger
 import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveLikedMoviesCountUseCase
-import com.msoula.hobbymatchmaker.features.movies.domain.useCases.ObserveLikedMoviesIdsUseCase
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.ObserveCurrentUserProfileStateUseCase
 import com.msoula.hobbymatchmaker.features.profile.domain.useCases.UploadAvatarUseCase
-import com.msoula.hobbymatchmaker.features.profile.presentation.mappers.toSocialMemberUiModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.mappers.toUserProfileUiModel
 import com.msoula.hobbymatchmaker.features.profile.presentation.models.UserProfileUiModel
-import com.msoula.hobbymatchmaker.features.social.domain.useCases.ComputeCommonMoviesUseCase
-import com.msoula.hobbymatchmaker.features.social.domain.useCases.ObserveSocialCircleUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.onStart
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 class UserProfileOrchestrator(
     private val observeCurrentUserProfileState: ObserveCurrentUserProfileStateUseCase,
-    private val observeSocialCircle: ObserveSocialCircleUseCase,
     private val observeLikedMoviesCount: ObserveLikedMoviesCountUseCase,
-    private val observeLikedMoviesIds: ObserveLikedMoviesIdsUseCase,
-    private val computeCommonMoviesUseCase: ComputeCommonMoviesUseCase,
     private val uploadAvatarUseCase: UploadAvatarUseCase,
     private val imageManager: ImageFileManager
 ) {
     fun observeCurrentUser(uid: String): Flow<UserProfileUiModel?> =
         combine(
             observeCurrentUserProfileState(uid),
-            observeLikedMoviesCount(),
-            observeLikedMoviesIds(),
-            observeSocialCircle(uid)
-                .onStart { emit(emptyList()) }
-        ) { profile, count, ids, members ->
-            val userMoviesSet = ids.toSet()
-            Logger.d("User movies set: $userMoviesSet with profile: $profile")
-            profile.toUserProfileUiModel(
-                likedMoviesCount = count.toInt(),
-                socialCircle = members.map { member ->
-                    member.toSocialMemberUiModel(
-                        commonMoviesCount = computeCommonMoviesUseCase(
-                            member.moviesLiked ?: emptyList(),
-                            userMoviesSet
-                        )
-                    )
-                }
-            )
+            observeLikedMoviesCount()
+        ) { profile, count ->
+            profile.toUserProfileUiModel(likedMoviesCount = count.toInt())
         }
 
     @OptIn(ExperimentalTime::class)
